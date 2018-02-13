@@ -1,0 +1,82 @@
+//background color
+@bg-color: #0b1422;
+//hover color
+@h-color: #17202e;
+//border color
+@bd-color: #658ec7;
+//select css
+a {
+    text-decoration: underline;
+    color: #b6bbbf;
+}
+
+.el-select-dropdown {
+    background-color: @bg-color;
+    border: 1px solid @bd-color;
+}
+
+.el-select .el-input .el-select__caret {
+    font-size: 0px;
+}
+
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item:hover {
+    background-color: @h-color;
+}
+
+.el-pagination.is-background .btn-next,
+.el-pagination.is-background .btn-prev,
+.el-pagination.is-background .el-pager li {
+    background-color: @bg-color;
+}
+
+input[type="text"],
+input[type="password"],
+select {
+    background: @bg-color;
+}
+
+.el-input__inner {
+    border: 1px solid @bd-color;
+}
+
+.el-input__suffix {
+    right: 2px;
+    width: 35px;
+    height: 20px;
+    margin-top: 15%;
+}
+
+.el-input__inner {
+    border: 0px solid @bd-color;
+    height: 1.5rem;
+}
+
+.el-table th {
+    background-color: #17202e;
+}
+
+.el-table tr {
+    background-color: @bg-color;
+}
+
+.el-table::before {
+    background-color: #17202e;
+}
+
+.el-table td,
+.el-table th {
+    padding: 3px 0;
+    font-size: 12px;
+}
+
+.el-table td,
+.el-table th.is-leaf {
+    border-bottom: 1px solid #17202e;
+}
+
+//pages
+.el-pagination {
+    margin-top: 1rem;
+    text-align: center;
+}
