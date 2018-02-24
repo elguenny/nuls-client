@@ -29,7 +29,7 @@
 		data() {
 			var checkprompt = (rule, value, callback) => {
 				if(!value) {
-                    return callback(new Error(this.$t('message.passWordHintEmpty')));
+					return callback(new Error(this.$t('message.passWordHintEmpty')));
 				}
 			};
 			var validatePass = (rule, value, callback) => {
@@ -98,23 +98,32 @@
 </script>
 <style lang="less">
 	.set-password {
-		width: 40%;
+		width: 385px;
 		height: 100%;
+		font-family: "微软雅黑";
 		margin: auto;
 		h2 {
-			font-size: 0.8rem;
-			line-height: 7rem;
+			font-size: 16px;
 			text-align: center;
+			margin: 2.5rem 0 2rem 0;
+			color: #ffffff;
 		}
 		.set-pass-info div {
-			font-size: 0.7rem;
+			font-size: 12px;
 			color: #FFFFFF;
 			word-break: break-word;
 			text-align: left;
-			line-height: 1.3rem;
+			line-height: 15px;
+			padding-bottom: 30px;
 		}
 		.set-pass-submit {
-			width: 70%;
+			width: 230px;
+		    border-radius: 0.05rem;
+		    background-color: #24426c;
+		    border-color: #24426c;
+		    height: 30px;
+		    line-height: 30px;
+		    padding: 0px;
 		}
 		.el-form-item__content {
 			text-align: center;
@@ -123,14 +132,18 @@
 				font-size: 0.8rem;
 			}
 			.set-pass-reset {
-				color: #FF0000;
+				color: #f64b3e;
+				font-size: 12px;
 			}
 		}
 		.el-input__inner {
-			border: 1px solid #658ec7;
+			border: 1px solid #6290c7;
 		}
 		.el-form-item__label {
-			line-height: 10px;
+			font-size: 12px;
+			color: #8a929b;
+			padding: 0 0 6px;
+			line-height: 0px;
 		}
 		.el-form-item__content {
 			line-height: 10px;
@@ -138,5 +151,10 @@
 		.el-input__suffix {
 			margin-top: 5%;
 		}
+		.el-form-item
+		{
+			margin-bottom: 1rem;
+		}
+		
 	}
 </style>

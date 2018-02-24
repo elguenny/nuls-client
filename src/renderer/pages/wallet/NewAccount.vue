@@ -9,8 +9,13 @@
 				<h3 class="fl">
 					{{$t("message.newAccountKey")}}：<input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly">
 				</h3>
-				<i class="el-icon-view" @click="keyShow = !keyShow"></i>
+				<i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
 				<i class="el-icon-menu" @click="keyCode"></i>
+				<div class="modal-overlay" v-show="isShow" @click="hideShow">
+					<div class="modal-data">
+						<div class="qrcode"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -37,19 +42,34 @@
 </template>
 
 <script>
+	import { jquery } from '../../assets/js/jquery.min.js'
+	import { jvectormap } from '../../assets/js/jquery.qrcode.min.js'
 	export default {
 		data() {
 			return {
 				keyShow: false,
 				keyInfo: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3',
+				isShow: false,
 			}
 		},
 		methods: {
-			keyHide() {
-				console.log('显示、隐藏私钥')
-			},
+			
 			keyCode() {
-				console.log('显示、隐藏二维码')
+				this.isShow = !this.isShow;
+				$('.qrcode').qrcode({
+					render: "canvas",
+					width: 256,
+					height: 256,
+					text: "NxaD59D7aAd29654eBC58A1DEaD649153B288928e3",
+					typeNumber: -1,
+					correctLevel: 2,
+					background: "#ffffff",
+					foreground: "#000000"
+				});
+			},
+			hideShow(){
+				 this.isShow =  false;
+				 $('.qrcode').html("");
 			},
 			backupsKey() {
 				console.log('备份私钥')
@@ -101,7 +121,7 @@
 					overflow: hidden;
 					white-space: nowrap;
 					text-overflow: ellipsis;
-					input{
+					input {
 						width: 100%;
 						border: none;
 					}
@@ -109,6 +129,26 @@
 				i {
 					font-size: 1.5rem;
 					margin-left: 1rem;
+				}
+				.modal-overlay {
+					position: absolute;
+					left: 0px;
+					top: 0px;
+					width: 100%;
+					height: 100%;
+					text-align: center;
+					z-index: 1000;
+					background-color: #333;
+					opacity: 0.85;
+				}
+				.modal-data {
+					width: 100%;
+					height: 100%;
+					padding: 100px auto;
+					text-align: center;
+					.qrcode{
+						padding: 20% 0 0 0;
+					}
 				}
 			}
 		}
