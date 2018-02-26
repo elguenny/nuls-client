@@ -4,8 +4,6 @@
 @h-color: #17202e;
 //border color
 @bd-color: #658ec7;
-
-
 //select css
 a {
     text-decoration: underline;
@@ -31,12 +29,13 @@ a {
 .el-pagination.is-background .el-pager li {
     background-color: @bg-color;
 }
+
 //input
 input[type="text"],
 input[type="password"],
 select {
     background: @bg-color;
-     border-radius: 0.05rem;
+    border-radius: 0.05rem;
     height: 26px;
 }
 
@@ -56,6 +55,7 @@ select {
     height: 1.5rem;
 }
 
+//table
 .el-table th {
     background-color: #17202e;
 }
@@ -83,4 +83,81 @@ select {
 .el-pagination {
     margin-top: 1rem;
     text-align: center;
+}
+
+.el-pagination button.disabled {
+    background-color: #0c1323;
+}
+
+.el-pager li {
+    background: #0c1323;
+}
+
+.el-pagination .btn-next,
+.el-pagination .btn-prev {
+    background: center center no-repeat #0c1323;
+    color: #c0c4cc;
+}
+
+//tabs
+.el-tabs__item.is-active {
+    color: #FFFFFF;
+}
+
+.el-tabs__nav-wrap::after {
+    //658ec7
+    height: 1px;
+    background-color: #24426c;
+}
+
+.el-tabs__active-bar {
+    height: 2px;
+    background-color: #658ec7;
+}
+
+.el-tabs__item {
+    color: #FFFFFF;
+}
+
+
+/**divIcon**/
+
+.divIcon {
+    height: 168px;
+    width: 200px;
+    overflow: hidden;
+    position: relative;
+    background-color: #181f2f;
+    border: 1px solid #24426c;
+    .subscript {
+        color: #fff;
+        height: 25px;
+        width: 70px;
+        position: absolute;
+        right: -20px;
+        text-align: center;
+        line-height: 25px;
+        font-size: 10px;
+        background-color: #82bd39;
+        -moz-transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+}
+
+//bar
+.bar {
+    display: block;
+    position: relative;
+    height: 2px;
+    span {
+        position: absolute;
+        text-align: center;
+        font-weight: bold;
+        margin-top: -1px;
+        height: 4px;
+        margin-left: 100%;
+    }
 }

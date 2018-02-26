@@ -63,7 +63,7 @@
 			margin-top: 2%;
 			li {
 				width: 20%;
-				height: 15rem;
+				height: 8rem;
 				float: left;
 				margin-right: 5%;
 				margin-left: 7%;

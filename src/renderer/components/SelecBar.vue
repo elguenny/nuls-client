@@ -60,7 +60,7 @@
 				li {
 					width: auto;
 					min-width: 2rem;
-					height: 1.5rem;
+					height: 30px;
 					position: relative;
 					text-align: center;
 					border-radius: 0.2rem;
@@ -74,8 +74,8 @@
 				}
 			}
 			.language-img{
-				width: 1.5rem;
-    			margin-top: 0.95rem;
+				width: 21px;
+    			margin-top: 18px;
 			}
 		}
 	}

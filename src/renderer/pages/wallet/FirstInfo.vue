@@ -42,7 +42,7 @@
 			width: 60%;
 			height: 50%;
 			margin: auto;
-			margin-top: 19%;
+			margin-top: 140px;
 			li {
 				width: 40%;
 				height: 11rem;
@@ -53,12 +53,13 @@
 				text-align: center;
 				span {
 					display: block;
-					font-size: 1rem;
+					font-size: 16px;
 					line-height: 6rem;
+					font-weight: 500;
 				}
 				label {
 					display: block;
-					font-size: 0.8rem;
+					font-size: 12px;
 					padding: 0 1rem;
 					text-align: left;
 				}

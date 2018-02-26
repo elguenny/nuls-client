@@ -14,43 +14,43 @@
 			<i class="icon-qr_icon" @click="accountCode"></i>
 			<i class="icon-zhanghu_icon fr" @click="accountChoice"></i>
 		</div>
-		<div class="wallet-hide">
-			<i class="el-icon-view" @click="walletHide"></i>
+		<div class="wallet-hide" v-show="walletHide">
+			<i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
 		</div>
 		<div class="wallet-tab cl">
 			<el-tabs v-model="activeName" @tab-click="handleClick">
-				<el-tab-pane :label= "$t('message.indexAccountHome')" name="first">
+				<el-tab-pane :label="$t('message.indexAccountHome')" name="first" >
 					<el-table :data="accountData" :highlight-current-row="true">
-						<el-table-column :label= "$t('message.indexProperty')" min-width="20" align='center'>
+						<el-table-column :label="$t('message.indexProperty')" min-width="20" align='center'>
 							<template slot-scope="scope">
 								<span>{{ scope.row.a_name }}</span>
 							</template>
 						</el-table-column>
-						<el-table-column :label= "$t('message.indexSum')" min-width="20" align='center'>
+						<el-table-column :label="$t('message.indexSum')" min-width="20" align='center'>
 							<template slot-scope="scope">
-								<span>{{ scope.row.a_allNo }}</span>
+								<input :type="keyShow ? 'text' : 'password'" :value= scope.row.a_allNo readonly="readonly">
 							</template>
 						</el-table-column>
-						<el-table-column :label= "$t('message.indexUsable')" min-width="20" align='center'>
+						<el-table-column :label="$t('message.indexUsable')" min-width="20" align='center'>
 							<template slot-scope="scope">
-								<span>{{ scope.row.a_canNo }}</span >
+								<input :type="keyShow ? 'text' : 'password'" :value= scope.row.a_canNo readonly="readonly">
 							</template>
 						</el-table-column>
 						<el-table-column :label= "$t('message.indexLock')" min-width="20" align='center'>
 							<template slot-scope="scope">
-								<router-link to='/wallet/index/freezeList'>{{ scope.row.a_lockNo }}</router-link>
+								<!--<router-link to='/wallet/index/freezeList'>-->
+								<input :type="keyShow ? 'text' : 'password'" :value=scope.row.a_lockNo  readonly="readonly" title="点击查看详情">
 							</template>
 						</el-table-column>
 						<el-table-column :label= "$t('message.operation')" align='center'>
 							<template slot-scope="scope">
-								<router-link to='/wallet/index/transfer'>{{ scope.row.a_lockState == 1 ? '转账' : '下载子链' }}</router-link>
+								<router-link to='/wallet/index/transfer' title='点击查看详情' >{{ scope.row.a_lockState == 1 ? '转账' : '下载子链' }}</router-link>
 							</template>
 						</el-table-column>
 					</el-table>
-					<!--<el-pagination backgroundlayout="prev, pager, next":total="1000">
-					</el-pagination>-->
+					<el-pagination layout="prev, pager, next":total="1000"></el-pagination>
 				</el-tab-pane>
-				<el-tab-pane :label= "$t('message.transactionRecord')" name="second">
+				<el-tab-pane :label= "$t('message.transactionRecord')" name="second" >
 					<el-table :data="dealList" :highlight-current-row="true">
 						<el-table-column
 					      prop="tag"
@@ -81,7 +81,7 @@
 								<span>{{ scope.row.deal_state }}</span>
 							</template>
 						</el-table-column>
-						<el-table-column :label= "$t('message.time')" width="120" align='center'>
+						<el-table-column :label="$t('message.time')" width="120" align='center'>
 							<template slot-scope="scope">
 								<span>{{ scope.row.deal_time}}</span>
 							</template>
@@ -99,6 +99,8 @@
 	export default {
 		data() {
 			return {
+				walletHide:true,
+				keyShow:false,
 				accountAddress: [{
 					value: '选项1',
 					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
@@ -115,20 +117,20 @@
 						a_allNo: '23265464',
 						a_canNo: '4568613',
 						a_lockNo: '58000',
-						a_lockState:'1',
+						a_lockState: '1',
 					}, {
 						a_name: 'TNKS',
 						a_allNo: '23265464',
 						a_canNo: '4568613',
 						a_lockNo: '58000',
-						a_lockState:'1',
+						a_lockState: '1',
 					},
 					{
 						a_name: 'LEMK',
 						a_allNo: '23265464',
 						a_canNo: '4568613',
 						a_lockNo: '58000',
-						a_lockState:'0',
+						a_lockState: '0',
 					}
 				],
 				dealList: [{
@@ -160,6 +162,7 @@
 		},
 		methods: {
 			handleClick(tab, event) {
+				this.walletHide = !this.walletHide;
 				console.log(tab, event);
 			},
 			funUsers() {
@@ -176,9 +179,9 @@
 			accountChoice() {
 				console.log('账户管理')
 			},
-			walletHide() {
+			/*walletHide() {
 				console.log('显示隐藏条内容')
-			},
+			},*/
 			filterTag(value, row) {
 				return row.deal_type === value;
 			},
@@ -195,6 +198,7 @@
 </script>
 
 <style lang="less">
+	@import url("../../assets/css/style.less");
 	.wallet {
 		width: 90%;
 		margin: auto;
@@ -227,6 +231,14 @@
 				font-size: 1rem;
 			}
 		}
+		.cell{
+			input{
+				border: none;
+				width: 100%;
+				background-color:#0b1422;
+				text-align: center;
+			}
+		}
 		.wallet-tab {
 			.el-tabs__item {
 				color: #FFFFFF;
@@ -244,5 +256,10 @@
 		.el-table__body tr.current-row>td {
 			background: rgba(23, 32, 46, .75) !important;
 		}
+	}
+	
+	.el-table-filter {
+		border: 1px solid #17202e;
+		background-color: #17202e;
 	}
 </style>

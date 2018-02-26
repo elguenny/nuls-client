@@ -37,7 +37,6 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/wallet/ImportAccount.vue'], resolve)
 		},
 		
-		
 		{
 			path: '/firstInto/firstInfo/importKey',
 			name: '明文私钥导入',
@@ -53,8 +52,6 @@ const router = new VueRouter({
 			name: 'NULS导入',
 			component: resolve => require(['../../renderer/pages/wallet/ImportNuls.vue'], resolve)
 		},
-		
-		
 		{
 			path: '/wallet',
 			name: '设置密码',
@@ -90,7 +87,11 @@ const router = new VueRouter({
 			name: '修改别名',
 			component: resolve => require(['../../renderer/pages/users/EditAliasing.vue'], resolve)
 		},
-
+		{
+			path: '/consensus',
+			name: '共识首页',
+			component: resolve => require(['../../renderer/pages/consensus/index.vue'], resolve)
+		},
 
 	]
 })

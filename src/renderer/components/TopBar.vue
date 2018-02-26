@@ -61,7 +61,7 @@
 			SelecBar
 		},
 		mounted() {
-			
+
 		},
 		methods: {
 
@@ -89,22 +89,20 @@
 	}
 </script>
 <style lang="less">
-	@import '../assets/css/style.less';
+	@import './../assets/css/style.less';
 	@div-width: 100%;
 	@div-height: 100%;
 	.nav-top {
 		width: @div-width;
-		height: 2.6rem;
-		line-height: 2.6rem;
+		height: 42px;
+		line-height: 42px;
 		background-color: #181f2f;
 		.logo {
-			width: @div-width * 0.07;
-			height: 2.6rem;
+			height: 42px;
 			text-align: center;
-			line-height: 2.6rem;
 			.logo-img {
-				margin-top: 0.6rem;
-				height: 1.5rem;
+				margin: 10px 10px 0 20px;
+				height: 22px;
 			}
 		}
 		ul {
@@ -112,28 +110,38 @@
 			height: @div-height;
 			float: left;
 			li {
-				width: @div-width * 0.2;
+				width: 120px;
 				height: @div-height;
 				float: left;
 				color: #FFFFFF;
-				height: 3rem;
-				font-size: 0.8rem;
+				height: 42px;
+				font-size: 12px;
 				text-align: center;
+				i {
+					font-size: 16px;
+					margin-right: 3px;
+					line-height: 42px;
+				}
 			}
 			li.router-link-active {
 				color: #FFFFFF;
-				border-bottom: 0.2rem solid #81bc3b;
-				height: 2.4rem;
+				border-bottom: 2px solid #81bc3b;
+				height: 40px;
 			}
 			li:hover {
 				cursor: pointer;
 			}
 		}
 		.top-icon {
-			width: 13%;
+			width: 12%;
 			margin-top: 0.2rem;
+			float: right;
+			margin-right: 20px;
 			.news {
 				width: 2rem;
+			}
+			i{
+				font-size: 18px;
 			}
 			i:hover {
 				cursor: pointer;

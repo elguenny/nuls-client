@@ -31,15 +31,12 @@
 
 		},
 		methods: {
-		    
 			getBottromInfo(bottomApi) {
 				this.$fetch(bottomApi)
 					.then((response) => {
 						this.bottomItem = response;
 						this.connectNumber = response.updateVersionUrl;
 						this.connectNumber = response.titleNo;
-						//console.log(this.purseVersions);
-						//console.log(response.coreVersion);
 						if(this.purseVersions != response.coreVersion){
 							updateVersion:true
 						}
@@ -51,12 +48,12 @@
 <style lang="less">
 	footer {
 		width: 100%;
-		height: 3rem;
-		line-height: 3rem;
+		height: 2rem;
+		line-height: 2rem;
 		position: fixed;
 		z-index: 999;
 		bottom: 0rem;
-		font-size: 0.6rem;
+		font-size: 12px;
 		.footer-left {
 			text-indent: 2rem;
 		}

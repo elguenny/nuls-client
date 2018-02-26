@@ -97,6 +97,7 @@
 	}
 </script>
 <style lang="less">
+	@import url("../../assets/css/style");
 	.set-password {
 		width: 385px;
 		height: 100%;

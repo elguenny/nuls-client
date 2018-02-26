@@ -5,17 +5,29 @@
 				<div class="nav-title">{{$t("message.fund")}}</div>
 				<div class="nav-all">
 					<label class="fl">{{$t("message.fundTotal")}}：</label>
-					<el-progress :percentage="100" :show-text="false" class="fl"></el-progress>
+					<div class="bar-bg fl">
+						<div class="bar">
+							<span></span>
+						</div>
+					</div>
 					<span class="fr">12866nuls</span>
 				</div>
 				<div class="nav-usable cl">
 					<label class="fl">{{$t("message.fundUsable")}}：</label>
-					<el-progress :percentage="(866/12866)*100" :show-text="false" class="fl" status="success"></el-progress>
+					<div class="bar-bg fl">
+						<div class="bar">
+							<span></span>
+						</div>
+					</div>
 					<span class="fr">866nuls</span>
 				</div>
 				<div class="nav-lock cl">
 					<label class="fl">{{$t("message.fundLock")}}：</label>
-					<el-progress :percentage="(12000/12866)*100" :show-text="false" class="fl" status="exception"></el-progress>
+					<div class="bar-bg fl">
+						<div class="bar">
+							<span></span>
+						</div>
+					</div>
 					<span class="fr">12000nuls</span>
 				</div>
 			</div>
@@ -23,17 +35,14 @@
 				<div class="nav-title">{{$t("message.consensus1")}}</div>
 				<div class="nav-all">
 					<label class="fl">{{$t("message.pledge")}}：</label>
-					<el-progress :percentage="100" :show-text="false" class="fl" status="success"></el-progress>
 					<span class="fr">12866nuls</span>
 				</div>
 				<div class="nav-usable cl">
 					<label class="fl">{{$t("message.income")}}：</label>
-					<el-progress :percentage="10" :show-text="false" class="fl" status="exception"></el-progress>
 					<span class="fr">866nuls</span>
 				</div>
 				<div class="nav-lock cl">
 					<label class="fl">{{$t("message.annualYield")}}：</label>
-
 				</div>
 			</div>
 			<div class="home-nav-top">
@@ -41,7 +50,7 @@
 		</div>
 		<div class="cl home-info">
 			<div class="home-info-consensus">
-				<div id="world-map-markers" style="height: 25rem;">
+				<div id="world-map-markers" style="height: 20rem;">
 				</div>
 			</div>
 		</div>
@@ -49,10 +58,10 @@
 </template>
 
 <script>
-	import '../../assets/css/jquery-jvectormap.css'
-	import { jquery } from '../../assets/js/jquery.min.js'
-	import { jvectormap } from '../../assets/js/jvectormap/jquery-jvectormap-1.2.2.min.js'
-	import { jvectormap1 } from '../../assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
+	import './../../assets/css/jquery-jvectormap.css'
+	import { jquery } from './../../assets/js/jquery.min.js'
+	import { jvectormap } from './../../assets/js/jvectormap/jquery-jvectormap-1.2.2.min.js'
+	import { jvectormap1 } from './../../assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
 	export default {
 		data() {
 			return {
@@ -63,11 +72,11 @@
 		mounted() {
 			let _this = this;
 			//encapsulated https
-			this.getQueryIp('/5a7fec882e0000f327b56990');
+			this.getQueryIp('./5a7fec882e0000f327b56990');
 
 		},
 		methods: {
-			
+
 			/** get IP 
 			 * @method getQueryIp
 			 * @for 
@@ -77,20 +86,20 @@
 			 * @date 2018-2-11
 			 * @version 1.0
 			 **/
-			getQueryIp(ipApi){
+			getQueryIp(ipApi) {
 				this.$fetch(ipApi)
-				.then((response) => {
-					this.ipData = response;
-					if(this.ipData.length > 0) {
-						this.ipMaps();
-						this.methodsMaps(this.mapObj);
-					} else {
-						console.log('Node data failed！');
-					}
-				});
+					.then((response) => {
+						this.ipData = response;
+						if(this.ipData.length > 0) {
+							this.ipMaps();
+							this.methodsMaps(this.mapObj);
+						} else {
+							alert('Node data failed！');
+							console.log('Node data failed！');
+						}
+					});
 			},
-			
-			
+
 			/** According to IP query node latitude and longitude, city name.
 			 * @method ipMaps
 			 * @for 所属类名
@@ -103,8 +112,7 @@
 			ipMaps() {
 				var MMDBReader = require('mmdb-reader');
 				var reader = new MMDBReader('./src/renderer/assets/path/data.mmdb');
-				var lats = [];
-				var cityName = '';
+				//var reader = new MMDBReader('./path/data.mmdb');
 				var markers = [];
 				for(var j = 0, len = this.ipData.length; j < len; j++) {
 					var latLngs = [reader.lookup(this.ipData[j]).location.latitude, reader.lookup(this.ipData[j]).location.longitude];
@@ -136,6 +144,7 @@
 			 * @version 1.0
 			 **/
 			methodsMaps(maps) {
+				//alert(maps);
 				$('#world-map-markers').vectorMap({
 					map: 'world_mill_en',
 					normalizeFunction: 'polynomial',
@@ -177,9 +186,9 @@
 </script>
 <style lang="less">
 	.home {
-		width: 90%;
+		width: 93%;
 		margin: auto;
-		margin-top: 2rem;
+		margin-top: 24px;
 		background-color: #0c1323;
 	}
 	
@@ -188,29 +197,61 @@
 		height: 150px;
 		.home-nav-top {
 			width: 30%;
-			height: 7.5rem;
+			height: 120px;
 			float: left;
 			margin-right: 4.5%;
 			border: 1px solid #658ec7;
 			.nav-title {
 				text-align: center;
-				font-size: 0.7rem;
+				font-size: 14px;
 				line-height: 2rem;
 			}
 			.nav-all,
 			.nav-usable,
 			.nav-lock {
-				font-size: 0.6rem;
+				font-size: 12px;
 				line-height: 1.5rem;
 				label {
 					margin-left: 1rem;
 				}
-				.el-progress {
-					width: 44%;
-					margin-top: 0.6rem;
+				.bar-bg {
+					width: 36%;
+					height: 2px;
+					display: block;
+					position: relative;
+					background-color: #4a5065;
+					margin-top: 13px;
 				}
+				
 				span {
 					margin-right: 1rem;
+				}
+			}
+			.nav-all {
+				.bar {
+					width: 100%;
+					background-color: #658EC7;
+				}
+				.bar span {
+					border-right: 1px solid #658EC7;
+				}
+			}
+			.nav-usable {
+				.bar {
+					width: 5%;
+					background-color: #82bd39;
+				}
+				.bar span {
+					border-right: 1px solid #82bd39;
+				}
+			}
+			.nav-lock {
+				.bar {
+					width: 25%;
+					background-color: #f64b3e;
+				}
+				.bar span {
+					border-right: 1px solid #f64b3e;
 				}
 			}
 		}
