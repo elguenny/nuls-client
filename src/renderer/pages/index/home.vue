@@ -5,29 +5,29 @@
 				<div class="nav-title">{{$t("message.fund")}}</div>
 				<div class="nav-all">
 					<label class="fl">{{$t("message.fundTotal")}}：</label>
-					<div class="bar-bg fl">
-						<div class="bar">
+					<span class="bar-bg fl">
+						<span class="bar">
 							<span></span>
-						</div>
-					</div>
+					</span>
+					</span>
 					<span class="fr">12866nuls</span>
 				</div>
 				<div class="nav-usable cl">
 					<label class="fl">{{$t("message.fundUsable")}}：</label>
-					<div class="bar-bg fl">
-						<div class="bar">
+					<span class="bar-bg fl">
+						<span class="bar">
 							<span></span>
-						</div>
-					</div>
+					</span>
+					</span>
 					<span class="fr">866nuls</span>
 				</div>
 				<div class="nav-lock cl">
 					<label class="fl">{{$t("message.fundLock")}}：</label>
-					<div class="bar-bg fl">
-						<div class="bar">
+					<span class="bar-bg fl">
+						<span class="bar">
 							<span></span>
-						</div>
-					</div>
+					</span>
+					</span>
 					<span class="fr">12000nuls</span>
 				</div>
 			</div>
@@ -185,6 +185,7 @@
 	}
 </script>
 <style lang="less">
+	@import url("../../assets/css/style.less");
 	.home {
 		width: 93%;
 		margin: auto;
@@ -214,15 +215,6 @@
 				label {
 					margin-left: 1rem;
 				}
-				.bar-bg {
-					width: 36%;
-					height: 2px;
-					display: block;
-					position: relative;
-					background-color: #4a5065;
-					margin-top: 13px;
-				}
-				
 				span {
 					margin-right: 1rem;
 				}
@@ -231,27 +223,27 @@
 				.bar {
 					width: 100%;
 					background-color: #658EC7;
-				}
-				.bar span {
-					border-right: 1px solid #658EC7;
+					span {
+						border-right: 1px solid #658EC7;
+					}
 				}
 			}
 			.nav-usable {
 				.bar {
 					width: 5%;
 					background-color: #82bd39;
-				}
-				.bar span {
-					border-right: 1px solid #82bd39;
+					span {
+						border-right: 1px solid #82bd39;
+					}
 				}
 			}
 			.nav-lock {
 				.bar {
 					width: 25%;
 					background-color: #f64b3e;
-				}
-				.bar span {
-					border-right: 1px solid #f64b3e;
+					span {
+						border-right: 1px solid #f64b3e;
+					}
 				}
 			}
 		}

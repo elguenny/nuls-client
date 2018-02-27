@@ -4,10 +4,31 @@
 @h-color: #17202e;
 //border color
 @bd-color: #658ec7;
-//select css
 a {
     text-decoration: underline;
     color: #b6bbbf;
+}
+
+.el-input--suffix .el-input__inner {
+    padding-right: 30px;
+    border: 1px solid #24426c;
+    height: 24px;
+    font-size: 12px;
+}
+
+.el-input--mini .el-input__inner {
+    height: 24px;
+    border: 1px solid #24426c;
+    background-color: #17202e;
+}
+
+.el-input__inner:hover {
+    border: 1px solid #658ec7;
+}
+
+.el-textarea__inner {
+    background-color: #17202e;
+    border: 1px solid #24426c;
 }
 
 .el-select-dropdown {
@@ -28,6 +49,10 @@ a {
 .el-pagination.is-background .btn-prev,
 .el-pagination.is-background .el-pager li {
     background-color: @bg-color;
+}
+
+.el-table--enable-row-hover .el-table__body tr:hover>td {
+    background: rgba(87, 107, 139, 0.1);
 }
 
 //input
@@ -57,7 +82,7 @@ select {
 
 //table
 .el-table th {
-    background-color: #17202e;
+    background-color: #222d3f;
 }
 
 .el-table tr {
@@ -105,7 +130,6 @@ select {
 }
 
 .el-tabs__nav-wrap::after {
-    //658ec7
     height: 1px;
     background-color: #24426c;
 }
@@ -122,13 +146,14 @@ select {
 
 /**divIcon**/
 
-.divIcon {
+.div-icon {
     height: 168px;
     width: 200px;
     overflow: hidden;
     position: relative;
     background-color: #181f2f;
     border: 1px solid #24426c;
+    margin-right: 10px;
     .subscript {
         color: #fff;
         height: 25px;
@@ -145,19 +170,51 @@ select {
         -ms-transform: rotate(45deg);
         transform: rotate(45deg);
     }
+    .stay {
+        background-color: #f64b3e;
+    }
+}
+
+.div-icon-last {
+    margin-right: 0px;
 }
 
 //bar
-.bar {
+.bar-bg {
+    width: 36%;
+    height: 2px;
     display: block;
     position: relative;
-    height: 2px;
-    span {
-        position: absolute;
-        text-align: center;
-        font-weight: bold;
-        margin-top: -1px;
-        height: 4px;
-        margin-left: 100%;
+    background-color: #4a5065;
+    margin-top: 13px;
+    .bar {
+        display: block;
+        position: relative;
+        height: 2px;
+        span {
+            position: absolute;
+            text-align: center;
+            font-weight: bold;
+            margin-top: -1px;
+            height: 4px;
+            margin-left: 100%;
+        }
     }
+}
+
+
+/**submit**/
+
+.submit {
+    text-align: center;
+}
+
+.el-button--primary {
+    width: 40%;
+    border-radius: 0.1rem;
+    height: 28px;
+    line-height: 28px;
+    padding: 0px;
+    background-color: #658ec7;
+    border-color: #658ec7;
 }

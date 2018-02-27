@@ -1,6 +1,6 @@
 <template>
 	<!--select-->
-	<div class="base-select fl" @click="showDataList" v-bind:style="{width: widthData}">
+	<div class="base-select fl" @click="showDataList">
 		<div class="sub-selected-value">
 			<img :src="selectedValue.value"  class="language-img">
 			<ul v-bind:style="{width: widthData}" v-if="showData">
@@ -46,7 +46,6 @@
 		position: relative;
 		top: 0px;
 		height: 1.25rem;
-		width: 2rem;
 		.sub-selected-value {
 			position: absolute;
 			top: -0.35rem;

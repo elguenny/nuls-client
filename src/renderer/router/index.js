@@ -36,7 +36,7 @@ const router = new VueRouter({
 			name: '导入账户',
 			component: resolve => require(['../../renderer/pages/wallet/ImportAccount.vue'], resolve)
 		},
-		
+
 		{
 			path: '/firstInto/firstInfo/importKey',
 			name: '明文私钥导入',
@@ -66,7 +66,7 @@ const router = new VueRouter({
 			path: '/wallet/index/freezeList',
 			name: '冻结列表',
 			component: resolve => require(['../../renderer/pages/wallet/FreezeList.vue'], resolve)
-		}, 
+		},
 		{
 			path: '/wallet/index/transfer',
 			name: '转账',
@@ -80,7 +80,7 @@ const router = new VueRouter({
 		{
 			path: '/wallet/users/userInfo',
 			name: '账户信息',
-			component: resolve => require(['../../renderer/pages/users/userInfo.vue'], resolve)
+			component: resolve => require(['../../renderer/pages/users/UserInfo.vue'], resolve)
 		},
 		{
 			path: '/wallet/users/editAliasing',
@@ -90,8 +90,29 @@ const router = new VueRouter({
 		{
 			path: '/consensus',
 			name: '共识首页',
-			component: resolve => require(['../../renderer/pages/consensus/index.vue'], resolve)
+			component: resolve => require(['../../renderer/pages/consensus/Index.vue'], resolve)
+
+		}, 
+		{
+			path: '/consensus/pledgeInfo',
+			name: '抵押详情',
+			component: resolve => require(['../../renderer/pages/consensus/PledgeInfo.vue'], resolve)
 		},
+		{
+			path: '/consensus/newNode',
+			name: '自建节点共识',
+			component: resolve => require(['../../renderer/pages/consensus/NewNode.vue'], resolve)
+		}
+		/*{
+			path: '/consensus',
+			name: '共识首页',
+			component: resolve => require(['../../renderer/pages/consensus/Index.vue'], resolve),
+			children:[{
+				path: '/consensus/pledgeInfo',
+				name: '抵押详情',
+				component: resolve => require(['../../renderer/pages/consensus/PledgeInfo.vue'], resolve)
+			}]
+		}*/
 
 	]
 })

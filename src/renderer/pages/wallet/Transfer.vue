@@ -4,8 +4,7 @@
 		<div class="transfer-info">
 			<h2>转账</h2>
 			<el-form ref="form" :model="transferForm" label-width="100px" label-position="top">
-				<el-form-item label="转账资产:" class="out-name">
-					<el-button type="text" v-model="transferForm.outName">转账资产：NULS(可用余额:1,000,11.236)</el-button>
+				<el-form-item label="转账资产：NULS(可用余额:1,000,11.236)" class="out-name">
 				</el-form-item>
 				<el-form-item label="账户地址:" class="out-address">
 					<el-select v-model="transferForm.outAddress" placeholder="请选择账户地址">
@@ -20,8 +19,7 @@
 				<el-form-item label="转账金额:">
 					<el-input type="text" v-model="transferForm.joinNo"></el-input>
 				</el-form-item>
-				<el-form-item label="手续费:" class="service-no">
-					<el-button type="text" v-model="transferForm.serviceNo">0.01NULS</el-button>
+				<el-form-item label="手续费:0.01NULS" class="service-no">
 				</el-form-item>
 				<el-form-item label="备注:" class="remark">
 					<el-input type="textarea" v-model="transferForm.remark"></el-input>
@@ -69,6 +67,7 @@
 </script>
 
 <style lang="less">
+	@import url("../../assets/css/style.less");
 	#top-bg() {
 		display: block;
 		width: 2rem;
@@ -108,8 +107,8 @@
 					position: relative;
 					z-index: 1025;
 					float: right;
-					margin-top: -43px;
-					margin-right: 10px;
+					margin-top: -36px;
+    				margin-right: 0px;
 					background-position: -3px -70px;
 				}
 			}
@@ -134,12 +133,31 @@
 				background: #17202e;
 			}
 		}
+		.el-form-item{
+			margin-bottom: 0px;
+		}
+		.el-form-item__label{
+			line-height: 25px;
+			padding: 0px;
+		}
+		.el-input__suffix{
+			margin-top: 0px;
+		}
+		.el-select .el-input .el-select__caret{
+			font-size: 14px;
+		}
+		.el-form-item__content{
+			line-height: 30px;
+		}
 		.el-select-dropdown {
 			background-color: #17202e;
 		}
 		.el-select-dropdown__item.hover,
 		.el-select-dropdown__item:hover {
 			background-color: #17202e;
+		}
+		.transfer-submit{
+			margin-top: 30px;
 		}
 	}
 </style>

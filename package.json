@@ -1,9 +1,9 @@
 {
-  "name": "NULS",
-  "version": "1.0.0",
+  "name": "NulsWallet",
+  "version": "0.1.0",
   "author": "Bolang <986887991@qq.com>",
-  "description": "NulsWallet",
-  "license": null,
+  "description": "Nuls Wallet corss platform app.",
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
@@ -20,7 +20,7 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "NULS",
+    "productName": "NulsWallet",
     "appId": "org.simulatedgreg.electron-vue",
     "directories": {
       "output": "build"

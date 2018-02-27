@@ -1,14 +1,10 @@
-# nuls-client
-nuls client platform, including wallet 
+# Nuls-Wallet
+Nuls GUI Program.
 
-# install dependencies 
+## Get Start
+
+### Install dependencies 
 npm install
 
-# install vue-i18n
-npm install vue-i18n
-
-# install mmdb-reader
-npm install mmdb-reader
-
-# serve with hot reload at localhost:8080
+### Run dev
 npm run dev
