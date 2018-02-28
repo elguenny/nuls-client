@@ -78,7 +78,6 @@
 	.users {
 		width: 90%;
 		margin: auto;
-		margin-top: 5rem;
 		.back {
 			width: 100%;
 			height: 3rem;
