@@ -15,7 +15,6 @@
 
 <style lang="less">
 	.back {
-		width: 100%;
 		height: 3rem;
 		line-height: 4rem;
 		font-size: 14px;

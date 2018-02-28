@@ -5,45 +5,36 @@
 				<div class="nav-title">{{$t("message.fund")}}</div>
 				<div class="nav-all">
 					<label class="fl">{{$t("message.fundTotal")}}：</label>
-					<span class="bar-bg fl">
-						<span class="bar">
-							<span></span>
-					</span>
-					</span>
+					<ProgressBar colorData="#658EC7" widthData="100%"></ProgressBar>
 					<span class="fr">12866nuls</span>
 				</div>
 				<div class="nav-usable cl">
 					<label class="fl">{{$t("message.fundUsable")}}：</label>
-					<span class="bar-bg fl">
-						<span class="bar">
-							<span></span>
-					</span>
-					</span>
+					<ProgressBar colorData="#82bd39" widthData="5%"></ProgressBar>
 					<span class="fr">866nuls</span>
 				</div>
 				<div class="nav-lock cl">
 					<label class="fl">{{$t("message.fundLock")}}：</label>
-					<span class="bar-bg fl">
-						<span class="bar">
-							<span></span>
-					</span>
-					</span>
+					<ProgressBar colorData="#f64b3e" widthData="25%"></ProgressBar>
 					<span class="fr">12000nuls</span>
 				</div>
 			</div>
 			<div class="home-nav-top">
 				<div class="nav-title">{{$t("message.consensus1")}}</div>
-				<div class="nav-all">
-					<label class="fl">{{$t("message.pledge")}}：</label>
-					<span class="fr">12866nuls</span>
-				</div>
-				<div class="nav-usable cl">
-					<label class="fl">{{$t("message.income")}}：</label>
-					<span class="fr">866nuls</span>
-				</div>
-				<div class="nav-lock cl">
-					<label class="fl">{{$t("message.annualYield")}}：</label>
-				</div>
+				<ul>
+					<li>
+						<label class="fl">{{$t("message.pledge")}}：</label>
+						<span>12866nuls</span>
+					</li>
+					<li class="cl">
+						<label class="fl">{{$t("message.income")}}：</label>
+						<span>866nuls</span>
+					</li>
+					<li class="cl">
+						<label class="fl">{{$t("message.annualYield")}}：</label>
+						<span>50%</span>
+					</li>
+				</ul>
 			</div>
 			<div class="home-nav-top">
 			</div>
@@ -58,6 +49,7 @@
 </template>
 
 <script>
+	import ProgressBar from './../../components/ProgressBar.vue'
 	import './../../assets/css/jquery-jvectormap.css'
 	import { jquery } from './../../assets/js/jquery.min.js'
 	import { jvectormap } from './../../assets/js/jvectormap/jquery-jvectormap-1.2.2.min.js'
@@ -68,6 +60,9 @@
 				ipData: [],
 				mapObj: []
 			};
+		},
+		components: {
+			ProgressBar,
 		},
 		mounted() {
 			let _this = this;
@@ -207,6 +202,18 @@
 				font-size: 14px;
 				line-height: 2rem;
 			}
+			ul{
+				li{
+					font-size:12px;
+					line-height: 22px;
+					label{
+						display: block;
+						width: 70px;
+						float: left;
+						margin-left: 1rem;
+					}
+				}
+			}
 			.nav-all,
 			.nav-usable,
 			.nav-lock {
@@ -217,33 +224,6 @@
 				}
 				span {
 					margin-right: 1rem;
-				}
-			}
-			.nav-all {
-				.bar {
-					width: 100%;
-					background-color: #658EC7;
-					span {
-						border-right: 1px solid #658EC7;
-					}
-				}
-			}
-			.nav-usable {
-				.bar {
-					width: 5%;
-					background-color: #82bd39;
-					span {
-						border-right: 1px solid #82bd39;
-					}
-				}
-			}
-			.nav-lock {
-				.bar {
-					width: 25%;
-					background-color: #f64b3e;
-					span {
-						border-right: 1px solid #f64b3e;
-					}
 				}
 			}
 		}

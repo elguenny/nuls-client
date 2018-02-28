@@ -189,3 +189,12 @@ a:focus {
 	border: 0.1rem solid #D7D7D7;
 	width: 100%;
 }
+
+/**cursor-p**/
+.cursor-p{
+	cursor: pointer;
+}
+/**text-d**/
+.text-d{
+	text-decoration: underline;
+}

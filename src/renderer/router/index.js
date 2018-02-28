@@ -88,9 +88,26 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/users/EditAliasing.vue'], resolve)
 		},
 		{
+			path: '/users/setPage',
+			name: '设置界面',
+			component: resolve => require(['../../renderer/pages/users/SetPage.vue'], resolve)
+		},
+		{
 			path: '/consensus',
 			name: '共识首页',
 			component: resolve => require(['../../renderer/pages/consensus/Index.vue'], resolve)
+
+		}, 
+		{
+			path: '/consensus/myNode',
+			name: '我的节点信息',
+			component: resolve => require(['../../renderer/pages/consensus/MyNode.vue'], resolve)
+
+		}, 
+		{
+			path: '/consensus/myNode/addNode',
+			name: '添加节点',
+			component: resolve => require(['../../renderer/pages/consensus/AddNode.vue'], resolve)
 
 		}, 
 		{
@@ -102,7 +119,28 @@ const router = new VueRouter({
 			path: '/consensus/newNode',
 			name: '自建节点共识',
 			component: resolve => require(['../../renderer/pages/consensus/NewNode.vue'], resolve)
+		},
+		{
+			path: '/consensus/agencyNode',
+			name: '共识代理节点',
+			component: resolve => require(['../../renderer/pages/consensus/AgencyNode.vue'], resolve)
+		},
+		{
+			path: '/consensus/nodeInfo',
+			name: '节点信息',
+			component: resolve => require(['../../renderer/pages/consensus/NodeInfo.vue'], resolve)
+		},
+		{
+			path: '/consensus/nodeInfo/allPledge',
+			name: '所有节点',
+			component: resolve => require(['../../renderer/pages/consensus/AllPledge.vue'], resolve)
+		},
+		{
+			path: '/consensus/nodeInfo/nodePage',
+			name: '节点页面',
+			component: resolve => require(['../../renderer/pages/consensus/NodePage.vue'], resolve)
 		}
+		
 		/*{
 			path: '/consensus',
 			name: '共识首页',

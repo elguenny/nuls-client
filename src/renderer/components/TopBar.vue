@@ -83,7 +83,9 @@
 				console.log('news')
 			},
 			setUp() {
-				console.log('setUp')
+				this.$router.push({
+					path: '/users/setPage'
+				})
 			},
 		}
 	}

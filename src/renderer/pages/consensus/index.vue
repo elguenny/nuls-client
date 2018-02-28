@@ -1,12 +1,6 @@
 <template>
 	<div class="consensus-index">
-		<div class="consensus-top">
-			<label>{{$t("message.indexAccountAddress")}}</label>
-			<el-select v-model="value" >
-				<el-option v-for="item in accountAddress" :key="item.value" :label="item.label" :value="item.value">
-				</el-option>
-			</el-select>
-		</div>
+		<AccountAddressBar></AccountAddressBar>
 		<div class="consensus-center">
 			<h2>
 				<label>总抵押金额（全网）：</label>20,000,000NULS,<label>总共识数：</label>264<label>年化收益：</label>0.25%
@@ -22,7 +16,7 @@
 					<label>创建节点：</label>0个 (<span title="点击创建节点" @click="toNewNode">创建</span>)
 				</li>
 				<li>
-					<label>委托节点：</label>4个 (<span title="点击委托节点">委托</span>)
+					<label>委托节点：</label>4个 (<span title="点击委托节点" @click="toAgencyNode">委托</span>)
 				</li>
 				<li>
 					<label>抵押总数：</label><span title="点击查看抵押详情" @click="toPledgeInfo">20，000NULS</span>
@@ -204,11 +198,11 @@
 								<p class="cb">根据近100轮违规情况和出块正确性计算</p>
 							</div>
 						</div>
-						
+
 						<el-pagination layout="prev, pager, next" :total="1000" class="cb"></el-pagination>
 					</el-tab-pane>
 					<el-tab-pane label="我的共识" name="second">
-						<div class="div-icon fl">
+						<div class="div-icon fl" @click="toMyNode">
 							<p class="subscript">
 								共识中
 							</p>
@@ -375,13 +369,13 @@
 								<p class="cb">根据近100轮违规情况和出块正确性计算</p>
 							</div>
 						</div>
-						
+
 						<el-pagination layout="prev, pager, next" :total="1000" class="cb"></el-pagination>
-						
+
 						<div class="noData" v-show="isData">
 							<i class="el-icon-plus"></i>
 						</div>
-						
+
 					</el-tab-pane>
 				</el-tabs>
 			</template>
@@ -390,6 +384,7 @@
 </template>
 
 <script>
+	import AccountAddressBar from './../../components/AccountAddressBar.vue'
 	export default {
 		data() {
 			return {
@@ -408,18 +403,31 @@
 				creditValuesShow0: false,
 				creditValuesShow1: false,
 				creditValuesShow2: false,
-				isData:false,
+				isData: false,
 			}
 		},
+		components: {
+			AccountAddressBar,
+		},
 		methods: {
-			toNewNode(){
+			toNewNode() {
 				this.$router.push({
 					path: '/consensus/newNode'
 				});
 			},
-			toPledgeInfo(){
+			toPledgeInfo() {
 				this.$router.push({
 					path: '/consensus/pledgeInfo'
+				});
+			},
+			toAgencyNode(){
+				this.$router.push({
+					path: '/consensus/agencyNode'
+				});
+			},
+			toMyNode(){
+				this.$router.push({
+					path: '/consensus/myNode'
 				});
 			},
 			toggleShow(e) {
@@ -435,25 +443,7 @@
 <style lang="less">
 	@import url("../../assets/css/style");
 	.consensus-index {
-		.consensus-top {
-			height: 50px;
-			margin: auto;
-			width: 68%;
-			margin-top: 20px;
-			label {
-				font-size: 14px;
-				margin-right: 15px;
-			}
-			.el-input--suffix .el-input__inner {
-				width: 410px;
-			}
-			.el-input__suffix {
-				margin-top: 1%;
-			}
-			.el-select .el-input .el-select__caret {
-				font-size: 14px;
-			}
-		}
+		
 		.consensus-center {
 			width: 640px;
 			height: 106px;
@@ -542,68 +532,23 @@
 					}
 				}
 			}
-			.credit-valuesDiv {
-				height: 80px;
-				width: 200px;
-				position: fixed;
-				background-color: #181f2f;
-				border: 1px solid #24426c;
-				z-index: 99;
-				margin-left: 150px;
-				margin-top: -20px;
-				padding-left: 10px;
-				h2 {
-					font-size: 10px;
-					label {
-						margin-top: 8px;
-					}
-					.bar-bg {
-						margin-top: 15px;
-						.bar {
-							width: 40%;
-							background-color: #42b8ad;
-							span {
-								border-right: 1px solid #42b8ad;
-							}
-						}
-					}
-				}
-				p {
-					font-size: 10px;
-				}
-				h4 {
-					font-size: 10px;
-					label {
-						margin-top: 8px;
-					}
-					.bar-bg {
-						margin-top: 15px;
-						.bar {
-							width: 50%;
-							background-color: #658EC7;
-							span {
-								border-right: 1px solid #658EC7;
-							}
-						}
-					}
-				}
-			}
+			
 			.el-pagination {
 				padding: 10px 5px;
 			}
-			.noData{
+			.noData {
 				height: 168px;
-			    width: 200px;
-			    overflow: hidden;
-			    position: relative;
-			    background-color: #181f2f;
-			    border: 1px solid #24426c;
-			    margin:auto;
-			    margin-top: 15px;
-			    text-align: center;
-			    font-size: 5rem;
-			    line-height: 150px;
-			    cursor: pointer;
+				width: 200px;
+				overflow: hidden;
+				position: relative;
+				background-color: #181f2f;
+				border: 1px solid #24426c;
+				margin: auto;
+				margin-top: 15px;
+				text-align: center;
+				font-size: 5rem;
+				line-height: 150px;
+				cursor: pointer;
 			}
 		}
 	}
