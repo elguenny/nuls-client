@@ -53,12 +53,17 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/wallet/ImportNuls.vue'], resolve)
 		},
 		{
-			path: '/wallet',
+			path: '/users/setPassword',
 			name: '设置密码',
 			component: resolve => require(['../../renderer/pages/users/SetPassword.vue'], resolve)
 		},
 		{
-			path: '/wallet/index',
+			path: '/users/userLog',
+			name: '设置密码',
+			component: resolve => require(['../../renderer/pages/users/UserLog.vue'], resolve)
+		},
+		{
+			path: '/wallet',
 			name: '钱包首页',
 			component: resolve => require(['../../renderer/pages/wallet/Index.vue'], resolve)
 		},
@@ -91,6 +96,11 @@ const router = new VueRouter({
 			path: '/users/setPage',
 			name: '设置界面',
 			component: resolve => require(['../../renderer/pages/users/SetPage.vue'], resolve)
+		},
+		{
+			path: '/users/userAddressList',
+			name: '通讯录',
+			component: resolve => require(['../../renderer/pages/users/UserAddressList.vue'], resolve)
 		},
 		{
 			path: '/consensus',

@@ -1,8 +1,8 @@
 <template>
 	<footer>
 		<el-col :span="12" class='footer-left'>
-			{{$t("message.purseVersion")}}：V{{$store.state.purseVersion}}（{{$t("message.coreVersion")}} V{{ bottomItem.coreVersion }}}）
-			<router-link :to="updateVersionUrl" v-show="updateVersion" >{{$t("message.toUpdate")}}</router-link>
+			{{$t("message.purseVersion")}}：V{{$store.state.purseVersion}}（{{$t("message.coreVersion")}} V{{ bottomItem.myVersion }}）
+			<span @click="updateVersionUrl" v-show="updateVersion" class="cursor-p text-d" >{{$t("message.toUpdate")}}</span>
 		</el-col>
 		<el-col :span="12" class='footer-right'>
 			{{$t("message.blockState")}}：{{$t("message.local")}} {{ bottomItem.local }}（{{$t("message.backward")}} {{ bottomItem.backWard }}s） /{{$t("message.theMain")}} {{bottomItem.theMain}}
@@ -18,8 +18,7 @@
 			return {
 				bottomItem: [],
 				purseVersions:store.state.purseVersion,
-				updateVersionUrl:'',
-				updateVersion:true,
+				updateVersion:false,
 				connectNumber:'',
 				
 			}
@@ -27,20 +26,25 @@
 		mounted() {
 			let _this = this;
 			//encapsulated https
-			this.getBottromInfo('/5a81392c2f00006300a4c260');
+			this.getBottromInfo('/sys/version');
 
 		},
 		methods: {
 			getBottromInfo(bottomApi) {
 				this.$fetch(bottomApi)
 					.then((response) => {
-						this.bottomItem = response;
-						this.connectNumber = response.updateVersionUrl;
-						this.connectNumber = response.titleNo;
-						if(this.purseVersions != response.coreVersion){
-							updateVersion:true
+						this.bottomItem = response.data;
+						//console.log(response);
+						if(response.data.myVersion == response.data.newestVersion){
+							this.updateVersion = true
 						}
+						/*if(this.purseVersions != response.coreVersion){
+							this.updateVersion = true
+						}*/
 					});
+			},
+			updateVersionUrl(){
+				console.log('更新！');
 			}
 		}
 	}
@@ -56,6 +60,9 @@
 		font-size: 12px;
 		.footer-left {
 			text-indent: 2rem;
+			span{
+				color: #C1C5C9;
+			}
 		}
 		.footer-right {
 			text-align: right;

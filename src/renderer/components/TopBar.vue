@@ -30,6 +30,16 @@
 			<i class="el-icon-setting" @click="setUp"></i>
 			<SelecBar v-on:select="selectLanguage" :selectedValue="projectName" :dataList="languageItem" :widthData="widthData"></SelecBar>
 		</div>
+		<div class="news-div" v-show="newsOk">
+			<h2>消息</h2>
+			<div class="news-div-info">
+				<div class="news-div-info-div cursor-p">
+					<h5>系统消息</h5>
+					<el-badge class="mark" :value="12" />
+					<p>请更新钱包版本V1.0.0 2018-9-8</p>
+				</div>
+			</div>
+		</div>
 	</nav>
 </template>
 
@@ -38,6 +48,7 @@
 	export default {
 		data() {
 			return {
+				newsOk: false,
 				//languageItem
 				languageItem: [{
 						key: "zh",
@@ -80,7 +91,7 @@
 			},
 
 			news() {
-				console.log('news')
+				this.newsOk = !this.newsOk
 			},
 			setUp() {
 				this.$router.push({
@@ -142,7 +153,7 @@
 			.news {
 				width: 2rem;
 			}
-			i{
+			i {
 				font-size: 18px;
 			}
 			i:hover {
@@ -162,6 +173,57 @@
 				padding: 0 0.1rem;
 				font-size: 0.4rem;
 				right: 1rem;
+			}
+		}
+		.news-div {
+			width: 145px;
+			height: 100%;
+			border: 1px solid #24426c;
+			position: fixed;
+			top: 40px;
+			right: 0px;
+			z-index: 9999;
+			background-color: #0b1422;
+			h2 {
+				font-size: 12px;
+				text-align: center;
+				background-color: #222d3f;
+				line-height: 30px;
+			}
+			.news-div-info {
+				border-bottom: 1px solid #24426c;
+				.news-div-info-div {
+					.el-badge__content {
+						border-radius: 2px;
+						height: 15px;
+						line-height: 15px;
+						border: none;
+						
+					}
+					h5 {
+						float: left;
+						color: #C1C5C9;
+						font-size: 12px;
+						padding: 0 5px;
+						line-height: 30px;
+						height: 35px;
+					}
+					p {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+						color: #C1C5C9;
+						font-size: 12px;
+						padding: 0 5px;
+						height: 35px;
+						margin-top: -10px;
+						clear: both;
+					}
+					div{
+						line-height: 9px;
+						margin-top: -20px;
+					}
+				}
 			}
 		}
 	}

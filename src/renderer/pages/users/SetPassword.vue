@@ -1,7 +1,11 @@
 <template>
 	<div class="set-password">
+		<Back :backTitle="backTitle" v-show="backOk"></Back>
 		<h2>{{$t("message.setPassWord")}}</h2>
 		<el-form :model="setPass" status-icon :rules="rules2" :label-position="labelPosition" ref="setPass" label-width="100px" class="set-pass">
+			<el-form-item label="旧密码" prop="pass" v-show="oldPassOk">
+				<el-input type="password" v-model="setPass.oldpass" auto-complete="off"></el-input>
+			</el-form-item>
 			<el-form-item :label="$t('message.walletPassWord')" prop="pass">
 				<el-input type="password" v-model="setPass.pass" auto-complete="off"></el-input>
 			</el-form-item>
@@ -25,6 +29,7 @@
 
 </template>
 <script>
+	import Back from './../../components/BackBar.vue'
 	export default {
 		data() {
 			var checkprompt = (rule, value, callback) => {
@@ -52,6 +57,9 @@
 				}
 			};
 			return {
+				oldPassOk: false,
+				backOk: true,
+				backTitle: "设置",
 				labelPosition: 'top',
 				setPass: {
 					pass: '',
@@ -73,6 +81,9 @@
 					}]
 				}
 			};
+		},
+		components: {
+			Back,
 		},
 		methods: {
 			submitForm(formName) {
@@ -99,63 +110,64 @@
 <style lang="less">
 	@import url("../../assets/css/style");
 	.set-password {
-		width: 385px;
 		height: 100%;
 		font-family: "微软雅黑";
 		margin: auto;
 		h2 {
 			font-size: 16px;
 			text-align: center;
-			margin: 2.5rem 0 2rem 0;
-			color: #ffffff;
+			line-height: 20px;
+			margin-bottom: 28px;
 		}
-		.set-pass-info div {
-			font-size: 12px;
-			color: #FFFFFF;
-			word-break: break-word;
-			text-align: left;
-			line-height: 15px;
-			padding-bottom: 30px;
-		}
-		.set-pass-submit {
-			width: 230px;
-		    border-radius: 0.05rem;
-		    background-color: #24426c;
-		    border-color: #24426c;
-		    height: 30px;
-		    line-height: 30px;
-		    padding: 0px;
-		}
-		.el-form-item__content {
-			text-align: center;
-			.setPassSubmit {
-				width: 70%;
-				font-size: 0.8rem;
-			}
-			.set-pass-reset {
-				color: #f64b3e;
+		.set-pass {
+			width: 385px;
+			margin: auto;
+			.set-pass-info div {
 				font-size: 12px;
+				color: #FFFFFF;
+				word-break: break-word;
+				text-align: left;
+				line-height: 15px;
+				padding-bottom: 30px;
+			}
+			.set-pass-submit {
+				width: 230px;
+				border-radius: 0.05rem;
+				background-color: #24426c;
+				border-color: #24426c;
+				height: 30px;
+				line-height: 30px;
+				padding: 0px;
+			}
+			.el-form-item__content {
+				text-align: center;
+				.setPassSubmit {
+					width: 70%;
+					font-size: 0.8rem;
+				}
+				.set-pass-reset {
+					color: #f64b3e;
+					font-size: 12px;
+				}
+			}
+			.el-input__inner {
+				border: 1px solid #6290c7;
+			}
+			.el-form-item__label {
+				font-size: 12px;
+				color: #8a929b;
+				padding: 0 0 6px;
+				line-height: 0px;
+			}
+			.el-form-item__content {
+				line-height: 10px;
+			}
+			.el-input__suffix {
+				margin-top: 5%;
+			}
+			.el-form-item {
+				margin-bottom: 1rem;
 			}
 		}
-		.el-input__inner {
-			border: 1px solid #6290c7;
-		}
-		.el-form-item__label {
-			font-size: 12px;
-			color: #8a929b;
-			padding: 0 0 6px;
-			line-height: 0px;
-		}
-		.el-form-item__content {
-			line-height: 10px;
-		}
-		.el-input__suffix {
-			margin-top: 5%;
-		}
-		.el-form-item
-		{
-			margin-bottom: 1rem;
-		}
-		
 	}
 </style>

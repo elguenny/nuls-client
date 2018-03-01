@@ -2,7 +2,8 @@ import axios from 'axios';
 import { Message } from 'element-ui';
 
 axios.defaults.timeout = 5000;
-axios.defaults.baseURL ='http://www.mocky.io/v2';
+/*axios.defaults.baseURL ='http://www.mocky.io/v2';*/
+axios.defaults.baseURL ='http://localhost:8001/nuls';
 
 
 //http request Interceptor

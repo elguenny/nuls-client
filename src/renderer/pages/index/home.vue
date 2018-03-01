@@ -57,7 +57,27 @@
 	export default {
 		data() {
 			return {
-				ipData: [],
+
+				ipData: [
+					"186.101.196.150",
+					"176.101.196.150",
+					"166.101.196.150",
+					"156.101.196.150",
+					"146.101.196.150",
+					"136.101.196.150",
+					"126.101.196.150",
+					"116.101.196.150",
+					"106.101.196.150",
+					"186.101.196.150",
+					"186.100.196.150",
+					"186.99.196.150",
+					"186.80.196.150",
+					"186.70.196.150",
+					"186.60.196.150",
+					"186.50.196.150",
+					"186.40.196.150",
+					"186.30.196.150"
+				],
 				mapObj: []
 			};
 		},
@@ -67,7 +87,9 @@
 		mounted() {
 			let _this = this;
 			//encapsulated https
-			this.getQueryIp('./5a7fec882e0000f327b56990');
+			//this.getQueryIp('./5a7fec882e0000f327b56990');
+
+			this.getQueryIp();
 
 		},
 		methods: {
@@ -80,16 +102,18 @@
 			 * @author Wave
 			 * @date 2018-2-11
 			 * @version 1.0
+			 * http://localhost:8001/nuls/sys/version
 			 **/
 			getQueryIp(ipApi) {
+				console.log(ipApi);
 				this.$fetch(ipApi)
 					.then((response) => {
 						this.ipData = response;
+						console.log(response);
 						if(this.ipData.length > 0) {
 							this.ipMaps();
 							this.methodsMaps(this.mapObj);
 						} else {
-							alert('Node data failed！');
 							console.log('Node data failed！');
 						}
 					});
@@ -202,11 +226,11 @@
 				font-size: 14px;
 				line-height: 2rem;
 			}
-			ul{
-				li{
-					font-size:12px;
+			ul {
+				li {
+					font-size: 12px;
 					line-height: 22px;
-					label{
+					label {
 						display: block;
 						width: 70px;
 						float: left;
