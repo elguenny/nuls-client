@@ -15,10 +15,8 @@
 
 <style lang="less">
 	.back {
-		height: 3rem;
-		line-height: 4rem;
 		font-size: 14px;
-		margin-left: 55px;
 		cursor: pointer;
+		margin: 20px 0 0 55px;
 	}
 </style>

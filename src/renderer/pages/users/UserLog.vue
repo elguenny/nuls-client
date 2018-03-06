@@ -31,7 +31,7 @@
 </template>
 
 <script>
-	import Back from './../../components/BackBar.vue'
+	import Back from '@/components/BackBar.vue';
 	export default {
 		data() {
 			return {

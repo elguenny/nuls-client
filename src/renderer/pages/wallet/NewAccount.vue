@@ -1,201 +1,278 @@
 <template>
-	<div class="new-account">
-		<div class="new-account-top">
-			<h1>{{$t("message.newAccountTitle")}}</h1>
-			<h2>
-				{{$t("message.newAccountAddress")}}:NxaD59D7aAd29654eBC58A1DEaD649153B288928e3
-			</h2>
-			<div class="new-account-key">
-				<h3 class="fl">
-					{{$t("message.newAccountKey")}}：<input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly">
-				</h3>
-				<i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
-				<i class="el-icon-menu" @click="keyCode"></i>
-				<div class="modal-overlay" v-show="isShow" @click="hideShow">
-					<div class="modal-data">
-						<div class="qrcode"></div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<ul>
-			<li @click="backupsKey">
-				<span>{{$t("message.newAccountBackupsKey")}}</span>
-				<label>{{$t("message.newAccountBackupsKeyInfo")}}</label>
-			</li>
-			<li @click="backupsCode">
-				<span>{{$t("message.newAccountBackupsCode")}}</span>
-				<label>{{$t("message.newAccountBackupsCodeInfo")}}</label>
-			</li>
-			<li @click="backupsNuls">
-				<span>{{$t("message.newAccountBackupsNuls")}}</span>
-				<label>{{$t("message.newAccountBackupsNulsInfo")}}</label>
-			</li>
-		</ul>
-		<div class="cl new-bt">
-			<el-button type="primary" class="new-submit" @click="newSubmit()">{{$t("message.newAccountSubmit")}}</el-button>
-			<el-button type="primary" class="new-reset" @click="newReset()">{{$t("message.newAccountReset")}}</el-button>
-		</div>
-
-	</div>
+    <div class="new-account">
+        <div class="new-account-top">
+            <h1>{{$t("message.newAccountTitle")}}</h1>
+            <h2>
+                {{$t("message.newAccountAddress")}}:{{ newAccountAddress }}
+            </h2>
+            <div class="new-account-key">
+                <h3 class="fl">
+                    {{$t("message.newAccountKey")}}：
+                    <input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly">
+                </h3>
+                <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
+                <i class="el-icon-menu" @click="keyCode"></i>
+                <CodeBar v-show="codeShowOk" :keyInfo="keyInfo" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
+            </div>
+        </div>
+        <ul>
+            <li @click="backupsKey">
+                <span>{{$t("message.newAccountBackupsKey")}}</span>
+                <label>{{$t("message.newAccountBackupsKeyInfo")}}</label>
+            </li>
+            <li @click="backupsCode">
+                <span>{{$t("message.newAccountBackupsCode")}}</span>
+                <label>{{$t("message.newAccountBackupsCodeInfo")}}</label>
+            </li>
+        </ul>
+        <div class="cl new-bt">
+            <el-button type="primary" class="new-submit" @click="newSubmit()">{{$t("message.newAccountSubmit")}}
+            </el-button>
+            <el-button type="primary" class="new-reset" @click="newReset()">{{$t("message.newAccountReset")}}
+            </el-button>
+        </div>
+    </div>
 </template>
 
 <script>
-	import { jquery } from '../../assets/js/jquery.min.js'
-	import { jvectormap } from '../../assets/js/jquery.qrcode.min.js'
-	export default {
-		data() {
-			return {
-				keyShow: false,
-				keyInfo: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3',
-				isShow: false,
-			}
-		},
-		methods: {
-			
-			keyCode() {
-				this.isShow = !this.isShow;
-				$('.qrcode').qrcode({
-					render: "canvas",
-					width: 256,
-					height: 256,
-					text: "NxaD59D7aAd29654eBC58A1DEaD649153B288928e3",
-					typeNumber: -1,
-					correctLevel: 2,
-					background: "#ffffff",
-					foreground: "#000000"
-				});
-			},
-			hideShow(){
-				 this.isShow =  false;
-				 $('.qrcode').html("");
-			},
-			backupsKey() {
-				console.log('备份私钥')
-				//window.open("https://codeload.github.com/douban/douban-client/legacy.zip/master");
-			},
-			backupsCode() {
-				console.log('备份二维码')
-			},
-			backupsNuls() {
-				console.log('备份NULS')
-			},
-			newSubmit() {
-				this.$router.push({
-					path: '/wallet/index'
-				})
-			},
-			newReset() {
-				console.log('确认风险，不备份')
-			}
-		}
-	}
+    import CodeBar from '@/components/CodeBar.vue'
+    import {jquery} from '@/assets/js/jquery.min.js'
+    import {jvectormap} from '@/assets/js/jquery.qrcode.min.js'
+    export default {
+        data() {
+            return {
+                keyShow: false,
+                keyInfo: '',
+                newAccountAddress: localStorage.getItem('newAccountAddress'),
+                codeShowOk: false,
+            }
+        },
+        components: {
+            CodeBar
+        },
+        mounted() {
+            let _this = this;
+            this.$fetch('/account/load/' + localStorage.getItem('newAccountAddress'))
+                .then((response) => {
+                    this.keyInfo = response.data.pubKey;
+                });
+        },
+        methods: {
+            keyCode() {
+                this.$refs.codeBar.codeMaker(this.keyInfo)
+                this.codeShowOk = !this.codeShowOk;
+            },
+            codeShowOks(){
+                this.codeShowOk = false;
+            },
+            /** Backups Key
+             * @method backupsKey
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
+            backupsKey() {
+                var fs = require('fs');
+                fs.writeFileSync('pubKey.txt', this.keyInfo, 'utf8');
+                var downloadFileAddress = "D:/work/nuls-client/pubKey.txt";
+                this.backupFile(downloadFileAddress);
+            },
+            /** Backups Code
+             * @method backupsCode
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
+            backupsCode() {
+                $('.qrcode').qrcode({
+                    render: "canvas",
+                    width: 256,
+                    height: 256,
+                    text: this.keyInfo,
+                    typeNumber: -1,
+                    correctLevel: 2,
+                    background: "#ffffff",
+                    foreground: "#000000"
+                });
+                this.exportCanvasAsPNG($(".qrcode").find("canvas")[0], "code.png");
+            },
+            /** Export Canvas As PNG
+             * @method exportCanvasAsPNG
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
+            exportCanvasAsPNG(canvas, fileName) {
+                var MIME_TYPE = "image/png";
+                var dlLink = document.createElement('a');
+                dlLink.download = fileName;
+                dlLink.href = canvas.toDataURL("image/png");
+                dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
+                document.body.appendChild(dlLink);
+                dlLink.click();
+                document.body.removeChild(dlLink);
+                $('.qrcode').html("");
+            },
+            /** Backup File
+            * @method backupFile
+            * @author Wave
+            * @date 2018-2-11
+            * @version 1.0
+            **/
+            backupFile(downloadAddress) {
+                const {dialog} = require('electron').remote;
+                const {ipcRenderer} = require('electron');
+                ipcRenderer.on('tips', (event, person) => {
+                });
+                dialog.showOpenDialog({
+                    defaultPath: '../Desktop',
+                    properties: [
+                        'openDirectory',
+                    ],
+                    filters: [
+                        {name: 'All', extensions: ['*']},
+                    ]
+                }, function (res) {
+                    if (res[0] != "") {
+                        ipcRenderer.send('download', downloadAddress + "+" + res[0]);
+                        alert("保存成功！");
+                    } else {
+                        alert("请选择保存文件夹！");
+                    }
+                })
+            },
+            /** New Submit
+             * @method newSubmit
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
+            newSubmit() {
+                this.$router.push({
+                    path: '/wallet'
+                })
+            },
+            /** New Reset
+             * @method newReset
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
+            newReset() {
+                this.$router.push({
+                    path: '/wallet'
+                })
+            }
+        }
+    }
 </script>
 
 <style lang="less">
-	.new-account {
-		width: 90%;
-		height: 100%;
-		margin: auto;
-		margin-top: 4%;
-		text-align: center;
-		font-size: 0.9rem;
-		line-height: 1.6rem;
-		.new-account-top {
-			width: 77%;
-			margin: auto;
-			text-align: left;
-			h1 {
-				padding: 1.2rem 0;
-				font-size: 1rem;
-				font-weight: 500;
-			}
-			h2 {}
-			.new-account-key {
-				width: 100%;
-				margin: auto;
-				text-align: left;
-				h3 {
-					width: 70%;
-					overflow: hidden;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-					input {
-						width: 100%;
-						border: none;
-					}
-				}
-				i {
-					font-size: 1.5rem;
-					margin-left: 1rem;
-				}
-				.modal-overlay {
-					position: absolute;
-					left: 0px;
-					top: 0px;
-					width: 100%;
-					height: 100%;
-					text-align: center;
-					z-index: 1000;
-					background-color: #333;
-					opacity: 0.85;
-				}
-				.modal-data {
-					width: 100%;
-					height: 100%;
-					padding: 100px auto;
-					text-align: center;
-					.qrcode{
-						padding: 20% 0 0 0;
-					}
-				}
-			}
-		}
-		ul {
-			width: 100%;
-			height: 50%;
-			margin: auto;
-			margin-top: 2%;
-			li {
-				width: 25%;
-				height: 11rem;
-				float: left;
-				margin-right: 3%;
-				margin-left: 4%;
-				border: 1px solid #658cc5;
-				background-color: #181f2f;
-				text-align: center;
-				span {
-					display: block;
-					font-size: 1rem;
-					padding: 1.2rem 0;
-				}
-				label {
-					display: block;
-					font-size: 0.8rem;
-					padding: 0 0.5rem;
-					text-align: center;
-				}
-			}
-			li:last-child {}
-		}
-		.new-bt {
-			width: 60%;
-			height: 10rem;
-			margin: auto;
-			padding-top: 2%;
-			button {
-				display: block;
-				width: 50%;
-				margin: auto;
-				margin-top: 5%;
-			}
-			.new-submit {}
-			.new-reset {
-				background-color: #181f2f;
-				border-color: #658cc5;
-			}
-		}
-	}
+    .new-account {
+        width: 90%;
+        height: 100%;
+        margin: auto;
+        margin-top: 4%;
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.6rem;
+        .new-account-top {
+            width: 77%;
+            margin: auto;
+            text-align: left;
+            h1 {
+                padding: 1.2rem 0;
+                font-size: 16px;
+                font-weight: 500;
+            }
+            h2 {
+            }
+            .new-account-key {
+                width: 145%;
+                margin: auto;
+                text-align: left;
+                h3 {
+                    width: 70%;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    input {
+                        width: 100%;
+                        border: none;
+                    }
+                }
+                i {
+                    font-size: 1.5rem;
+                    margin-left: 1rem;
+                }
+                .modal-overlay {
+                    position: absolute;
+                    left: 0px;
+                    top: 0px;
+                    width: 100%;
+                    height: 100%;
+                    text-align: center;
+                    z-index: 1000;
+                    background-color: #333;
+                    opacity: 0.85;
+                }
+                .modal-data {
+                    width: 100%;
+                    height: 100%;
+                    padding: 100px auto;
+                    text-align: center;
+                    .qrcode {
+                        padding: 20% 0 0 0;
+                    }
+                }
+            }
+        }
+        ul {
+            width: 65%;
+            height: 50%;
+            margin: auto;
+            margin-top: 2%;
+            li {
+                width: 42%;
+                height: 11rem;
+                float: left;
+                margin-right: 3%;
+                margin-left: 4%;
+                border: 1px solid #658cc5;
+                background-color: #181f2f;
+                text-align: center;
+                span {
+                    display: block;
+                    font-size: 1rem;
+                    padding: 1.2rem 0;
+                }
+                label {
+                    display: block;
+                    font-size: 0.8rem;
+                    padding: 0 0.5rem;
+                    text-align: center;
+                }
+            }
+            li:last-child {
+            }
+        }
+        .new-bt {
+            width: 60%;
+            height: 10rem;
+            margin: auto;
+            padding-top: 2%;
+            button {
+                display: block;
+                width: 50%;
+                margin: auto;
+                margin-top: 5%;
+            }
+            .new-submit {
+            }
+            .new-reset {
+                background-color: #181f2f;
+                border-color: #658cc5;
+            }
+        }
+    }
 </style>

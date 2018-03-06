@@ -17,9 +17,9 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/index/Home.vue'], resolve)
 		},
 		{
-			path: '/firstInto',
-			name: '设置密码',
-			component: resolve => require(['../../renderer/pages/users/SetPassword.vue'], resolve)
+            path: '/firstInto :backOk/:oldPassOk',
+            name: '/firstInto',
+            component: resolve => require(['../../renderer/pages/users/SetPassword.vue'], resolve),
 		},
 		{
 			path: '/firstInto/firstInfo',

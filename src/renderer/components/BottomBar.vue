@@ -5,7 +5,7 @@
 			<span @click="updateVersionUrl" v-show="updateVersion" class="cursor-p text-d" >{{$t("message.toUpdate")}}</span>
 		</el-col>
 		<el-col :span="12" class='footer-right'>
-			{{$t("message.blockState")}}：{{$t("message.local")}} {{ bottomItem.local }}（{{$t("message.backward")}} {{ bottomItem.backWard }}s） /{{$t("message.theMain")}} {{bottomItem.theMain}}
+			{{$t("message.blockState")}}：{{$t("message.local")}} {{ netWorkInfo.localBestHeight }}<span v-show="timeOffsetOk">（{{$t("message.backward")}} {{ netWorkInfo.timeOffset }}）</span> /{{$t("message.theMain")}} {{netWorkInfo.netBestHeight}}
 			<i class="icon-wifi_icon" :title="connectNumber"></i>
 		</el-col>
 	</footer>
@@ -19,32 +19,66 @@
 				bottomItem: [],
 				purseVersions:store.state.purseVersion,
 				updateVersion:false,
-				connectNumber:'',
-				
+				timeOffsetOk:true,
+				connectNumber:'节点块数',
+				netWorkInfo:[],
 			}
 		},
 		mounted() {
 			let _this = this;
 			//encapsulated https
 			this.getBottromInfo('/sys/version');
+			//get net work info
+			this.getNetWorkInfo('/network/info');
 
 		},
 		methods: {
+            /** getBottromInfo
+             * @method getBottromInfo
+             * @param {string} urlAdderss
+             * @return {int} update to install
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
 			getBottromInfo(bottomApi) {
 				this.$fetch(bottomApi)
 					.then((response) => {
 						this.bottomItem = response.data;
-						//console.log(response);
-						if(response.data.myVersion == response.data.newestVersion){
+						if(response.data.myVersion != response.data.newestVersion){
 							this.updateVersion = true
 						}
-						/*if(this.purseVersions != response.coreVersion){
-							this.updateVersion = true
-						}*/
 					});
 			},
+            /** updateVersionUrl
+             * @method updateVersionUrl
+             * @param {string} urlAdderss
+             * @return {int} updateUrl
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
 			updateVersionUrl(){
 				console.log('更新！');
+			},
+            /** getNetWorkInfo
+             * @method getNetWorkInfo
+             * @param {string} urlAdderss
+             * @return {int} netWorkInfo
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
+			getNetWorkInfo(urls) {
+				this.$fetch(urls)
+					.then((response) => {
+						this.netWorkInfo = response.data;
+						if(this.netWorkInfo.timeOffset > 0){
+							this.timeOffsetOk = true;
+						}else{
+							this.timeOffsetOk = false;
+						}
+					});
 			}
 		}
 	}

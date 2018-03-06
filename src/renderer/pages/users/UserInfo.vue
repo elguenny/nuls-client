@@ -1,18 +1,19 @@
 <template>
 	<div class="users">
-		<div class="back" @click="back"><i class="el-icon-arrow-left"></i>钱包管理</div>
+		<Back :backTitle="backTitle"></Back>
 		<div class="freeze-list-tabs">
 			<h2>账户管理</h2>
-			<el-table :data="userData" style="width: 100%">
-				<el-table-column prop="userName" label="账户">
+			<el-table :data="userData">
+				<el-table-column prop="address" label="账户" min-width="50" align='center'>
 				</el-table-column>
-				<el-table-column  label="别名" min-width="20" class="user-aliasing">
+				<el-table-column  label="别名" min-width="25" class="user-aliasing">
 					 <template slot-scope="scope">
-				        <span style="margin-left: 10px">{{ scope.row.userAliasing }}</span>
-				        <i class="el-icon-edit" @click="editAliasing"></i>
+
+				        <span>{{ scope.row.alias != undefined  ? scope.row.alias : "-" }}</span>
+				        <i class="el-icon-edit cursor-p" @click="editAliasing"></i>
 				      </template>
 				</el-table-column>
-				<el-table-column label="操作" align='center'>
+				<el-table-column label="操作"  min-width="25" align='center'>
 					<template slot-scope="scope">
 						<el-button size="mini" type="text" @click="outUser()">移除账户</el-button>
 						<el-button size="mini" type="text" @click="backupUser()">备份账户</el-button>
@@ -26,31 +27,31 @@
 </template>
 
 <script>
+    import Back from '@/components/BackBar.vue';
 	export default {
 		data() {
 			return {
-				userData: [{
-					userName: '0x7f80545d8c3147002c752fe8ade665739bf578ca',
-					userAliasing: 'NETER7'
-				}, {
-					userName: '0x7f80545d8c3147002c752fe8ade665739bf578ca',
-					userAliasing: 'NETER7'
-				}, {
-					userName: '0x7f80545d8c3147002c752fe8ade665739bf578ca',
-					userAliasing: 'NETER7'
-				}, {
-					userName: '0x7f80545d8c3147002c752fe8ade665739bf578ca',
-					userAliasing: 'NETER7'
-				}]
+                backTitle:'钱包管理',
+                userData:[],
 			}
 		},
-		components: {
+        components: {
+            Back,
+        },
+        mounted() {
+            let _this = this;
+            this.getUserList("/account/list");
 
-		},
+        },
 		methods: {
-			back() {
-				this.$router.go(-1);
+		    getUserList(api){
+                this.$fetch(api)
+					.then((response) => {
+						this.userData = response.data;
+						console.log(response.data.alias);
+					});
 			},
+
 			outUser() {
 				console.log('移除账户')
 			},
@@ -67,14 +68,7 @@
 	}
 </script>
 <style lang="less">
-	#bg() {
-		display: block;
-		width: 2rem;
-		height: 2rem;
-		background-repeat: no-repeat;
-		background-image: url(../../assets/images/top-icon.png);
-		background-size: 200px;
-	}
+	@import url("../../assets/css/style.less");
 	.users {
 		width: 90%;
 		margin: auto;
@@ -89,12 +83,7 @@
 				text-align: center;
 				line-height: 3rem;
 			}
-			.user-aliasing{
-			 	i{
-			 		#bg();
-			 		background-position: -130px -45px;
-			 	}	
-			}
+
 		}
 		.el-table th {
 			background-color: #17202e;

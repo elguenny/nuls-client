@@ -4,15 +4,16 @@
 			<div class="search-account fl">
 				<label>{{$t("message.indexAccountAddress")}}:</label>
 				<template>
-					<el-select v-model="value" placeholder="Please select the account address">
+					<el-select v-model="accountAddressValue" placeholder="" @change="accountAddressChecked">
 						<el-option v-for="item in accountAddress" :key="item.value" :label="item.label" :value="item.value">
 						</el-option>
 					</el-select>
 				</template>
 			</div>
-			<i class="icon-copy_icon" @click="accountCopy"></i>
+			<i class="icon-copy_icon copyBtn" :data-clipboard-text="this.accountAddressValue" @click="accountCopy"></i>
 			<i class="icon-qr_icon" @click="accountCode"></i>
 			<i class="icon-zhanghu_icon fr" @click="accountChoice"></i>
+			<CodeBar v-show="codeShowOk"  v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
 		</div>
 		<div class="wallet-hide" v-show="walletHide">
 			<i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
@@ -96,22 +97,26 @@
 </template>
 
 <script>
+    import Clipboard from 'clipboard';
+    import CodeBar from '@/components/CodeBar.vue';
+    let clipboard = new Clipboard('.copyBtn');
 	export default {
 		data() {
 			return {
 				walletHide:true,
 				keyShow:false,
+                codeShowOk:false,
 				accountAddress: [{
-					value: '选项1',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
+                    value: '12348',
+                    label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
 				}, {
-					value: '选项2',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
+                    value: '1233',
+                    label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
 				}, {
-					value: '选项3',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
+                    value: '1234',
+                    label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
 				}],
-				value: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter9）',
+                accountAddressValue:localStorage.getItem('newAccountAddress'),
 				accountData: [{
 						a_name: 'NULS',
 						a_allNo: '23265464',
@@ -157,10 +162,13 @@
 				activeName: 'first',
 			}
 		},
-		components: {
-
-		},
+        components: {
+            CodeBar
+        },
 		methods: {
+            accountAddressChecked(value){
+                console.log(value);
+			},
 			handleClick(tab, event) {
 				this.walletHide = !this.walletHide;
 				console.log(tab, event);
@@ -171,13 +179,22 @@
 				})
 			},
 			accountCopy() {
-				console.log('复制账户')
+                this.$message({
+                    message: '复制成功！',
+                    type: 'success'
+                });
 			},
 			accountCode() {
-				console.log('显示二维码')
+                this.$refs.codeBar.codeMaker(localStorage.getItem('newAccountAddress'));
+                this.codeShowOk = !this.codeShowOk;
 			},
+            codeShowOks(){
+                this.codeShowOk = false;
+            },
 			accountChoice() {
-				console.log('账户管理')
+                this.$router.push({
+                    path: '/wallet/users/userInfo'
+                })
 			},
 			/*walletHide() {
 				console.log('显示隐藏条内容')

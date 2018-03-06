@@ -49,15 +49,15 @@
 </template>
 
 <script>
-	import ProgressBar from './../../components/ProgressBar.vue'
-	import './../../assets/css/jquery-jvectormap.css'
-	import { jquery } from './../../assets/js/jquery.min.js'
-	import { jvectormap } from './../../assets/js/jvectormap/jquery-jvectormap-1.2.2.min.js'
-	import { jvectormap1 } from './../../assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
+	import axios from 'axios'
+	import ProgressBar from '@/components/ProgressBar.vue'
+	import '@/assets/css/jquery-jvectormap.css'
+	import { jquery } from '@/assets/js/jquery.min.js'
+	import { jvectormap } from '@/assets/js/jvectormap/jquery-jvectormap-1.2.2.min.js'
+	import { jvectormap1 } from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
 	export default {
 		data() {
 			return {
-
 				ipData: [
 					"186.101.196.150",
 					"176.101.196.150",
@@ -78,7 +78,7 @@
 					"186.40.196.150",
 					"186.30.196.150"
 				],
-				mapObj: []
+				mapObj: [{latLng: [34.74, 113.66], name: '郑州 '}],
 			};
 		},
 		components: {
@@ -86,70 +86,50 @@
 		},
 		mounted() {
 			let _this = this;
-			//encapsulated https
-			//this.getQueryIp('./5a7fec882e0000f327b56990');
-
-			this.getQueryIp();
+			for(var j = 0, len = this.ipData.length; j < len; j++) {
+				this.getQueryIp(this.ipData[j]);
+			}
+			//console.log(this.mapObj)
+			this.methodsMaps(this.mapObj);
+			if(localStorage.getItem("fastUser") == null){
+                localStorage.setItem('fastUser','0');
+			}
 
 		},
 		methods: {
 
-			/** get IP 
-			 * @method getQueryIp
-			 * @for 
-			 * @param {string} Api adderss
-			 * @return {int} Whether to get IP data.
-			 * @author Wave
-			 * @date 2018-2-11
-			 * @version 1.0
-			 * http://localhost:8001/nuls/sys/version
-			 **/
-			getQueryIp(ipApi) {
-				console.log(ipApi);
-				this.$fetch(ipApi)
-					.then((response) => {
-						this.ipData = response;
-						console.log(response);
-						if(this.ipData.length > 0) {
-							this.ipMaps();
-							this.methodsMaps(this.mapObj);
+			/** get IP
+             * @method getQueryIp
+             * @for
+             * @param {string} Api adderss
+             * @return {int} Whether to get IP data.
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
+			getQueryIp(ip) {
+				axios.get('http://freegeoip.net/json/' + ip)
+					.then(function(response) {
+						//console.log(response.data);
+						var latLngs = [response.data.latitude, response.data.longitude];
+						var names = response.data.time_zone;
+						if(names == undefined) {
+							names = 'anonymous'
 						} else {
-							console.log('Node data failed！');
+							names = names.split('/')[1]
 						}
+						var obj = {
+							//GOOGLE API
+							"latLng": latLngs,
+							//Get city name
+							"name": names
+						};
+						//this.mapObj.push(obj);
+					})
+					.catch(function(err) {
+						console.log('Node data failed！===' + err);
 					});
-			},
 
-			/** According to IP query node latitude and longitude, city name.
-			 * @method ipMaps
-			 * @for 所属类名
-			 * @param {参数类型} 参数名 参数说明
-			 * @return {返回值类型} 返回值说明
-			 * @author Wave
-			 * @date 2018-2-11
-			 * @version 1.0
-			 **/
-			ipMaps() {
-				var MMDBReader = require('mmdb-reader');
-				var reader = new MMDBReader('./src/renderer/assets/path/data.mmdb');
-				//var reader = new MMDBReader('./path/data.mmdb');
-				var markers = [];
-				for(var j = 0, len = this.ipData.length; j < len; j++) {
-					var latLngs = [reader.lookup(this.ipData[j]).location.latitude, reader.lookup(this.ipData[j]).location.longitude];
-					var names = reader.lookup(this.ipData[j]).location.time_zone;
-					if(names == undefined) {
-						names = 'anonymous'
-					} else {
-						names = names.split('/')[1]
-					}
-					var obj = {
-						//GOOGLE API
-						"latLng": latLngs,
-						//Get city name
-						"name": names
-					};
-					markers.push(obj);
-				}
-				this.mapObj = markers;
 			},
 
 			/** jVector Maps
@@ -163,7 +143,6 @@
 			 * @version 1.0
 			 **/
 			methodsMaps(maps) {
-				//alert(maps);
 				$('#world-map-markers').vectorMap({
 					map: 'world_mill_en',
 					normalizeFunction: 'polynomial',

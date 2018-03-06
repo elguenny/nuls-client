@@ -1,11 +1,22 @@
 module.exports = {
 	message:  {
+		//public
+		passWordTitle:"请输入密码",
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+		passWordSuccess:"恭喜您，创建账户成功！",
+        passWordFailed:"对不起，创建账户失败！",
+        passWordWasincorrect:"您的密码不正确",
+        enterCance:"取消输入",
+
 		//topNav
 		home: '首页',
 		wallet: '钱包管理',
 		consensus: '共识挖矿',
 		applications: '应用',
 		more: '更多',
+		news:'消息',
+
 		//home
 		fund: '资金',
 		fundTotal: '总额',
@@ -18,16 +29,19 @@ module.exports = {
 		annualYield: '年化收益',
 		
 		//set password
+        set:"设置",
+        oldPassWord:"旧密码",
 		setPassWord:'设置密码',
 		walletPassWord:'钱包密码',
 		affirmWalletPassWord:'确认钱包密码',
 		passWordHint:'密码提示',
 		passWordInfo:'请认真保存当前钱包密码，若钱包密码丢失，很可能导致您的资产丢失！',
         passWordHintEmpty:'密码提示不能为空!',
-        walletPassWordEmpty:'请输入密码!',
+        walletPassWordEmpty:'登录密码8-20位，且为字母、数字、符号等任意2种以上组合！',
         affirmWalletPassWordEmpty:'请再次输入密码!',
         passWordAtypism:'两次输入密码不一致!',
 		passWordAffirm:'确认',
+
 		passWordCancel:'我确认钱包风险，暂不设置密码',
 		
 		//first info

@@ -8,6 +8,7 @@ const store = new Vuex.Store({
 	// 定义状态
 	state: {
 		purseVersion: '1.0.0',
+        //codeInfo: '',
 	},
 	actions: {
 		

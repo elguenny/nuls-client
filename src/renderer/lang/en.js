@@ -1,11 +1,20 @@
 module.exports={
   message:  {
-  	//top nav
-    home: 'Home',
+      //public
+      passWordTitle:"Please enter your password",
+      confirmButtonText: 'Confirm ',
+      cancelButtonText: 'Cancel',
+      passWordSuccess:"Congratulations on creating your account！",
+      passWordFailed:"Sorry to create an account failure！",
+      passWordWasincorrect:"Your password is not correct！",
+      enterCance:"Cancel the input",
+	  //top nav
+    	home: 'Home',
 		wallet: 'Wallet',
 		consensus: 'Consensus',
 		applications: 'Applications',
 		more: 'More',
+      	news:'news',
 		//home
 		fund: 'Fund',
 		fundTotal: 'Total',
@@ -17,6 +26,8 @@ module.exports={
 		income: 'Income',
 		annualYield: 'Annual Yield',
 		//set password
+        set:"Set",
+      	oldPassWord:"oldPassWord",
 		setPassWord:'Set PassWord',
 		walletPassWord:'Wallet PassWord',
 		affirmWalletPassWord:'Affirm Wallet PassWord',

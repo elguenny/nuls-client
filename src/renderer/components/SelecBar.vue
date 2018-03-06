@@ -28,7 +28,8 @@
 		},
 		methods: {
 			showDataList() {
-				this.showData = !this.showData
+				this.showData = !this.showData;
+				
 			},
 			select(item, index) {
 				this.showData = false;
@@ -36,6 +37,8 @@
 				this.selectedValue.key = item.key;
 				this.selectedValue.value = item.value;
 				this.$emit('select');
+				localStorage.setItem('language',item.key);
+				//console.log(item.key);
 			},
 		},
 		mounted() {}

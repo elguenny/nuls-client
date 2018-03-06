@@ -1,8 +1,8 @@
 <template>
 	<div class="edit-aliasing">
-		<div class="back" @click="back"><i class="el-icon-arrow-left"></i>钱包管理</div>
+		<Back :backTitle="backTitle"></Back>
 		<div class="edit-info">
-			<h2>账户管理</h2>
+			<h2>修改别名</h2>
 			<el-form :model="aliasingData">
 				<el-form-item label="账户地址:">
 					<el-input type="text" disabled v-model="aliasingData.address"></el-input>
@@ -22,9 +22,11 @@
 </template>
 
 <script>
+    import Back from '@/components/BackBar.vue';
 	export default {
 		data() {
 			return {
+                backTitle:'账户管理',
 				aliasingData: {
 					address: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3',
 					aliasing: '',
@@ -32,9 +34,9 @@
 				}
 			}
 		},
-		components: {
-
-		},
+        components: {
+            Back,
+        },
 		methods: {
 			back() {
 				this.$router.go(-1);
@@ -47,16 +49,10 @@
 </script>
 <style lang="less">
 	.edit-aliasing {
-		width: 90%;
+		width: 100%;
 		margin: auto;
-		.back {
-			width: 100%;
-			height: 3rem;
-			line-height: 3rem;
-			font-size: 1rem;
-		}
 		.edit-info {
-			width: 60%;
+			width: 50%;
 			margin: auto;
 			h2 {
 				text-align: center;
