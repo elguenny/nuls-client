@@ -12,7 +12,6 @@
 				<el-button type="primary" @click="nulsSubmit">确定</el-button>
 			</el-form-item>
 		</el-form>
-
 	</div>
 </template>
 

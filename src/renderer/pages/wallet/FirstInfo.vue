@@ -14,7 +14,7 @@
 </template>
 
 <script>
-    import md5 from 'js-md5'
+    import axios from 'axios';
     export default {
         data() {
             return {}
@@ -33,13 +33,12 @@
                     inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
                     inputErrorMessage:this.$t('message.walletPassWordEmpty')
                 }).then(({value}) => {
-                   if(md5(value).substring(0,10) ===  localStorage.getItem('userPass')){
-                       var param = {"count":1,"password":localStorage.getItem('userPass')};
-                       this.$post('/account/create/',param)
+                   if(value ===  localStorage.getItem('userPass')){
+                       var password=localStorage.getItem("userPass");
+                       var param = '{"count":1,"password":"'+password+'"}';
+                       this.$post('/account',param)
                            .then((response) => {
-                               console.log(param);
                                if(response.success){
-                                   console.log(response);
                                    this.$message({
                                        type: 'success', message: this.$t('message.passWordSuccess')
                                    });
@@ -48,6 +47,7 @@
                                        path: '/firstInto/firstInfo/newAccount'
                                    })
                                }else {
+
                                    this.$message({
                                        type: 'warning', message:this.$t('message.passWordFailed')
                                    });

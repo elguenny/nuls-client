@@ -59,7 +59,7 @@ const router = new VueRouter({
 		},
 		{
 			path: '/users/userLog',
-			name: '设置密码',
+			name: '用户日志',
 			component: resolve => require(['../../renderer/pages/users/UserLog.vue'], resolve)
 		},
 		{
@@ -88,8 +88,8 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/users/UserInfo.vue'], resolve)
 		},
 		{
-			path: '/wallet/users/editAliasing',
-			name: '修改别名',
+			path: '/wallet/users/editAliasing :address/:alias',
+			name: '/editAliasing',
 			component: resolve => require(['../../renderer/pages/users/EditAliasing.vue'], resolve)
 		},
 		{

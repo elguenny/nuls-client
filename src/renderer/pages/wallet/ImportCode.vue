@@ -1,13 +1,15 @@
 <template>
 	<div class="import-code">
 		<h2>二维码导入</h2>
-		<el-form  >
-			<el-upload action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-				<i class="el-icon-plus"></i>
+		<el-form >
+			<el-upload class="avatar-uploader"
+					   action="https://jsonplaceholder.typicode.com/posts/"
+					   :show-file-list="false"
+					   :on-success="handleAvatarSuccess"
+					   :before-upload="beforeAvatarUpload">
+				<img v-if="imageUrl" :src="imageUrl" class="avatar">
+				<i v-else class="el-icon-plus avatar-uploader-icon"></i>
 			</el-upload>
-			<el-dialog :visible.sync="dialogVisible">
-				<img width="100%" :src="dialogImageUrl" alt="">
-			</el-dialog>
 			<el-form-item>
 				<el-button type="primary" @click="codeSubmit">确定</el-button>
 			</el-form-item>
@@ -18,24 +20,31 @@
 
 <script>
 	export default {
-		data() {
-			return {
-				dialogImageUrl: '',
-				dialogVisible: false
-			};
-		},
-		methods: {
-			handleRemove(file, fileList) {
-				console.log(file, fileList);
-			},
-			handlePictureCardPreview(file) {
-				this.dialogImageUrl = file.url;
-				this.dialogVisible = true;
-			},
-			codeSubmit(){
-				console.log('二维码导入')
+        data() {
+            return {
+                imageUrl: ''
+            };
+        },
+        methods: {
+            handleAvatarSuccess(res, file) {
+                this.imageUrl = URL.createObjectURL(file.raw);
+            },
+            beforeAvatarUpload(file) {
+                const isPNG = file.type === 'image/png';
+                const isJPG = file.type === 'image/jpg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+                if (!isJPG && !isPNG) {
+                    this.$message.error('上传头像图片只能是PNG或 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return (isJPG || isPNG) && isLt2M;
+            },
+            codeSubmit(){
+              console.log("codeSubmit");
 			}
-		}
+        }
 	}
 </script>
 
@@ -52,15 +61,28 @@
 			margin: auto;
 			text-align: center;
 		}
-		.el-textarea__inner {
-			background-color: #17202e;
+		.avatar-uploader .el-upload {
+			border: 1px dashed #d9d9d9;
+			border-radius: 6px;
+			cursor: pointer;
+			position: relative;
+			overflow: hidden;
 		}
-		.el-form-item__content {
+		.avatar-uploader .el-upload:hover {
+			border-color: #409EFF;
+		}
+		.avatar-uploader-icon {
+			font-size: 28px;
+			color: #8c939d;
+			width: 178px;
+			height: 178px;
+			line-height: 178px;
 			text-align: center;
-			margin-top: 3rem;
-			button {
-				width: 30%;
-			}
+		}
+		.avatar {
+			width: 178px;
+			height: 178px;
+			display: block;
 		}
 	}
 </style>

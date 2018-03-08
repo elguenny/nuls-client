@@ -4,8 +4,8 @@
 			<div class="search-account fl">
 				<label>{{$t("message.indexAccountAddress")}}:</label>
 				<template>
-					<el-select v-model="accountAddressValue" placeholder="" @change="accountAddressChecked">
-						<el-option v-for="item in accountAddress" :key="item.value" :label="item.label" :value="item.value">
+					<el-select v-model="accountAddressValue" placeholder="请选择账户地址" @change="accountAddressChecked">
+						<el-option v-for="item in accountAddress" :key="item.address" :label="item.address + '('+item.alias+')'" :value="item.address">
 						</el-option>
 					</el-select>
 				</template>
@@ -106,16 +106,7 @@
 				walletHide:true,
 				keyShow:false,
                 codeShowOk:false,
-				accountAddress: [{
-                    value: '12348',
-                    label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}, {
-                    value: '1233',
-                    label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}, {
-                    value: '1234',
-                    label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}],
+				accountAddress: [],
                 accountAddressValue:localStorage.getItem('newAccountAddress'),
 				accountData: [{
 						a_name: 'NULS',
@@ -165,7 +156,19 @@
         components: {
             CodeBar
         },
+        mounted() {
+            let _this = this;
+            this.getaccountAddress("/account/list");
+        },
 		methods: {
+		    getaccountAddress(api){
+                this.$fetch(api)
+                    .then((response) => {
+                        this.accountAddress = response.data;
+                        console.log(response.data);
+                    });
+			},
+
             accountAddressChecked(value){
                 console.log(value);
 			},

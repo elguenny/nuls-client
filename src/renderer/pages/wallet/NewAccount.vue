@@ -52,9 +52,15 @@
         },
         mounted() {
             let _this = this;
-            this.$fetch('/account/load/' + localStorage.getItem('newAccountAddress'))
+            var address=localStorage.getItem('userPass');
+            var password=localStorage.getItem('newAccountAddress');
+            var param = '{"address":"'+address+'","password":"'+password+'"}';
+            this.keyInfo = "2CWJ8tL9wXWmCAu7yqJbEguBuS2SCr2";
+           this.$fetch('/account/prikey' + param)
                 .then((response) => {
-                    this.keyInfo = response.data.pubKey;
+                    console.log(response);
+                    //this.keyInfo = response.data.pubKey;
+                    this.keyInfo = "2CWJ8tL9wXWmCAu7yqJbEguBuS2SCr2";
                 });
         },
         methods: {

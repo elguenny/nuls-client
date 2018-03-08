@@ -12,14 +12,15 @@
 		props: {
 			colorData: {
 				type: String,
-				default: "#f64b3e"
+				default: "#4a5065"
 			},
 			widthData: {
 				type: String,
-				default: "160px"
+				default: "0px"
 			}
 		},
-		mounted() {}
+		mounted() {
+		}
 	}
 </script>
 

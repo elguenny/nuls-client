@@ -8,15 +8,15 @@
 				</el-table-column>
 				<el-table-column  label="别名" min-width="25" class="user-aliasing">
 					 <template slot-scope="scope">
-
 				        <span>{{ scope.row.alias != undefined  ? scope.row.alias : "-" }}</span>
-				        <i class="el-icon-edit cursor-p" @click="editAliasing"></i>
+				        <i class="el-icon-edit cursor-p" @click="editAliasing(scope.row.address,scope.row.alias)"></i>
 				      </template>
 				</el-table-column>
 				<el-table-column label="操作"  min-width="25" align='center'>
 					<template slot-scope="scope">
-						<el-button size="mini" type="text" @click="outUser()">移除账户</el-button>
-						<el-button size="mini" type="text" @click="backupUser()">备份账户</el-button>
+						<el-button size="mini" type="text" @click="setAs()">设为默认</el-button>
+						<el-button size="mini" type="text" @click="outUser()">移除</el-button>
+						<el-button size="mini" type="text" @click="backupUser()">备份</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
@@ -48,8 +48,10 @@
                 this.$fetch(api)
 					.then((response) => {
 						this.userData = response.data;
-						console.log(response.data.alias);
 					});
+			},
+            setAs(){
+		        console.log("设为默认")
 			},
 
 			outUser() {
@@ -58,10 +60,11 @@
 			backupUser() {
 				console.log('备份账户')
 			},
-			editAliasing(){
-				this.$router.push({
-					path: '/wallet/users/editAliasing'
-				})
+			editAliasing(accountAddress,accountAlias){
+                this.$router.push({
+                    name: '/editAliasing',
+                    params: {address: accountAddress, alias: accountAlias},
+                })
 			}
 
 		}
@@ -70,7 +73,7 @@
 <style lang="less">
 	@import url("../../assets/css/style.less");
 	.users {
-		width: 90%;
+		width: 100%;
 		margin: auto;
 		.back {
 			width: 100%;
@@ -79,6 +82,8 @@
 			font-size: 1rem;
 		}
 		.freeze-list-tabs{
+			width: 80%;
+			margin: auto;
 			h2{
 				text-align: center;
 				line-height: 3rem;

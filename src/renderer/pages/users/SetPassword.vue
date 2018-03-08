@@ -67,8 +67,8 @@
                 backTitle: this.$t('message.set'),
                 labelPosition: 'top',
                 setPass: {
-                    pass: '123456asd',
-                    checkPass: '123456asd',
+                    pass: 'nuls123456',
+                    checkPass: 'nuls123456',
                     passWordHint: '456'
                 },
                 rules2: {
@@ -105,14 +105,13 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        localStorage.setItem('userPass', md5(this.setPass.pass).substring(0,10));
+                        localStorage.setItem('userPass', this.setPass.pass);
                         localStorage.setItem('passWordHint', this.setPass.passWordHint);
                         localStorage.setItem('fastUser', '1');
                         this.$router.push({
                             path: '/firstInto/firstInfo'
                         })
                     } else {
-                        console.log('error submit!!');
                         return false;
                     }
                 });
@@ -125,7 +124,7 @@
              * @version 1.0
              **/
             resetForm(formName) {
-                localStorage.setItem('userPass', Base64.encode(this.setPass.pass));
+                localStorage.setItem('userPass', this.setPass.pass);
                 localStorage.setItem('passWordHint', this.setPass.passWordHint);
                 localStorage.setItem('fastUser', '0');
                 this.$router.push({
