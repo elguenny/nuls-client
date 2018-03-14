@@ -68,7 +68,7 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/wallet/Index.vue'], resolve)
 		},
 		{
-			path: '/wallet/index/freezeList',
+			path: '/wallet/index/freezeList :address',
 			name: '/freezeList',
 			component: resolve => require(['../../renderer/pages/wallet/FreezeList.vue'], resolve)
 		},
@@ -78,8 +78,8 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/wallet/Transfer.vue'], resolve)
 		},
 		{
-			path: '/wallet/index/dealInfo',
-			name: '交易详情',
+			path: '/wallet/index/dealInfo :hash',
+			name: '/dealInfo',
 			component: resolve => require(['../../renderer/pages/wallet/DealInfo.vue'], resolve)
 		},
 		{

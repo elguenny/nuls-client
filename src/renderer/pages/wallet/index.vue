@@ -11,7 +11,7 @@
                     </el-select>
                 </template>
             </div>
-            <i class="icon-copy_icon copyBtn" :data-clipboard-text="this.accountAddressValue" @click="accountCopy"></i>
+            <i class="icon-copy_icon copyBtn" :data-clipboard-text="accountAddressValue" @click="accountCopy"></i>
             <i class="icon-qr_icon" @click="accountCode"></i>
             <i class="icon-zhanghu_icon fr" @click="accountChoice"></i>
             <CodeBar v-show="codeShowOk" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
@@ -23,27 +23,27 @@
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane :label="$t('message.indexAccountHome')" name="first">
                     <el-table :data="accountData">
-                        <el-table-column :label="$t('message.indexProperty')" min-width="20" align='center'>
+                        <el-table-column :label="$t('message.indexProperty')" min-width="30" align='center'>
                             <template slot-scope="scope">
                                 <span>{{ scope.row.asset }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.indexSum')" min-width="20" align='center'>
+                        <el-table-column :label="$t('message.indexSum')" min-width="80" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.balance*0.0000000001
+                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.balance*0.00000001
                                        readonly="readonly">
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.indexUsable')" min-width="20" align='center'>
+                        <el-table-column :label="$t('message.indexUsable')" min-width="80" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.usable*0.0000000001
+                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.usable*0.00000001
                                        readonly="readonly">
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.indexLock')" min-width="20" align='center'>
+                        <el-table-column :label="$t('message.indexLock')" min-width="80" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.locked*0.0000000001
-                                       readonly="readonly" title="点击查看详情" class="cursor-p text-d" @click="toLocked()">
+                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.locked*0.00000001
+                                       readonly="readonly" title="点击查看详情" class="cursor-p text-d" @click="toLocked(accountAddressValue)">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.operation')" align='center'>
@@ -109,6 +109,7 @@
 
 <script>
     import CodeBar from '@/components/CodeBar.vue';
+    import copy from 'copy-to-clipboard';
     import moment from 'moment';
     export default {
         data() {
@@ -131,7 +132,7 @@
             this.getaccountAddress("/account/list");
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
             let params = {"address": this.accountAddressValue};
-            this.getAccountTxList('/tx/list/', params);
+            this.getAccountTxList('/tx/address/list/', params);
         },
         methods: {
             //获取账户地址列表
@@ -155,7 +156,7 @@
                         this.dealList = response.data;
                        if (response.data.length != undefined) {
                            for (var i = 0; i < response.data.length; i++) {
-                                this.dealList[i].values = response.data[i].value * response.data[i].transferType;
+                                this.dealList[i].values = response.data[i].value * response.data[i].transferType*0.00000001;
                                 this.dealList[i].times = moment(response.data[i].time).format('YYYY-MM-DD hh:mm:ss');
                             }
                         } else {
@@ -167,7 +168,7 @@
             accountAddressChecked(value) {
                 this.getAccountAssets("/account/assets/" + value);
                 let params = {"address": value};
-                this.getAccountTxList("/tx/list/", params);
+                this.getAccountTxList("/tx/address/list/", params);
                 //console.log(value);
             },
             //tab切换
@@ -177,6 +178,7 @@
             },
             //复制功能
             accountCopy() {
+                copy(this.accountAddressValue);
                 this.$message({
                     message: '复制成功！',
                     type: 'success'
@@ -201,15 +203,16 @@
             },
             //toTxid跳转
             toTxid(txId) {
-                console.log(txId);
                 this.$router.push({
-                    path: '/wallet/index/dealInfo'
+                    name: '/dealInfo',
+                    params:{hash:txId},
                 })
             },
             //toLocked 跳转冻结列表
-            toLocked(){
+            toLocked(address){
                 this.$router.push({
-                    path: '/wallet/index/freezeList'
+                    name: '/freezeList',
+                    params:{address:address},
                 })
             },
             //跳转转账

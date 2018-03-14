@@ -19,7 +19,7 @@
                     <i @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item label="转账金额:">
-                    <el-input type="text" v-model="transferForm.joinNo"></el-input>
+                    <el-input type="text" v-model="transferForm.joinNo" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="手续费:0.01NULS" class="service-no">
                 </el-form-item>
@@ -70,7 +70,6 @@
                 accountAddress: [],
                 transferForm: {
                     outName: '',
-                    outAddress: '',
                     joinAddress: '',
                     joinNo: '',
                     serviceNo: '',
@@ -82,11 +81,15 @@
                         trigger: 'blur'
                     }]
                 },
-
+                form:{
+                    joinNo: [
+                        { validator: joinNo, trigger: 'blur' }
+                    ],
+                },
                 userAddressList: [
-                    {"userAddress":"2CfnhnNxNorPiug5knrn1txaRpReCGn","userAlias":"linxin","userHelp":"456"},
-                    {"userAddress":"2CidJFvJhyruCS9RQLSVMVcYgm845Fh","userAlias":"789","userHelp":"456"},
-                    {"userAddress":"2CkFHVWKVogUQRScVzgsu8oEA5Txz8W","userAlias":"96358964","userHelp":"85568"}
+                    {"userAddress":"2Ck3mbLK5vh3JBKYWjeujAnY9EA6gNA","userAlias":"linxin","userHelp":"456"},
+                    {"userAddress":"2CWyLqVgZHawcjsSpY2h5mYFQMZrL3r","userAlias":"789","userHelp":"456"},
+                    {"userAddress":"2CdvShGME8haSJCciuHd5HbnDE3ajxa","userAlias":"96358964","userHelp":"85568"}
                 ],
                 dialogTableVisible: false,
             }
@@ -97,7 +100,7 @@
         mounted() {
             let _this = this;
             this.getaccountAddress("/account/list");
-            this.getBalanceAddress('/account/balance/'+this.address)
+            this.getBalanceAddress('/account/balance/'+this.address);
         },
         methods: {
             //获取账户地址列表
@@ -119,10 +122,6 @@
                 this.address = value;
                 this.getBalanceAddress('/account/balance/'+this.address)
             },
-            //确认转账
-            transferSubmit() {
-                console.log('submit!');
-            },
             //选择通讯录
             toUsersAddressList() {
                 this.dialogTableVisible=true;
@@ -131,7 +130,27 @@
             checkedAddress(address){
                 this.transferForm.joinAddress =address;
                 this.dialogTableVisible=false;
-            }
+            },
+            //确认转账
+            transferSubmit() {
+
+                this.$prompt(this.$t('message.passWordTitle'), '', {
+                    confirmButtonText: this.$t('message.confirmButtonText'),
+                    cancelButtonText: this.$t('message.cancelButtonText'),
+                    inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                    inputErrorMessage: this.$t('message.walletPassWordEmpty')
+                }).then(({value}) => {
+                    //console.log(this.address + this.transferForm.joinAddress+this.transferForm.joinNo+this.transferForm.remark);
+                    var param = '{"address":"'+this.address+'","toaddress":"'+this.transferForm.joinAddress+'","amount":"'+this.transferForm.joinNo+'","password":"'+value+'","remark":"'+this.transferForm.remark+'"}';
+                    console.log(param);
+                    /*this.$post('/wallet/transfer/',param)
+                        .then((response) => {
+                            console.log(response)
+                        })*/
+                })
+
+
+            },
         }
     }
 </script>

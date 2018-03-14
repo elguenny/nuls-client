@@ -114,10 +114,10 @@
             getAccountAddress(api) {
                 this.$fetch(api)
                     .then((response) => {
-                        this.balance = response.data.balance*0.0000000001;
-                        this.locked = response.data.locked*0.0000000001;
+                        this.balance = response.data.balance*0.00000001;
+                        this.locked = response.data.locked*0.00000001;
                         this.lockedWidth =this.locked/this.balance*100+"%";
-                        this.usable = response.data.usable*0.0000000001;
+                        this.usable = response.data.usable*0.00000001;
                         this.usableWidth =this.usable/this.balance*100+"%";
                     });
             },

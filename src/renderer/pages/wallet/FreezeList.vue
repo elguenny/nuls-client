@@ -25,36 +25,25 @@
 		data() {
 			return {
                 backTitle:'钱包管理',
-				freezeData: [{
-					freezeType: '锁仓',
-					freezeMoney: '2565459',
-					lockTime: '2018-1-26',
-					outTime: '2018-1-26'
-				}, {
-					freezeType: '锁仓',
-					freezeMoney: '2565459',
-					lockTime: '2018-1-26',
-					outTime: '2018-1-26'
-				}, {
-					freezeType: '锁仓',
-					freezeMoney: '2565459',
-					lockTime: '2018-1-26',
-					outTime: '2018-1-26'
-				}, {
-					freezeType: '锁仓',
-					freezeMoney: '2565459',
-					lockTime: '2018-1-26',
-					outTime: '2018-1-26'
-				}]
+				address:this.$route.params.address,
+				freezeData: []
 
 			}
 		},
         components: {
             Back,
         },
+        mounted() {
+            let _this = this;
+            var params = {"address": this.address};
+            this.getLocked('tx/locked',params);
+		},
 		methods: {
-			back(){
-				this.$router.go(-1);
+			getLocked(url,param){
+                this.$fetch(url, param)
+                    .then((response) => {
+                        this.freezeData =response.data
+					})
 			}
 		}
 	}
