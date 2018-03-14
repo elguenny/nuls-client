@@ -14,14 +14,14 @@
 				</el-table-column>
 				<el-table-column label="操作"  min-width="25" align='center'>
 					<template slot-scope="scope">
-						<el-button size="mini" type="text" @click="setAs()">设为默认</el-button>
+						<el-button size="mini" type="text" @click="setAs(scope.row.address)">{{ setAsAddress == scope.row.address ? "已默认":"设为默认"}}</el-button>
 						<el-button size="mini" type="text" @click="outUser()">移除</el-button>
-						<el-button size="mini" type="text" @click="backupUser()">备份</el-button>
+						<el-button size="mini" type="text" @click="backupUser(scope.row.address)">备份</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
-			<el-pagination background layout="prev, pager, next" :total="1000">
-			</el-pagination>
+			<!--<el-pagination background layout="prev, pager, next" :total="1000">
+			</el-pagination>-->
 		</div>
 	</div>
 </template>
@@ -32,6 +32,7 @@
 		data() {
 			return {
                 backTitle:'钱包管理',
+				setAsAddress:localStorage.getItem('newAccountAddress'),
                 userData:[],
 			}
 		},
@@ -41,7 +42,6 @@
         mounted() {
             let _this = this;
             this.getUserList("/account/list");
-
         },
 		methods: {
 		    getUserList(api){
@@ -50,15 +50,19 @@
 						this.userData = response.data;
 					});
 			},
-            setAs(){
-		        console.log("设为默认")
+            setAs(address){
+                this.setAsAddress = address
+                localStorage.setItem('newAccountAddress',address);
 			},
 
 			outUser() {
 				console.log('移除账户')
 			},
-			backupUser() {
-				console.log('备份账户')
+			backupUser(address) {
+                this.$router.push({
+                    name: '/newAccount',
+					params:{newOk:false,address:address},
+                })
 			},
 			editAliasing(accountAddress,accountAlias){
                 this.$router.push({

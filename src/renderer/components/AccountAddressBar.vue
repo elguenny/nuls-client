@@ -1,6 +1,6 @@
 <template>
 	<div class="account-address">
-		<label>{{$t("message.indexAccountAddress")}}</label>
+		<label v-show="accountAddressOk">{{$t("message.indexAccountAddress")}}</label>
 		<el-select v-model="value">
 			<el-option v-for="item in accountAddress" :key="item.value" :label="item.label" :value="item.value">
 			</el-option>
@@ -12,18 +12,23 @@
 	export default {
 		data() {
 			return {
-				accountAddress: [{
-					value: '选项1',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}, {
-					value: '选项2',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}, {
-					value: '选项3',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}],
+                accountAddressOk:true,
+				accountAddress: [],
 				value: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter9）',
 			}
+		},
+        mounted() {
+            let _this = this;
+            this.getaccountAddress("/account/list");
+        },
+        methods: {
+            //获取账户地址列表
+            getaccountAddress(api) {
+                this.$fetch(api)
+                    .then((response) => {
+                        this.accountAddress = response.data;
+                    });
+            }
 		}
 	}
 </script>

@@ -174,6 +174,9 @@
             }
             li:hover {
                 cursor: pointer;
+                color: #FFFFFF;
+                border-bottom: 2px solid #81bc3b;
+                height: 40px;
             }
         }
         .top-icon {

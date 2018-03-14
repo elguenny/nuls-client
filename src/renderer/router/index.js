@@ -27,8 +27,8 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/wallet/FirstInfo.vue'], resolve)
 		},
 		{
-			path: '/firstInto/firstInfo/newAccount',
-			name: '新建账户',
+			path: '/firstInto/newAccount :newOk/:address',
+			name: '/newAccount',
 			component: resolve => require(['../../renderer/pages/wallet/NewAccount.vue'], resolve)
 		},
 		{
@@ -69,12 +69,12 @@ const router = new VueRouter({
 		},
 		{
 			path: '/wallet/index/freezeList',
-			name: '冻结列表',
+			name: '/freezeList',
 			component: resolve => require(['../../renderer/pages/wallet/FreezeList.vue'], resolve)
 		},
 		{
-			path: '/wallet/index/transfer',
-			name: '转账',
+			path: '/wallet/index/transfer :address',
+			name: '/transfer',
 			component: resolve => require(['../../renderer/pages/wallet/Transfer.vue'], resolve)
 		},
 		{

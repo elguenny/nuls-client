@@ -2,16 +2,16 @@
     <div class="edit-aliasing">
         <Back :backTitle="backTitle"></Back>
         <div class="edit-info">
-            <h2>{{this.aliasingData.alias == null ? "设置别名":"修改别名"}}</h2>
-            <el-form :model="aliasingData">
+            <h2>{{this.alias == null ? "设置别名":"修改别名"}}</h2>
+            <el-form>
                 <el-form-item label="账户地址:">
-                    <el-input type="text" disabled v-model="aliasingData.address"></el-input>
+                    <el-input v-model="address" type="text" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="别名:" class="label-aliasing">
-                    <el-input v-model="aliasingData.aliasing" class="bt-aliasing"></el-input>
+                    <el-input v-model="alias" class="bt-aliasing"></el-input>
                 </el-form-item>
                 <el-form-item label="手续费:">
-                    <el-input type="text" disabled v-model="aliasingData.serviceNo"></el-input>
+                    <el-input v-model="serviceNo" type="text" disabled></el-input>
                 </el-form-item>
                 <el-form-item class="aliasing-submit">
                     <el-button type="primary" @click="aliasingSubmit">确定</el-button>
@@ -28,11 +28,9 @@
         data() {
             return {
                 backTitle: '账户管理',
-                aliasingData: {
-                    address: this.$route.params.address,
-                    alias: this.$route.params.alias,
-                    serviceNo: '0.01NULS'
-                }
+                alias: this.$route.params.alias,
+                address: this.$route.params.address,
+                serviceNo: '0.01NULS'
             }
         },
         components: {
@@ -40,15 +38,13 @@
         },
         mounted() {
             let _this = this;
-            console.log(this.aliasingData.alias == null);
         },
         methods: {
             back() {
                 this.$router.go(-1);
             },
             aliasingSubmit() {
-                console.log('提交');
-                var param = {"alias": "", "address": "", "password": ""}
+                var param = {"alias": this.alias, "address": this.address, "password": "nuls123456"}
                 this.$post('/account/alias/', param)
                     .then((response) => {
                         if (response.success) {

@@ -14,7 +14,7 @@
 </template>
 
 <script>
-    import axios from 'axios';
+    import moment from 'moment';
     export default {
         data() {
             return {}
@@ -34,9 +34,10 @@
                     inputErrorMessage:this.$t('message.walletPassWordEmpty')
                 }).then(({value}) => {
                    if(value ===  localStorage.getItem('userPass')){
-                       var password=localStorage.getItem("userPass");
+                       var password=localStorage.getItem('userPass');
+                       localStorage.setItem('lockTime', moment().format('h:mm:ss'));
                        var param = '{"count":1,"password":"'+password+'"}';
-                       this.$post('/account',param)
+                      this.$post('/account',param)
                            .then((response) => {
                                if(response.success){
                                    this.$message({
@@ -44,10 +45,10 @@
                                    });
                                    localStorage.setItem('newAccountAddress', response.data[0]);
                                    this.$router.push({
-                                       path: '/firstInto/firstInfo/newAccount'
+                                       name:'/newAccount',
+                                       params: {newOk: true,address:''},
                                    })
                                }else {
-
                                    this.$message({
                                        type: 'warning', message:this.$t('message.passWordFailed')
                                    });

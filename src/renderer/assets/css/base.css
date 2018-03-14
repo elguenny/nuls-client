@@ -198,3 +198,9 @@ a:focus {
 .text-d{
 	text-decoration: underline;
 }
+/**overflow ....**/
+.overflow {
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
+}

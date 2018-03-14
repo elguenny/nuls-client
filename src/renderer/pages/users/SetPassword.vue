@@ -34,9 +34,7 @@
 
 </template>
 <script>
-    import md5 from 'js-md5'
-    import Back from '@/components/BackBar.vue'
-
+    import Back from '@/components/BackBar.vue';
     export default {
         data() {
             var passWordHint = (rule, value, callback) => {

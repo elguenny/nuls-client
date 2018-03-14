@@ -102,7 +102,6 @@
             if (localStorage.getItem("fastUser") == null) {
                 localStorage.setItem('fastUser', '0');
             }
-            ;
             if (localStorage.getItem("newAccountAddress") != null) {
                 this.getAccountAddress("/account/balance/" + localStorage.getItem("newAccountAddress"));
             } else {
@@ -115,10 +114,10 @@
             getAccountAddress(api) {
                 this.$fetch(api)
                     .then((response) => {
-                        this.balance = response.data.balance;
-                        this.locked = response.data.locked;
+                        this.balance = response.data.balance*0.0000000001;
+                        this.locked = response.data.locked*0.0000000001;
                         this.lockedWidth =this.locked/this.balance*100+"%";
-                        this.usable = response.data.usable;
+                        this.usable = response.data.usable*0.0000000001;
                         this.usableWidth =this.usable/this.balance*100+"%";
                     });
             },

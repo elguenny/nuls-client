@@ -1,7 +1,7 @@
 <template>
     <div class="new-account">
         <div class="new-account-top">
-            <h1>{{$t("message.newAccountTitle")}}</h1>
+            <h1 v-show="newOk">{{$t("message.newAccountTitle")}}</h1>
             <h2>
                 {{$t("message.newAccountAddress")}}:{{ newAccountAddress }}
             </h2>
@@ -43,8 +43,10 @@
             return {
                 keyShow: false,
                 keyInfo: '',
-                newAccountAddress: localStorage.getItem('newAccountAddress'),
+                newAccountAddress:this.$route.params.address=="" ? localStorage.getItem('newAccountAddress'):this.$route.params.address,
                 codeShowOk: false,
+                newOk:this.$route.params.newOk,
+                //address:this.$route.params.address,
             }
         },
         components: {
@@ -52,15 +54,12 @@
         },
         mounted() {
             let _this = this;
-            var address=localStorage.getItem('userPass');
-            var password=localStorage.getItem('newAccountAddress');
+            var address=this.newAccountAddress;
+            var password=localStorage.getItem('userPass');
             var param = '{"address":"'+address+'","password":"'+password+'"}';
-            this.keyInfo = "2CWJ8tL9wXWmCAu7yqJbEguBuS2SCr2";
-           this.$fetch('/account/prikey' + param)
+           this.$post('/account/prikey',param)
                 .then((response) => {
-                    console.log(response);
-                    //this.keyInfo = response.data.pubKey;
-                    this.keyInfo = "2CWJ8tL9wXWmCAu7yqJbEguBuS2SCr2";
+                    this.keyInfo = response.data;
                 });
         },
         methods: {
@@ -109,15 +108,32 @@
              * @version 1.0
              **/
             exportCanvasAsPNG(canvas, fileName) {
-                var MIME_TYPE = "image/png";
-                var dlLink = document.createElement('a');
-                dlLink.download = fileName;
-                dlLink.href = canvas.toDataURL("image/png");
-                dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
-                document.body.appendChild(dlLink);
-                dlLink.click();
-                document.body.removeChild(dlLink);
-                $('.qrcode').html("");
+                const {dialog} = require('electron').remote;
+                const {ipcRenderer} = require('electron');
+                ipcRenderer.on('tips', (event, person) => {
+                });
+                dialog.showOpenDialog({
+                        defaultPath: '../Desktop',
+                        properties: [
+                            'openDirectory',
+                        ],
+                        filters: [
+                            {name: 'All', extensions: ['*']},
+                        ]
+                    }, function (res) {
+                        console.log(res);
+                        /*var MIME_TYPE = "image/png";
+                       var dlLink = document.createElement('a');
+                       dlLink.download = fileName;
+                       dlLink.href = canvas.toDataURL("image/png");
+                       dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
+                       document.body.appendChild(dlLink);
+                       dlLink.click();
+                       document.body.removeChild(dlLink);
+                       $('.qrcode').html("");*/
+                    })
+
+
             },
             /** Backup File
             * @method backupFile

@@ -1,6 +1,6 @@
 <template>
 	<div class="freeze-list">
-		<div class="back" @click="back"><i class="el-icon-arrow-left"></i>账户地址</div>
+		<Back :backTitle="backTitle"></Back>
 		<div class="freeze-list-tabs">
 			<h2>冻结列表</h2>
 			<el-table :data="freezeData" style="width: 100%">
@@ -13,16 +13,18 @@
 				<el-table-column prop="outTime" label="解冻时间">
 				</el-table-column>
 			</el-table>
-			<el-pagination background layout="prev, pager, next" :total="1000">
-			</el-pagination>
+			<!--<el-pagination background layout="prev, pager, next" :total="1000">
+			</el-pagination>-->
 		</div>
 	</div>
 </template>
 
 <script>
+    import Back from '@/components/BackBar.vue';
 	export default {
 		data() {
 			return {
+                backTitle:'钱包管理',
 				freezeData: [{
 					freezeType: '锁仓',
 					freezeMoney: '2565459',
@@ -47,9 +49,9 @@
 
 			}
 		},
-		components: {
-
-		},
+        components: {
+            Back,
+        },
 		methods: {
 			back(){
 				this.$router.go(-1);
@@ -60,15 +62,11 @@
 
 <style lang="less">
 	.freeze-list {
-		width: 90%;
+		width: 100%;
 		margin: auto;
-		.back {
-			width: 100%;
-			height: 3rem;
-			line-height: 3rem;
-			font-size: 1rem;
-		}
 		.freeze-list-tabs {
+			width: 85%;
+			margin: auto;
 			h2 {
 				line-height: 3rem;
 				text-align: center;
