@@ -31,7 +31,8 @@
                     confirmButtonText: this.$t('message.confirmButtonText'),
                     cancelButtonText: this.$t('message.cancelButtonText'),
                     inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                    inputErrorMessage:this.$t('message.walletPassWordEmpty')
+                    inputErrorMessage:this.$t('message.walletPassWordEmpty'),
+                    inputType:'password'
                 }).then(({value}) => {
                    if(value ===  localStorage.getItem('userPass')){
                        var password=localStorage.getItem('userPass');

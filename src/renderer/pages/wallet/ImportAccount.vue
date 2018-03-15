@@ -8,9 +8,9 @@
 			<li @click="importCode">
 				<span>二维码导入</span>
 			</li>
-			<li @click="importNuls">
-				<span>.NULS格式备份</span>
-			</li>
+			<!--<li @click="importNuls">
+				<span>.NULS格式导入</span>
+			</li>-->
 		</ul>
 	</div>
 </template>
@@ -33,11 +33,11 @@
 					path: '/firstInto/firstInfo/importCode'
 				})
 			},
-			importNuls() {
+			/*importNuls() {
 				this.$router.push({
 					path: '/firstInto/firstInfo/importNuls'
 				})
-			}
+			}*/
 		}
 	}
 </script>
@@ -65,8 +65,8 @@
 				width: 20%;
 				height: 8rem;
 				float: left;
-				margin-right: 5%;
-				margin-left: 7%;
+				margin-right: 10%;
+				margin-left: 15%;
 				border: 1px solid #658cc5;
 				background-color: #181f2f;
 				text-align: center;

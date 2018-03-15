@@ -38,14 +38,15 @@
     import CodeBar from '@/components/CodeBar.vue'
     import {jquery} from '@/assets/js/jquery.min.js'
     import {jvectormap} from '@/assets/js/jquery.qrcode.min.js'
+
     export default {
         data() {
             return {
                 keyShow: false,
                 keyInfo: '',
-                newAccountAddress:this.$route.params.address=="" ? localStorage.getItem('newAccountAddress'):this.$route.params.address,
+                newAccountAddress: this.$route.params.address == "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
                 codeShowOk: false,
-                newOk:this.$route.params.newOk,
+                newOk: this.$route.params.newOk,
                 //address:this.$route.params.address,
             }
         },
@@ -54,10 +55,10 @@
         },
         mounted() {
             let _this = this;
-            var address=this.newAccountAddress;
-            var password=localStorage.getItem('userPass');
-            var param = '{"address":"'+address+'","password":"'+password+'"}';
-           this.$post('/account/prikey',param)
+            var address = this.newAccountAddress;
+            var password = localStorage.getItem('userPass');
+            var param = '{"address":"' + address + '","password":"' + password + '"}';
+            this.$post('/account/prikey', param)
                 .then((response) => {
                     this.keyInfo = response.data;
                 });
@@ -67,7 +68,7 @@
                 this.$refs.codeBar.codeMaker(this.keyInfo)
                 this.codeShowOk = !this.codeShowOk;
             },
-            codeShowOks(){
+            codeShowOks() {
                 this.codeShowOk = false;
             },
             /** Backups Key
@@ -113,34 +114,32 @@
                 ipcRenderer.on('tips', (event, person) => {
                 });
                 dialog.showOpenDialog({
-                        defaultPath: '../Desktop',
-                        properties: [
-                            'openDirectory',
-                        ],
-                        filters: [
-                            {name: 'All', extensions: ['*']},
-                        ]
-                    }, function (res) {
-                        console.log(res);
-                        /*var MIME_TYPE = "image/png";
-                       var dlLink = document.createElement('a');
-                       dlLink.download = fileName;
-                       dlLink.href = canvas.toDataURL("image/png");
-                       dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
-                       document.body.appendChild(dlLink);
-                       dlLink.click();
-                       document.body.removeChild(dlLink);
-                       $('.qrcode').html("");*/
-                    })
-
-
+                    defaultPath: '../Desktop',
+                    properties: [
+                        'openDirectory',
+                    ],
+                    filters: [
+                        {name: 'All', extensions: ['*']},
+                    ]
+                }, function (res) {
+                    var MIME_TYPE = "image/png";
+                    var dlLink = document.createElement('a');
+                    dlLink.download = fileName;
+                    dlLink.href = canvas.toDataURL("image/png");
+                    dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
+                    document.body.appendChild(dlLink);
+                    dlLink.click();
+                    document.body.removeChild(dlLink);
+                    $('.qrcode').html("");
+                })
             },
+
             /** Backup File
-            * @method backupFile
-            * @author Wave
-            * @date 2018-2-11
-            * @version 1.0
-            **/
+             * @method backupFile
+             * @author Wave
+             * @date 2018-2-11
+             * @version 1.0
+             **/
             backupFile(downloadAddress) {
                 const {dialog} = require('electron').remote;
                 const {ipcRenderer} = require('electron');
@@ -157,7 +156,7 @@
                 }, function (res) {
                     if (res[0] != "") {
                         ipcRenderer.send('download', downloadAddress + "+" + res[0]);
-                        alert("保存成功！");
+                        alert("保存成功！路径:" + res);
                     } else {
                         alert("请选择保存文件夹！");
                     }

@@ -3,7 +3,7 @@
         <Back :backTitle="backTitle"></Back>
         <div class="transfer-info">
             <h2>转账</h2>
-            <el-form ref="form" :model="transferForm" :rules="rulesTransferForm" label-width="100px" label-position="top">
+            <el-form :model="transferForm" :rules="rules" ref="transferForm">
                 <div class="out-name">
                     转账资产：NULS(可用余额:{{ usable }} )
                 </div>
@@ -14,12 +14,12 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="转账地址:" class="join-address">
+                <el-form-item label="转账地址:" class="join-address" prop="joinAddress">
                     <el-input type="text" v-model="transferForm.joinAddress"></el-input>
                     <i @click="toUsersAddressList"></i>
                 </el-form-item>
-                <el-form-item label="转账金额:">
-                    <el-input type="text" v-model="transferForm.joinNo" auto-complete="off"></el-input>
+                <el-form-item label="转账金额:" prop="joinNo">
+                    <el-input type="number" v-model="transferForm.joinNo" class="joinNo"></el-input>
                 </el-form-item>
                 <el-form-item label="手续费:0.01NULS" class="service-no">
                 </el-form-item>
@@ -27,38 +27,39 @@
                     <el-input type="textarea" v-model="transferForm.remark"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
-                    <el-button type="primary" @click="transferSubmit">确认转账</el-button>
+                    <el-button type="primary" @click="transferSubmit('rulesTransferForm')">确认转账</el-button>
                 </el-form-item>
             </el-form>
-
             <el-dialog :visible.sync="dialogTableVisible">
-                <el-table :data="userAddressList">
+                <el-table :data="userAddressList" @row-dblclick="dbcheckedAddress">
                     <el-table-column property="userAddress" label="账户" min-width="60" align='center'></el-table-column>
                     <el-table-column property="userAlias" label="别名" min-width="20" align='center'></el-table-column>
                     <el-table-column property="userHelp" label="备注" min-width="20" align='center'></el-table-column>
                     <el-table-column label="操作" min-width="20" align='center'>
                         <template slot-scope="scope">
-                            <span class="cursor-p text-d" @click="checkedAddress(scope.row.userAddress)">选中</span>
+                            <span class="cursor-p text-d" @click="checkedAddress(scope.row.userAddress)">选择</span>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-dialog>
-
         </div>
     </div>
-
 </template>
-
 <script>
     import Back from '@/components/BackBar.vue';
 
     export default {
         data() {
-            var joinNo = (rule, value, callback) => {
+            var checkJoinAddress = (rule, value, callback) => {
                 if (value === '') {
-                    callback(new Error("请输入交易金额！"));
-                } else if (value < this.usable) {
-                    callback(new Error("交易金额不能大于可用余额"));
+                    callback(new Error('请输入转账地址！'));
+                }
+            };
+            var checkNo = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入转账金额！'));
+                } else if (value > this.usable) {
+                    callback(new Error('转账金额不能大于可用余额！'));
                 } else {
                     callback();
                 }
@@ -66,7 +67,7 @@
             return {
                 backTitle: '钱包管理',
                 address: this.$route.params.address,
-                usable:'0',
+                usable: '0',
                 accountAddress: [],
                 transferForm: {
                     outName: '',
@@ -75,21 +76,18 @@
                     serviceNo: '',
                     remark: ''
                 },
-                rulesTransferForm:{
-                    joinNo: [{
-                        validator: joinNo,
-                        trigger: 'blur'
-                    }]
-                },
-                form:{
-                    joinNo: [
-                        { validator: joinNo, trigger: 'blur' }
+                rules: {
+                    joinAddress: [
+                        {validator: checkJoinAddress, trigger: 'blur'}
                     ],
+                    joinNo: [
+                        {validator: checkNo, trigger: 'blur'}
+                    ]
                 },
                 userAddressList: [
-                    {"userAddress":"2Ck3mbLK5vh3JBKYWjeujAnY9EA6gNA","userAlias":"linxin","userHelp":"456"},
-                    {"userAddress":"2CWyLqVgZHawcjsSpY2h5mYFQMZrL3r","userAlias":"789","userHelp":"456"},
-                    {"userAddress":"2CdvShGME8haSJCciuHd5HbnDE3ajxa","userAlias":"96358964","userHelp":"85568"}
+                    {"userAddress": "2Ck3mbLK5vh3JBKYWjeujAnY9EA6gNA", "userAlias": "linxin", "userHelp": "456"},
+                    {"userAddress": "2CWyLqVgZHawcjsSpY2h5mYFQMZrL3r", "userAlias": "789", "userHelp": "456"},
+                    {"userAddress": "2CdvShGME8haSJCciuHd5HbnDE3ajxa", "userAlias": "96358964", "userHelp": "85568"}
                 ],
                 dialogTableVisible: false,
             }
@@ -100,7 +98,7 @@
         mounted() {
             let _this = this;
             this.getaccountAddress("/account/list");
-            this.getBalanceAddress('/account/balance/'+this.address);
+            this.getBalanceAddress('/account/balance/' + this.address);
         },
         methods: {
             //获取账户地址列表
@@ -114,42 +112,49 @@
             getBalanceAddress(api) {
                 this.$fetch(api)
                     .then((response) => {
-                        this.usable = response.data.usable*0.0000000001;
+                        this.usable = response.data.usable * 0.0000000001;
                     });
             },
             //选择账户地址
             accountAddressChecked(value) {
                 this.address = value;
-                this.getBalanceAddress('/account/balance/'+this.address)
+                this.getBalanceAddress('/account/balance/' + this.address)
             },
             //选择通讯录
             toUsersAddressList() {
-                this.dialogTableVisible=true;
+                this.dialogTableVisible = true;
             },
             //选中通讯录地址
-            checkedAddress(address){
-                this.transferForm.joinAddress =address;
-                this.dialogTableVisible=false;
+            checkedAddress(address) {
+                this.transferForm.joinAddress = address;
+                this.dialogTableVisible = false;
+            },
+            //双击选择通讯录地址
+            dbcheckedAddress(row, event){
+                this.transferForm.joinAddress = row.userAddress;
+                this.dialogTableVisible = false;
             },
             //确认转账
-            transferSubmit() {
-
-                this.$prompt(this.$t('message.passWordTitle'), '', {
-                    confirmButtonText: this.$t('message.confirmButtonText'),
-                    cancelButtonText: this.$t('message.cancelButtonText'),
-                    inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                    inputErrorMessage: this.$t('message.walletPassWordEmpty')
-                }).then(({value}) => {
-                    //console.log(this.address + this.transferForm.joinAddress+this.transferForm.joinNo+this.transferForm.remark);
-                    var param = '{"address":"'+this.address+'","toaddress":"'+this.transferForm.joinAddress+'","amount":"'+this.transferForm.joinNo+'","password":"'+value+'","remark":"'+this.transferForm.remark+'"}';
-                    console.log(param);
-                    /*this.$post('/wallet/transfer/',param)
-                        .then((response) => {
-                            console.log(response)
-                        })*/
-                })
-
-
+            transferSubmit(formName) {
+                if (this.transferForm.joinAddress === '' || this.transferForm.joinNo === '' || this.transferForm.joinNo > this.usable) {
+                    this.$message({
+                        message: '请输入正确的转账地址、转账金额！',
+                        type: 'warning'
+                    });
+                } else {
+                    this.$prompt(this.$t('message.passWordTitle'), '', {
+                        confirmButtonText: this.$t('message.confirmButtonText'),
+                        cancelButtonText: this.$t('message.cancelButtonText'),
+                        inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                        inputErrorMessage: this.$t('message.walletPassWordEmpty')
+                    }).then(({value}) => {
+                        var param = '{"address":"' + this.address + '","toaddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
+                        this.$post('/wallet/transfer/', param)
+                            .then((response) => {
+                                console.log(response)
+                            })
+                    })
+                }
             },
         }
     }
@@ -173,7 +178,13 @@
         .transfer-info {
             width: 70%;
             margin: auto;
-            .out-name{
+            .joinNo {
+                .el-input__inner {
+                    background-color: #17202e;
+                    border: 1px solid #24426c;
+                }
+            }
+            .out-name {
                 font-size: 14px;
                 color: #606266;
             }
@@ -255,6 +266,9 @@
             .el-dialog__body {
                 padding: 0px;
             }
+        }
+        input[type="text"], input[type="password"], select {
+            border: 1px solid #24426c;
         }
     }
 </style>

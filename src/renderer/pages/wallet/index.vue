@@ -6,7 +6,8 @@
                 <template>
                     <el-select v-model="accountAddressValue" placeholder="请选择账户地址" @change="accountAddressChecked">
                         <el-option v-for="item in accountAddress" :key="item.address"
-                                   :label="item.address + item.alias == null ? '('+item.alias+')' : '' " :value="item.address">
+                                   :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
+                                   :value="item.address">
                         </el-option>
                     </el-select>
                 </template>
@@ -42,8 +43,9 @@
                         </el-table-column>
                         <el-table-column :label="$t('message.indexLock')" min-width="80" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.locked*0.00000001
-                                       readonly="readonly" title="点击查看详情" class="cursor-p text-d" @click="toLocked(accountAddressValue)">
+                                <input :type="keyShow ? 'text' : 'password'" :value=parseFloat(scope.row.locked)*0.00000001
+                                       readonly="readonly" title="点击查看详情" class="cursor-p text-d"
+                                       @click="toLocked(accountAddressValue)">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.operation')" align='center'>
@@ -111,6 +113,7 @@
     import CodeBar from '@/components/CodeBar.vue';
     import copy from 'copy-to-clipboard';
     import moment from 'moment';
+
     export default {
         data() {
             return {
@@ -153,14 +156,14 @@
             getAccountTxList(api, param) {
                 this.$fetch(api, param)
                     .then((response) => {
-                        this.dealList = response.data;
-                       if (response.data.length != undefined) {
-                           for (var i = 0; i < response.data.length; i++) {
-                                this.dealList[i].values = response.data[i].value * response.data[i].transferType*0.00000001;
+                        if(response.data.list !==null){
+                            this.dealList = response.data;
+                            for (var i = 0; i < response.data.length; i++) {
+                                this.dealList[i].values = response.data[i].value * response.data[i].transferType * 0.00000001;
                                 this.dealList[i].times = moment(response.data[i].time).format('YYYY-MM-DD hh:mm:ss');
                             }
-                        } else {
-                           this.dealList=''
+                        }else {
+                            this.dealList=[];
                         }
                     });
             },
@@ -174,7 +177,10 @@
             //tab切换
             handleClick(tab, event) {
                 this.walletHide = !this.walletHide;
-                console.log(tab, event);
+                this.getAccountAssets("/account/assets/" + this.accountAddressValue);
+                let params = {"address": this.accountAddressValue};
+                this.getAccountTxList('/tx/address/list/', params);
+                //console.log(tab, event);
             },
             //复制功能
             accountCopy() {
@@ -203,23 +209,24 @@
             },
             //toTxid跳转
             toTxid(txId) {
+                //this.activeName='second';
                 this.$router.push({
                     name: '/dealInfo',
-                    params:{hash:txId},
+                    params: {hash: txId},
                 })
             },
             //toLocked 跳转冻结列表
-            toLocked(address){
+            toLocked(address) {
                 this.$router.push({
                     name: '/freezeList',
-                    params:{address:address},
+                    params: {address: address},
                 })
             },
             //跳转转账
             toTransfer(address) {
                 this.$router.push({
                     name: '/transfer',
-                    params:{address:address},
+                    params: {address: address},
                 })
             },
 

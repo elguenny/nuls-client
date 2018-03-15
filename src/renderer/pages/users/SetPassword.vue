@@ -65,9 +65,9 @@
                 backTitle: this.$t('message.set'),
                 labelPosition: 'top',
                 setPass: {
-                    pass: 'nuls123456',
-                    checkPass: 'nuls123456',
-                    passWordHint: '456'
+                    pass: '',
+                    checkPass: '',
+                    passWordHint: ''
                 },
                 rules2: {
                     pass: [{

@@ -29,11 +29,11 @@ function createWindow() {
 		height: 560,
 		useContentSize: true,
         webPreferences: {webSecurity: false},
-		width: 1360,
+		width: 1500,
 		//Set minimum width height.
 		minWidth:800,
 		minHeight:560,
-      /*  maxWidth:800,
+        /*maxWidth:800,
         maxHeight:560,*/
 	});
 

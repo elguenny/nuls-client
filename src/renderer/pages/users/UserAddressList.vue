@@ -31,12 +31,7 @@
         data() {
             return {
                 backTitle: "设置",
-               /* tableData: [
-                    {"userAddress":"2CfnhnNxNorPiug5knrn1txaRpReCGn","userAlias":"linxin","userHelp":"456"},
-                    {"userAddress":"2CidJFvJhyruCS9RQLSVMVcYgm845Fh","userAlias":"789","userHelp":"456"},
-                    {"userAddress":"2CkFHVWKVogUQRScVzgsu8oEA5Txz8W","userAlias":"96358964","userHelp":"85568"}
-                    ],*/
-                tableData:[],
+                tableData: [],
             }
         },
         components: {
@@ -47,16 +42,13 @@
             this.openDB();
             //this.addUserDB();
             this.getUserList();
-            console.log(this.tableData);
         },
         methods: {
             //创建usersDB
-            openDB()
-            {
+            openDB() {
                 var request = indexedDB.open('usersDB', 1);
                 request.onupgradeneeded = function (e) {
                     var db = e.target.result;
-                    console.log("====" + !db.objectStoreNames.contains('usersDB'));
                     // 如果不存在Users对象仓库则创建
                     if (!db.objectStoreNames.contains('usersDB')) {
                         var store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false});
@@ -64,8 +56,7 @@
                 }
             },
             //给userlist添加数据
-            addUserDB()
-            {
+            addUserDB() {
                 var request = indexedDB.open('usersDB', 1);
                 var db;
                 request.onsuccess = function (event) {
@@ -73,40 +64,37 @@
                     var tx = db.transaction('addressList', 'readwrite');
                     var store = tx.objectStore('addressList');
                     var value = {
-                        'userAddress': '2CkFHVWKVogUQRScVzgsu8oEA5Txz8W',
-                        'userAlias': '96358964',
-                        'userHelp': '85568'
+                        'userAddress': '2CkFHVWKVog78RScVzgsu8oEA5Txz8W',
+                        'userAlias': '看看',
+                        'userHelp': '试一下'
                     }
                     store.put(value);
                 }
             },
             //读取userList
-            getUserList(callback){
+            getUserList() {
                 var request = indexedDB.open('usersDB', 1);
-                var dbData=[{"userAddress":"2CfnhnNxNorPiug5knrn1txaRpR1234","userAlias":"linxin","userHelp":"456"}];
-                request.onsuccess = function(event){
+                var dbData = [];
+                request.onsuccess = function (event) {
                     var db = event.target.result;
-                    var tx = db.transaction('addressList','readonly');
+                    var tx = db.transaction('addressList', 'readonly');
                     var store = tx.objectStore('addressList');
-
                     // 打开游标，遍历customers中所有数据
-                    store.openCursor().onsuccess = function(event) {
+                    store.openCursor().onsuccess = function (event) {
                         var cursor = event.target.result;
                         if (cursor) {
-                            //console.log(JSON.stringify(cursor.value));
-                            dbData.push({"userAddress":cursor.value.userAddress,"userAlias":cursor.value.userAlias,"userHelp":cursor.value.userHelp});                            cursor.continue();
+                            dbData.push(cursor.value);
+                            cursor.continue();
                         }
                     }
-                    this.tableData=dbData;
-                    console.log(this.tableData);
                 }
+                this.tableData = dbData;
             },
         }
     }
 </script>
 <style lang="less">
     @import url("../../assets/css/style.less");
-
     .users {
         width: 90%;
         margin: auto;

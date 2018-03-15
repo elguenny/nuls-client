@@ -19,8 +19,8 @@ function openDB(){
         db = e.target.result;
         // 如果不存在Users对象仓库则创建
         if(!db.objectStoreNames.contains('Users')){
-            var store = db.createObjectStore('Users',{keyPath: 'userAddress', autoIncrement: true});
-            var idx = store.createIndex('userAddress','userAddress',{unique: false})
+            var store = db.createObjectStore('Users',{keyPath: 'id', autoIncrement: true});
+            var idx = store.createIndex('index','username',{unique: false})
         }
     }
 }
