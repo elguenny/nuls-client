@@ -74,7 +74,7 @@
         },
         mounted() {
             let _this = this;
-            this.$i18n.locale = localStorage.getItem("language");
+            this.$i18n.locale = localStorage.getItem("language") == null ? "zh":localStorage.getItem("language");
         },
         methods: {
             /**
@@ -96,7 +96,7 @@
              * @version 1.0
              **/
             toWallet() {
-                if (localStorage.getItem("fastUser") == "0") {
+                if (localStorage.getItem("fastUser") == "0" && localStorage.getItem("newAccountAddress") == null) {
                     this.$router.push({
                         name: '/firstInto',
                         params: {backOk: false, oldPassOk: false},

@@ -27,14 +27,15 @@ function createWindow() {
 	 */
 	mainWindow = new BrowserWindow({
 		height: 560,
+        width: 800,
 		useContentSize: true,
         webPreferences: {webSecurity: false},
-		width: 1500,
+        frame: false,
 		//Set minimum width height.
 		minWidth:800,
 		minHeight:560,
-        /*maxWidth:800,
-        maxHeight:560,*/
+        maxWidth:800,
+        maxHeight:560,
 	});
 
     ipcMain.on('download', (evt, args) => {

@@ -3,6 +3,7 @@
 		<Back :backTitle="backTitle"></Back>
 		<div class="freeze-list-tabs">
 			<h2>账户管理</h2>
+			<el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount" title="新增账户"></el-button>
 			<el-table :data="userData">
 				<el-table-column prop="address" label="账户" min-width="50" align='center'>
 				</el-table-column>
@@ -14,7 +15,6 @@
 				</el-table-column>
 				<el-table-column label="操作"  min-width="25" align='center'>
 					<template slot-scope="scope">
-						<el-button size="mini" type="text" @click="setAs(scope.row.address)">{{ setAsAddress == scope.row.address ? "已默认":"设为默认"}}</el-button>
 						<el-button size="mini" type="text" @click="outUser()">移除</el-button>
 						<el-button size="mini" type="text" @click="backupUser(scope.row.address)">备份</el-button>
 					</template>
@@ -50,11 +50,6 @@
 						this.userData = response.data;
 					});
 			},
-            setAs(address){
-                this.setAsAddress = address
-                localStorage.setItem('newAccountAddress',address);
-			},
-
 			outUser() {
 				console.log('移除账户')
 			},
@@ -69,6 +64,12 @@
                     name: '/editAliasing',
                     params: {address: accountAddress, alias: accountAlias},
                 })
+			},
+			//新增账户
+            toNewAccount(){
+                this.$router.push({
+                    path: '/firstInto/firstInfo'
+                })
 			}
 
 		}
@@ -79,15 +80,18 @@
 	.users {
 		width: 100%;
 		margin: auto;
-		.back {
-			width: 100%;
-			height: 3rem;
-			line-height: 3rem;
-			font-size: 1rem;
-		}
 		.freeze-list-tabs{
 			width: 80%;
 			margin: auto;
+			.newAccount{
+				width: 30px;
+				line-height: 20px;
+				height: 20px;
+				background-color: #0b1422;
+				float: right;
+				border: 1px solid #0b1422;
+				margin-bottom: 10px;
+			}
 			h2{
 				text-align: center;
 				line-height: 3rem;

@@ -27,20 +27,24 @@
                     confirmButtonText: this.$t('message.confirmButtonText'),
                     cancelButtonText: this.$t('message.cancelButtonText'),
                     inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                    inputErrorMessage: this.$t('message.walletPassWordEmpty')
+                    inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                    inputType:'password'
                 }).then(({value}) => {
                     var param = '{"prikey":"'+this.keyData.keyInfo+'","password":"' + value + '"}';
                     this.$post('/wallet/import/', param)
                         .then((response) => {
                             if (response.success) {
+                                localStorage.setItem('newAccountAddress', '2Ck3mbLK5vh3JBKYWjeujAnY9EA6gNA');
+                                this.$router.push({
+                                    path: '/wallet'
+                                })
                                 this.$message({
                                     type: 'success', message: this.$t('message.passWordSuccess')
                                 });
-                                /*localStorage.setItem('newAccountAddress', response.data[0]);
-                                this.$router.push({
-                                    name: '/newAccount',
-                                    params: {newOk: true, address: ''},
-                                })*/
+                                //导入成功需要返回账户地址
+                                /*console.log(response)
+                                localStorage.setItem('newAccountAddress', response.data[0]);*/
+
                             } else {
                                 this.$message({
                                     type: 'warning', message: this.$t('message.passWordFailed')

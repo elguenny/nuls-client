@@ -67,13 +67,13 @@
 				float: left;
 				margin-right: 10%;
 				margin-left: 15%;
-				border: 1px solid #658cc5;
+				border: 1px solid #0b1422;
 				background-color: #181f2f;
 				text-align: center;
+
 				span {
 					display: block;
-					font-size: 1rem;
-					font-weight: 600;
+					font-size: 14px;
 					line-height: 8rem;
 				}
 				label {
@@ -82,6 +82,10 @@
 					padding: 0 1.5rem;
 					text-align: center;
 				}
+			}
+			li:hover{
+				cursor: pointer;
+				border-color: #658ec7;
 			}
 			li:last-child {}
 		}

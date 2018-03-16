@@ -122,15 +122,24 @@
                         {name: 'All', extensions: ['*']},
                     ]
                 }, function (res) {
-                    var MIME_TYPE = "image/png";
-                    var dlLink = document.createElement('a');
-                    dlLink.download = fileName;
-                    dlLink.href = canvas.toDataURL("image/png");
-                    dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
-                    document.body.appendChild(dlLink);
-                    dlLink.click();
-                    document.body.removeChild(dlLink);
-                    $('.qrcode').html("");
+                    if (res[0] != "") {
+                        var MIME_TYPE = "image/png";
+                        var dlLink = document.createElement('a');
+                        dlLink.download = fileName;
+                        dlLink.href = canvas.toDataURL("image/png");
+                        var fs = require('fs');
+                        fs.writeFileSync('code.png', dlLink.href.slice('22'), 'utf8');
+                        var downloadAddress = "D:/work/nuls-client/code.png";
+                        ipcRenderer.send('download', downloadAddress + "+" + res[0]);
+                        dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
+                        document.body.appendChild(dlLink);
+                        dlLink.click();
+                        document.body.removeChild(dlLink);
+                        $('.qrcode').html("");
+                        alert("保存成功！路径:" + res);
+                    } else {
+                        alert("请选择保存文件夹！");
+                    }
                 })
             },
 

@@ -10,7 +10,8 @@
                 <el-form-item label="账户地址:" class="out-address">
                     <el-select v-model="address" placeholder="请选择账户地址" @change="accountAddressChecked">
                         <el-option v-for="item in accountAddress" :key="item.address"
-                                   :label="item.address + '('+item.alias+')'" :value="item.address">
+                                   :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
+                                   :value="item.address">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -84,11 +85,7 @@
                         {validator: checkNo, trigger: 'blur'}
                     ]
                 },
-                userAddressList: [
-                    {"userAddress": "2Ck3mbLK5vh3JBKYWjeujAnY9EA6gNA", "userAlias": "linxin", "userHelp": "456"},
-                    {"userAddress": "2CWyLqVgZHawcjsSpY2h5mYFQMZrL3r", "userAlias": "789", "userHelp": "456"},
-                    {"userAddress": "2CdvShGME8haSJCciuHd5HbnDE3ajxa", "userAlias": "96358964", "userHelp": "85568"}
-                ],
+                userAddressList: [],
                 dialogTableVisible: false,
             }
         },
@@ -123,6 +120,22 @@
             //选择通讯录
             toUsersAddressList() {
                 this.dialogTableVisible = true;
+                var request = indexedDB.open('usersDB', 1);
+                var dbData = [];
+                request.onsuccess = function (event) {
+                    var db = event.target.result;
+                    var tx = db.transaction('addressList', 'readonly');
+                    var store = tx.objectStore('addressList');
+                    // 打开游标，遍历customers中所有数据
+                    store.openCursor().onsuccess = function (event) {
+                        var cursor = event.target.result;
+                        if (cursor) {
+                            dbData.push(cursor.value);
+                            cursor.continue();
+                        }
+                    }
+                }
+                this.userAddressList = dbData;
             },
             //选中通讯录地址
             checkedAddress(address) {
@@ -130,7 +143,7 @@
                 this.dialogTableVisible = false;
             },
             //双击选择通讯录地址
-            dbcheckedAddress(row, event){
+            dbcheckedAddress(row, event) {
                 this.transferForm.joinAddress = row.userAddress;
                 this.dialogTableVisible = false;
             },
@@ -148,10 +161,14 @@
                         inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
                         inputErrorMessage: this.$t('message.walletPassWordEmpty')
                     }).then(({value}) => {
-                        var param = '{"address":"' + this.address + '","toaddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
+                        var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
                         this.$post('/wallet/transfer/', param)
                             .then((response) => {
-                                console.log(response)
+                                //console.log(response)
+                                this.$message({
+                                    message: '恭喜您！转账成功！',
+                                    type: 'warning'
+                                });
                             })
                     })
                 }

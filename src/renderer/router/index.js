@@ -64,7 +64,7 @@ const router = new VueRouter({
 		},
 		{
 			path: '/wallet',
-			name: '钱包首页',
+			name: '/wallet',
 			component: resolve => require(['../../renderer/pages/wallet/Index.vue'], resolve)
 		},
 		{

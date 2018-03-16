@@ -96,9 +96,10 @@
                 height: 11rem;
                 float: left;
                 margin-right: 18%;
-                border: 1px solid #658cc5;
+                border: 1px solid #0b1422;
                 background-color: #181f2f;
                 text-align: center;
+                cursor: pointer;
                 span {
                     display: block;
                     font-size: 16px;
@@ -111,6 +112,10 @@
                     padding: 0 1rem;
                     text-align: left;
                 }
+            }
+            li:hover{
+                cursor: pointer;
+                border-color: #658ec7;
             }
             li:last-child {
                 margin-right: 0px;

@@ -134,7 +134,7 @@
             let _this = this;
             this.getaccountAddress("/account/list");
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
-            let params = {"address": this.accountAddressValue};
+            let params = {"address": this.accountAddressValue,"pageSize":5};
             this.getAccountTxList('/tx/address/list/', params);
         },
         methods: {
@@ -156,6 +156,7 @@
             getAccountTxList(api, param) {
                 this.$fetch(api, param)
                     .then((response) => {
+                        console.log(response)
                         if(response.data.list !==null){
                             this.dealList = response.data;
                             for (var i = 0; i < response.data.length; i++) {
@@ -169,8 +170,9 @@
             },
             //地址选择
             accountAddressChecked(value) {
+                localStorage.setItem('newAccountAddress',value);
                 this.getAccountAssets("/account/assets/" + value);
-                let params = {"address": value};
+                let params = {"address": value,"pageSize":5};
                 this.getAccountTxList("/tx/address/list/", params);
                 //console.log(value);
             },
@@ -178,7 +180,7 @@
             handleClick(tab, event) {
                 this.walletHide = !this.walletHide;
                 this.getAccountAssets("/account/assets/" + this.accountAddressValue);
-                let params = {"address": this.accountAddressValue};
+                let params = {"address": this.accountAddressValue,"pageSize":5};
                 this.getAccountTxList('/tx/address/list/', params);
                 //console.log(tab, event);
             },

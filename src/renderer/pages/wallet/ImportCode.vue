@@ -14,7 +14,6 @@
                 <el-button type="primary" @click="codeSubmit">确定</el-button>
             </el-form-item>
         </el-form>
-
     </div>
 </template>
 
@@ -30,7 +29,7 @@
         methods: {
             handleAvatarSuccess(res, file) {
                 this.imageUrl = URL.createObjectURL(file.raw);
-                //console.log(file.raw.path);
+                console.log(file.raw.path);
                 this.imagesPash = file.raw.path;
                 this.getUrl();
             },
@@ -52,6 +51,7 @@
                 console.log(this.qrcode.decode(this.imagesPash));
             },
             codeSubmit(){
+                alert("开发中.....")
                 console.log("codeSubmit");
             }
         }

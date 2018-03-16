@@ -30,10 +30,10 @@
                         <label class="fl">{{$t("message.income")}}：</label>
                         <span>866nuls</span>
                     </li>
-                    <li class="cl">
+                   <!-- <li class="cl">
                         <label class="fl">{{$t("message.annualYield")}}：</label>
                         <span>50%</span>
-                    </li>
+                    </li>-->
                 </ul>
             </div>
             <div class="home-nav-top">
@@ -111,6 +111,7 @@
             }
         },
         methods: {
+            //根据账户地址获取总金、冻结、可用额
             getAccountAddress(api) {
                 this.$fetch(api)
                     .then((response) => {
@@ -246,7 +247,7 @@
                     margin-left: 1rem;
                 }
                 span {
-                    margin-right: 1rem;
+                    margin-right: 5px;
                 }
             }
         }

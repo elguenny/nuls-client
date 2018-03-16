@@ -46,7 +46,7 @@
 					.then((response) => {
 						this.bottomItem = response.data;
 						if(response.data.myVersion != response.data.newestVersion){
-							this.updateVersion = true
+							//this.updateVersion = true
 						}
 					});
 			},
