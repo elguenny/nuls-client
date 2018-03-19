@@ -164,11 +164,15 @@
                         var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
                         this.$post('/wallet/transfer/', param)
                             .then((response) => {
-                                //console.log(response)
                                 this.$message({
                                     message: '恭喜您！转账成功！',
                                     type: 'warning'
                                 });
+                                this.transferForm.joinAddress='',
+                                    this.transferForm.joinNo='',
+                                    this.transferForm.remark=''
+
+
                             })
                     })
                 }

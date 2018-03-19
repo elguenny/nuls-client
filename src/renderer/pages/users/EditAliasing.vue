@@ -47,17 +47,18 @@
                 var param = {"alias": this.alias, "address": this.address, "password": "nuls123456"}
                 this.$post('/account/alias/', param)
                     .then((response) => {
+                        console.log(response);
                         if (response.success) {
                             this.$message({
                                 type: 'success', message: "别名设置完成！"
                             });
                             //localStorage.setItem('newAccountAddress', response.data[0]);
                             this.$router.push({
-                                path: '/firstInto/firstInfo/newAccount'
+                                path: '/wallet'
                             })
                         } else {
                             this.$message({
-                                type: 'warning', message: "别名设置未完成！"
+                                type: 'warning', message: response.msg+",别名设置未完成!"
                             });
                         }
                     });

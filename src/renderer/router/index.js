@@ -12,13 +12,15 @@ const router = new VueRouter({
 	base: __dirname,
 	likActiveClass: 'link-active',
 	routes: [{
+			//首页
 			path: '*',
-			name: '首页',
+			name: '/home',
 			component: resolve => require(['../../renderer/pages/index/Home.vue'], resolve)
 		},
 		{
-            path: '/firstInto :backOk/:oldPassOk',
-            name: '/firstInto',
+            //设置钱包密码  返回/旧密码
+            path: '/setPassword :backOk/:oldPassOk',
+            name: '/setPassword',
             component: resolve => require(['../../renderer/pages/users/SetPassword.vue'], resolve),
 		},
 		{
@@ -103,8 +105,9 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/users/UserAddressList.vue'], resolve)
 		},
 		{
+			//共识首页
 			path: '/consensus',
-			name: '共识首页',
+			name: '/consensus',
 			component: resolve => require(['../../renderer/pages/consensus/Index.vue'], resolve)
 
 		}, 

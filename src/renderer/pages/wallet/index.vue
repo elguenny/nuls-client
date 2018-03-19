@@ -174,7 +174,6 @@
                 this.getAccountAssets("/account/assets/" + value);
                 let params = {"address": value,"pageSize":5};
                 this.getAccountTxList("/tx/address/list/", params);
-                //console.log(value);
             },
             //tab切换
             handleClick(tab, event) {
@@ -182,7 +181,6 @@
                 this.getAccountAssets("/account/assets/" + this.accountAddressValue);
                 let params = {"address": this.accountAddressValue,"pageSize":5};
                 this.getAccountTxList('/tx/address/list/', params);
-                //console.log(tab, event);
             },
             //复制功能
             accountCopy() {

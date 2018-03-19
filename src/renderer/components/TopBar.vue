@@ -1,35 +1,20 @@
 <template>
     <nav class="nav-top">
-        <div class="logo fl"><img class="logo-img" src="../assets/logo.png"/></div>
+        <div class="logo fl" style="-webkit-app-region: drag"><img class="logo-img" src="../assets/logo.png"/></div>
         <ul>
-            <router-link to="/home" tag="li" class="home-bg">
-                <i class="icon-home_icon"></i>
-                <span>{{$t("message.home")}}</span>
-            </router-link>
-            <li @click="toWallet" class="wallet-bg">
-                <i class="icon-page_icon"></i>
-                <span>{{$t("message.wallet")}}</span>
-            </li>
-            <router-link to="/consensus" tag="li" class="consensus-bg">
-                <i class="icon-consensus_icon"></i>
-                <span>{{$t("message.consensus")}}</span>
-            </router-link>
-            <router-link to="/application" tag="li" class="application-bg">
-                <i class="icon-use_icon"></i>
-                <span>{{$t("message.applications")}}</span>
-            </router-link>
-            <router-link to="/more" tag="li" class="more-bg">
-                <i class="icon-more_icon"></i>
-                <span>{{$t("message.more")}}</span>
-            </router-link>
+            <li @click="to('home','0')" ><i class="icon-home_icon"></i> <span>首页</span></li>
+            <li @click="to('wallet','1')" ><i class="icon-page_icon"></i> <span>钱包管理</span></li>
+            <li @click="to('consensus','2')" ><i class="icon-consensus_icon"></i> <span>共识挖矿</span></li>
+            <li @click="to('application','3')" ><i class="icon-use_icon"></i> <span>应用</span></li>
+            <li @click="to('more','4')" ><i class="icon-more_icon"></i> <span>更多</span></li>
         </ul>
+
         <div class="top-icon fl">
             <el-badge :value="12" class="news fl">
                 <i class="el-icon-bell" @click="news"></i>
             </el-badge>
             <i class="el-icon-setting" @click="toSetUp"></i>
-            <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem"
-                      :widthData="widthData"></SelecBar>
+            <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem" :widthData="widthData"></SelecBar>
         </div>
         <div class="news-div" v-show="newsOk">
             <h2>{{$t("message.news")}}</h2>
@@ -46,20 +31,22 @@
 
 <script>
     import SelecBar from './SelecBar.vue'
-
+    import {jquery} from '@/assets/js/jquery.min.js'
     export default {
         data() {
             return {
                 newsOk: false,
+                current: 0,
+                index:0,
                 //languageItem
                 languageItem: [{
                     key: "zh",
                     value: "static/img/Language-zh.png"
                 },
-                {
-                    key: "en",
-                    value: "static/img/Language-en.png"
-                }],
+                    {
+                        key: "en",
+                        value: "static/img/Language-en.png"
+                    }],
                 //select language initial info
                 projectName: {
                     key: "zh",
@@ -74,7 +61,8 @@
         },
         mounted() {
             let _this = this;
-            this.$i18n.locale = localStorage.getItem("language") == null ? "zh":localStorage.getItem("language");
+            index == 0;
+            this.$i18n.locale = localStorage.getItem("language") == null ? "zh" : localStorage.getItem("language");
         },
         methods: {
             /**
@@ -88,23 +76,43 @@
             selectLanguage() {
                 this.$i18n.locale = this.projectName.key;
             },
-            /**
-             * method statement
-             * @method toWallet
-             * @author Wave
-             * @date 2018-3-5
-             * @version 1.0
-             **/
-            toWallet() {
-                if (localStorage.getItem("fastUser") == "0" && localStorage.getItem("newAccountAddress") == null) {
+            //菜单跳转
+            to(url, index) {
+                console.log(url+"===="+index);
+               /* $(this).addClass("active").siblings().removeClass("active");
+                this.current==true;*/
+
+                if (url === "home") {
                     this.$router.push({
-                        name: '/firstInto',
-                        params: {backOk: false, oldPassOk: false},
+                        path: '/*',
                     })
-                } else {
+                }
+                if (url === "wallet") {
+                    if (localStorage.getItem("fastUser") == "0" || localStorage.getItem("newAccountAddress") == null) {
+                        this.$router.push({
+                            name: '/setPassword',
+                            params: {backOk: false, oldPassOk: false},
+                        })
+                    } else {
+                        this.$router.push({
+                            path: '/wallet'
+                        })
+                    }
+                }
+                if (url === "consensus") {
                     this.$router.push({
-                        path: '/wallet'
+                        name: '/consensus',
                     })
+                }
+                if (url === "application") {
+                    this.$message({
+                        type: 'info', message: "开发中，敬请期待！"
+                    });
+                }
+                if (url === "more") {
+                    this.$message({
+                        type: 'info', message: "开发中，敬请期待！"
+                    });
                 }
             },
             /**
@@ -134,6 +142,7 @@
 </script>
 <style lang="less">
     @import './../assets/css/style.less';
+
     @div-width: 100%;
     @div-height: 100%;
     .nav-top {
@@ -175,6 +184,10 @@
             li:hover {
                 cursor: pointer;
                 color: #FFFFFF;
+                border-bottom: 2px solid #81bc3b;
+                height: 40px;
+            }
+            li.active {
                 border-bottom: 2px solid #81bc3b;
                 height: 40px;
             }
