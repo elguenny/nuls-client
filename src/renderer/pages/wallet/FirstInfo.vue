@@ -51,7 +51,7 @@
                                    })
                                }else {
                                    this.$message({
-                                       type: 'warning', message:this.$t('message.passWordFailed')
+                                       type: 'warning', message:"对不起！创建失败："+response.msg
                                    });
                                }
                            });

@@ -10,7 +10,7 @@
                 </el-table-column>
                 <el-table-column label="别名" min-width="25" class="user-aliasing">
                     <template slot-scope="scope">
-                        <span>{{ scope.row.alias != undefined  ? scope.row.alias : "-" }}</span>
+                        <span>{{ scope.row.alias != null  ? scope.row.alias : "-" }}</span>
                         <i class="el-icon-edit cursor-p" title="设置别名"
                            v-show="scope.row.alias != undefined  ? false : true"
                            @click="editAliasing(scope.row.address,scope.row.alias)" ></i>
@@ -66,21 +66,24 @@
                 }).then(({value}) => {
                     if (value === localStorage.getItem('userPass')) {
                         var param = '{"address":"' + address + '","password":"' + value + '"}';
-                        alert("恭喜您，成功移除账户！");
-                        /*this.$post('/wallet/transfer/', param)
+                        this.$post('/wallet/remove/', param)
                             .then((response) => {
-                                this.$message({
-                                    type: 'success', message: this.$t("恭喜您，成功移除账户！")
-                                });
-                                this.getUserList("/account/list");
-                            })*/
+                                if(response.success){
+                                    this.$message({
+                                        type: 'success', message: "恭喜您，成功移除账户！"
+                                    });
+                                    this.getUserList("/account/list");
+                                }else {
+                                    this.$message({
+                                        type: 'success', message: "对不起！"+response.msg
+                                    });
+                                }
+                            })
                     } else {
                         this.$message({
                             type: 'success', message: this.$t('message.passWordWasincorrect')
                         });
                     }
-                    console.log('移除账户==' + address + "======" + value)
-
                 })
             },
             //备份账户地址跳转
@@ -92,10 +95,13 @@
             },
             //修改别名
             editAliasing(accountAddress, accountAlias) {
-                this.$router.push({
+                this.$message({
+                    type: 'info', message: "我们的工程师正专注研发，更多出色功能敬请期待！"
+                });
+                /*this.$router.push({
                     name: '/editAliasing',
                     params: {address: accountAddress, alias: accountAlias},
-                })
+                })*/
             },
             //新增账户
             toNewAccount() {
@@ -113,6 +119,9 @@
     .users {
         width: 100%;
         margin: auto;
+        .back{
+            margin-left: 25px;
+        }
         .freeze-list-tabs {
             width: 80%;
             margin: auto;

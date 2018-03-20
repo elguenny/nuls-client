@@ -33,6 +33,7 @@
                     var param = '{"prikey":"'+this.keyData.keyInfo+'","password":"' + value + '"}';
                     this.$post('/wallet/import/', param)
                         .then((response) => {
+                            console.log(response)
                             if (response.success) {
                                 localStorage.setItem('newAccountAddress', '2Ck3mbLK5vh3JBKYWjeujAnY9EA6gNA');
                                 this.$router.push({

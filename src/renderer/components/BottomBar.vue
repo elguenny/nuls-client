@@ -1,7 +1,7 @@
 <template>
 	<footer>
 		<el-col :span="12" class='footer-left'>
-			{{$t("message.purseVersion")}}：V{{$store.state.purseVersion}}（{{$t("message.coreVersion")}} V{{ bottomItem.myVersion }}）
+			<span @click="clearData">{{$t("message.purseVersion")}}</span>：V{{$store.state.purseVersion}}（{{$t("message.coreVersion")}} V{{ bottomItem.myVersion }}）
 			<span @click="updateVersionUrl" v-show="updateVersion" class="cursor-p text-d" >{{$t("message.toUpdate")}}</span>
 		</el-col>
 		<el-col :span="12" class='footer-right'>
@@ -79,6 +79,16 @@
 							this.timeOffsetOk = false;
 						}
 					});
+			},
+			//测试清理数据
+            clearData(){
+                localStorage.removeItem('fastUser');
+                localStorage.removeItem("language");
+                localStorage.removeItem("lockTime");
+                localStorage.removeItem("newAccountAddress");
+                localStorage.removeItem("passWordHint");
+                localStorage.removeItem("userPass");
+                indexedDB.deleteDatabase("usersDB");
 			}
 		}
 	}

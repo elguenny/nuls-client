@@ -10,12 +10,12 @@
                 </div>
                 <div class="nav-usable cl">
                     <label class="fl">{{$t("message.fundUsable")}}：</label>
-                    <ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth ></ProgressBar>
+                    <ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth></ProgressBar>
                     <span class="fr">{{this.locked}} nuls</span>
                 </div>
                 <div class="nav-lock cl">
                     <label class="fl">{{$t("message.fundLock")}}：</label>
-                    <ProgressBar :colorData=this.usableColor :widthData= this.usableWidth></ProgressBar>
+                    <ProgressBar :colorData=this.usableColor :widthData=this.usableWidth></ProgressBar>
                     <span class="fr">{{this.usable}} nuls</span>
                 </div>
             </div>
@@ -30,18 +30,18 @@
                         <label class="fl">{{$t("message.income")}}：</label>
                         <span>866nuls</span>
                     </li>
-                   <!-- <li class="cl">
-                        <label class="fl">{{$t("message.annualYield")}}：</label>
-                        <span>50%</span>
-                    </li>-->
+                    <!-- <li class="cl">
+                         <label class="fl">{{$t("message.annualYield")}}：</label>
+                         <span>50%</span>
+                     </li>-->
                 </ul>
             </div>
-            <div class="home-nav-top">
-            </div>
+            <!--<div class="home-nav-top">
+            </div>-->
         </div>
         <div class="cl home-info">
             <div class="home-info-consensus">
-                <div id="world-map-markers" style="height: 20rem;">
+                <div id="world-map-markers" style="height: 18.5rem;">
                 </div>
             </div>
         </div>
@@ -63,29 +63,21 @@
                 balanceColor: '#658EC7',
                 locked: '0',
                 lockedColor: '#82bd39',
-                lockedWidth:'0',
+                lockedWidth: '0',
                 usable: '0',
                 usableColor: '#f64b3e',
-                usableWidth:'0',
+                usableWidth: '0',
                 ipData: [
                     "186.101.196.150",
                     "176.101.196.150",
                     "166.101.196.150",
-                    "156.101.196.150",
+                    "166.101.196.150",
                     "146.101.196.150",
                     "136.101.196.150",
                     "126.101.196.150",
                     "116.101.196.150",
                     "106.101.196.150",
-                    "186.101.196.150",
-                    "186.100.196.150",
-                    "186.99.196.150",
-                    "186.80.196.150",
-                    "186.70.196.150",
-                    "186.60.196.150",
-                    "186.50.196.150",
-                    "186.40.196.150",
-                    "186.30.196.150"
+                    "186.101.196.150"
                 ],
                 mapObj: [{latLng: [34.74, 113.66], name: '郑州 '}],
             };
@@ -115,11 +107,11 @@
             getAccountAddress(api) {
                 this.$fetch(api)
                     .then((response) => {
-                        this.balance = response.data.balance*0.00000001;
-                        this.locked = response.data.locked*0.00000001;
-                        this.lockedWidth =this.locked/this.balance*100+"%";
-                        this.usable = response.data.usable*0.00000001;
-                        this.usableWidth =this.usable/this.balance*100+"%";
+                        this.balance = response.data.balance * 0.00000001;
+                        this.locked = response.data.locked * 0.00000001;
+                        this.lockedWidth = this.locked / this.balance * 100 + "%";
+                        this.usable = response.data.usable * 0.00000001;
+                        this.usableWidth = this.usable / this.balance * 100 + "%";
                     });
             },
 
@@ -134,24 +126,24 @@
              * @version 1.0
              **/
             getQueryIp(ip) {
+                let obj = [];
                 axios.get('http://freegeoip.net/json/' + ip)
                     .then(function (response) {
+                        //console.log(response);
                         var latLngs = [response.data.latitude, response.data.longitude];
                         var names = response.data.time_zone;
-                        if (names == undefined) {
+                        if (names == "undefined") {
                             names = 'anonymous'
                         } else {
                             names = names.split('/')[1]
                         }
-                        var obj = {
-                            "latLng": latLngs,
-                            "name": names
-                        };
-                        //this.mapObj.push(obj);
+                        obj.push({"latLng": latLngs, "name": names});
+                        //this.mapObj=obj;
+                        //console.log(obj)
                     })
-                    .catch(function (err) {
-                        console.log('Node data failed！===' + err);
-                    });
+                .catch(function (err) {
+                    console.log('Node data failed！===' + err);
+                });
 
             },
             /** jVector Maps
@@ -213,10 +205,11 @@
     }
 
     .home-nav {
-        width: 100%;
+        width: 85%;
         height: 150px;
+        margin: auto;
         .home-nav-top {
-            width: 30%;
+            width: 47%;
             height: 120px;
             float: left;
             margin-right: 4.5%;

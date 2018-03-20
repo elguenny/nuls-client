@@ -9,7 +9,7 @@
             </el-table-column>
             <el-table-column prop="userAlias" label="别名" min-width="10" align='center'>
             </el-table-column>
-            <el-table-column prop="userHelp" label="助记词" min-width="10" align='center'>
+            <el-table-column prop="userHelp" label="备注" min-width="10" align='center'>
             </el-table-column>
             <el-table-column label="操作" min-width="20" align='center'>
                 <template slot-scope="scope">
@@ -24,11 +24,11 @@
             </el-table-column>
         </el-table>
         <el-dialog title="新增通讯录" :visible.sync="dialogFormVisible">
-            <el-form :model="form" label-width="80px" :rules="formRules" :label-position="labelPosition" ref="form">
+            <el-form :model="form" label-width="80px" :rules="formRules"  ref="form">
                 <el-form-item label="账户">
                     <el-input v-model="form.userAddress"></el-input>
                 </el-form-item>
-                <el-form-item label="助记词">
+                <el-form-item label="备注">
                     <el-input v-model="form.userHelp"></el-input>
                 </el-form-item>
                 <div class="userAlias">别名 {{form.userAlias}}</div>
@@ -186,7 +186,7 @@
             background-color: #0b1422;
             .userAlias {
                 line-height: 20px;
-                margin-left: 35px;
+                margin-left: 40px;
                 color: #606266;
             }
             .el-dialog__title {

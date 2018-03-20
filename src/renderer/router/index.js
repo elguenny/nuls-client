@@ -18,11 +18,17 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/index/Home.vue'], resolve)
 		},
 		{
-            //设置钱包密码  返回/旧密码
-            path: '/setPassword :backOk/:oldPassOk',
+            //设置钱包密码
+            path: '/setPassword',
             name: '/setPassword',
             component: resolve => require(['../../renderer/pages/users/SetPassword.vue'], resolve),
 		},
+        {
+            //修改钱包密码
+            path: '/editorPassword',
+            name: '/editorPassword',
+            component: resolve => require(['../../renderer/pages/users/EditorPassword.vue'], resolve),
+        },
 		{
 			path: '/firstInto/firstInfo',
 			name: '首次进入',

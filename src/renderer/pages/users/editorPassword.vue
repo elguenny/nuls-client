@@ -1,8 +1,13 @@
 <template>
     <div class="set-password">
-        <h2>设置密码</h2>
-        <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
-            <el-form-item label="钱包密码(8-20位字符,需包含大小写字母和数字)" prop="pass">
+        <Back :backTitle="backTitle" ></Back>
+        <h2>修改密码</h2>
+
+        <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm"  class="set-pass">
+            <el-form-item label="旧密码" prop="oldPass">
+                <el-input type="password" v-model="passForm.oldPass"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="pass">
                 <el-input type="password" v-model="passForm.pass"></el-input>
             </el-form-item>
             <el-form-item label="确认密码" prop="checkPass">
@@ -12,18 +17,26 @@
                 <el-input v-model.number="passForm.passHelp"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit">提交</el-button>
-                <el-button type="text" class="set-pass-reset" @click="resetForm('setPass')">
-                    我确认钱包风险，以后设置钱包密码
-                </el-button>
+                <el-button type="primary" @click="submitForm('passForm')">提交</el-button>
             </el-form-item>
         </el-form>
     </div>
 
 </template>
 <script>
+    import Back from '@/components/BackBar.vue';
     export default {
         data() {
+            var validateOldPass = (rule, value, callback) => {
+                if ( value !== localStorage.getItem('userPass')) {
+                    callback(new Error('请输入正确的旧密码'));
+                } else {
+                    if (this.passForm.checkPass !== '') {
+                        this.$refs.passForm.validateField('checkPass');
+                    }
+                    callback();
+                }
+            };
             var validatePass = (rule, value, callback) => {
                 var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/;
                 if (value === '') {
@@ -47,23 +60,35 @@
                 }
             };
             return {
+                backTitle: '设置',
                 passForm: {
+                    oldPass:'',
                     pass: '',
                     checkPass: '',
                     passHelp: ''
                 },
                 rulesPass: {
+                    oldPass:[
+                        { validator: validateOldPass, trigger: 'blur' }
+                    ],
                     pass: [
-                        {validator: validatePass, trigger: 'blur'}
+                        { validator: validatePass, trigger: 'blur' }
                     ],
                     checkPass: [
-                        {validator: validatePass2, trigger: 'blur'}
+                        { validator: validatePass2, trigger: 'blur' }
                     ]
+
                 }
             };
         },
+        components: {
+            Back,
+        },
+        mounted() {
+            let _this = this;
+        },
         methods: {
-            /** Set the password for the user
+            /** Editor password
              * @method submitForm
              * @param {string} user password
              * @author Wave
@@ -71,31 +96,35 @@
              * @version 1.0
              **/
             submitForm(formName) {
-                console.log(123456)
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        localStorage.setItem('userPass', this.passForm.pass);
-                        localStorage.setItem('passWordHint', this.passForm.passWordHint);
-                        localStorage.setItem('fastUser', '1');
-                        this.$router.push({
-                            path: '/firstInto/firstInfo'
-                        })
+                        var param = '{"password":"' + this.passForm.oldPass + '","newPassword":"' + this.passForm.pass + '"}';
+                        //console.log(param);
+                        this.$post('/wallet/reset/', param)
+                            .then((response) => {
+                                if (response.success) {
+                                    this.$message({
+                                        type: 'success', message: "恭喜您！" + response.msg
+                                    });
+                                    localStorage.setItem('userPass', this.passForm.pass);
+                                    localStorage.setItem('passWordHint', this.passForm.passWordHint);
+                                    this.$router.push({
+                                        path: '/users/setPage'
+                                    })
+                                } else {
+                                    this.$message({
+                                        type: 'success', message: "对不起！" + response.msg
+                                    });
+                                }
+
+                            });
                     } else {
                         this.$message({
-                            type: 'success', message: "对不起！" + response.msg
+                            type: 'success', message: "对不起！请输入正确的密码信息。"
                         });
                         return false;
                     }
                 });
-            },
-            //不设置密码
-            resetForm() {
-                localStorage.setItem('userPass', '');
-                localStorage.setItem('passWordHint', '');
-                localStorage.setItem('fastUser', '0');
-                this.$router.push({
-                    path: '/firstInto/firstInfo'
-                })
             }
         }
     }

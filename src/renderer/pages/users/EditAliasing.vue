@@ -44,24 +44,31 @@
                 this.$router.go(-1);
             },
             aliasingSubmit() {
-                var param = {"alias": this.alias, "address": this.address, "password": "nuls123456"}
-                this.$post('/account/alias/', param)
-                    .then((response) => {
-                        console.log(response);
-                        if (response.success) {
-                            this.$message({
-                                type: 'success', message: "别名设置完成！"
-                            });
-                            //localStorage.setItem('newAccountAddress', response.data[0]);
-                            this.$router.push({
-                                path: '/wallet'
-                            })
-                        } else {
-                            this.$message({
-                                type: 'warning', message: response.msg+",别名设置未完成!"
-                            });
-                        }
-                    });
+                this.$prompt(this.$t('message.passWordTitle'), '', {
+                    confirmButtonText: this.$t('message.confirmButtonText'),
+                    cancelButtonText: this.$t('message.cancelButtonText'),
+                    inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                    inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                    inputType:'password'
+                }).then(({value}) => {
+                    var param = {"alias": this.alias, "address": this.address, "password": value}
+                    this.$post('/account/alias/', param)
+                        .then((response) => {
+                            console.log(response);
+                            if (response.success) {
+                                this.$message({
+                                    type: 'success', message: "别名设置完成！"
+                                });
+                                this.$router.push({
+                                    path: '/users/userInfo'
+                                })
+                            } else {
+                                this.$message({
+                                    type: 'warning', message: response.msg + ",别名设置未完成!"
+                                });
+                            }
+                        });
+                })
             }
         }
     }

@@ -4,9 +4,6 @@
         <div class="transfer-info">
             <h2>转账</h2>
             <el-form :model="transferForm" :rules="rules" ref="transferForm">
-                <div class="out-name">
-                    转账资产：NULS(可用余额:{{ usable }} )
-                </div>
                 <el-form-item label="账户地址:" class="out-address">
                     <el-select v-model="address" placeholder="请选择账户地址" @change="accountAddressChecked">
                         <el-option v-for="item in accountAddress" :key="item.address"
@@ -20,7 +17,8 @@
                     <i @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item label="转账金额:" prop="joinNo">
-                    <el-input type="number" v-model="transferForm.joinNo" class="joinNo"></el-input>
+                    <span class="allUsable">当前余额:{{ usable }} NULS</span>
+                    <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input><span class="allNo" @click="allUsable(usable)">全部</span>
                 </el-form-item>
                 <el-form-item label="手续费:0.01NULS" class="service-no">
                 </el-form-item>
@@ -54,15 +52,22 @@
             var checkJoinAddress = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error('请输入转账地址！'));
+                }else {
+                    callback();
                 }
             };
             var checkNo = (rule, value, callback) => {
-                if (value === '') {
+                var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                if(value !== ''){
+                    if(!re.exec(value)){
+                        callback(new Error('请输入正确的转账金额为数字值！'));
+                    }else if(value > this.usable) {
+                        callback(new Error('转账金额不能大于可用余额！'));
+                    }else{
+                        callback();
+                    }
+                }else {
                     callback(new Error('请输入转账金额！'));
-                } else if (value > this.usable) {
-                    callback(new Error('转账金额不能大于可用余额！'));
-                } else {
-                    callback();
                 }
             };
             return {
@@ -117,6 +122,10 @@
                 this.address = value;
                 this.getBalanceAddress('/account/balance/' + this.address)
             },
+            //选择全部金额
+            allUsable(no){
+                this.transferForm.joinNo = no;
+            },
             //选择通讯录
             toUsersAddressList() {
                 this.dialogTableVisible = true;
@@ -159,20 +168,27 @@
                         confirmButtonText: this.$t('message.confirmButtonText'),
                         cancelButtonText: this.$t('message.cancelButtonText'),
                         inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                        inputErrorMessage: this.$t('message.walletPassWordEmpty')
+                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                        inputType: 'password'
                     }).then(({value}) => {
                         var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
                         this.$post('/wallet/transfer/', param)
                             .then((response) => {
-                                this.$message({
-                                    message: '恭喜您！转账成功！',
-                                    type: 'warning'
-                                });
-                                this.transferForm.joinAddress='',
-                                    this.transferForm.joinNo='',
-                                    this.transferForm.remark=''
-
-
+                                console.log(response)
+                                if(response.success){
+                                    this.$message({
+                                        message: '恭喜您！转账成功！',
+                                        type: 'success'
+                                    });
+                                    this.transferForm.joinAddress='',
+                                        this.transferForm.joinNo='',
+                                        this.transferForm.remark=''
+                                }else {
+                                    this.$message({
+                                        message: '对不起！'+response.msg,
+                                        type: 'warning'
+                                    });
+                                }
                             })
                     })
                 }
@@ -251,6 +267,20 @@
             input[type="password"],
             select {
                 background: #17202e;
+            }
+        }
+        .el-form{
+            .allUsable{
+                color: #606266;
+                float: right;
+                font-size: 12px;
+            }
+            .allNo{
+                color: #658ec7;
+                float: right;
+                margin-right: -30px;
+                font-size: 12px;
+                cursor: pointer;
             }
         }
         .el-form-item {

@@ -36,7 +36,7 @@
         mounted() {
             let _this = this;
             var params = {"address": this.address};
-            this.getLocked('tx/locked',params);
+            this.getLocked('tx/utxo/locked/',params);
 		},
 		methods: {
 			getLocked(url,param){

@@ -84,7 +84,7 @@
 			},
 			toEditPassword(){
 				this.$router.push({
-					path: '/users/setPassword'
+                    name: '/editorPassword',
 				})
 			},
 			versionUpdates() {
@@ -95,12 +95,12 @@
 				}).then(() => {
 					this.$message({
 						type: 'success',
-						message: '删除成功!'
+						message: '恭喜您，升级成功！'
 					});
 				}).catch(() => {
 					this.$message({
 						type: 'info',
-						message: '已取消删除'
+						message: '对不起，升级失败！'
 					});
 				});
 			}

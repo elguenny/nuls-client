@@ -1,20 +1,23 @@
 <template>
     <nav class="nav-top">
-        <div class="logo fl" style="-webkit-app-region: drag"><img class="logo-img" src="../assets/logo.png"/></div>
+        <div class="logo fl"><img class="logo-img" src="../assets/logo.png"/></div>
         <ul>
-            <li @click="to('home','0')" ><i class="icon-home_icon"></i> <span>首页</span></li>
-            <li @click="to('wallet','1')" ><i class="icon-page_icon"></i> <span>钱包管理</span></li>
-            <li @click="to('consensus','2')" ><i class="icon-consensus_icon"></i> <span>共识挖矿</span></li>
-            <li @click="to('application','3')" ><i class="icon-use_icon"></i> <span>应用</span></li>
-            <li @click="to('more','4')" ><i class="icon-more_icon"></i> <span>更多</span></li>
+            <li @click="to('home','0')" :class="[errorClass ,isActive===0 ? activeClass : '']"><i class="icon-home_icon"></i> <span>首页</span>
+            </li>
+            <li @click="to('wallet','1')" :class="[errorClass ,isActive===1 ? activeClass : '']"><i class="icon-page_icon"></i> <span>钱包</span></li>
+            <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i class="icon-consensus_icon"></i> <span>共识</span></li>
+            <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i class="icon-use_icon"></i> <span>应用</span></li>
+            <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="icon-more_icon"></i> <span>更多</span></li>
         </ul>
-
         <div class="top-icon fl">
             <el-badge :value="12" class="news fl">
                 <i class="el-icon-bell" @click="news"></i>
             </el-badge>
             <i class="el-icon-setting" @click="toSetUp"></i>
-            <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem" :widthData="widthData"></SelecBar>
+            <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem"
+                      :widthData="widthData"></SelecBar>
+            <i class="el-icon-minus minus-close fl" @click="toMinus"></i>
+            <i class="el-icon-close minus-close fl " @click="toClose"></i>
         </div>
         <div class="news-div" v-show="newsOk">
             <h2>{{$t("message.news")}}</h2>
@@ -32,12 +35,12 @@
 <script>
     import SelecBar from './SelecBar.vue'
     import {jquery} from '@/assets/js/jquery.min.js'
+
     export default {
         data() {
             return {
                 newsOk: false,
                 current: 0,
-                index:0,
                 //languageItem
                 languageItem: [{
                     key: "zh",
@@ -54,6 +57,9 @@
                 },
                 //select language initial width
                 widthData: "2rem",
+                errorClass:'',
+                activeClass:'active',
+                isActive:0
             }
         },
         components: {
@@ -61,7 +67,6 @@
         },
         mounted() {
             let _this = this;
-            index == 0;
             this.$i18n.locale = localStorage.getItem("language") == null ? "zh" : localStorage.getItem("language");
         },
         methods: {
@@ -78,20 +83,21 @@
             },
             //菜单跳转
             to(url, index) {
-                console.log(url+"===="+index);
-               /* $(this).addClass("active").siblings().removeClass("active");
-                this.current==true;*/
-
+                /*console.log(url + "====" + index);*/
+                /* $(this).addClass("active").siblings().removeClass("active");*/
+                /*this.current==true;*/
+                $(this).addClass("active");
                 if (url === "home") {
+                    this.isActive = 0;
                     this.$router.push({
                         path: '/*',
                     })
                 }
                 if (url === "wallet") {
+                    this.isActive = 1;
                     if (localStorage.getItem("fastUser") == "0" || localStorage.getItem("newAccountAddress") == null) {
                         this.$router.push({
                             name: '/setPassword',
-                            params: {backOk: false, oldPassOk: false},
                         })
                     } else {
                         this.$router.push({
@@ -100,18 +106,21 @@
                     }
                 }
                 if (url === "consensus") {
+                    this.isActive = 2;
                     this.$router.push({
                         name: '/consensus',
                     })
                 }
                 if (url === "application") {
+                    this.isActive = 3;
                     this.$message({
-                        type: 'info', message: "开发中，敬请期待！"
+                        type: 'info', message: "我们的工程师正专注研发，更多出色功能敬请期待！"
                     });
                 }
                 if (url === "more") {
+                    this.isActive = 4;
                     this.$message({
-                        type: 'info', message: "开发中，敬请期待！"
+                        type: 'info', message: "我们的工程师正专注研发，更多出色功能敬请期待！"
                     });
                 }
             },
@@ -123,7 +132,7 @@
              * @version 1.0
              **/
             news() {
-                this.newsOk = !this.newsOk
+                /*this.newsOk = !this.newsOk*/
             },
             /**
              * method statement
@@ -137,6 +146,29 @@
                     path: '/users/setPage'
                 })
             },
+            /**
+             * method statement
+             * @method toMinus
+             * @author Wave
+             * @date 2018-3-5
+             * @version 1.0
+             **/
+            toMinus() {
+                var ipc = require('electron').ipcRenderer;
+                ipc.send('window-min');
+            },
+            /**
+             * method statement
+             * @method toClose
+             * @author Wave
+             * @date 2018-3-5
+             * @version 1.0
+             **/
+            toClose() {
+                console.log("toClose");
+                var ipc = require('electron').ipcRenderer;
+                ipc.send('window-close');
+            }
         }
     }
 </script>
@@ -150,6 +182,7 @@
         height: 42px;
         line-height: 42px;
         background-color: #181f2f;
+        -webkit-app-region: drag;
         .logo {
             height: 42px;
             text-align: center;
@@ -159,11 +192,12 @@
             }
         }
         ul {
-            width: @div-width * 0.8;
+            width: 400px;
             height: @div-height;
             float: left;
+            -webkit-app-region: no-drag;
             li {
-                width: 120px;
+                width: 80px;
                 height: @div-height;
                 float: left;
                 color: #FFFFFF;
@@ -193,10 +227,10 @@
             }
         }
         .top-icon {
-            width: 12%;
+            width: 185px;
             margin-top: 0.2rem;
             float: right;
-            margin-right: 20px;
+            -webkit-app-region: no-drag;
             .news {
                 width: 2rem;
             }
@@ -205,6 +239,14 @@
             }
             i:hover {
                 cursor: pointer;
+            }
+            i.minus-close {
+                margin-left: 65px;
+                margin-top: 10px;
+                color: #C1C5C9;
+            }
+            i.minus-close:last-child {
+                margin-left: 10px;
             }
             .el-icon-setting {
                 float: left;

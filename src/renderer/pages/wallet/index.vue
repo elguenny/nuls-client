@@ -134,8 +134,8 @@
             let _this = this;
             this.getaccountAddress("/account/list");
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
-            let params = {"address": this.accountAddressValue,"pageSize":5};
-            this.getAccountTxList('/tx/address/list/', params);
+            let params = {"address":this.accountAddressValue};
+            this.getAccountTxList('/tx/list/', params);
         },
         methods: {
             //获取账户地址列表
@@ -156,12 +156,15 @@
             getAccountTxList(api, param) {
                 this.$fetch(api, param)
                     .then((response) => {
-                        console.log(response)
-                        if(response.data.list !==null){
-                            this.dealList = response.data;
-                            for (var i = 0; i < response.data.length; i++) {
-                                this.dealList[i].values = response.data[i].value * response.data[i].transferType * 0.00000001;
-                                this.dealList[i].times = moment(response.data[i].time).format('YYYY-MM-DD hh:mm:ss');
+                        if(response.data != null){
+                            if(response.data.list.length > 0){
+                                this.dealList = response.data.list;
+                                for (var i = 0; i < response.data.list.length; i++) {
+                                    this.dealList[i].values = response.data.list[i].value * response.data.list[i].transferType * 0.00000001;
+                                    this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
+                                }
+                            }else {
+                                this.dealList=[];
                             }
                         }else {
                             this.dealList=[];
@@ -173,14 +176,14 @@
                 localStorage.setItem('newAccountAddress',value);
                 this.getAccountAssets("/account/assets/" + value);
                 let params = {"address": value,"pageSize":5};
-                this.getAccountTxList("/tx/address/list/", params);
+                this.getAccountTxList("/tx/list/", params);
             },
             //tab切换
             handleClick(tab, event) {
                 this.walletHide = !this.walletHide;
                 this.getAccountAssets("/account/assets/" + this.accountAddressValue);
                 let params = {"address": this.accountAddressValue,"pageSize":5};
-                this.getAccountTxList('/tx/address/list/', params);
+                this.getAccountTxList('/tx/list/', params);
             },
             //复制功能
             accountCopy() {

@@ -1,5 +1,6 @@
 <template>
     <div class="new-account">
+        <Back :backTitle="backTitle" v-show="newOks"></Back>
         <div class="new-account-top">
             <h1 v-show="newOk">{{$t("message.newAccountTitle")}}</h1>
             <h2>
@@ -11,8 +12,8 @@
                     <input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly">
                 </h3>
                 <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
-                <i class="el-icon-menu" @click="keyCode"></i>
-                <CodeBar v-show="codeShowOk" :keyInfo="keyInfo" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
+                <i class="" @click="keyCode"></i>
+                <CodeBar v-show="codeShowOk " :keyInfo="keyInfo" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
             </div>
         </div>
         <ul>
@@ -28,13 +29,14 @@
         <div class="cl new-bt">
             <el-button type="primary" class="new-submit" @click="newSubmit()">{{$t("message.newAccountSubmit")}}
             </el-button>
-            <el-button type="primary" class="new-reset" @click="newReset()">{{$t("message.newAccountReset")}}
+            <el-button type="primary" class="new-reset" @click="newReset()" v-show="newOk">{{$t("message.newAccountReset")}}
             </el-button>
         </div>
     </div>
 </template>
 
 <script>
+    import Back from '@/components/BackBar.vue';
     import CodeBar from '@/components/CodeBar.vue'
     import {jquery} from '@/assets/js/jquery.min.js'
     import {jvectormap} from '@/assets/js/jquery.qrcode.min.js'
@@ -42,15 +44,18 @@
     export default {
         data() {
             return {
+                backTitle: '账户管理',
                 keyShow: false,
                 keyInfo: '',
                 newAccountAddress: this.$route.params.address == "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
                 codeShowOk: false,
                 newOk: this.$route.params.newOk,
+                newOks:this.$route.params.newOk ? false :true,
                 //address:this.$route.params.address,
             }
         },
         components: {
+            Back,
             CodeBar
         },
         mounted() {
@@ -128,7 +133,7 @@
                         dlLink.download = fileName;
                         dlLink.href = canvas.toDataURL("image/png");
                         var fs = require('fs');
-                        fs.writeFileSync('code.png', dlLink.href.slice('22'), 'utf8');
+                        fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
                         var downloadAddress = "D:/work/nuls-client/code.png";
                         ipcRenderer.send('download', downloadAddress + "+" + res[0]);
                         dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
@@ -203,9 +208,11 @@
         height: 100%;
         margin: auto;
         margin-top: 4%;
-        text-align: center;
         font-size: 14px;
         line-height: 1.6rem;
+        .back{
+            margin-left: 0px;
+        }
         .new-account-top {
             width: 77%;
             margin: auto;
