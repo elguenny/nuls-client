@@ -83,9 +83,26 @@
 				})
 			},
 			toEditPassword(){
-				this.$router.push({
-                    name: '/editorPassword',
-				})
+			    if(localStorage.getItem('userPass') != ''){
+                    this.$router.push({
+                        name: '/editorPassword',
+                    })
+				}else {
+                    this.$confirm('对不起，您还没设置密码请先设置密码', '提示', {
+                        confirmButtonText: '去设置密码',
+                        type: 'warning'
+                    }).then(() => {
+                        this.$router.push({
+                            name: '/setPassword',
+                        })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '你取消了去设置密码！'
+                        });
+                    });
+				}
+
 			},
 			versionUpdates() {
 				this.$confirm('确定升级到钱包版本v1.0.1（核心版本v0.1.4）？', '版本更新', {

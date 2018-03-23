@@ -54,7 +54,7 @@
                     var param = {"alias": this.alias, "address": this.address, "password": value}
                     this.$post('/account/alias/', param)
                         .then((response) => {
-                            console.log(response);
+                            //console.log(response);
                             if (response.success) {
                                 this.$message({
                                     type: 'success', message: "别名设置完成！"

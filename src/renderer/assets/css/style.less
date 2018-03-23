@@ -8,7 +8,9 @@ a {
     text-decoration: underline;
     color: #b6bbbf;
 }
-
+.el-loading-mask{
+     background-color: #0c1323;
+}
 .el-input--suffix .el-input__inner {
     padding-right: 30px;
     border: 1px solid #24426c;
@@ -43,12 +45,6 @@ a {
 .el-select-dropdown__item.hover,
 .el-select-dropdown__item:hover {
     background-color: @h-color;
-}
-
-.el-pagination.is-background .btn-next,
-.el-pagination.is-background .btn-prev,
-.el-pagination.is-background .el-pager li {
-    background-color: @bg-color;
 }
 
 .el-table--enable-row-hover .el-table__body tr:hover>td {
@@ -154,9 +150,35 @@ select {
 
 
 /**divIcon**/
-
+.div-icon1 {
+    width: 645px;
+    margin: auto;
+    overflow: hidden;
+    position: relative;
+    background-color: #181f2f;
+    border: 1px solid #24426c;
+    .subscript {
+        color: #fff;
+        height: 25px;
+        width: 70px;
+        position: absolute;
+        right: -20px;
+        text-align: center;
+        line-height: 25px;
+        font-size: 10px;
+        background-color: #82bd39;
+        -moz-transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+    .stay {
+        background-color: #f64b3e;
+    }
+}
 .div-icon {
-    height: 168px;
+    height: 185px;
     width: 200px;
     overflow: hidden;
     position: relative;
@@ -201,22 +223,25 @@ select {
         }
     }
 }
-
-.div-icon-last {
+.div-icon:nth-child(3){
     margin-right: 0px;
+}
+.div-icon:hover{
+    border-color: #82bd39;
 }
 
 //credit-valuesDiv
 .credit-valuesDiv {
     height: 80px;
-    width: 200px;
+    width: 190px;
     position: fixed;
     background-color: #181f2f;
     border: 1px solid #24426c;
     z-index: 99;
-    margin-left: 150px;
+    margin-left: 50px;
     margin-top: -20px;
     padding-left: 10px;
+    display: none;
     h2 {
         font-size: 10px;
         label {
@@ -242,8 +267,8 @@ select {
 }
 
 .el-button--primary {
-    width: 40%;
-    border-radius: 0.1rem;
+    width: 230px;
+    border-radius: 1px;
     height: 28px;
     line-height: 28px;
     padding: 0px;
@@ -305,4 +330,28 @@ select {
 .el-table__empty-block {
     min-height: 45px;
     background-color: #17202e;
+}
+.el-form {
+    .allUsable {
+        color: #606266;
+        float: right;
+        font-size: 12px;
+    }
+    .allNo {
+        color: #658ec7;
+        float: right;
+        margin-right: -30px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-top: -30px;
+    }
+}
+
+.procedure{
+    font-size: 12px;
+    margin-left: 50px;
+    color: #c1c1c1;
+    span{
+        margin-left: 15px;
+    }
 }

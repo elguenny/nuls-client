@@ -4,19 +4,19 @@
         <h2>修改密码</h2>
 
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm"  class="set-pass">
-            <el-form-item label="旧密码" prop="oldPass">
+            <el-form-item label="旧密码:" prop="oldPass">
                 <el-input type="password" v-model="passForm.oldPass"></el-input>
             </el-form-item>
-            <el-form-item label="密码" prop="pass">
+            <el-form-item label="新密码(8-16位字符，需包含大小写字母和数字):" prop="pass">
                 <el-input type="password" v-model="passForm.pass"></el-input>
             </el-form-item>
-            <el-form-item label="确认密码" prop="checkPass">
+            <el-form-item label="确认密码:" prop="checkPass">
                 <el-input type="password" v-model="passForm.checkPass"></el-input>
             </el-form-item>
-            <el-form-item label="密码提示">
+            <el-form-item label="密码提示(可选):">
                 <el-input v-model.number="passForm.passHelp"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item class="submitForm">
                 <el-button type="primary" @click="submitForm('passForm')">提交</el-button>
             </el-form-item>
         </el-form>
@@ -140,7 +140,7 @@
             font-size: 16px;
             text-align: center;
             line-height: 20px;
-            margin: 40px 0 20px 0;
+            margin: 10px 0 20px 0;
         }
         .set-pass {
             width: 385px;
@@ -148,7 +148,6 @@
             .set-pass-info div {
                 font-size: 12px;
                 color: #FFFFFF;
-                word-break: break-word;
                 text-align: left;
                 line-height: 15px;
                 padding-bottom: 30px;
@@ -190,6 +189,9 @@
             }
             .el-form-item {
                 margin-bottom: 1rem;
+            }
+            .submitForm{
+                margin-top: 50px;
             }
         }
     }

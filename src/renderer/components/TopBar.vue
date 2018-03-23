@@ -2,12 +2,12 @@
     <nav class="nav-top">
         <div class="logo fl"><img class="logo-img" src="../assets/logo.png"/></div>
         <ul>
-            <li @click="to('home','0')" :class="[errorClass ,isActive===0 ? activeClass : '']"><i class="icon-home_icon"></i> <span>首页</span>
+            <li @click="to('home','0')" :class="[errorClass ,isActive===0 ? activeClass : '']"><i class="icon-home_icon"></i> <span>{{$t("message.home")}}</span>
             </li>
-            <li @click="to('wallet','1')" :class="[errorClass ,isActive===1 ? activeClass : '']"><i class="icon-page_icon"></i> <span>钱包</span></li>
-            <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i class="icon-consensus_icon"></i> <span>共识</span></li>
-            <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i class="icon-use_icon"></i> <span>应用</span></li>
-            <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="icon-more_icon"></i> <span>更多</span></li>
+            <li @click="to('wallet','1')" :class="[errorClass ,isActive===1 ? activeClass : '']"><i class="icon-page_icon"></i> <span>{{$t("message.wallet")}}</span></li>
+            <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i class="icon-consensus_icon"></i> <span>{{$t("message.consensus")}}</span></li>
+            <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i class="icon-use_icon"></i> <span>{{$t("message.applications")}}</span></li>
+            <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="icon-more_icon"></i> <span>{{$t("message.more")}}</span></li>
         </ul>
         <div class="top-icon fl">
             <el-badge :value="12" class="news fl">
@@ -33,6 +33,7 @@
 </template>
 
 <script>
+    import store from '@/vuex/store'
     import SelecBar from './SelecBar.vue'
     import {jquery} from '@/assets/js/jquery.min.js'
 
@@ -59,7 +60,8 @@
                 widthData: "2rem",
                 errorClass:'',
                 activeClass:'active',
-                isActive:0
+                isActive:store.state.isActive,
+                //isActive:0
             }
         },
         components: {
@@ -83,10 +85,8 @@
             },
             //菜单跳转
             to(url, index) {
-                /*console.log(url + "====" + index);*/
-                /* $(this).addClass("active").siblings().removeClass("active");*/
-                /*this.current==true;*/
-                $(this).addClass("active");
+               /* store.getters.isActive(index);
+                console.log(store.state.isActive);*/
                 if (url === "home") {
                     this.isActive = 0;
                     this.$router.push({
@@ -109,6 +109,7 @@
                     this.isActive = 2;
                     this.$router.push({
                         name: '/consensus',
+                        params: { activeName: "first"},
                     })
                 }
                 if (url === "application") {
@@ -165,7 +166,6 @@
              * @version 1.0
              **/
             toClose() {
-                console.log("toClose");
                 var ipc = require('electron').ipcRenderer;
                 ipc.send('window-close');
             }
@@ -181,7 +181,7 @@
         width: @div-width;
         height: 42px;
         line-height: 42px;
-        background-color: #181f2f;
+        background-color: #17202e;
         -webkit-app-region: drag;
         .logo {
             height: 42px;
@@ -192,12 +192,12 @@
             }
         }
         ul {
-            width: 400px;
+            width: 500px;
             height: @div-height;
             float: left;
             -webkit-app-region: no-drag;
             li {
-                width: 80px;
+                width: 100px;
                 height: @div-height;
                 float: left;
                 color: #FFFFFF;

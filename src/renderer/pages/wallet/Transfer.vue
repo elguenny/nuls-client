@@ -16,9 +16,10 @@
                     <el-input type="text" v-model="transferForm.joinAddress"></el-input>
                     <i @click="toUsersAddressList"></i>
                 </el-form-item>
-                <el-form-item label="转账金额:" prop="joinNo">
+                <el-form-item label="转账金额:" prop="joinNo" class="join-nos">
                     <span class="allUsable">当前余额:{{ usable }} NULS</span>
-                    <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input><span class="allNo" @click="allUsable(usable)">全部</span>
+                    <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input>
+                    <span class="allNo" @click="allUsable(usable)">全部</span>
                 </el-form-item>
                 <el-form-item label="手续费:0.01NULS" class="service-no">
                 </el-form-item>
@@ -26,7 +27,7 @@
                     <el-input type="textarea" v-model="transferForm.remark"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
-                    <el-button type="primary" @click="transferSubmit('rulesTransferForm')">确认转账</el-button>
+                    <el-button type="primary" @click="transferSubmit('transferForm')">确认转账</el-button>
                 </el-form-item>
             </el-form>
             <el-dialog :visible.sync="dialogTableVisible">
@@ -50,25 +51,33 @@
     export default {
         data() {
             var checkJoinAddress = (rule, value, callback) => {
-                if (value === '') {
+                if (!value) {
                     callback(new Error('请输入转账地址！'));
-                }else {
-                    callback();
                 }
-            };
-            var checkNo = (rule, value, callback) => {
-                var re = /^\d+(?=\.{0,1}\d+$|$)/;
-                if(value !== ''){
-                    if(!re.exec(value)){
-                        callback(new Error('请输入正确的转账金额为数字值！'));
-                    }else if(value > this.usable) {
-                        callback(new Error('转账金额不能大于可用余额！'));
-                    }else{
+                setTimeout(() => {
+                    if (value === this.address) {
+                        callback(new Error('转账地址不能是账户地址！'));
+                    } else {
                         callback();
                     }
-                }else {
+                }, 500);
+            };
+            var checkJoinNo = (rule, value, callback) => {
+                if (!value) {
                     callback(new Error('请输入转账金额！'));
                 }
+                setTimeout(() => {
+                    var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                    if (!re.exec(value)){
+                        callback(new Error('请输入正确的转账金额为数字值！'));
+                    } else if (value > this.usable-0.01) {
+                        callback(new Error('转账金额不能大于可用余额！'));
+                    } else {
+                        callback();
+                    }
+
+                }, 100);
+
             };
             return {
                 backTitle: '钱包管理',
@@ -87,7 +96,7 @@
                         {validator: checkJoinAddress, trigger: 'blur'}
                     ],
                     joinNo: [
-                        {validator: checkNo, trigger: 'blur'}
+                        {validator: checkJoinNo, trigger: 'blur'}
                     ]
                 },
                 userAddressList: [],
@@ -111,10 +120,12 @@
                     });
             },
             //根据账户地址获取账户余额
-            getBalanceAddress(api) {
-                this.$fetch(api)
+            getBalanceAddress(url) {
+                this.$fetch(url)
                     .then((response) => {
-                        this.usable = response.data.usable * 0.0000000001;
+                        if(response.success){
+                            this.usable = response.data.usable * 0.0000000001;
+                        }
                     });
             },
             //选择账户地址
@@ -123,8 +134,8 @@
                 this.getBalanceAddress('/account/balance/' + this.address)
             },
             //选择全部金额
-            allUsable(no){
-                this.transferForm.joinNo = no;
+            allUsable(no) {
+                this.transferForm.joinNo = (parseInt(no)-0.01).toString();
             },
             //选择通讯录
             toUsersAddressList() {
@@ -157,41 +168,39 @@
                 this.dialogTableVisible = false;
             },
             //确认转账
-            transferSubmit(formName) {
-                if (this.transferForm.joinAddress === '' || this.transferForm.joinNo === '' || this.transferForm.joinNo > this.usable) {
-                    this.$message({
-                        message: '请输入正确的转账地址、转账金额！',
-                        type: 'warning'
-                    });
-                } else {
-                    this.$prompt(this.$t('message.passWordTitle'), '', {
-                        confirmButtonText: this.$t('message.confirmButtonText'),
-                        cancelButtonText: this.$t('message.cancelButtonText'),
-                        inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),
-                        inputType: 'password'
-                    }).then(({value}) => {
-                        var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
-                        this.$post('/wallet/transfer/', param)
-                            .then((response) => {
-                                console.log(response)
-                                if(response.success){
-                                    this.$message({
-                                        message: '恭喜您！转账成功！',
-                                        type: 'success'
-                                    });
-                                    this.transferForm.joinAddress='',
-                                        this.transferForm.joinNo='',
-                                        this.transferForm.remark=''
-                                }else {
-                                    this.$message({
-                                        message: '对不起！'+response.msg,
-                                        type: 'warning'
-                                    });
-                                }
-                            })
-                    })
-                }
+            transferSubmit(fromName) {
+                this.$refs[fromName].validate((valid) => {
+                    if (valid) {
+                        this.$prompt(this.$t('message.passWordTitle'), '', {
+                            confirmButtonText: this.$t('message.confirmButtonText'),
+                            cancelButtonText: this.$t('message.cancelButtonText'),
+                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                            inputType: 'password'
+                        }).then(({value}) => {
+                            var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 1000000 + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
+                            this.$post('/wallet/transfer/', param)
+                                .then((response) => {
+                                    if (response.success) {
+                                        this.$message({
+                                            message: '恭喜您！转账成功！',
+                                            type: 'success'
+                                        });
+                                        this.transferForm.joinAddress = '';
+                                        this.transferForm.joinNo = '';
+                                        this.transferForm.remark = ''
+                                    } else {
+                                        this.$message({
+                                            message: '对不起！' + response.msg,
+                                            type: 'warning',
+                                        });
+                                    }
+                                })
+                        })
+                    } else {
+                        return false;
+                    }
+                });
             },
         }
     }
@@ -269,22 +278,12 @@
                 background: #17202e;
             }
         }
-        .el-form{
-            .allUsable{
-                color: #606266;
-                float: right;
-                font-size: 12px;
-            }
-            .allNo{
-                color: #658ec7;
-                float: right;
-                margin-right: -30px;
-                font-size: 12px;
-                cursor: pointer;
-            }
-        }
+
         .el-form-item {
             margin-bottom: 0px;
+        }
+        .join-address, .join-nos {
+            margin-bottom: 15px;
         }
         .el-form-item__label {
             line-height: 25px;

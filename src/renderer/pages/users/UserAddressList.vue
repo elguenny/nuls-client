@@ -7,9 +7,9 @@
         <el-table :data="tableData">
             <el-table-column prop="userAddress" label="账户" min-width="60" align='center'>
             </el-table-column>
-            <el-table-column prop="userAlias" label="别名" min-width="10" align='center'>
+            <el-table-column prop="userAlias" label="别名" align='center'>
             </el-table-column>
-            <el-table-column prop="userHelp" label="备注" min-width="10" align='center'>
+            <el-table-column prop="userHelp" label="备注"  align='center'>
             </el-table-column>
             <el-table-column label="操作" min-width="20" align='center'>
                 <template slot-scope="scope">
@@ -162,7 +162,7 @@
     @import url("../../assets/css/style.less");
 
     .users {
-        width: 90%;
+        width: 86%;
         margin: auto;
         .newAccount {
             width: 30px;

@@ -1,20 +1,21 @@
 <template>
     <div class="set-password">
-        <h2>设置密码</h2>
+        <h2>{{$t("message.setPassWord")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
-            <el-form-item label="钱包密码(8-20位字符,需包含大小写字母和数字)" prop="pass">
+            <el-form-item :label="$t('message.walletPassWord')" prop="pass">
                 <el-input type="password" v-model="passForm.pass"></el-input>
             </el-form-item>
-            <el-form-item label="确认密码" prop="checkPass">
+            <el-form-item :label="$t('message.affirmWalletPassWord')" prop="checkPass">
                 <el-input type="password" v-model="passForm.checkPass"></el-input>
             </el-form-item>
-            <el-form-item label="密码提示">
+            <el-form-item :label="$t('message.passWordHint')">
                 <el-input v-model.number="passForm.passHelp"></el-input>
             </el-form-item>
+            <div class="set-pass-title">请认真保存当前钱包密码，若钱包密码丢失，很可能导致您的资产丢失！</div>
             <el-form-item>
-                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit">提交</el-button>
+                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit">{{$t('message.passWordAffirm')}}</el-button>
                 <el-button type="text" class="set-pass-reset" @click="resetForm('setPass')">
-                    我确认钱包风险，以后设置钱包密码
+                   {{$t('message.passWordCancel')}}
                 </el-button>
             </el-form-item>
         </el-form>
@@ -71,11 +72,10 @@
              * @version 1.0
              **/
             submitForm(formName) {
-                console.log(123456)
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         localStorage.setItem('userPass', this.passForm.pass);
-                        localStorage.setItem('passWordHint', this.passForm.passWordHint);
+                        localStorage.setItem('passWordHint', this.passForm.passHelp);
                         localStorage.setItem('fastUser', '1');
                         this.$router.push({
                             path: '/firstInto/firstInfo'
@@ -92,7 +92,7 @@
             resetForm() {
                 localStorage.setItem('userPass', '');
                 localStorage.setItem('passWordHint', '');
-                localStorage.setItem('fastUser', '0');
+                localStorage.setItem('fastUser', '1');
                 this.$router.push({
                     path: '/firstInto/firstInfo'
                 })
@@ -119,10 +119,12 @@
             .set-pass-info div {
                 font-size: 12px;
                 color: #FFFFFF;
-                word-break: break-word;
                 text-align: left;
                 line-height: 15px;
                 padding-bottom: 30px;
+            }
+            .set-pass-title{
+                font-size: 12px;
             }
             .set-pass-submit {
                 width: 230px;
@@ -136,7 +138,7 @@
             .el-form-item__content {
                 text-align: center;
                 .set-pass-submit {
-                    margin-top: 20px;
+                    margin-top: 40px;
                 }
                 .set-pass-reset {
                     color: #f64b3e;

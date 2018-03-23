@@ -25,11 +25,12 @@ module.exports={
 		pledge: 'Pledge',
 		income: 'Income',
 		annualYield: 'Annual Yield',
+      	applicationsNode:'Applications Node',
 		//set password
         set:"Set",
       	oldPassWord:"oldPassWord",
 		setPassWord:'Set PassWord',
-		walletPassWord:'Wallet PassWord',
+		walletPassWord:'Wallet password (8-20 characters, lower case letters and Numbers)',
 		affirmWalletPassWord:'Affirm Wallet PassWord',
 		passWordHint:'PassWord Hint',
 		passWordInfo:'Please carefully save the password of the current wallet. If the wallet password is lost, it is very likely that your asset will be lost!',
@@ -70,7 +71,7 @@ module.exports={
 		transfer:'Transfer',
 		download:'Download',
 		transactionRecord:'Transaction Record',
-		transactionType:'Transaction Type',
+		transactionType:'Type',
 		//转账
 		recorded:'Recorded',
 		assetChange:'Asset Change',

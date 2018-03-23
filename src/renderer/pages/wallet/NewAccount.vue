@@ -29,7 +29,8 @@
         <div class="cl new-bt">
             <el-button type="primary" class="new-submit" @click="newSubmit()">{{$t("message.newAccountSubmit")}}
             </el-button>
-            <el-button type="primary" class="new-reset" @click="newReset()" v-show="newOk">{{$t("message.newAccountReset")}}
+            <el-button type="primary" class="new-reset" @click="newReset()" v-show="newOk">
+                {{$t("message.newAccountReset")}}
             </el-button>
         </div>
     </div>
@@ -50,7 +51,7 @@
                 newAccountAddress: this.$route.params.address == "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
                 codeShowOk: false,
                 newOk: this.$route.params.newOk,
-                newOks:this.$route.params.newOk ? false :true,
+                newOks: this.$route.params.newOk ? false : true,
                 //address:this.$route.params.address,
             }
         },
@@ -83,10 +84,44 @@
              * @version 1.0
              **/
             backupsKey() {
+                var path = require('path');
+                var _path = path.join(__dirname, '../../../../pubKey.txt');
+                /* var _path ="D:/work/nuls-client/pubKey.txt";*/
+                //console.log(_path)
                 var fs = require('fs');
-                fs.writeFileSync('pubKey.txt', this.keyInfo, 'utf8');
-                var downloadFileAddress = "D:/work/nuls-client/pubKey.txt";
-                this.backupFile(downloadFileAddress);
+                fs.readFile(_path, 'utf8', function (err, data) {
+                    if (err) return console.log(err);
+                });
+
+                fs.writeFile(_path, this.keyInfo, function (err) {
+                    if (!err)
+                        console.log("写入成功！" + _path)
+                })
+                /*var downloadFileAddress = "D:/work/nuls-client/pubKey.txt";*/
+                const {dialog} = require('electron').remote;
+                const {ipcRenderer} = require('electron');
+                ipcRenderer.on('tips', (event, person) => {
+                });
+                dialog.showOpenDialog({
+                    defaultPath: '../Desktop',
+                    properties: [
+                        'openDirectory',
+                    ],
+                    filters: [
+                        {name: 'All', extensions: ['*']},
+                    ]
+                }, function (res) {
+                    if (res[0] != "") {
+                        ipcRenderer.send('download', _path + "+" + res[0]);
+                        /*fs.unlink(_path, function (err) {
+                                 if (err) return console.log(err);
+                                 console.log('文件删除成功');
+                             });*/
+                        alert("保存成功！路径:" + res);
+                    } else {
+                        alert("请选择保存文件夹！");
+                    }
+                })
             },
             /** Backups Code
              * @method backupsCode
@@ -134,8 +169,10 @@
                         dlLink.href = canvas.toDataURL("image/png");
                         var fs = require('fs');
                         fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
-                        var downloadAddress = "D:/work/nuls-client/code.png";
-                        ipcRenderer.send('download', downloadAddress + "+" + res[0]);
+                        var path = require('path');
+                        var _path = path.join(__dirname, '../../../../code.png');
+                        /*var _path = "D:/work/nuls-client/code.png";*/
+                        ipcRenderer.send('download', _path + "+" + res[0]);
                         dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
                         document.body.appendChild(dlLink);
                         dlLink.click();
@@ -170,6 +207,11 @@
                 }, function (res) {
                     if (res[0] != "") {
                         ipcRenderer.send('download', downloadAddress + "+" + res[0]);
+                        /*var fs = require('fs');
+                        fs.unlink(downloadAddress, function (err) {
+                                 if (err) return console.log(err);
+                                 console.log('文件删除成功');
+                             });*/
                         alert("保存成功！路径:" + res);
                     } else {
                         alert("请选择保存文件夹！");
@@ -183,9 +225,24 @@
              * @version 1.0
              **/
             newSubmit() {
-                this.$router.push({
-                    path: '/wallet'
-                })
+                this.$confirm('请您备份好私钥！', '提示', {
+                    confirmButtonText: '已经备份',
+                    cancelButtonText: '马上备份',
+                    type: 'warning'
+                }).then(() => {
+                    if(localStorage.getItem('toUserInfo') != "1"){
+                        this.$router.push({
+                            path: '/wallet'
+                        })
+                    }else {
+                        this.$router.push({
+                            path: '/wallet/users/userInfo'
+                        })
+                    }
+                }).catch(() => {
+
+                });
+
             },
             /** New Reset
              * @method newReset
@@ -210,7 +267,7 @@
         margin-top: 4%;
         font-size: 14px;
         line-height: 1.6rem;
-        .back{
+        .back {
             margin-left: 0px;
         }
         .new-account-top {

@@ -1,152 +1,286 @@
 <template>
-	<div class="node-page">
-		<Back :backTitle="backTitle"></Back>
-		<h2>雷霆节点</h2>
-		<div class="div-icon node-page-top">
-			<p class="subscript">
-				待共识
-			</p>
-			<ul>
-				<li class="li-bg">
-					<label>节点来源：</label>NTER7
-				</li>
-				<li>
-					<label>佣金比例：</label>15%
-				</li>
-				<li>
-					<label>保证金：</label>20000NULS
-				</li>
-				<li>
-					<label>参与人数：</label>
-					<ProgressBar colorData="#6a84f7" widthData="80%"></ProgressBar>
-				</li>
-				<li>
-					<label>信用值：</label>
-					<ProgressBar colorData="#82bd39" widthData="30%"></ProgressBar>
-				</li>
-				<li>
-					<label>剩余可抵押：</label>
-					<ProgressBar colorData="#58a5c9" widthData="60%"></ProgressBar>
-				</li>
-				<li class="li-info">
-					<label>节点介绍：</label>雷霆节点NULS忠实粉丝！
-				</li>
-			</ul>
-		</div>
-		<div class="node-page-bottom">
-			
-			<el-form ref="form" :model="sizeForm" size="mini" label-position="left">
-				<el-form-item label="">
-					<AccountAddressBar></AccountAddressBar>
-				</el-form-item>
-				<el-form-item label="抵押保证金">
-					<el-input v-model="sizeForm.name"></el-input>
-				</el-form-item>
-				</el-form-item>
-				<el-form-item size="large" class="submit">
-					<el-button type="primary" @click="onSubmit">确定</el-button>
-				</el-form-item>
-			</el-form>
-		</div>
-	</div>
+    <div class="node-page">
+        <Back :backTitle="backTitle"></Back>
+        <h2>{{this.nodeData.agentName}}</h2>
+        <div class="div-icon1 node-page-top">
+            <p class="subscript">
+                {{this.nodeData.status = 2 ? "正在共识" : "等待共识"}}
+            </p>
+            <ul>
+                <li class="li-bg overflow">
+                    <label>节点来源：</label>{{this.nodeData.agentAddress}}
+                </li>
+                <li>
+                    <label>佣金比例：</label>{{this.nodeData.commissionRate}}%
+                </li>
+                <li>
+                    <!--<label>保证金：</label>{{this.nodeData.owndeposit.value * 0.00000001}} NULS-->
+                    <label>保证金：</label>{{20000}} NULS
+                </li>
+                <li>
+                    <label>参与人数：</label>
+                    <ProgressBar colorData="#6a84f7" :widthData="this.nodeData.memberCount"></ProgressBar>
+                </li>
+                <li>
+                    <label>信用值：</label>
+                    <ProgressBar colorData="#82bd39" :widthData="this.nodeData.creditRatio"></ProgressBar>
+                </li>
+                <li>
+                    <label>剩余可抵押：</label>
+                   <!-- <ProgressBar colorData="#58a5c9" :widthData="this.nodeData.totalDeposit.value"></ProgressBar>-->
+                    <ProgressBar colorData="#58a5c9" widthData="5%"></ProgressBar>
+                </li>
+                <li class="li-info overflow">
+                    <label>节点介绍：</label>{{this.nodeData.introduction}}
+                </li>
+            </ul>
+        </div>
+        <div class="node-page-bottom">
+            <el-form ref="nodeForm" :model="nodeForm" :rules="nodeRules" size="mini" label-position="left">
+                <el-form-item label="账户地址:" class="account-address">
+                    <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
+                </el-form-item>
+                <span class="allUsable">当前余额:{{ usable }} NULS</span>
+                <el-form-item label="委托保证:" class="number" prop="nodeNo">
+                    <el-input v-model="nodeForm.nodeNo"></el-input>
+                    <span class="allNo" @click="allUsable(usable)">全部</span>
+                </el-form-item>
+                <div class="procedure">手续费:<span>0.01 NULS</span></div>
+                <el-form-item size="large" class="submit">
+                    <el-button type="primary" @click="onSubmit('nodeForm')">确定</el-button>
+                </el-form-item>
+
+            </el-form>
+        </div>
+    </div>
 </template>
 
 <script>
-	import Back from './../../components/BackBar.vue'
-	import ProgressBar from './../../components/ProgressBar.vue'
-	import AccountAddressBar from './../../components/AccountAddressBar.vue'
-	export default {
-		data() {
-			return {
-				backTitle: "委托共识",
-				sizeForm: {
-					name: ''
-				}
-			}
-		},
-		components: {
-			Back,
-			ProgressBar,
-			AccountAddressBar,
-		},
-		methods: {
-			onSubmit() {
-				this.$router.push({
-					path: '/consensus/nodeInfo/allPledge'
-				})
-			}
-		}
-	}
+    import Back from '@/components/BackBar.vue';
+    import ProgressBar from '@/components/ProgressBar.vue';
+    import AccountAddressBar from '@/components/AccountAddressBar.vue';
+
+    export default {
+        data() {
+            var checkNodeNo = (rule, value, callback) => {
+                if (!value) {
+                    callback(new Error('请输入委托保证金额！'));
+                }
+                setTimeout(() => {
+                    var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                    if (!re.exec(value)) {
+                        callback(new Error('请输入正确的委托保证金额为数字值！'));
+                    } else if (value > this.usable - 0.01) {
+                        callback(new Error('委托保证金额不能大于可用余额！'));
+                    } else {
+                        callback();
+                    }
+                }, 100);
+            };
+            return {
+                backTitle: "委托共识",
+                address: this.$route.params.address,
+                agentAddress:'',
+                nodeData: [],
+                usable: '',
+
+                nodeForm: {
+                    nodeNo: ''
+                },
+                nodeRules: {
+                    nodeNo: [
+                        {validator: checkNodeNo, trigger: 'blur'}
+                    ],
+                }
+            }
+        },
+        components: {
+            Back,
+            ProgressBar,
+            AccountAddressBar,
+        },
+        mounted() {
+            let _this = this;
+            this.getConsensusAddress("/consensus/agent/list/", {"address": this.address, "pageSize": "1"});
+            this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'));
+        },
+        methods: {
+            //根据address获取共识节点列表信息
+            getConsensusAddress(url, params) {
+                this.$fetch(url, params)
+                    .then((response) => {
+                        if (response.success) {
+                            if (response.data.list[0].creditRatio != 0) {
+                                if (response.data.list[0].creditRatio > 0) {
+                                    response.data.list[0].creditRatio = ((((response.data.list[0].creditRatio + 1) / 2)) * 100).toFixed() + '%';
+                                } else {
+                                    response.data.list[0].creditRatio = response.data.list[0].creditRatio * 100;
+                                }
+                            } else {
+                                response.data.list[0].creditRatio = "50%";
+                            }
+                            response.data.list[0].memberCount = (response.data.list[0].memberCount / 10).toFixed() + '%';
+                            response.data.list[0].totalDeposit.value = (response.data.list[0].totalDeposit.value / 50000000000000).toFixed() + '%';
+                            this.agentAddress = response.data.list[0].agentAddress;
+                            this.nodeData = response.data.list[0];
+                        }
+                    });
+            },
+            //获取下拉选择地址
+            chenckAccountAddress(chenckAddress) {
+                this.getBalanceAddress('/account/balance/' + chenckAddress);
+            },
+            //根据账户地址获取账户余额
+            getBalanceAddress(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if (response.success) {
+                            this.usable = response.data.usable * 0.0000000001;
+                        }
+                    });
+            },
+            //选择全部金额
+            allUsable(no) {
+                this.nodeForm.nodeNo = (parseInt(no) - 0.01).toString()
+            },
+            //提交委托
+            onSubmit(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$prompt(this.$t('message.passWordTitle'), '', {
+                            confirmButtonText: this.$t('message.confirmButtonText'),
+                            cancelButtonText: this.$t('message.cancelButtonText'),
+                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                            inputType: 'password'
+                        }).then(({value}) => {
+                            var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentAddress":"' + this.agentAddress + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
+                            console.log(param)
+                            this.$post('/consensus/deposit/', param)
+                                .then((response) => {
+                                    console.log(response);
+                                    /*if (response.success) {
+                                        this.$message({
+                                            message: '恭喜您！申请参与共识成功！',
+                                            type: 'success'
+                                        });
+                                         this.$router.push({
+                                             path: '/consensus/nodeInfo/allPledge'
+                                         })
+                                    } else {
+                                        this.$message({
+                                            message: '对不起！' + response.msg,
+                                            type: 'warning',
+                                        });
+                                    }*/
+                                    this.$router.push({
+                                        name: '/consensus',
+                                        params: { activeName: "second"},
+                                    })
+                                })
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            }
+        }
+    }
 </script>
 
 <style lang="less">
-	@import url("../../assets/css/style.less");
-	.node-page {
-		h2 {
-			font-size: 16px;
-			text-align: center;
-			line-height: 20px;
-			margin-bottom: 28px;
-		}
-		.div-icon {
-			height: 118px;
-			width: 80%;
-			margin: auto;
-			border: 1px solid #658ec7;
-		}
-		ul {
-			width: 100%;
-			height: 105px;
-			margin: auto;
-			font-size: 12px;
-			background-color: #17202e;
-			padding-top: 15px;
-			li {
-				color: #c1c5c9;
-				line-height: 22px;
-				width: 45%;
-				float: left;
-				label {
-					display: block;
-					width: 75px;
-					float: left;
-					padding-left: 25px;
-				}
-				span {}
-			}
-			.li-info {
-				width: 100%;
-				text-align: left;
-			}
-		}
-		.node-page-bottom{
-			width: 80%;
-			height: 160px;
-			margin: auto;
-			margin-top: 20px;
-			border: 1px solid #658ec7;
-			background-color: #17202e;
-			.account-address{
-				width: 100%;
-				label{
-					margin-right: 22px;
-					color: #C1C5C9;
-				}
-			}
-			.el-input__inner{
-			 width: 415px;	
-			}
-			.el-form-item{
-				width: 90%;
-				margin: auto;	
-			}
-			.el-input{
-				float: left;
-				width: 415px;		
-			}
-			.el-button--primary{
-				margin-top: 15px;
-			}
-		}
-	}
+    @import url("../../assets/css/style.less");
+
+    .node-page {
+        h2 {
+            font-size: 16px;
+            text-align: center;
+            line-height: 20px;
+            margin-bottom: 28px;
+        }
+        .div-icon {
+            height: 118px;
+            width: 80%;
+            margin: auto;
+            border: 1px solid #658ec7;
+        }
+        ul {
+            width: 100%;
+            height: 105px;
+            margin: auto;
+            font-size: 12px;
+            background-color: #17202e;
+            padding-top: 15px;
+            li {
+                color: #c1c5c9;
+                line-height: 22px;
+                width: 45%;
+                float: left;
+                label {
+                    display: block;
+                    width: 75px;
+                    float: left;
+                    padding-left: 25px;
+                }
+                span {
+                }
+            }
+            .li-info {
+                width: 100%;
+                text-align: left;
+            }
+        }
+        .node-page-bottom {
+            width: 80%;
+            height: 190px;
+            margin: 20px auto 0px;
+            border: 1px solid #658ec7;
+            background-color: #17202e;
+            .account-address {
+                margin-bottom: 8px;
+                .el-form-item__label {
+                    margin-top: 20px;
+                    margin-right: 0px;
+                }
+            }
+            .number {
+                .el-form-item__label {
+                    margin-top: 15px;
+                }
+            }
+            .el-input__inner {
+                width: 415px;
+            }
+            .el-form-item {
+                width: 90%;
+                margin: 0px auto 10px;
+                .el-form-item__label {
+                    color: #C1C5C9;
+                }
+
+            }
+            .el-input {
+                float: left;
+                width: 415px;
+            }
+            .el-button--primary {
+                margin-top: 15px;
+            }
+            .el-form-item__error {
+                margin-left: 70px;
+            }
+        }
+        .el-form {
+            .allUsable {
+                margin-right: 128px;
+                position: relative;
+            }
+        }
+        .allNo {
+            display: block;
+            position: fixed;
+            top: 69%;
+            right: 26%;
+        }
+    }
 </style>

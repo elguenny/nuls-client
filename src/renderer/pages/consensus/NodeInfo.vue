@@ -1,37 +1,37 @@
 <template>
 	<div class="node-info">
 		<Back :backTitle="backTitle"></Back>
-		<h2>雷霆节点</h2>
+		<h2>{{this.myNodeInfo.agentName}}</h2>
 		<ul>
 			<li>
-				<label>出块状态</label><span>NxaD59D7aAd29654eBC58A1DEaD649153B288928e3</span>
+				<label>出块地址</label><span>{{this.myNodeInfo.agentAddress}}</span>
 			</li>
 			<li>
-				<label>状态</label><span>正在共识</span>
+				<label>状态</label><span>{{this.myNodeInfo.status == 2 ? "正在共识":"等待共识"}}</span>
 			</li>
 			<li>
-				<label>累计收益</label><span>1266NULS</span>
+				<label>累计收益</label><span>{{this.myNodeInfo.reward.value*0.00000001 }} NULS</span>
 			</li>
 			<li>
-				<label>保证金</label><span>20000</span>
+				<label>保证金</label><span>{{this.myNodeInfo.totalDeposit.value*0.00000001}}</span>
 			</li>
 			<li>
-				<label>代理佣金比例</label><span>15%</span>
+				<label>代理佣金比例</label><span>{{this.myNodeInfo.commissionRate}} %</span>
 			</li>
 			<li>
-				<label>信用值</label><span>0.1</span>
+				<label>信用值</label><span>{{this.myNodeInfo.creditRatio}}</span>
 			</li>
 			<li>
-				<label>参与人数</label><span>2</span>
+				<label>参与人数</label><span>{{this.myNodeInfo.memberCount}}</span>
 			</li>
 			<li>
-				<label>总抵押金额</label><span class="cursor-p text-d" title="点击查看详情" @click="toallPledge">180000</span>
+				<label>总抵押金额</label><span class="cursor-p text-d" title="点击查看详情" @click="toallPledge">{{this.myNodeInfo.owndeposit.value*0.00000001}}</span>
 			</li>
-			<li>
-				<label>节点介绍</label><span>雷霆节点NULS忠实粉丝的选择！</span>
+			<li class="overflow">
+				<label>节点介绍</label><span>{{this.myNodeInfo.introduction}}！</span>
 			</li>
 		</ul>
-		<el-button @click="closedNode()" type="button" class="bottom-btn">关闭节点</el-button>
+		<el-button @click="closedNode" type="button" class="bottom-btn">关闭节点</el-button>
 	</div>
 </template>
 
@@ -41,19 +41,64 @@
 	export default {
 		data() {
 			return {
-				backTitle: "共识首页"
+				backTitle: "共识首页",
+				myNodeInfo:[],
 			}
 		},
 		components: {
 			Back,
 		},
+        mounted() {
+            let _this = this;
+            this.getMyNodeInfo("/consensus/agent/address/"+localStorage.getItem("2CVxEw3XJXwc2H5Ue7FYn82XDEJ2Wbm"));
+		},
 		methods: {
-			closedNode() {
-				console.log('closedNode');
+		    //获取我创建的节点信息
+            getMyNodeInfo(url){
+                this.$fetch(url)
+                    .then((response) => {
+                        if(response.success){
+                            console.log(response)
+                            this.myNodeInfo = response.data.list[0];
+						}
+                    });
 			},
+			//关闭我创建的节点信息
+			closedNode() {
+
+                this.$confirm('确定关闭节点么?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$prompt(this.$t('message.passWordTitle'), '', {
+                        confirmButtonText: this.$t('message.confirmButtonText'),
+                        cancelButtonText: this.$t('message.cancelButtonText'),
+                        inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                        inputType: 'password'
+                    }).then(({value}) => {
+                        console.log(value);
+                        this.$message({
+                            type: 'success',
+                            message: '恭喜您、你已经申请了关闭节点！'
+                        });
+                        //关闭我的节点方法不通，模拟数据
+                        this.$router.push({
+                            name: '/consensus'
+                        })
+                    })
+                }).catch(() => {
+
+                });
+				console.log(localStorage.getItem("newAccountAddress"));
+
+			},
+			//查看我创建节点的抵押明细
 			toallPledge() {
 				this.$router.push({
-					path: '/consensus/nodeInfo/allPledge'
+					name: '/allPledge',
+					params:{"agentName":this.myNodeInfo.agentName}
 				})
 			}
 		}

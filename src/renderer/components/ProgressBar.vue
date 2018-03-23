@@ -16,10 +16,12 @@
 			},
 			widthData: {
 				type: String,
-				default: "0px"
+				default: "0"
 			}
 		},
 		mounted() {
+            let _this = this;
+            //console.log(this.widthData);
 		}
 	}
 </script>

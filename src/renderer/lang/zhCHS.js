@@ -11,8 +11,8 @@ module.exports = {
 
 		//topNav
 		home: '首页',
-		wallet: '钱包管理',
-		consensus: '共识挖矿',
+		wallet: '钱包',
+		consensus: '共识',
 		applications: '应用',
 		more: '更多',
 		news:'消息',
@@ -24,17 +24,19 @@ module.exports = {
 		fundLock: '冻结',
 		
 		consensus1: '共识',
-		pledge: '抵押',
+		pledge: '委托',
 		income: '收入',
-		annualYield: '年化收益',
+		annualYield: '节点数',
+        applicationsNode:'共识节点',
+
 		
 		//set password
         set:"设置",
-        oldPassWord:"旧密码:",
-		setPassWord:'设置密码:',
-		walletPassWord:'钱包密码(8-20位字符,需包含大小写字母和数字):',
-		affirmWalletPassWord:'确认钱包密码:',
-		passWordHint:'密码提示(可选):',
+        oldPassWord:"旧密码",
+		setPassWord:'设置密码',
+		walletPassWord:'钱包密码(8-20位字符,需包含大小写字母和数字)',
+		affirmWalletPassWord:'确认钱包密码',
+		passWordHint:'密码提示(可选)',
 		passWordInfo:'请认真保存当前钱包密码，若钱包密码丢失，很可能导致您的资产丢失！',
         passWordHintEmpty:'密码提示不能为空!',
         walletPassWordEmpty:'密码8-20位，且为字母、数字、符号等任意2种以上组合！',
@@ -60,7 +62,7 @@ module.exports = {
 		newAccountBackupsCodeInfo:'点击将下载二维码图片，请保存到安全的地方!',
 		newAccountBackupsNuls:'.NULS格式备份',
 		newAccountBackupsNulsInfo:'点击将下载.NULS文件，请保存到安全的地方!',
-		newAccountSubmit:'确认',
+		newAccountSubmit:'完成备份',
 		newAccountReset:'确认风险，不备份',
 		
 		//wallet index

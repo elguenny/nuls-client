@@ -119,11 +119,8 @@
     .users {
         width: 100%;
         margin: auto;
-        .back{
-            margin-left: 25px;
-        }
         .freeze-list-tabs {
-            width: 80%;
+            width: 86%;
             margin: auto;
             .newAccount {
                 width: 30px;
@@ -133,6 +130,7 @@
                 float: right;
                 border: 1px solid #0b1422;
                 margin-bottom: 10px;
+                margin-right:50px ;
             }
             h2 {
                 text-align: center;

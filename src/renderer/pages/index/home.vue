@@ -6,17 +6,17 @@
                 <div class="nav-all">
                     <label class="fl">{{$t("message.fundTotal")}}：</label>
                     <ProgressBar :colorData=this.balanceColor widthData="100%"></ProgressBar>
-                    <span class="fr">{{this.balance}} nuls</span>
+                    <span class="fr">{{this.balance}} NULS</span>
                 </div>
                 <div class="nav-usable cl">
                     <label class="fl">{{$t("message.fundUsable")}}：</label>
                     <ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth></ProgressBar>
-                    <span class="fr">{{this.locked}} nuls</span>
+                    <span class="fr">{{this.locked}} NULS</span>
                 </div>
                 <div class="nav-lock cl">
                     <label class="fl">{{$t("message.fundLock")}}：</label>
                     <ProgressBar :colorData=this.usableColor :widthData=this.usableWidth></ProgressBar>
-                    <span class="fr">{{this.usable}} nuls</span>
+                    <span class="fr">{{this.usable}} NULS</span>
                 </div>
             </div>
             <div class="home-nav-top">
@@ -24,24 +24,26 @@
                 <ul>
                     <li>
                         <label class="fl">{{$t("message.pledge")}}：</label>
-                        <span>12866nuls</span>
+                        <span>{{this.entrust}} NULS</span>
                     </li>
                     <li class="cl">
                         <label class="fl">{{$t("message.income")}}：</label>
-                        <span>866nuls</span>
+                        <span>{{this.income}} NULS</span>
                     </li>
-                    <!-- <li class="cl">
-                         <label class="fl">{{$t("message.annualYield")}}：</label>
-                         <span>50%</span>
-                     </li>-->
+                    <li class="cl">
+                        <label class="fl">{{$t("message.annualYield")}}：</label>
+                        <span>{{this.nodeNumber}}</span>
+                    </li>
                 </ul>
             </div>
             <!--<div class="home-nav-top">
             </div>-->
         </div>
+        <div class="div-title">{{$t("message.applicationsNode")}}</div>
         <div class="cl home-info">
-            <div class="home-info-consensus">
-                <div id="world-map-markers" style="height: 18.5rem;">
+           <!-- <div class="home-info-consensus">-->
+               <div class="home-info-consensus" v-loading.lock="loading">
+                <div id="world-map-markers" style="height: 17rem;" >
                 </div>
             </div>
         </div>
@@ -59,6 +61,7 @@
     export default {
         data() {
             return {
+                loading: true,
                 balance: '0',
                 balanceColor: '#658EC7',
                 locked: '0',
@@ -67,19 +70,26 @@
                 usable: '0',
                 usableColor: '#f64b3e',
                 usableWidth: '0',
-                ipData: [
-                    "186.101.196.150",
-                    "176.101.196.150",
-                    "166.101.196.150",
-                    "166.101.196.150",
-                    "146.101.196.150",
-                    "136.101.196.150",
-                    "126.101.196.150",
-                    "116.101.196.150",
-                    "106.101.196.150",
-                    "186.101.196.150"
-                ],
-                mapObj: [{latLng: [34.74, 113.66], name: '郑州 '}],
+
+                entrust: '',
+                income: '',
+                nodeNumber: '',
+
+                /* ipData: [
+                     "186.101.196.150",
+                     "176.101.196.150",
+                     "166.101.196.150",
+                     "156.101.196.150",
+                     "146.101.196.150",
+                     "136.101.196.150",
+                     "126.101.196.150",
+                     "116.101.196.150",
+                     "106.101.196.150",
+                     "186.101.166.150"
+                 ],*/
+                ipData: [],
+                mapObj: [],
+
             };
         },
         components: {
@@ -87,65 +97,84 @@
         },
         mounted() {
             let _this = this;
-            for (var j = 0, len = this.ipData.length; j < len; j++) {
-                this.getQueryIp(this.ipData[j]);
-            }
-            this.methodsMaps(this.mapObj);
+            //this.getNetworkNodes('/network/nodes');
+            let obj = [];
+            //查询网络节点数
+            this.$fetch('/network/nodes')
+                .then((response) => {
+                    if (response.success) {
+                        //this.ipData = response.data;
+                        this.ipData = [
+                            "186.101.196.150",
+                            "176.101.196.150",
+                            "166.101.196.150",
+                            "156.101.196.150",
+                            "146.101.196.150",
+                            "136.101.196.150",
+                            "126.101.196.150",
+                            "116.101.196.150",
+                            "106.101.196.150",
+                            "186.101.166.150"
+                        ];
+                        for (var j = 0, len = this.ipData.length; j < len; j++) {
+                            axios.get('http://freegeoip.net/json/' + this.ipData[j])
+                                .then(function (response) {
+                                    var latLngs = [response.data.latitude, response.data.longitude];
+                                    var names = response.data.time_zone;
+                                    if (names == "undefined") {
+                                        names = 'anonymous'
+                                    } else {
+                                        names = names.split('/')[1]
+                                    }
+                                    obj.push({"latLng": latLngs, "name": names});
+                                })
+                                .catch(function (err) {
+                                    console.log(err);
+                                });
+                        }
+                    }
+                });
+            setTimeout(() => {
+                this.methodsMaps(obj);
+            }, 600);
+
             if (localStorage.getItem("fastUser") == null) {
                 localStorage.setItem('fastUser', '0');
             }
-            if (localStorage.getItem("newAccountAddress") != null) {
-                this.getAccountAddress("/account/balance/" + localStorage.getItem("newAccountAddress"));
-            } else {
-                this.balanceColor = '';
-                this.lockedColor = '';
-                this.usableColor = '';
-            }
+            this.getAccountAddress("/account/balances/");
+            this.getConsensus("/consensus");
         },
         methods: {
             //根据账户地址获取总金、冻结、可用额
-            getAccountAddress(api) {
-                this.$fetch(api)
+            getAccountAddress(url) {
+                this.$fetch(url)
                     .then((response) => {
-                        this.balance = response.data.balance * 0.00000001;
-                        this.locked = response.data.locked * 0.00000001;
-                        this.lockedWidth = this.locked / this.balance * 100 + "%";
-                        this.usable = response.data.usable * 0.00000001;
-                        this.usableWidth = this.usable / this.balance * 100 + "%";
+                        if (response.success) {
+                            //console.log(response);
+                            this.balance = response.data.balance * 0.00000001;
+                            this.locked = response.data.locked * 0.00000001;
+                            this.lockedWidth = this.locked / this.balance * 100 + "%";
+                            this.usable = response.data.usable * 0.00000001;
+                            this.usableWidth = this.usable / this.balance * 100 + "%";
+                        } else {
+                            this.balanceColor = '';
+                            this.lockedColor = '';
+                            this.usableColor = '';
+                        }
                     });
             },
-
-
-            /** get IP
-             * @method getQueryIp
-             * @for
-             * @param {string} Api adderss
-             * @return {int} Whether to get IP data.
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            getQueryIp(ip) {
-                let obj = [];
-                axios.get('http://freegeoip.net/json/' + ip)
-                    .then(function (response) {
-                        //console.log(response);
-                        var latLngs = [response.data.latitude, response.data.longitude];
-                        var names = response.data.time_zone;
-                        if (names == "undefined") {
-                            names = 'anonymous'
-                        } else {
-                            names = names.split('/')[1]
+            //获取所有共识信息
+            getConsensus(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if (response.success) {
+                            this.entrust = response.data.totalDeposit * 0.00000001;
+                            this.income = response.data.rewardOfDay * 0.00000001;
+                            this.nodeNumber = response.data.agentCount;
                         }
-                        obj.push({"latLng": latLngs, "name": names});
-                        //this.mapObj=obj;
-                        //console.log(obj)
                     })
-                .catch(function (err) {
-                    console.log('Node data failed！===' + err);
-                });
-
             },
+
             /** jVector Maps
              * Create a world map with markers
              * @method methodsMaps
@@ -185,11 +214,18 @@
                     markerStyle: {
                         initial: {
                             fill: '#00a65a',
-                            stroke: '#111'
+                            stroke: '#82bd39',
+                            r: 3,
+                        },
+                        hover: {
+                            r: 4,
+                            fill: '#dbf433',
+                            stroke: '#82bd39',
                         }
                     },
-                    markers: maps
+                    markers: maps,
                 });
+                this.loading = false;
             }
         }
     }
@@ -199,59 +235,70 @@
 
     .home {
         width: 93%;
-        margin: auto;
-        margin-top: 24px;
+        margin: 24px auto;
         background-color: #0c1323;
-    }
-
-    .home-nav {
-        width: 85%;
-        height: 150px;
-        margin: auto;
-        .home-nav-top {
-            width: 47%;
-            height: 120px;
-            float: left;
-            margin-right: 4.5%;
-            border: 1px solid #658ec7;
-            .nav-title {
-                text-align: center;
-                font-size: 14px;
-                line-height: 2rem;
-            }
-            ul {
-                li {
+        .home-nav {
+            width: 605px;
+            height: 122px;
+            margin: auto;
+            .home-nav-top {
+                width: 277px;
+                height: 120px;
+                float: left;
+                margin-right: 40px;
+                border: 1px solid #658ec7;
+                background-color: #17202e;
+                .nav-title {
+                    text-align: center;
+                    font-size: 14px;
+                    line-height: 2rem;
+                }
+                ul {
+                    li {
+                        font-size: 12px;
+                        line-height: 22px;
+                        label {
+                            display: block;
+                            width: 55px;
+                            float: left;
+                            margin-left: 1rem;
+                        }
+                    }
+                }
+                .nav-all,
+                .nav-usable,
+                .nav-lock {
                     font-size: 12px;
-                    line-height: 22px;
+                    line-height: 1.5rem;
                     label {
-                        display: block;
-                        width: 70px;
-                        float: left;
                         margin-left: 1rem;
+                    }
+                    span {
+                        margin-right: 5px;
                     }
                 }
             }
-            .nav-all,
-            .nav-usable,
-            .nav-lock {
-                font-size: 12px;
-                line-height: 1.5rem;
-                label {
-                    margin-left: 1rem;
-                }
-                span {
-                    margin-right: 5px;
-                }
+            .home-nav-top:last-child {
+                margin-right: 0px;
+            }
+            .home-info {
+                widow: 100%;
+                height: 25rem;
+                margin-top: 0.5rem;
+                border: 1px solid #333333;
+
             }
         }
-        .home-nav-top:last-child {
-            margin-right: 0px;
+        .div-title {
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            font-size: 14px;
         }
-        .home-info {
-            widows: 100%;
-            height: 25rem;
-            margin-top: 0.5rem;
-            border: 1px solid #333333;
-        }
+    }
+
+    .jvectormap-labels {
+        font-size: 12px;
+        color: #C1C5C9;
     }
 </style>

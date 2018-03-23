@@ -1,5 +1,6 @@
 <template>
 	<div class="import-account">
+		<Back :backTitle="backTitle"></Back>
 		<h1>导入账户</h1>
 		<ul>
 			<li @click="importKey">
@@ -16,12 +17,16 @@
 </template>
 
 <script>
+    import Back from '@/components/BackBar.vue';
 	export default {
 		data() {
 			return {
-
+                backTitle: '创建或导入账户',
 			}
 		},
+        components: {
+            Back,
+        },
 		methods: {
 			importKey() {
 				this.$router.push({
@@ -44,37 +49,35 @@
 
 <style lang="less">
 	.import-account {
-		widows: 90%;
+		width: 100%;
 		height: 100%;
-		margin: auto;
-		margin-top: 10%;
+		margin:auto;
 		text-align: center;
 		font-size: 0.9rem;
 		line-height: 1.6rem;
 		h1 {
 			line-height: 3rem;
-			font-size: 1rem;
+			font-size: 16px;
 			font-weight: 500;
 		}
 		ul {
-			width: 100%;
-			height: 50%;
-			margin: auto;
-			margin-top: 2%;
+			width: 650px;
+			height: 182px;
+			margin: 50px auto;
 			li {
-				width: 20%;
-				height: 8rem;
+				width: 185px;
+				height: 11rem;
 				float: left;
-				margin-right: 10%;
-				margin-left: 15%;
-				border: 1px solid #0b1422;
+				margin-right: 50px;
+				margin-left: 70px;
+				border: 1px solid #1e314d;
 				background-color: #181f2f;
 				text-align: center;
-
+				cursor: pointer;
 				span {
 					display: block;
-					font-size: 14px;
-					line-height: 8rem;
+					font-size: 16px;
+					line-height: 170px;
 				}
 				label {
 					display: block;

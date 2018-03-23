@@ -1,555 +1,456 @@
 <template>
-	<div class="consensus-index">
-		<AccountAddressBar></AccountAddressBar>
-		<div class="consensus-center">
-			<h2>
-				<label>总抵押金额（全网）：</label>20,000,000NULS,<label>总共识数：</label>264<label>年化收益：</label>0.25%
-			</h2>
-			<ul>
-				<li class="li-bg">
-					<label>我的总体情况：</label>
-				</li>
-				<li class="li-bg">
-					<label>累计收益：</label>188NULS
-				</li>
-				<li>
-					<label>创建节点：</label>0个 (<span title="点击创建节点" @click="toNewNode">创建</span>)
-				</li>
-				<li>
-					<label>委托节点：</label>4个 (<span title="点击委托节点" @click="toAgencyNode">委托</span>)
-				</li>
-				<li>
-					<label>抵押总数：</label><span title="点击查看抵押详情" @click="toPledgeInfo">20，000NULS</span>
-				</li>
-				<li>
-					<label>可用余额：</label>256，222NULS
-				</li>
-			</ul>
-		</div>
-		<div class="consensus-bottom">
-			<template>
-				<el-tabs v-model="activeName" @tab-click="handleClick">
-					<el-tab-pane label="全部共识" name="first">
-
-						<div class="div-icon fl">
-							<p class="subscript">
-								共识中
-							</p>
-							<h3>雷霆节点</h3>
-							<ul>
-								<li><label>我的抵押：</label>40，000NULS</li>
-								<li><label>累计收益：</label>120NULS</li>
-								<li class="participants">
-									<label class="fl">参与人数：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="pawn-amount cb">
-									<label class="fl">抵押金额：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="cb"><label>佣金比例：</label>15%</li>
-								<li class="credit-values" @mouseover="toggleShow(0)" @mouseout="toggleShow(0)">
-									<label class="fl">信用值：&nbsp;&nbsp;&nbsp;</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-							</ul>
-							<div class="credit-valuesDiv" v-show="creditValuesShow0">
-								<h2>
-									<label class="fl">能力系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h2>
-								<p class="cb">根据近100轮出块数量计算</p>
-								<h4>
-									<label class="fl">责任系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h4>
-								<p class="cb">根据近100轮违规情况和出块正确性计算</p>
-							</div>
-						</div>
-
-						<div class="div-icon fl">
-							<p class="subscript">
-								共识中
-							</p>
-							<h3>雷霆节点</h3>
-							<ul>
-								<li><label>我的抵押：</label>40，000NULS</li>
-								<li><label>累计收益：</label>120NULS</li>
-								<li class="participants">
-									<label class="fl">参与人数：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="pawn-amount cb">
-									<label class="fl">抵押金额：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="cb"><label>佣金比例：</label>15%</li>
-								<li class="credit-values" @mouseover="toggleShow(1)" @mouseout="toggleShow(1)">
-									<label class="fl">信用值：&nbsp;&nbsp;&nbsp;</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-							</ul>
-							<div class="credit-valuesDiv" v-show="creditValuesShow1">
-								<h2>
-									<label class="fl">能力系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h2>
-								<p class="cb">根据近100轮出块数量计算</p>
-								<h4>
-									<label class="fl">责任系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h4>
-								<p class="cb">根据近100轮违规情况和出块正确性计算</p>
-							</div>
-						</div>
-
-						<div class="div-icon fl div-icon-last">
-							<p class="subscript stay">
-								待共识
-							</p>
-							<h3>雷霆节点</h3>
-							<ul>
-								<li><label>我的抵押：</label>40，000NULS</li>
-								<li><label>累计收益：</label>120NULS</li>
-								<li class="participants">
-									<label class="fl">参与人数：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="pawn-amount cb">
-									<label class="fl">抵押金额：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="cb"><label>佣金比例：</label>15%</li>
-								<li class="credit-values" @mouseover="toggleShow(2)" @mouseout="toggleShow(2)">
-									<label class="fl">信用值：&nbsp;&nbsp;&nbsp;</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-							</ul>
-							<div class="credit-valuesDiv" v-show="creditValuesShow2">
-								<h2>
-									<label class="fl">能力系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h2>
-								<p class="cb">根据近100轮出块数量计算</p>
-								<h4>
-									<label class="fl">责任系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h4>
-								<p class="cb">根据近100轮违规情况和出块正确性计算</p>
-							</div>
-						</div>
-
-						<el-pagination layout="prev, pager, next" :total="1000" class="cb"></el-pagination>
-					</el-tab-pane>
-					<el-tab-pane label="我的共识" name="second">
-						<div class="div-icon fl" @click="toMyNode">
-							<p class="subscript">
-								共识中
-							</p>
-							<h3>雷霆节点</h3>
-							<ul>
-								<li><label>我的抵押：</label>40，000NULS</li>
-								<li><label>累计收益：</label>120NULS</li>
-								<li class="participants">
-									<label class="fl">参与人数：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="pawn-amount cb">
-									<label class="fl">抵押金额：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="cb"><label>佣金比例：</label>15%</li>
-								<li class="credit-values" @mouseover="toggleShow(0)" @mouseout="toggleShow(0)">
-									<label class="fl">信用值：&nbsp;&nbsp;&nbsp;</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-							</ul>
-							<div class="credit-valuesDiv" v-show="creditValuesShow0">
-								<h2>
-									<label class="fl">能力系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h2>
-								<p class="cb">根据近100轮出块数量计算</p>
-								<h4>
-									<label class="fl">责任系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h4>
-								<p class="cb">根据近100轮违规情况和出块正确性计算</p>
-							</div>
-						</div>
-
-						<div class="div-icon fl">
-							<p class="subscript stay">
-								待共识
-							</p>
-							<h3>雷霆节点</h3>
-							<ul>
-								<li><label>我的抵押：</label>40，000NULS</li>
-								<li><label>累计收益：</label>120NULS</li>
-								<li class="participants">
-									<label class="fl">参与人数：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="pawn-amount cb">
-									<label class="fl">抵押金额：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="cb"><label>佣金比例：</label>15%</li>
-								<li class="credit-values" @mouseover="toggleShow(1)" @mouseout="toggleShow(1)">
-									<label class="fl">信用值：&nbsp;&nbsp;&nbsp;</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-							</ul>
-							<div class="credit-valuesDiv" v-show="creditValuesShow1">
-								<h2>
-									<label class="fl">能力系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h2>
-								<p class="cb">根据近100轮出块数量计算</p>
-								<h4>
-									<label class="fl">责任系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h4>
-								<p class="cb">根据近100轮违规情况和出块正确性计算</p>
-							</div>
-						</div>
-
-						<div class="div-icon fl div-icon-last">
-							<p class="subscript stay">
-								待共识
-							</p>
-							<h3>雷霆节点</h3>
-							<ul>
-								<li><label>我的抵押：</label>40，000NULS</li>
-								<li><label>累计收益：</label>120NULS</li>
-								<li class="participants">
-									<label class="fl">参与人数：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="pawn-amount cb">
-									<label class="fl">抵押金额：</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-								<li class="cb"><label>佣金比例：</label>15%</li>
-								<li class="credit-values" @mouseover="toggleShow(2)" @mouseout="toggleShow(2)">
-									<label class="fl">信用值：&nbsp;&nbsp;&nbsp;</label>
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-									</span>
-									</span>
-								</li>
-							</ul>
-							<div class="credit-valuesDiv" v-show="creditValuesShow2">
-								<h2>
-									<label class="fl">能力系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h2>
-								<p class="cb">根据近100轮出块数量计算</p>
-								<h4>
-									<label class="fl">责任系数&nbsp;</label> 
-									<span class="bar-bg fl">
-										<span class="bar">
-											<span></span>
-										</span>
-									</span>
-								</h4>
-								<p class="cb">根据近100轮违规情况和出块正确性计算</p>
-							</div>
-						</div>
-
-						<el-pagination layout="prev, pager, next" :total="1000" class="cb"></el-pagination>
-
-						<div class="noData" v-show="isData">
-							<i class="el-icon-plus"></i>
-						</div>
-
-					</el-tab-pane>
-				</el-tabs>
-			</template>
-		</div>
-	</div>
+    <div class="consensus-index">
+        <div class="account-address">
+            <label v-show="accountAddressOk">{{$t("message.indexAccountAddress")}}</label>
+            <el-select v-model="accountAddressValue" placeholder="请选择账户地址" @change="accountAddressChecked">
+                <el-option v-for="item in accountAddress" :key="item.address"
+                           :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
+                           :value="item.address">
+                </el-option>
+            </el-select>
+        </div>
+        <div class="consensus-index-title">
+            <label>总抵押金额（全网）：</label>{{this.allTotalDeposit*0.00000001}} NULS,<label>总共识数：</label>{{this.allAgentCount}}
+            <!--<label>年化收益：</label>0.25%-->
+        </div>
+        <div class="consensus-center">
+            <ul>
+                <li class="li-bg">
+                    <label>我的总体情况：</label>
+                </li>
+                <li class="li-bg">
+                    <label>累计收益：</label>{{this.reward*0.00000001}} NULS
+                </li>
+                <li>
+                    <label>创建节点：</label>{{this.agentCount}} 个 <span v-show="this.agentCount > 0 ? false:true ">(<span
+                        title="点击创建节点" @click="toNewNode" class="span">创建</span>)</span>
+                </li>
+                <li>
+                    <label>委托节点：</label>{{this.delegateAgentCount}} 个 (<span title="点击委托节点"
+                                                                             @click="toAgencyNode"
+                                                                             class="span">委托</span>)
+                </li>
+                <li>
+                    <label>抵押总数：</label><span title="点击查看抵押详情" @click="toPledgeInfo" class="span">{{this.totalDeposit*0.00000001}} NULS</span>
+                </li>
+                <li>
+                    <label>可用余额：</label>{{this.usableBalance*.00000001}} NULS
+                </li>
+            </ul>
+        </div>
+        <div class="consensus-bottom">
+            <template>
+                <el-tabs v-model="activeName" @tab-click="handleClick">
+                    <el-tab-pane label="全部共识" name="first">
+                        <div class="div-icon cursor-p fl" v-for="(item,index) in allConsensus"
+                             @click="toNodePage(item.delegateAddress)">
+                            <p class="subscript">
+                                {{item.status = 2 ? "正在共识" : "等待共识"}}
+                            </p>
+                            <h3>{{item.agentName}}</h3>
+                            <ul>
+                                <li><label>节点来源：</label>{{ item.reward.value }}</li>
+                                <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
+                                <li><label>保证金：</label>{{ item.owndeposit.value*0.00000001 }} NULS</li>
+                                <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
+                                    <label class="fl cursor-p">信用值:</label>
+                                    <ProgressBar colorData="#6e84f7" :widthData="item.creditRatio"></ProgressBar>
+                                </li>
+                                <li class="cb">
+                                    <label class="fl">参与人数：</label>
+                                    <ProgressBar colorData="'#f64b3e'" :widthData="item.memberCount"></ProgressBar>
+                                </li>
+                                <li class="cb">
+                                    <label class="fl">抵押金额：</label>
+                                    <ProgressBar colorData="#82BD39" :widthData="item.totalDeposit.value"></ProgressBar>
+                                </li>
+                            </ul>
+                            <div class="credit-valuesDiv" :id=index>
+                                <h2>
+                                    <label class="fl">能力系数&nbsp;</label>
+                                    <ProgressBar colorData="#82BD39" widthData="50%"></ProgressBar>
+                                </h2>
+                                <p class="cb">根据近100轮出块数量计算</p>
+                                <h4>
+                                    <label class="fl">责任系数&nbsp;</label>
+                                    <ProgressBar colorData="#82BD39" widthData="80%"></ProgressBar>
+                                </h4>
+                                <p class="cb">根据近100轮违规情况和出块正确性计算</p>
+                            </div>
+                        </div>
+                        <el-pagination layout="prev, pager, next" :page-size="3" :total=this.totalAll class="cb"
+                                       @current-change="allConsensusSize"></el-pagination>
+                    </el-tab-pane>
+                    <el-tab-pane label="我的共识" name="second">
+                        <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
+                             @click="toMyNode(item.agentAddress,index)">
+                            <p class="subscript" :class="{stay:item.status == 2 ? false : true }">
+                                {{item.status == 2 ? "正在共识" : "等待共识"}}
+                            </p>
+                            <h3>{{item.agentName}}</h3>
+                            <ul>
+                                <li><label>节点来源：</label>{{ item.rewardValue }}</li>
+                                <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
+                                <li><label>保证金：</label>{{ item.value*0.00000001 }} NULS</li>
+                                <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
+                                    <label class="fl cursor-p">信用值:</label>
+                                    <ProgressBar colorData="#6e84f7" widthData="50%"></ProgressBar>
+                                </li>
+                                <li class="cb">
+                                    <label class="fl">参与人数：</label>
+                                    <ProgressBar colorData="'#f64b3e'" widthData="80%"></ProgressBar>
+                                </li>
+                                <li class="cb">
+                                    <label class="fl">抵押金额：</label>
+                                    <ProgressBar colorData="#82BD39" widthData="90%"></ProgressBar>
+                                </li>
+                            </ul>
+                            <div class="credit-valuesDiv" :id=index>
+                                <h2>
+                                    <label class="fl">能力系数&nbsp;</label>
+                                    <ProgressBar colorData="#82BD39" widthData="50%"></ProgressBar>
+                                </h2>
+                                <p class="cb">根据近100轮出块数量计算</p>
+                                <h4>
+                                    <label class="fl">责任系数&nbsp;</label>
+                                    <ProgressBar colorData="#82BD39" widthData="80%"></ProgressBar>
+                                </h4>
+                                <p class="cb">根据近100轮违规情况和出块正确性计算</p>
+                            </div>
+                        </div>
+                        <el-pagination layout="prev, pager, next" :page-size="3" :total=this.myTotalAll class="cb"
+                                       @current-change="myConsensusSize" v-show="myConsensusSizeOK"></el-pagination>
+                        <div class="noData" v-show="noDataOK" @click="toNodeList">
+                            <i class="el-icon-plus"></i>
+                        </div>
+                    </el-tab-pane>
+                </el-tabs>
+            </template>
+        </div>
+    </div>
 </template>
 
 <script>
-	import AccountAddressBar from './../../components/AccountAddressBar.vue'
-	export default {
-		data() {
-			return {
-				accountAddress: [{
-					value: '选项1',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}, {
-					value: '选项2',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}, {
-					value: '选项3',
-					label: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter7）'
-				}],
-				value: 'NxaD59D7aAd29654eBC58A1DEaD649153B288928e3（nter9）',
-				activeName: 'first',
-				creditValuesShow0: false,
-				creditValuesShow1: false,
-				creditValuesShow2: false,
-				isData: false,
-			}
-		},
-		components: {
-			AccountAddressBar,
-		},
-		methods: {
-			toNewNode() {
-				this.$router.push({
-					path: '/consensus/newNode'
-				});
-			},
-			toPledgeInfo() {
-				this.$router.push({
-					path: '/consensus/pledgeInfo'
-				});
-			},
-			toAgencyNode(){
-				this.$router.push({
-					path: '/consensus/agencyNode'
-				});
-			},
-			toMyNode(){
-				this.$router.push({
-					path: '/consensus/myNode'
-				});
-			},
-			toggleShow(e) {
-				this.creditValuesShow0 = !this.creditValuesShow0;
-			},
-			handleClick(tab, event) {
-				console.log(tab, event);
-			}
-		}
-	}
+    import ProgressBar from '@/components/ProgressBar.vue'
+
+    export default {
+        data() {
+            return {
+                accountAddressOk: true,
+                accountAddress: [],
+                accountAddressValue: localStorage.getItem('newAccountAddress'),
+                activeName: this.$route.params.activeName,
+                creditValuesShow0: false,
+                creditValuesShow1: false,
+                creditValuesShow2: false,
+                noDataOK: false,
+                myConsensusSizeOK: true,
+
+                allAgentCount: 0,
+                allTotalDeposit: 0,
+
+                agentCount: 0,
+                totalDeposit: 0,
+                reward: 0,
+                usableBalance: 0,
+                delegateAgentCount: 0,
+
+                creditColor: '#6e84f7',
+                totalColor: '#f64b3e',
+                memberColor: '#82BD39',
+
+                allConsensus: [],
+                totalAll: 0,
+
+                myConsensus: [
+                    {'status':'2','rewardValue':'2CYd1ZSg','agentAddress':'2CYdNLysoMbPRc4Q5YsVreT99Q61ZSg','agentName':'超级节点01','commissionRate':'15%','value':'5000000000'},
+                    {'status':'1','rewardValue':'2CYd1ZSg','agentAddress':'2CYdNLysoMbPRc4Q5YsVreT99Q61ZSg','agentName':'超级节点01','commissionRate':'15%','value':'5000000000'}
+                ],
+                myTotalAll: 0,
+
+            }
+        },
+        components: {
+            ProgressBar,
+        },
+        mounted() {
+            let _this = this;
+            this.getaccountAddress("/account/list");
+            this.getConsensus("/consensus");
+            this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
+            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "3"});
+
+            //方法没出来待定
+            this.getMyConsensus("/consensus/deposit/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+            if (this.myConsensus.length != 0) {
+                this.noDataOK = false;
+                this.myConsensusSizeOK = true;
+            } else {
+                this.noDataOK = true;
+                this.myConsensusSizeOK = false;
+            }
+
+        },
+        methods: {
+            //获取账户地址列表
+            getaccountAddress(api) {
+                this.$fetch(api)
+                    .then((response) => {
+                        this.accountAddress = response.data;
+                    });
+            },
+            //选择账户地址
+            accountAddressChecked(value) {
+                console.log(value)
+                this.getConsensusAddress("/consensus/address/" + value);
+                this.getMyConsensus("/consensus/deposit/address/"+value,{"pageSize": "3"});
+            },
+            //获取共识信息
+            getConsensus(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if (response.success) {
+                            this.allAgentCount = response.data.agentCount;
+                            this.allTotalDeposit = response.data.totalDeposit;
+                        }
+                    });
+            },
+            //获取钱包内账户参与共识基本信息
+            getConsensusAddress(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        console.log(response)
+                        if (response.success) {
+                            this.agentCount = response.data.agentCount;
+                            this.totalDeposit = response.data.totalDeposit;
+                            this.reward = response.data.reward;
+                            this.usableBalance = response.data.usableBalance;
+                            this.delegateAgentCount = response.data.delegateAgentCount;
+                        }
+                    });
+            },
+            //获取我的共识列表
+            getMyConsensus(url, params) {
+                this.$fetch(url, params)
+                    .then((response) => {
+                        this.myTotalAll = 1;
+                        /*if (response.success) {
+                            for (var i = 0; i < response.data.list.length; i++) {
+                                response.data.list[i].reward.value = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
+                                if (response.data.list[i].creditRatio != 0) {
+                                    if (response.data.list[i].creditRatio > 0) {
+                                        response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
+                                    } else {
+                                        response.data.list[i].creditRatio = response.data.list[i].creditRatio * 100;
+                                    }
+                                } else {
+                                    response.data.list[i].creditRatio = "50%";
+                                }
+                                response.data.list[i].memberCount = (response.data.list[i].memberCount / 10).toFixed() + '%';
+                                response.data.list[i].totalDeposit.value = (response.data.list[i].totalDeposit.value / 50000000000000).toFixed() + '%';
+
+                            }
+                            this.myTotalAll = response.data.total;
+                            this.myConsensus = response.data.list;
+                            console.log("===" + this.myConsensus)
+                        }*/
+                    });
+            },
+            //我的共识列表分页
+            myConsensusSize(events) {
+                this.getMyConsensus("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {
+                    "pageNumber": events,
+                    "pageSize": "3"
+                });
+            },
+            //获取全部共识列表
+            getAllConsensus(url, params) {
+                this.$fetch(url, params)
+                    .then((response) => {
+                        if (response.success) {
+                            for (var i = 0; i < response.data.list.length; i++) {
+                                response.data.list[i].reward.value = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
+                                if (response.data.list[i].creditRatio != 0) {
+                                    if (response.data.list[i].creditRatio > 0) {
+                                        response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
+                                    } else {
+                                        response.data.list[i].creditRatio = response.data.list[i].creditRatio * 100;
+                                    }
+                                } else {
+                                    response.data.list[i].creditRatio = "50%";
+                                }
+                                response.data.list[i].memberCount = (response.data.list[i].memberCount / 10).toFixed() + '%';
+                                response.data.list[i].totalDeposit.value = (response.data.list[i].totalDeposit.value / 50000000000000).toFixed() + '%';
+
+                            }
+                            this.totalAll = response.data.total;
+                            this.allConsensus = response.data.list;
+                        }
+                    });
+            },
+            //全部共识分页
+            allConsensusSize(events) {
+                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "3"});
+            },
+            //创建节点跳转
+            toNewNode() {
+                this.$router.push({
+                    path: '/consensus/newNode'
+                });
+            },
+            //查看抵押详情跳转
+            toPledgeInfo() {
+                this.$router.push({
+                    path: '/consensus/pledgeInfo'
+                });
+            },
+            //点击全部共识跳转加入节点页面
+            toNodePage(index) {
+                this.$router.push({
+                    name: '/nodePage',
+                    params: {address: index},
+                });
+                /*this.$router.push({
+                    name: '/nodePage',
+                    params: {address: index},
+                });*/
+            },
+            //委托节点跳转
+            toAgencyNode(){
+                this.$router.push({
+                    name: '/agencyNode',
+                });
+             },
+            //我的节点跳转
+            toMyNode(addres,index) {
+                if(index !=0){
+                    this.$router.push({
+                        name: '/myNode'
+                    });
+                }else {
+                    this.$router.push({
+                        name: '/nodeInfo'
+                    });
+                }
+            },
+            //显示隐藏信用系数规则
+            toggleShow(index) {
+                //console.log(index);
+                /*this.creditValuesShow0 = !this.creditValuesShow0;*/
+            },
+            //切换tab
+            handleClick(tab, event) {
+                this.getAllConsensus("/consensus/agent/list/", {"pageSize": "3"});
+                //方法没有，待定
+                this.getMyConsensus("/consensus/deposit/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+            },
+            //跳转加入共识列表
+            toNodeList(){
+                this.$router.push({
+                    name: '/agencyNode'
+                });
+            },
+        }
+    }
 </script>
 
 <style lang="less">
-	@import url("../../assets/css/style");
-	.consensus-index {
-		
-		.consensus-center {
-			width: 640px;
-			height: 106px;
-			margin: auto;
-			border: 1px solid #658ec7;
-			text-align: center;
-			font-family: "微软雅黑";
-			h2 {
-				font-size: 14px;
-				font-weight: 590;
-				line-height: 36px;
-				label {}
-			}
-			ul {
-				width: 100%;
-				li {
-					width: 35%;
-					height: 20px;
-					padding-left: 15%;
-					text-align: left;
-					float: left;
-					font-size: 12px;
-					color: #C1C5C9;
-					label {}
-					span {
-						text-decoration: underline;
-						cursor: pointer;
-					}
-				}
-				li.li-bg {
-					background-color: #222d3f;
-				}
-			}
-		}
-		.consensus-bottom {
-			width: 80%;
-			margin: auto;
-			margin-top: 5px;
-			h3 {
-				text-align: center;
-				font-size: 14px;
-				line-height: 35px;
-			}
-			ul {
-				li {
-					font-size: 12px;
-					color: #C1C5C9;
-					padding-left: 20px;
-					line-height: 20px;
-					label {}
-					.bar-bg {
-						margin-top: 10px;
-					}
-				}
-				li.participants {
-					.bar-bg {
-						.bar {
-							width: 50%;
-							background-color: #6e84f7;
-							span {
-								border-right: 1px solid #6e84f7;
-							}
-						}
-					}
-				}
-				li.pawn-amount {
-					.bar-bg {
-						.bar {
-							width: 70%;
-							background-color: #f64b3e;
-							span {
-								border-right: 1px solid #f64b3e;
-							}
-						}
-					}
-				}
-				li.credit-values {
-					.bar-bg {
-						.bar {
-							width: 60%;
-							background-color: #82BD39;
-							span {
-								border-right: 1px solid #82BD39;
-							}
-						}
-					}
-				}
-			}
-			
-			.el-pagination {
-				padding: 10px 5px;
-			}
-			.noData {
-				height: 168px;
-				width: 200px;
-				overflow: hidden;
-				position: relative;
-				background-color: #181f2f;
-				border: 1px solid #24426c;
-				margin: auto;
-				margin-top: 15px;
-				text-align: center;
-				font-size: 5rem;
-				line-height: 150px;
-				cursor: pointer;
-			}
-		}
-	}
+    @import url("../../assets/css/style");
+    .consensus-index {
+        .account-address {
+            height: 50px;
+            margin:20px auto 0px;
+            width: 68%;
+            label {
+                font-size: 14px;
+                margin-right: 15px;
+            }
+            .el-input--suffix .el-input__inner {
+                width: 410px;
+            }
+            .el-input__suffix {
+                margin-top: 1%;
+            }
+            .el-select .el-input .el-select__caret {
+                font-size: 14px;
+            }
+        }
+        .consensus-index-title {
+            width: 640px;
+            margin: auto;
+            font-size: 12px;
+            line-height: 32px;
+            color: #658ec7;
+            label {
+            }
+        }
+        .consensus-center {
+            width: 640px;
+            height: 80px;
+            margin: auto;
+            border: 1px solid #658ec7;
+            text-align: center;
+            font-family: "微软雅黑";
+            ul {
+                width: 100%;
+                li {
+                    width: 35%;
+                    height: 25px;
+                    line-height: 25px;
+                    padding-left: 15%;
+                    text-align: left;
+                    float: left;
+                    font-size: 12px;
+                    color: #C1C5C9;
+                    label {
+                    }
+                    .span {
+                        text-decoration: underline;
+                        cursor: pointer;
+                    }
+                    span.span {
+                        text-decoration: underline;
+                        cursor: pointer;
+                    }
+                }
+                li.li-bg {
+                    background-color: #222d3f;
+                }
+            }
+
+        }
+        .consensus-bottom {
+            width: 80%;
+            margin: 5px auto 0px;
+            h3 {
+                text-align: center;
+                font-size: 14px;
+                line-height: 35px;
+            }
+            ul {
+                li {
+                    label {
+                    }
+                    .bar-bg {
+                        margin-top: 10px;
+                    }
+                }
+            }
+            .noData {
+                width: 130px;
+                height: 100px;
+                text-align: center;
+                border: 1px solid #658ec7;
+                line-height: 90px;
+                font-size: 50px;
+                color: #c1c1c1;
+                margin: 50px auto;
+                background-color: #17202e;
+            }
+            .noData:hover {
+                border: 1px solid #3a8ee6;
+                cursor: pointer;
+            }
+        }
+    }
 </style>

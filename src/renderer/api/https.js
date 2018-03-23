@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 axios.defaults.timeout = 5000;
-/*axios.defaults.baseURL ='http://www.mocky.io/v2';*/
 axios.defaults.baseURL = 'http://192.168.1.201:8001/nuls';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -14,9 +13,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
  */
 export function fetch(url, params = {}) {
     return new Promise((resolve, reject) => {
-        axios.get(url, {
-            params: params
-        })
+        axios.get(url, {params: params})
             .then(response => {
                 resolve(response.data);
             })

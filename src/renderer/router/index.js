@@ -112,14 +112,14 @@ const router = new VueRouter({
 		},
 		{
 			//共识首页
-			path: '/consensus',
+			path: '/consensus :activeName' ,
 			name: '/consensus',
 			component: resolve => require(['../../renderer/pages/consensus/Index.vue'], resolve)
 
 		}, 
 		{
-			path: '/consensus/myNode',
-			name: '我的节点信息',
+			path: '/consensus/myNode :agentAddress',
+			name: '/myNode',
 			component: resolve => require(['../../renderer/pages/consensus/MyNode.vue'], resolve)
 
 		}, 
@@ -141,22 +141,22 @@ const router = new VueRouter({
 		},
 		{
 			path: '/consensus/agencyNode',
-			name: '共识代理节点',
+			name: '/agencyNode',
 			component: resolve => require(['../../renderer/pages/consensus/AgencyNode.vue'], resolve)
 		},
 		{
 			path: '/consensus/nodeInfo',
-			name: '节点信息',
+			name: '/nodeInfo',
 			component: resolve => require(['../../renderer/pages/consensus/NodeInfo.vue'], resolve)
 		},
 		{
-			path: '/consensus/nodeInfo/allPledge',
-			name: '所有节点',
+			path: '/consensus/nodeInfo/allPledge :agentName',
+			name: '/allPledge',
 			component: resolve => require(['../../renderer/pages/consensus/AllPledge.vue'], resolve)
 		},
 		{
-			path: '/consensus/nodeInfo/nodePage',
-			name: '节点页面',
+			path: '/consensus/nodeInfo/nodePage :address' ,
+			name: '/nodePage',
 			component: resolve => require(['../../renderer/pages/consensus/NodePage.vue'], resolve)
 		}
 		

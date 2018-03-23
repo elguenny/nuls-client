@@ -17,6 +17,8 @@
 	.back {
 		font-size: 14px;
 		cursor: pointer;
-		margin: 20px 0 0 55px;
+		margin: 25px 0 0 55px;
+		width: 115px;
+		height: 20px;
 	}
 </style>

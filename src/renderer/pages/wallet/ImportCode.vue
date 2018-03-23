@@ -1,6 +1,8 @@
 <template>
     <div class="import-code">
+        <Back :backTitle="backTitle"></Back>
         <h2>二维码导入</h2>
+        <p>请选择您备份的二维码图片即可导入</p>
         <el-form >
             <el-upload class="avatar-uploader"
                        action="https://jsonplaceholder.typicode.com/posts/"
@@ -18,13 +20,18 @@
 </template>
 
 <script>
+    import Back from '@/components/BackBar.vue';
     import {qrcode} from '@/assets/js/qrcode.js';
     export default {
         data() {
             return {
+                backTitle: '导入账户',
                 imageUrl: '',
                 imagesPash:'',
             };
+        },
+        components: {
+            Back,
         },
         methods: {
             handleAvatarSuccess(res, file) {
@@ -47,11 +54,11 @@
             },
             //识别二维码
             getUrl(){
-                //console.log(this.imagesPash);
-                console.log(this.qrcode.decode(this.imagesPash));
+                console.log(this.imagesPash);
+                //console.log(this.qrcode.decode(this.imagesPash));
             },
             codeSubmit(){
-                alert("开发中.....")
+                alert("开发中.....");
                 console.log("codeSubmit");
             }
         }
@@ -66,10 +73,20 @@
             text-align: center;
             line-height: 3rem;
         }
+        p{
+            text-align: center;
+            font-size: 12px;
+            color: #C1C5C9;
+            line-height: 30px;
+        }
         form {
             width: 60%;
             margin: auto;
             text-align: center;
+            .el-form-item {
+                margin-bottom: 22px;
+                margin-top: 30px;
+            }
         }
         .avatar-uploader .el-upload {
             border: 1px dashed #d9d9d9;
