@@ -1,4 +1,4 @@
-module.exports = {
+amodule.exports = {
     message: {
         //public
         accountManagement:'Account',
@@ -9,7 +9,7 @@ module.exports = {
         remarks:'Remarks',
         addressNull:'Please input the source address.',
         transferNull:'Please input the destination address.',
-        addressOrTransfer:'The destination address can not be yourself.',
+        addressOrTransfer:'The destination address cannot be the same as the source address.',
         transferNO:'Please input transfer amount.',
         transferNO1:'Please check the amount.',
         transferNO2:'Lack of balance.',
@@ -19,7 +19,7 @@ module.exports = {
         passWordTitle: 'Please input your password',
         confirmButtonText: 'Confirm ',
         cancelButtonText: 'Cancel',
-        passWordSuccess: 'Congratulations, new account created！',
+        passWordSuccess: 'Congratulations,a new account created！',
         passWordFailed: 'Sorry,failed to create an account！',
         passWordWasincorrect: 'Incorrect password！',
         enterCance: 'Cancel',
@@ -45,8 +45,8 @@ module.exports = {
         oldPassWord: 'old passWord',
         setPassWord: 'new passWord',
         walletPassWord: 'Wallet password (8-20 characters, lower case letters and Numbers)',
-        affirmWalletPassWord: 'Confirm Password',
-        passWordHint: 'Password Hint',
+        affirmWalletPassWord: 'Confirm password',
+        passWordHint: 'Password hint',
         passWordInfo: 'Please remember your password,and password loss is likely to cause your asset loss!',
         passWordHintEmpty: 'Password hint can not be empty!',
         walletPassWordEmpty: 'Please input your password!',
