@@ -4,7 +4,7 @@
 		<h2>{{this.agentAddressInfo.agentName}}</h2>
 		<div class="div-icon1 node-page-top">
 			<p class="subscript">
-				{{this.agentAddressInfo.status == 2 ? "正在共识" : "等待共识"}}
+				{{this.agentAddressInfo.status}}
 			</p>
 			<ul>
 				<li class="li-bg overflow">
@@ -15,20 +15,22 @@
 				</li>
 				<li>
 					<!--<label>保证金：</label>{{this.nodeData.owndeposit.value * 0.00000001}} NULS-->
-					<label>保证金：</label>{{20000}} NULS
+					<label>保证金：</label>{{(this.agentAddressInfo.owndeposit*0.00000001).toFixed(8)}} NULS
 				</li>
 				<li>
 					<label>参与人数：</label>
 					<ProgressBar colorData="#6a84f7" :widthData="this.agentAddressInfo.memberCount"></ProgressBar>
+					<span>&nbsp;{{this.agentAddressInfo.memberCounts}}</span>
 				</li>
 				<li>
 					<label>信用值：</label>
 					<ProgressBar colorData="#82bd39" :widthData="this.agentAddressInfo.creditRatio"></ProgressBar>
+					<span>&nbsp;{{this.agentAddressInfo.creditRatios}}</span>
 				</li>
 				<li>
 					<label>剩余可抵押：</label>
-					<!-- <ProgressBar colorData="#58a5c9" :widthData="this.nodeData.totalDeposit.value"></ProgressBar>-->
-					<ProgressBar colorData="#58a5c9" widthData="5%"></ProgressBar>
+					<ProgressBar colorData="#58a5c9" :widthData="this.agentAddressInfo.totalDeposit"></ProgressBar>
+					<span>&nbsp;{{this.agentAddressInfo.totalDeposits}}</span>
 				</li>
 				<li class="li-info overflow">
 					<label>节点介绍：</label>{{this.agentAddressInfo.introduction}}
@@ -53,7 +55,7 @@
 					</template>
 				</el-table-column>
 			</el-table>
-			<el-pagination layout="prev, pager, next" :page-size="3"  :total=this.total @current-change="myMortgageSize" class="cb"></el-pagination>
+			<el-pagination layout="prev, pager, next" :page-size="3"  :total=this.total v-show="totalOK = this.total > 3 ? true:false" @current-change="myMortgageSize" class="cb"></el-pagination>
 		</div>
 	</div>
 </template>
@@ -79,7 +81,7 @@
 		},
         mounted() {
             let _this = this;
-            this.getAgentAddressInfo("/consensus/agent/list/", {"address": this.agentAddress, "pageSize": "1"});
+            this.getAgentAddressInfo("/consensus/agent/"+this.agentAddress);
             this.getAddressList("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
         },
 		methods: {
@@ -87,19 +89,23 @@
             getAgentAddressInfo(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
+                        console.log(response)
                         if (response.success) {
-                            if (response.data.list[0].creditRatio != 0) {
-                                if (response.data.list[0].creditRatio > 0) {
-                                    response.data.list[0].creditRatio = ((((response.data.list[0].creditRatio + 1) / 2)) * 100).toFixed() + '%';
+                            response.data.creditRatios = response.data.creditRatio;
+                            if (response.data.creditRatio != 0) {
+                                if (response.data.creditRatio > 0) {
+                                    response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                 } else {
-                                    response.data.list[0].creditRatio = response.data.list[0].creditRatio * 100;
+                                    response.data.creditRatio = response.data.creditRatio * 100;
                                 }
                             } else {
-                                response.data.list[0].creditRatio = "50%";
+                                response.data.creditRatio = "50%";
                             }
-                            response.data.list[0].memberCount = (response.data.list[0].memberCount / 10).toFixed() + '%';
-                            response.data.list[0].totalDeposit.value = (response.data.list[0].totalDeposit.value / 50000000000000).toFixed() + '%';
-                            this.agentAddressInfo = response.data.list[0];
+                            response.data.memberCounts = response.data.memberCount +"/1000";
+                            response.data.memberCount = (response.data.memberCount / 1000).toFixed(3) + '%';
+                            response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
+                            response.data.totalDeposit = (response.data.totalDeposit / 50000000000000).toFixed(2) + '%';
+                            this.agentAddressInfo = response.data;
                         }
                     });
             },
@@ -132,8 +138,10 @@
 			},*/
 			//追加共识
 			addNode(){
+			    console.log(this.agentAddress);
 				this.$router.push({
-					path: '/consensus/myNode/addNode'
+					name: '/addNode',
+                    params: {agentAddress: this.agentAddress},
 				});
 			},
 			//退出共识

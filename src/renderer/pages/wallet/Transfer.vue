@@ -17,7 +17,7 @@
                     <i @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')" prop="joinNo" class="join-nos">
-                    <span class="allUsable">{{$t("message.currentBalance")}}:{{ this.usable }} NULS</span>
+                    <span class="allUsable">{{$t("message.currentBalance")}}:{{ usable }} NULS</span>
                     <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t("message.all")}}</span>
                 </el-form-item>
@@ -65,10 +65,20 @@
                     callback(new Error(this.$t('message.transferNull')));
                 }
                 setTimeout(() => {
-                    if (value === this.address) {
-                        callback(new Error(this.$t('message.addressOrTransfer')));
-                    } else {
-                        callback();
+                    console.log(this.address !== undefined);
+                    if(this.address !== undefined){
+                        if (value === this.address) {
+                            callback(new Error(this.$t('message.addressOrTransfer')));
+                        } else {
+                            callback();
+                        }
+                    }else {
+                        this.address = localStorage.getItem("newAccountAddress");
+                        if (value === this.address) {
+                            callback(new Error(this.$t('message.addressOrTransfer')));
+                        } else {
+                            callback();
+                        }
                     }
                 }, 500);
             };
@@ -96,7 +106,7 @@
                 usable: '0',
                 accountAddress: [],
                 transferForm: {
-                    address: this.$route.params.address == "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
+                    address: localStorage.getItem('newAccountAddress'),
                     outName: '',
                     joinAddress: '',
                     joinNo: '',
@@ -133,13 +143,12 @@
                     .then((response) => {
                         this.accountAddress = response.data;
                     });
-                //this.backTitle = $t('message.WalletManagement');
+
             },
             //根据账户地址获取账户余额
             getBalanceAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response);
                         if(response.success){
                             this.usable = (response.data.usable * 0.00000001).toFixed(8);
                         }
@@ -154,13 +163,14 @@
             },
             //选择全部金额
             allUsable(no) {
+                console.log(no);
                 if(no == 0){
                     this.$message({
                         message: this.$t('message.creditLow'),
-                        type: 'success'
+                        type: 'warning '
                     });
                 }else {
-                    this.transferForm.joinNo = (parseInt(no)-0.01).toString();
+                    this.transferForm.joinNo = no-0.01;
                 }
             },
             //选择通讯录
@@ -346,6 +356,7 @@
         }
         input[type="text"], input[type="password"], select {
             border: 1px solid #24426c;
+            font-size: 14px;
         }
     }
 </style>

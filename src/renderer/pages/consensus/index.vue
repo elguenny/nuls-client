@@ -46,7 +46,7 @@
                         <div class="div-icon cursor-p fl" v-for="(item,index) in allConsensus"
                              @click="toNodePage(item.agentAddress)">
                             <p class="subscript">
-                                {{item.status = 2 ? "正在共识" : "等待共识"}}
+                                {{item.status}}
                             </p>
                             <h3>{{item.agentName}}</h3>
                             <ul>
@@ -87,11 +87,11 @@
                         <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
                              @click="toMyNode(item.agentAddress,index)">
                             <p class="subscript" :class="{stay:item.status == 2 ? false : true }">
-                                {{item.status == 2 ? "正在共识" : "等待共识"}}
+                                {{item.status}}
                             </p>
                             <h3>{{item.agentName}}</h3>
                             <ul>
-                                <li><label>节点来源：</label>{{ item.rewardValue }}</li>
+                                <li class="overflow"><label>节点来源：</label>{{ item.agentAddress }}</li>
                                 <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
                                 <li><label>保证金：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
@@ -248,7 +248,6 @@
                             }
                             this.myTotalAll = response.data.total;
                             this.myConsensus = response.data.list;
-                            //console.log("===" + this.myConsensus)
                         }
                     });
             },
@@ -319,7 +318,8 @@
              },
             //我的节点跳转
             toMyNode(addres,index) {
-                if(index !=0){
+                console.log(addres)
+                /*if(index !=0){
                     this.$router.push({
                         name: '/myNode'
                     });
@@ -327,7 +327,7 @@
                     this.$router.push({
                         name: '/nodeInfo'
                     });
-                }
+                }*/
             },
             //显示隐藏信用系数规则
             toggleShow(index) {
@@ -337,11 +337,8 @@
             //切换tab
             handleClick(tab, event) {
                 if(tab.name !== 'first'){
-                    this.getMyConsensus("/consensus/deposit/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "4"});
+                    this.getMyConsensus("/consensus/deposit/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
                 }
-                //this.getAllConsensus("/consensus/agent/list/", {"pageSize": "4"});
-                //方法没有，待定
-
             },
             //跳转加入共识列表
             toNodeList(){

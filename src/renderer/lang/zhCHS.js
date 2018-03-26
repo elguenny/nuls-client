@@ -97,7 +97,7 @@ module.exports = {
         sourceAddress:'转出地址',
         destinationAddress: '收款地址',
         transferAmount: '转账金额',
-        currentBalance: '当前余额',
+        currentBalance: '可用余额',
         select: '选择',
         //freezeList
         freezeList: '冻结列表',

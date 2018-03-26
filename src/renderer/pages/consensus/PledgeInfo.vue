@@ -1,11 +1,11 @@
 <template>
     <div class="pledge-info">
         <Back :backTitle="backTitle"></Back>
-        <h2>我的抵押总额明细</h2>
+        <h2>我的委托总额明细</h2>
         <el-table :data="pledgeData" >
-            <el-table-column prop="agentAddress" label="节点名称" width="280" align='center'>
+            <el-table-column prop="agentName" label="节点名称" width="180" align='center'>
             </el-table-column>
-            <el-table-column prop="amount" label="金额" width="50" align='center'>
+            <el-table-column prop="amount" label="金额" width="150" align='center'>
             </el-table-column>
             <el-table-column prop="status" label="状态"  width="100" align='center'>
             </el-table-column>
@@ -17,7 +17,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination layout="prev, pager, next" :total=this.total class="cb"  @current-change="pledgeSize"></el-pagination>
+        <el-pagination layout="prev, pager, next" :page-size="8" :total=this.total class="cb"  @current-change="pledgeSize" v-show="totalOK = this.total > 8 ? true:false"></el-pagination>
     </div>
 </template>
 
@@ -44,15 +44,14 @@
             getConsensusDeposit(url,params) {
                 this.$fetch(url,params)
                     .then((response) => {
-                        console.log(params)
+                        console.log(response)
                         if (response.success) {
                             this.total = response.data.total;
                             for (var i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = response.data.list[i].amount *0.00000001;
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
-                                response.data.list[i].status = response.data.list[i].status !=2 ?"等待共识":"正在共识";
+                                //response.data.list[i].status = response.data.list[i].status !=2 ?"等待共识":"正在共识";
                             }
-                            console.log(response)
                             this.pledgeData = response.data.list;
                         }
                     });

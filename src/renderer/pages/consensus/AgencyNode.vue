@@ -22,7 +22,7 @@
             <!--<div class="div-icon cursor-p fl" @click="toNodePage">-->
             <div class="div-icon fl cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentAddress)">
                 <p class="subscript">
-                    {{item.status = 2 ? "正在共识" : "等待共识"}}
+                    {{item.status}}
                 </p>
                 <h3>{{item.agentName}}</h3>
                 <ul>

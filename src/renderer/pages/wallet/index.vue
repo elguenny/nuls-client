@@ -12,13 +12,15 @@
                     </el-select>
                 </template>
             </div>
-            <i class="icon-copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue" @click="accountCopy"></i>
+            <i class="icon-copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
+               @click="accountCopy"></i>
             <i class="icon-qr_icon cursor-p" @click="accountCode"></i>
             <i class="icon-zhanghu_icon fr cursor-p" @click="accountChoice"></i>
             <CodeBar v-show="codeShowOk" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
         </div>
         <div class="wallet-hide" v-show="walletHide">
-            <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow" class="cursor-p"></i>
+            <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="toKeyShow"
+               class="cursor-p"></i>
         </div>
         <div class="wallet-tab cl">
             <el-tabs v-model="activeName" @tab-click="handleClick" @dblclick="tab-clicks">
@@ -31,19 +33,22 @@
                         </el-table-column>
                         <el-table-column :label="$t('message.indexSum')" width="150" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=(scope.row.balance*0.00000001).toFixed(8)
+                                <input :type="keyShow ? 'text' : 'password'"
+                                       :value=(scope.row.balance*0.00000001).toFixed(8)
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexUsable')" width="150" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=(scope.row.usable*0.00000001).toFixed(8)
+                                <input :type="keyShow ? 'text' : 'password'"
+                                       :value=(scope.row.usable*0.00000001).toFixed(8)
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexLock')" width="150" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value= (scope.row.locked*0.00000001).toFixed(8)
+                                <input :type="keyShow ? 'text' : 'password'"
+                                       :value=(scope.row.locked*0.00000001).toFixed(8)
                                        readonly="readonly" class="cursor-p text-d"
                                        @click="toLocked(accountAddressValue)">
                             </template>
@@ -70,15 +75,15 @@
                                 :label="$t('message.transactionType')"
                                 width="110"
                                 align='center'>
-                                <!--:filters="[{ text: '转账', value: '转账' }, { text: '入账', value: '入账' }]"
-                                :filter-method="filterTag"
-                                filter-placement="bottom-end"-->
+                            <!--:filters="[{ text: '转账', value: '转账' }, { text: '入账', value: '入账' }]"
+                            :filter-method="filterTag"
+                            filter-placement="bottom-end"-->
                             <template slot-scope="scope">
                                 <span>{{ scope.row.type }}</span>
-                               <!-- <el-tag
-                                        :type="scope.row.transferType == '-1' ? 'primary' : 'success'"
-                                        close-transition>{{scope.row.transferType == '-1' ? $t('message.rollOut'):$t('message.rollIn')}}
-                                </el-tag>-->
+                                <!-- <el-tag
+                                         :type="scope.row.transferType == '-1' ? 'primary' : 'success'"
+                                         close-transition>{{scope.row.transferType == '-1' ? $t('message.rollOut'):$t('message.rollIn')}}
+                                 </el-tag>-->
                             </template>
                         </el-table-column>
                         <el-table-column label="txid" width="238" align='center'>
@@ -121,25 +126,25 @@
         data() {
             return {
                 walletHide: true,
-                keyShow: false,
+                keyShow: localStorage.getItem('keyShow'),
                 codeShowOk: false,
                 accountAddress: [],
                 accountAddressValue: localStorage.getItem('newAccountAddress'),
                 accountData: [],
                 dealList: [],
                 activeName: 'first',
-                objType:[
-                    {"tx1":"tx1","value":"共识奖励"},
-                    {"tx2":"tx2","value":"转账交易"},
-                    {"tx3":"tx3","value":"锁仓交易"},
-                    {"tx4":"tx4","value":"解锁交易"},
-                    {"tx5":"tx5","value":"零钱换整"},
-                    {"tx11":"tx11","value":"设置别名"},
-                    {"tx90":"tx90","value":"注册共识"},
-                    {"tx91":"tx91","value":"加入共识"},
-                    {"tx92":"tx92","value":"退出共识"},
-                    {"tx93":"tx93","value":"黄牌惩罚"},
-                    {"tx94":"tx94","value":"红牌惩罚"}
+                objType: [
+                    {"tx1": "tx1", "value": "共识奖励"},
+                    {"tx2": "tx2", "value": "转账交易"},
+                    {"tx3": "tx3", "value": "锁仓交易"},
+                    {"tx4": "tx4", "value": "解锁交易"},
+                    {"tx5": "tx5", "value": "零钱换整"},
+                    {"tx11": "tx11", "value": "设置别名"},
+                    {"tx90": "tx90", "value": "注册共识"},
+                    {"tx91": "tx91", "value": "加入共识"},
+                    {"tx92": "tx92", "value": "退出共识"},
+                    {"tx93": "tx93", "value": "黄牌惩罚"},
+                    {"tx94": "tx94", "value": "红牌惩罚"}
                 ],
             }
         },
@@ -156,9 +161,9 @@
             getaccountAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        if(response.success){
+                        if (response.success) {
                             this.accountAddress = response.data;
-                        }else {
+                        } else {
                             console.log("获取账户地址失败！");
                             return;
                         }
@@ -169,7 +174,7 @@
             getAccountAssets(api) {
                 this.$fetch(api)
                     .then((response) => {
-                        if(response.success){
+                        if (response.success) {
                             this.accountData = response.data;
                         }
                     });
@@ -178,38 +183,76 @@
             getAccountTxList(api, param) {
                 this.$fetch(api, param)
                     .then((response) => {
-                        console.log(response);
-                        if(response.data != null){
-                            if(response.data.list.length > 0){
+                        if (response.data != null) {
+                            if (response.data.list.length > 0) {
                                 this.dealList = response.data.list;
                                 for (var i = 0; i < response.data.list.length; i++) {
-                                    this.dealList[i].type = this.objType[response.data.list[i].type].value;
+                                    this.dealList[i].type = this.switchTyep(response.data.list[i].type);
                                     this.dealList[i].values = response.data.list[i].value * response.data.list[i].transferType * 0.00000001;
                                     this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
                                 }
-                            }else {
-                                this.dealList=[];
+                            } else {
+                                this.dealList = [];
                             }
-                        }else {
-                            this.dealList=[];
+                        } else {
+                            this.dealList = [];
                         }
                     });
             },
 
             //地址选择
             accountAddressChecked(value) {
-                localStorage.setItem('newAccountAddress',value);
+                localStorage.setItem('newAccountAddress', value);
                 this.getAccountAssets("/account/assets/" + value);
-                let params = {"address": value,"pageSize":5,"pageNumber":1};
+                let params = {"address": value, "pageSize": 5, "pageNumber": 1};
                 this.getAccountTxList('/tx/list/', params);
+            },
+            //查询交易类型
+            switchTyep(type) {
+                switch (type) {
+                    case 1:
+                        return "共识奖励";
+                        break;
+                    case 2:
+                        return "转账交易";
+                        break;
+                    case 3:
+                        return "锁仓交易";
+                        break;
+                    case 4:
+                        return "解锁交易";
+                        break;
+                    case 5:
+                        return "零钱换整";
+                        break;
+                    case 11:
+                        return "设置别名";
+                        break;
+                    case 90:
+                        return "注册共识";
+                        break;
+                    case 91:
+                        return "加入共识";
+                        break;
+                    case 92:
+                        return "退出共识";
+                        break;
+                    case 93:
+                        return "黄牌惩罚";
+                        break;
+                    case 94:
+                        return "共识奖励";
+                        break;
+
+                }
             },
             //tab切换
             handleClick(tab, event) {
-                if(tab.name !== "first"){
+                if (tab.name !== "first") {
                     this.walletHide = false;
-                    let params = {"address": this.accountAddressValue,"pageSize":5,"pageNumber":1};
+                    let params = {"address": this.accountAddressValue, "pageSize": 5, "pageNumber": 1};
                     this.getAccountTxList('/tx/list/', params);
-                }else {
+                } else {
                     this.walletHide = true;
                     this.getAccountAssets("/account/assets/" + this.accountAddressValue);
                 }
@@ -232,13 +275,20 @@
             },
             //账户管理跳转
             accountChoice() {
-                localStorage.setItem('toUserInfo','1');
+                localStorage.setItem('toUserInfo', '1');
                 this.$router.push({
                     path: '/wallet/users/userInfo'
                 })
             },
-            filterTag(value, row) {
-                return row.deal_type === value;
+            //金额显示隐藏
+            toKeyShow() {
+               if(this.keyShow){
+                    localStorage.setItem("keyShow",false);
+                    this.keyShow = false;
+               }else {
+                   localStorage.setItem("keyShow",true);
+                   this.keyShow = true;
+               }
             },
             //toTxid跳转
             toTxid(txId) {
@@ -277,7 +327,7 @@
             height: 2.6rem;
             .search-account {
                 width: 523px;
-                .lable-title{
+                .lable-title {
                     font-size: 14px;
                     margin-left: 17px;
                 }
@@ -342,7 +392,7 @@
         background: rgba(87, 107, 139, 0.2);
         .cell {
             input {
-                background: rgba(87, 107, 139,0);
+                background: rgba(87, 107, 139, 0);
             }
         }
     }

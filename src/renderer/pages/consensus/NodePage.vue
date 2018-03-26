@@ -4,7 +4,7 @@
         <h2>{{this.nodeData.agentName}}</h2>
         <div class="div-icon1 node-page-top">
             <p class="subscript">
-                {{this.nodeData.status = 2 ? "正在共识" : "等待共识"}}
+                {{this.nodeData.status}}
             </p>
             <ul>
                 <li class="li-bg overflow">
@@ -163,7 +163,6 @@
                             inputType: 'password'
                         }).then(({value}) => {
                             var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
-                            console.log(param)
                             this.$post('/consensus/deposit/', param)
                                 .then((response) => {
                                     if (response.success) {

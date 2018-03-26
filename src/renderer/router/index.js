@@ -124,8 +124,8 @@ const router = new VueRouter({
 
 		}, 
 		{
-			path: '/consensus/myNode/addNode',
-			name: '添加节点',
+			path: '/consensus/myNode/addNode :agentAddress',
+			name: '/addNode',
 			component: resolve => require(['../../renderer/pages/consensus/AddNode.vue'], resolve)
 
 		}, 

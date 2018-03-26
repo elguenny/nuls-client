@@ -138,6 +138,7 @@
 
             if (localStorage.getItem("fastUser") == null) {
                 localStorage.setItem('fastUser', '0');
+                localStorage.setItem("keyShow",false);
             }
             this.getAccountAddress("/account/balances/");
             this.getConsensus("/consensus");
