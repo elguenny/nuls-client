@@ -61,33 +61,26 @@
                         inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                         inputType: 'password'
                     }).then(({value}) => {
-                        if (value === localStorage.getItem('userPass')) {
-                            var password = localStorage.getItem('userPass');
-                            localStorage.setItem('lockTime', moment().format('h:mm:ss'));
-                            var param = '{"count":1,"password":"' + password + '"}';
-                            this.$post('/account', param)
-                                .then((response) => {
-                                    if (response.success) {
-                                        this.$message({
-                                            type: 'success', message: this.$t('message.passWordSuccess')
-                                        });
-                                        localStorage.setItem('newAccountAddress', response.data[0]);
-                                        this.$router.push({
-                                            name: '/newAccount',
-                                            params: {newOk: true, address: ''},
-                                        })
-                                    } else {
-                                        this.$message({
-                                            type: 'warning', message: "对不起！创建失败：" + response.msg
-                                        });
-                                    }
-                                });
-                        } else {
-                            this.$message({
-                                type: 'warning',
-                                message: this.$t('message.passWordWasincorrect')
+                        localStorage.setItem('lockTime', moment().format('h:mm:ss'));
+                        var param = '{"count":1,"password":"' + value + '"}';
+                        this.$post('/account', param)
+                            .then((response) => {
+                                console.log(response)
+                                if (response.success) {
+                                    this.$message({
+                                        type: 'success', message: this.$t('message.passWordSuccess')
+                                    });
+                                    localStorage.setItem('newAccountAddress', response.data[0]);
+                                    this.$router.push({
+                                        name: '/newAccount',
+                                        params: {newOk: true, address: ''},
+                                    })
+                                } else {
+                                    this.$message({
+                                        type: 'warning', message: "对不起！创建失败：" + response.msg
+                                    });
+                                }
                             });
-                        }
                     }).catch(() => {
                         this.$message({
                             type: 'warning',

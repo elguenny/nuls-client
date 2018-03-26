@@ -1,4 +1,4 @@
-amodule.exports = {
+module.exports = {
     message: {
         //public
         accountManagement:'Account',
@@ -13,6 +13,7 @@ amodule.exports = {
         transferNO:'Please input transfer amount.',
         transferNO1:'Please check the amount.',
         transferNO2:'Lack of balance.',
+        transferNO3:'Transfer amount can not be less than 0.01 NULS',
         creditLow:'Lack of balance.',
         //input password
         //public
@@ -31,7 +32,7 @@ amodule.exports = {
         more: 'More',
         news: 'News',
         //home
-        fund: 'Fund',
+        fund: 'My asset',
         fundTotal: 'Balance',
         fundUsable: 'Available',
         fundLock: 'Frozen',
@@ -73,7 +74,7 @@ amodule.exports = {
         newAccountSubmit: 'Submit',
         newAccountReset: 'Understood the risks, but do not backup.',
         //wallet index
-        indexAccountAddress: 'Account Address',
+        indexAccountAddress: 'Accounts',
         indexAccountHome: 'Account Home',
         indexProperty: 'Assets',
         indexSum: 'Total balance',
@@ -95,7 +96,8 @@ amodule.exports = {
         state: 'State',
         time: 'Date',
         //transfer
-        transferAddress:'Source Address',
+        sourceAddress:'Source Address',
+        destinationAddress:'Destination Address',
         transferAmount:'Amount',
         currentBalance:'Current balance',
         select:'select',
@@ -130,7 +132,7 @@ amodule.exports = {
         purseVersion: 'Wallet version',
         coreVersion: 'Core version',
         toUpdate: 'Latest version',
-        blockState: 'Block state',
+        blockState: 'Block',
         local: 'Local height',
         backward: 'Backward',
         theMain: 'Mainnet height',

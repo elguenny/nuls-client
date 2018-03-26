@@ -4,7 +4,7 @@
         <div class="transfer-info">
             <h2>{{$t('message.transfer')}}</h2>
             <el-form :model="transferForm" :rules="rules" ref="transferForm">
-                <el-form-item :label="$t('message.indexAccountAddress')" class="out-address">
+                <el-form-item :label="$t('message.sourceAddress')" class="out-address">
                     <el-select v-model="transferForm.address" prop="selectAddress" @change="accountAddressChecked">
                         <el-option v-for="item in accountAddress" :key="item.address"
                                    :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
@@ -12,12 +12,12 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item :label="$t('message.transferAddress')" class="join-address" prop="joinAddress">
+                <el-form-item :label="$t('message.destinationAddress')" class="join-address" prop="joinAddress">
                     <el-input type="text" v-model="transferForm.joinAddress"></el-input>
                     <i @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')" prop="joinNo" class="join-nos">
-                    <span class="allUsable">{{$t("message.currentBalance")}}:{{ this.usable.toFixed(8) }} NULS</span>
+                    <span class="allUsable">{{$t("message.currentBalance")}}:{{ this.usable }} NULS</span>
                     <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t("message.all")}}</span>
                 </el-form-item>
@@ -80,8 +80,10 @@
                     var re = /^\d+(?=\.{0,1}\d+$|$)/;
                     if (!re.exec(value)){
                         callback(new Error(this.$t('message.transferNO1')));
-                    } else if (value > this.usable-0.01) {
+                    } else if ( value > this.usable-0.01) {
                         callback(new Error(this.$t('message.transferNO2')));
+                    }else if(value < 0.01){
+                        callback(new Error(this.$t('message.transferNO3')));
                     } else {
                         callback();
                     }
@@ -139,7 +141,7 @@
                     .then((response) => {
                         console.log(response);
                         if(response.success){
-                            this.usable = response.data.usable * 0.00000001;
+                            this.usable = (response.data.usable * 0.00000001).toFixed(8);
                         }
                     });
             },

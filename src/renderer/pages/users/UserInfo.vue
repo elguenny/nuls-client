@@ -49,9 +49,10 @@
         },
         methods: {
             //获取账户列表
-            getUserList(api) {
-                this.$fetch(api)
+            getUserList(url) {
+                this.$fetch(url)
                     .then((response) => {
+                        console.log(response);
                         this.userData = response.data;
                     });
             },

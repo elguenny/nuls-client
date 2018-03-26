@@ -23,19 +23,20 @@
                 </li>
                 <li>
                     <label>创建节点：</label>{{this.agentCount}} 个 <span v-show="this.agentCount > 0 ? false:true ">(<span
-                        title="点击创建节点" @click="toNewNode" class="span">创建</span>)</span>
+                         @click="toNewNode" class="span">创建</span>)</span>
                 </li>
                 <li>
-                    <label>委托节点：</label>{{this.delegateAgentCount}} 个 (<span title="点击委托节点"
+                    <label>委托节点：</label>{{this.delegateAgentCount}} 个 (<span
                                                                              @click="toAgencyNode"
                                                                              class="span">委托</span>)
                 </li>
                 <li>
-                    <label>抵押总数：</label><span title="点击查看抵押详情" @click="toPledgeInfo" class="span">{{this.totalDeposit*0.00000001}} NULS</span>
-                </li>
-                <li>
                     <label>可用余额：</label>{{this.usableBalance*.00000001}} NULS
                 </li>
+                <li>
+                    <label>委托总数：</label><span @click="toPledgeInfo" class="span">{{this.totalDeposit*0.00000001}} NULS</span>
+                </li>
+
             </ul>
         </div>
         <div class="consensus-bottom">
@@ -79,6 +80,7 @@
                             </div>
                         </div>
                         <el-pagination layout="prev, pager, next" :page-size="3" :total=this.totalAll class="cb"
+                                       v-show="totalAllOk = this.totalAll>3 ?true:false"
                                        @current-change="allConsensusSize"></el-pagination>
                     </el-tab-pane>
                     <el-tab-pane label="我的共识" name="second">
@@ -119,7 +121,8 @@
                             </div>
                         </div>
                         <el-pagination layout="prev, pager, next" :page-size="3" :total=this.myTotalAll class="cb"
-                                       @current-change="myConsensusSize" v-show="myConsensusSizeOK"></el-pagination>
+                                       v-show="totalAllOk = this.myTotalAll>3 ?true:false"
+                                       @current-change="myConsensusSize"></el-pagination>
                         <div class="noData" v-show="noDataOK" @click="toNodeList">
                             <i class="el-icon-plus"></i>
                         </div>
@@ -176,13 +179,13 @@
             this.getConsensus("/consensus");
             this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
 
-            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "4"});
-            this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "4"});
+            this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
+            this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
         },
         methods: {
             //获取账户地址列表
-            getaccountAddress(api) {
-                this.$fetch(api)
+            getaccountAddress(url) {
+                this.$fetch(url)
                     .then((response) => {
                         this.accountAddress = response.data;
                     });
@@ -191,7 +194,7 @@
             accountAddressChecked(value) {
                 localStorage.setItem('newAccountAddress',value);
                 this.getConsensusAddress("/consensus/address/" + value);
-                this.getMyConsensus("/consensus/agent/address/"+value,{"pageSize": "4"});
+                this.getMyConsensus("/consensus/agent/address/"+ value,{"pageSize": "3"});
             },
             //获取共识信息
             getConsensus(url) {
@@ -207,7 +210,6 @@
             getConsensusAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        //console.log(response);
                         if (response.success) {
                             this.agentCount = response.data.agentCount;
                             this.totalDeposit = response.data.totalDeposit;
@@ -221,7 +223,6 @@
             getMyConsensus(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
-                        console.log(url);
                         this.myTotalAll = 1;
                         if (response.success) {
                             if (response.data.list.length != 0) {
@@ -255,16 +256,15 @@
             myConsensusSize(events) {
                 this.getMyConsensus("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {
                     "pageNumber": events,
-                    "pageSize": "4"
+                    "pageSize": "3"
                 });
             },
             //获取全部共识列表
             getAllConsensus(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
-                        console.log(url)
                        if (response.success) {
-                           //console.log(response)
+                           console.log(response);
                             for (var i = 0; i < response.data.list.length; i++) {
                                 //response.data.list[i].agentAddress = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
                                 if (response.data.list[i].creditRatio != 0) {
@@ -286,7 +286,7 @@
             },
             //全部共识分页
             allConsensusSize(events) {
-                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "4"});
+                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "1"});
             },
             //创建节点跳转
             toNewNode() {

@@ -200,6 +200,8 @@
             accountAddressChecked(value) {
                 localStorage.setItem('newAccountAddress',value);
                 this.getAccountAssets("/account/assets/" + value);
+                let params = {"address": value,"pageSize":5,"pageNumber":1};
+                this.getAccountTxList('/tx/list/', params);
             },
             //tab切换
             handleClick(tab, event) {

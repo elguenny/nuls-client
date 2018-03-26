@@ -5,18 +5,18 @@
                 <div class="nav-title">{{$t("message.fund")}}</div>
                 <div class="nav-all">
                     <label class="fl">{{$t("message.fundTotal")}}：</label>
-                    <ProgressBar :colorData=this.balanceColor widthData="100%"></ProgressBar>
-                    <span class="fr">{{this.balanceData.balance*0.00000001}} NULS</span>
+                   <!-- <ProgressBar :colorData=this.balanceColor widthData="100%"></ProgressBar>-->
+                    <span class="fr">{{(this.balanceData.balance*0.00000001).toFixed(8)}} NULS</span>
                 </div>
                 <div class="nav-usable cl">
                     <label class="fl">{{$t("message.fundUsable")}}：</label>
-                    <ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth></ProgressBar>
-                    <span class="fr">{{this.balanceData.usable*0.00000001}} NULS</span>
+                    <!--<ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth></ProgressBar>-->
+                    <span class="fr">{{(this.balanceData.usable*0.00000001).toFixed(8)}} NULS</span>
                 </div>
                 <div class="nav-lock cl">
                     <label class="fl">{{$t("message.fundLock")}}：</label>
-                    <ProgressBar :colorData=this.usableColor :widthData=this.usableWidth></ProgressBar>
-                    <span class="fr">{{this.balanceData.locked*0.00000001}} NULS</span>
+                    <!--<ProgressBar :colorData=this.usableColor :widthData=this.usableWidth></ProgressBar>-->
+                    <span class="fr">{{(this.balanceData.locked*0.00000001).toFixed(8)}} NULS</span>
                 </div>
             </div>
             <div class="home-nav-top">
@@ -164,8 +164,8 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.entrust = response.data.totalDeposit * 0.00000001;
-                            this.income = response.data.rewardOfDay * 0.00000001;
+                            this.entrust = (response.data.totalDeposit * 0.00000001).toFixed(8);
+                            this.income = (response.data.rewardOfDay * 0.00000001).toFixed(8);
                             this.nodeNumber = response.data.agentCount;
                         }
                     })

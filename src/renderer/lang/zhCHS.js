@@ -13,6 +13,7 @@ module.exports = {
         transferNO: '请输入转账金额！',
         transferNO1: '请输入正确的转账金额为数字值！',
         transferNO2: '转账金额不能大于可用余额！',
+        transferNO3:'转账金额不能小于0.01 NULS！',
         creditLow: '对不起，您选择的账户余额不足！',
         //input password
         passWordTitle: '请输入密码',
@@ -93,7 +94,8 @@ module.exports = {
         state: '状态',
         time: '时间',
         //transfer
-        transferAddress: '转账地址',
+        sourceAddress:'转出地址',
+        destinationAddress: '收款地址',
         transferAmount: '转账金额',
         currentBalance: '当前余额',
         select: '选择',

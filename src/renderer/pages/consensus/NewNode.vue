@@ -68,7 +68,7 @@
                 var re = /^\d+(?=\.{0,1}\d+$|$)/;
                 if (!re.exec(value)) {
                     callback(new Error('请输入正确的节点佣金比例数字值！'));
-                } else if ( 0 > value || value > 20) {
+                } else if (0 > value || value > 20) {
                     callback(new Error('节点佣金比例为：0-20'));
                 } else {
                     callback();
@@ -137,7 +137,7 @@
             accountAddressChecked(value) {
                 this.getBalanceAddress('/account/balance/' + value);
                 setTimeout(() => {
-                    if(this.newNodeForm.deposit !== ''){
+                    if (this.newNodeForm.deposit !== '') {
                         this.$refs.newNodeForm.validateField('deposit');
                     }
                 }, 500);
@@ -153,32 +153,23 @@
                             inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                             inputType: 'password'
                         }).then(({value}) => {
-                            if (value === localStorage.getItem('userPass')) {
-                                var param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + value + '"}';
-                                //console.log(param)
-                                this.$post('/consensus/agent ', param)
-                                    .then((response) => {
-                                        console.log("===="+response);
-                                        if (response.success) {
-                                            this.$message({
-                                                type: 'success', message: "恭喜您，创建成功！"
-                                            });
-                                            this.$router.push({
-                                                name: '/consensus',
-                                            })
-                                        } else {
-                                            this.$message({
-                                                type: 'warning', message: "对不起，创建失败" + response.msg
-                                            });
-                                        }
-
-                                    })
-                            } else {
-                                this.$message({
-                                    type: 'warning', message: "对不起，密码错误！"
-                                });
-                            }
-
+                            var param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + value + '"}';
+                            this.$post('/consensus/agent ', param)
+                                .then((response) => {
+                                    console.log( response);
+                                    if (response.success) {
+                                        this.$message({
+                                            type: 'success', message: "恭喜您，创建成功！"
+                                        });
+                                        this.$router.push({
+                                            name: '/consensus',
+                                        })
+                                    } else {
+                                        this.$message({
+                                            type: 'warning', message: "对不起，创建失败" + response.msg
+                                        });
+                                    }
+                                })
                         })
                     }
                     else {
