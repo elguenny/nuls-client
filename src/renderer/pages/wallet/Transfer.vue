@@ -2,42 +2,42 @@
     <div class="transfer">
         <Back :backTitle="backTitle"></Back>
         <div class="transfer-info">
-            <h2>转账</h2>
+            <h2>{{$t('message.transfer')}}</h2>
             <el-form :model="transferForm" :rules="rules" ref="transferForm">
-                <el-form-item label="账户地址:" class="out-address">
-                    <el-select v-model="address" placeholder="请选择账户地址" @change="accountAddressChecked">
+                <el-form-item :label="$t('message.indexAccountAddress')" class="out-address">
+                    <el-select v-model="transferForm.address" prop="selectAddress" @change="accountAddressChecked">
                         <el-option v-for="item in accountAddress" :key="item.address"
                                    :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
                                    :value="item.address">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="转账地址:" class="join-address" prop="joinAddress">
+                <el-form-item :label="$t('message.transferAddress')" class="join-address" prop="joinAddress">
                     <el-input type="text" v-model="transferForm.joinAddress"></el-input>
                     <i @click="toUsersAddressList"></i>
                 </el-form-item>
-                <el-form-item label="转账金额:" prop="joinNo" class="join-nos">
-                    <span class="allUsable">当前余额:{{ usable }} NULS</span>
+                <el-form-item :label="$t('message.transferAmount')" prop="joinNo" class="join-nos">
+                    <span class="allUsable">{{$t("message.currentBalance")}}:{{ this.usable.toFixed(8) }} NULS</span>
                     <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input>
-                    <span class="allNo" @click="allUsable(usable)">全部</span>
+                    <span class="allNo" @click="allUsable(usable)">{{$t("message.all")}}</span>
                 </el-form-item>
-                <el-form-item label="手续费:0.01NULS" class="service-no">
+                <el-form-item :label="$t('message.miningFee')" class="service-no">
                 </el-form-item>
-                <el-form-item label="备注:" class="remark">
+                <el-form-item :label="$t('message.remarks')" class="remark">
                     <el-input type="textarea" v-model="transferForm.remark"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
-                    <el-button type="primary" @click="transferSubmit('transferForm')">确认转账</el-button>
+                    <el-button type="primary" @click="transferSubmit('transferForm')">{{$t("message.confirmButtonText")}}</el-button>
                 </el-form-item>
             </el-form>
             <el-dialog :visible.sync="dialogTableVisible">
                 <el-table :data="userAddressList" @row-dblclick="dbcheckedAddress">
-                    <el-table-column property="userAddress" label="账户" min-width="60" align='center'></el-table-column>
-                    <el-table-column property="userAlias" label="别名" min-width="20" align='center'></el-table-column>
-                    <el-table-column property="userHelp" label="备注" min-width="20" align='center'></el-table-column>
-                    <el-table-column label="操作" min-width="20" align='center'>
+                    <el-table-column property="userAddress" :label="$t('message.tabName')" width="280" align='center'></el-table-column>
+                    <el-table-column property="userAlias" :label="$t('message.tabAlias')" width="70" align='center'></el-table-column>
+                    <el-table-column property="userHelp" :label="$t('message.remarks')"  width="110" align='center'></el-table-column>
+                    <el-table-column :label="$t('message.operation')" width="100" align='center'>
                         <template slot-scope="scope">
-                            <span class="cursor-p text-d" @click="checkedAddress(scope.row.userAddress)">选择</span>
+                            <span class="cursor-p text-d" @click="checkedAddress(scope.row.userAddress)">{{$t('message.select')}}</span>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -50,13 +50,23 @@
 
     export default {
         data() {
+            var selectAddress = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error(this.$t('message.addressNull')));
+                }else {
+                    if (this.transferForm.checkPass !== '') {
+                        this.$refs.transferForm.validateField('joinNo');
+                    }
+                    callback();
+                }
+            };
             var checkJoinAddress = (rule, value, callback) => {
                 if (!value) {
-                    callback(new Error('请输入转账地址！'));
+                    callback(new Error(this.$t('message.transferNull')));
                 }
                 setTimeout(() => {
                     if (value === this.address) {
-                        callback(new Error('转账地址不能是账户地址！'));
+                        callback(new Error(this.$t('message.addressOrTransfer')));
                     } else {
                         callback();
                     }
@@ -64,14 +74,14 @@
             };
             var checkJoinNo = (rule, value, callback) => {
                 if (!value) {
-                    callback(new Error('请输入转账金额！'));
+                    callback(new Error(this.$t('message.transferNO')));
                 }
                 setTimeout(() => {
                     var re = /^\d+(?=\.{0,1}\d+$|$)/;
                     if (!re.exec(value)){
-                        callback(new Error('请输入正确的转账金额为数字值！'));
+                        callback(new Error(this.$t('message.transferNO1')));
                     } else if (value > this.usable-0.01) {
-                        callback(new Error('转账金额不能大于可用余额！'));
+                        callback(new Error(this.$t('message.transferNO2')));
                     } else {
                         callback();
                     }
@@ -80,11 +90,11 @@
 
             };
             return {
-                backTitle: '钱包管理',
-                address: this.$route.params.address,
+                backTitle: this.$t('message.walletManagement'),
                 usable: '0',
                 accountAddress: [],
                 transferForm: {
+                    address: this.$route.params.address == "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
                     outName: '',
                     joinAddress: '',
                     joinNo: '',
@@ -92,6 +102,9 @@
                     remark: ''
                 },
                 rules: {
+                    selectAddress:[
+                        {validator: selectAddress, trigger: 'blur'}
+                    ],
                     joinAddress: [
                         {validator: checkJoinAddress, trigger: 'blur'}
                     ],
@@ -109,7 +122,7 @@
         mounted() {
             let _this = this;
             this.getaccountAddress("/account/list");
-            this.getBalanceAddress('/account/balance/' + this.address);
+                this.getBalanceAddress('/account/balance/' + this.transferForm.address);
         },
         methods: {
             //获取账户地址列表
@@ -118,24 +131,35 @@
                     .then((response) => {
                         this.accountAddress = response.data;
                     });
+                //this.backTitle = $t('message.WalletManagement');
             },
             //根据账户地址获取账户余额
             getBalanceAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
+                        console.log(response);
                         if(response.success){
-                            this.usable = response.data.usable * 0.0000000001;
+                            this.usable = response.data.usable * 0.00000001;
                         }
                     });
             },
             //选择账户地址
             accountAddressChecked(value) {
                 this.address = value;
-                this.getBalanceAddress('/account/balance/' + this.address)
+                this.getBalanceAddress('/account/balance/' + value);
+                this.$refs.transferForm.validateField('joinAddress');
+                this.$refs.transferForm.validateField('joinNo');
             },
             //选择全部金额
             allUsable(no) {
-                this.transferForm.joinNo = (parseInt(no)-0.01).toString();
+                if(no == 0){
+                    this.$message({
+                        message: this.$t('message.creditLow'),
+                        type: 'success'
+                    });
+                }else {
+                    this.transferForm.joinNo = (parseInt(no)-0.01).toString();
+                }
             },
             //选择通讯录
             toUsersAddressList() {
@@ -178,12 +202,13 @@
                             inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                             inputType: 'password'
                         }).then(({value}) => {
-                            var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 1000000 + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
+                            var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
+                            console.log(param);
                             this.$post('/wallet/transfer/', param)
                                 .then((response) => {
                                     if (response.success) {
                                         this.$message({
-                                            message: '恭喜您！转账成功！',
+                                            message: this.$t('message.passWordSuccess'),
                                             type: 'success'
                                         });
                                         this.transferForm.joinAddress = '';
@@ -191,7 +216,7 @@
                                         this.transferForm.remark = ''
                                     } else {
                                         this.$message({
-                                            message: '对不起！' + response.msg,
+                                            message: this.$t('message.passWordFailed') + response.msg,
                                             type: 'warning',
                                         });
                                     }

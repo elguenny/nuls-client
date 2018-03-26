@@ -1,13 +1,13 @@
 <template>
     <div class="import-key">
         <Back :backTitle="backTitle"></Back>
-        <h2>明文私钥导入</h2>
+        <h2>{{$t("message.key")}}</h2>
         <el-form ref="keyData" :model="keyData" :rules="keyRules" label-position="top">
-            <el-form-item label="请输入明文私钥:" prop="keyInfo">
+            <el-form-item :label="$t('message.keyLow')" prop="keyInfo">
                 <el-input type="textarea" v-model="keyData.keyInfo"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="keySubmit('keyData')">确定</el-button>
+                <el-button type="primary" @click="keySubmit('keyData')">{{$t('message.confirmButtonText')}}</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -19,13 +19,13 @@
     export default {
         data() {
             return {
-                backTitle: '导入账户',
+                backTitle: this.$t("message.inportAccount"),
                 keyData: {
                     keyInfo: ''
                 },
                 keyRules: {
                     keyInfo: [
-                        {required: true, message: '请输入明文私钥！', trigger: 'blur'}
+                        {required: true, message: this.$t('message.keyLow'), trigger: 'blur'}
                     ]
                 },
             }
@@ -69,7 +69,7 @@
 
                                     } else {
                                         this.$message({
-                                            type: 'warning', message: this.$t('message.passWordFailed' + response.msg)
+                                            type: 'warning', message: this.$t('message.passWordFailed') + response.msg
                                         });
                                     }
                                 });
@@ -85,7 +85,7 @@
 
 <style lang="less">
     .import-key {
-        width: 90%;
+        width: 100%;
         margin: auto;
         h2 {
             text-align: center;

@@ -18,7 +18,8 @@
 		font-size: 14px;
 		cursor: pointer;
 		margin: 25px 0 0 55px;
-		width: 115px;
+		width: 250px;
 		height: 20px;
+		text-align: left;
 	}
 </style>

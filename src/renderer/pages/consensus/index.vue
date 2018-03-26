@@ -43,15 +43,15 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="全部共识" name="first">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in allConsensus"
-                             @click="toNodePage(item.delegateAddress)">
+                             @click="toNodePage(item.agentAddress)">
                             <p class="subscript">
                                 {{item.status = 2 ? "正在共识" : "等待共识"}}
                             </p>
                             <h3>{{item.agentName}}</h3>
                             <ul>
-                                <li><label>节点来源：</label>{{ item.reward.value }}</li>
+                                <li class="overflow"><label>节点来源：</label>{{ item.agentAddress }}</li>
                                 <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
-                                <li><label>保证金：</label>{{ item.owndeposit.value*0.00000001 }} NULS</li>
+                                <li><label>保证金：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">信用值:</label>
                                     <ProgressBar colorData="#6e84f7" :widthData="item.creditRatio"></ProgressBar>
@@ -91,7 +91,7 @@
                             <ul>
                                 <li><label>节点来源：</label>{{ item.rewardValue }}</li>
                                 <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
-                                <li><label>保证金：</label>{{ item.value*0.00000001 }} NULS</li>
+                                <li><label>保证金：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">信用值:</label>
                                     <ProgressBar colorData="#6e84f7" widthData="50%"></ProgressBar>
@@ -162,10 +162,7 @@
                 allConsensus: [],
                 totalAll: 0,
 
-                myConsensus: [
-                    {'status':'2','rewardValue':'2CYd1ZSg','agentAddress':'2CYdNLysoMbPRc4Q5YsVreT99Q61ZSg','agentName':'超级节点01','commissionRate':'15%','value':'5000000000'},
-                    {'status':'1','rewardValue':'2CYd1ZSg','agentAddress':'2CYdNLysoMbPRc4Q5YsVreT99Q61ZSg','agentName':'超级节点01','commissionRate':'15%','value':'5000000000'}
-                ],
+                myConsensus:[],
                 myTotalAll: 0,
 
             }
@@ -178,18 +175,9 @@
             this.getaccountAddress("/account/list");
             this.getConsensus("/consensus");
             this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
-            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "3"});
 
-            //方法没出来待定
-            this.getMyConsensus("/consensus/deposit/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
-            if (this.myConsensus.length != 0) {
-                this.noDataOK = false;
-                this.myConsensusSizeOK = true;
-            } else {
-                this.noDataOK = true;
-                this.myConsensusSizeOK = false;
-            }
-
+            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "4"});
+            this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "4"});
         },
         methods: {
             //获取账户地址列表
@@ -201,9 +189,9 @@
             },
             //选择账户地址
             accountAddressChecked(value) {
-                console.log(value)
+                localStorage.setItem('newAccountAddress',value);
                 this.getConsensusAddress("/consensus/address/" + value);
-                this.getMyConsensus("/consensus/deposit/address/"+value,{"pageSize": "3"});
+                this.getMyConsensus("/consensus/agent/address/"+value,{"pageSize": "4"});
             },
             //获取共识信息
             getConsensus(url) {
@@ -219,13 +207,13 @@
             getConsensusAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response)
+                        //console.log(response);
                         if (response.success) {
                             this.agentCount = response.data.agentCount;
                             this.totalDeposit = response.data.totalDeposit;
                             this.reward = response.data.reward;
                             this.usableBalance = response.data.usableBalance;
-                            this.delegateAgentCount = response.data.delegateAgentCount;
+                            this.delegateAgentCount = response.data.joinAccountCount;
                         }
                     });
             },
@@ -233,10 +221,18 @@
             getMyConsensus(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
+                        console.log(url);
                         this.myTotalAll = 1;
-                        /*if (response.success) {
+                        if (response.success) {
+                            if (response.data.list.length != 0) {
+                                this.noDataOK = false;
+                                this.myConsensusSizeOK = true;
+                            } else {
+                                this.noDataOK = true;
+                                this.myConsensusSizeOK = false;
+                            }
                             for (var i = 0; i < response.data.list.length; i++) {
-                                response.data.list[i].reward.value = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
+                                //response.data.list[i].agentAddress = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
                                 if (response.data.list[i].creditRatio != 0) {
                                     if (response.data.list[i].creditRatio > 0) {
                                         response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
@@ -246,30 +242,31 @@
                                 } else {
                                     response.data.list[i].creditRatio = "50%";
                                 }
-                                response.data.list[i].memberCount = (response.data.list[i].memberCount / 10).toFixed() + '%';
-                                response.data.list[i].totalDeposit.value = (response.data.list[i].totalDeposit.value / 50000000000000).toFixed() + '%';
-
+                                response.data.list[i].memberCount = (response.data.list[i].memberCount/1000).toFixed() + '%';
+                                response.data.list[i].totalDeposit = response.data.list[i].totalDeposit / 50000000000000 + '%';
                             }
                             this.myTotalAll = response.data.total;
                             this.myConsensus = response.data.list;
-                            console.log("===" + this.myConsensus)
-                        }*/
+                            //console.log("===" + this.myConsensus)
+                        }
                     });
             },
             //我的共识列表分页
             myConsensusSize(events) {
                 this.getMyConsensus("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {
                     "pageNumber": events,
-                    "pageSize": "3"
+                    "pageSize": "4"
                 });
             },
             //获取全部共识列表
             getAllConsensus(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
-                        if (response.success) {
+                        console.log(url)
+                       if (response.success) {
+                           //console.log(response)
                             for (var i = 0; i < response.data.list.length; i++) {
-                                response.data.list[i].reward.value = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
+                                //response.data.list[i].agentAddress = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
                                 if (response.data.list[i].creditRatio != 0) {
                                     if (response.data.list[i].creditRatio > 0) {
                                         response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
@@ -279,9 +276,8 @@
                                 } else {
                                     response.data.list[i].creditRatio = "50%";
                                 }
-                                response.data.list[i].memberCount = (response.data.list[i].memberCount / 10).toFixed() + '%';
-                                response.data.list[i].totalDeposit.value = (response.data.list[i].totalDeposit.value / 50000000000000).toFixed() + '%';
-
+                                response.data.list[i].memberCount = (response.data.list[i].memberCount/1000).toFixed() + '%';
+                                response.data.list[i].totalDeposit = response.data.list[i].totalDeposit / 50000000000000 + '%';
                             }
                             this.totalAll = response.data.total;
                             this.allConsensus = response.data.list;
@@ -290,7 +286,7 @@
             },
             //全部共识分页
             allConsensusSize(events) {
-                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "3"});
+                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "4"});
             },
             //创建节点跳转
             toNewNode() {
@@ -340,9 +336,12 @@
             },
             //切换tab
             handleClick(tab, event) {
-                this.getAllConsensus("/consensus/agent/list/", {"pageSize": "3"});
+                if(tab.name !== 'first'){
+                    this.getMyConsensus("/consensus/deposit/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "4"});
+                }
+                //this.getAllConsensus("/consensus/agent/list/", {"pageSize": "4"});
                 //方法没有，待定
-                this.getMyConsensus("/consensus/deposit/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+
             },
             //跳转加入共识列表
             toNodeList(){

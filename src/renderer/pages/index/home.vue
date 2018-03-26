@@ -6,17 +6,17 @@
                 <div class="nav-all">
                     <label class="fl">{{$t("message.fundTotal")}}：</label>
                     <ProgressBar :colorData=this.balanceColor widthData="100%"></ProgressBar>
-                    <span class="fr">{{this.balance}} NULS</span>
+                    <span class="fr">{{this.balanceData.balance*0.00000001}} NULS</span>
                 </div>
                 <div class="nav-usable cl">
                     <label class="fl">{{$t("message.fundUsable")}}：</label>
                     <ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth></ProgressBar>
-                    <span class="fr">{{this.locked}} NULS</span>
+                    <span class="fr">{{this.balanceData.usable*0.00000001}} NULS</span>
                 </div>
                 <div class="nav-lock cl">
                     <label class="fl">{{$t("message.fundLock")}}：</label>
                     <ProgressBar :colorData=this.usableColor :widthData=this.usableWidth></ProgressBar>
-                    <span class="fr">{{this.usable}} NULS</span>
+                    <span class="fr">{{this.balanceData.locked*0.00000001}} NULS</span>
                 </div>
             </div>
             <div class="home-nav-top">
@@ -62,12 +62,10 @@
         data() {
             return {
                 loading: true,
-                balance: '0',
+                balanceData:[],
                 balanceColor: '#658EC7',
-                locked: '0',
                 lockedColor: '#82bd39',
                 lockedWidth: '0',
-                usable: '0',
                 usableColor: '#f64b3e',
                 usableWidth: '0',
 
@@ -151,10 +149,8 @@
                     .then((response) => {
                         if (response.success) {
                             //console.log(response);
-                            this.balance = response.data.balance * 0.00000001;
-                            this.locked = response.data.locked * 0.00000001;
+                            this.balanceData = response.data;
                             this.lockedWidth = this.locked / this.balance * 100 + "%";
-                            this.usable = response.data.usable * 0.00000001;
                             this.usableWidth = this.usable / this.balance * 100 + "%";
                         } else {
                             this.balanceColor = '';
@@ -242,7 +238,7 @@
             height: 122px;
             margin: auto;
             .home-nav-top {
-                width: 277px;
+                width: 280px;
                 height: 120px;
                 float: left;
                 margin-right: 40px;

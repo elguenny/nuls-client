@@ -45,7 +45,7 @@
     export default {
         data() {
             return {
-                backTitle: '账户管理',
+                backTitle: this.$t('message.accountManagement'),
                 keyShow: false,
                 keyInfo: '',
                 newAccountAddress: this.$route.params.address == "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
@@ -282,7 +282,7 @@
             h2 {
             }
             .new-account-key {
-                width: 145%;
+                width: 120%;
                 margin: auto;
                 text-align: left;
                 h3 {

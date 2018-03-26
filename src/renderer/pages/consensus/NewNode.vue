@@ -20,7 +20,7 @@
                     <el-input v-model="newNodeForm.agentName"></el-input>
                 </el-form-item>
                 <el-form-item label="保证金：" class="form-left" prop="deposit">
-                    <el-input v-model.number="newNodeForm.deposit" placeholder="当前余额:5006256"></el-input>
+                    <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder></el-input>
                 </el-form-item>
                 <el-form-item label="代理佣金比例：" class="form-left" prop="commissionRate">
                     <el-input v-model.number="newNodeForm.commissionRate"></el-input>
@@ -45,9 +45,40 @@
 
     export default {
         data() {
+            var checkNodeNo = (rule, value, callback) => {
+                if (!value) {
+                    callback(new Error('请输入保证金额！'));
+                }
+                var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                if (!re.exec(value)) {
+                    callback(new Error('请输入正确的保证金额为数字值！'));
+                }
+                if (value > this.usable - 0.01) {
+                    callback(new Error('保证金额不能大于可用余额！'));
+                } else if (value < 20000) {
+                    callback(new Error('保证金额必须大于20000!'));
+                } else {
+                    callback();
+                }
+            };
+            var checkCommissionRate = (rule, value, callback) => {
+                if (!value) {
+                    callback(new Error('请输入节点佣金比例！'));
+                }
+                var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                if (!re.exec(value)) {
+                    callback(new Error('请输入正确的节点佣金比例数字值！'));
+                } else if ( 0 > value || value > 20) {
+                    callback(new Error('节点佣金比例为：0-20'));
+                } else {
+                    callback();
+                }
+            };
             return {
-                backTitle: "共识首页",
+                backTitle: this.$t('message.accountManagement'),
                 accountAddress: [],
+                usable: "0",
+                placeholder: "",
                 newNodeForm: {
                     accountAddressValue: localStorage.getItem('newAccountAddress'),
                     packingAddress: '',
@@ -65,14 +96,10 @@
                         {max: 50, message: '请输入节点名称', trigger: 'blur'}
                     ],
                     deposit: [
-                        {required: true, message: '请输入节点保证金金额'},
-                        {type: 'number', message: '保证金金额必须为数字值'}
-
+                        {validator: checkNodeNo, trigger: 'blur'},
                     ],
                     commissionRate: [
-                        {required: true, message: '请输入节点佣金比例'},
-                        {type: 'number', message: '节点佣金比例必须为数字值'},
-                        {pattern: /^((\d{1,2}(\.\d{1,2})?)|20|20.00)$/, message: '节点佣金比例为：0-20'}
+                        {validator: checkCommissionRate, trigger: 'blur'}
                     ],
                     remark: [
                         {required: true, message: '请输入节点备注', trigger: 'blur'}
@@ -86,6 +113,7 @@
         mounted() {
             let _this = this;
             this.getaccountAddress("/account/list");
+            this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'));
         },
         methods: {
             //获取账户地址列表
@@ -95,9 +123,24 @@
                         this.accountAddress = response.data;
                     });
             },
+            //根据账户地址获取账户余额
+            getBalanceAddress(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if (response.success) {
+                            this.usable = response.data.usable * 0.00000001;
+                            this.placeholder = "当前余额:" + response.data.usable * 0.00000001;
+                        }
+                    });
+            },
             //选择账户地址
             accountAddressChecked(value) {
-                //console.log(value);
+                this.getBalanceAddress('/account/balance/' + value);
+                setTimeout(() => {
+                    if(this.newNodeForm.deposit !== ''){
+                        this.$refs.newNodeForm.validateField('deposit');
+                    }
+                }, 500);
             },
             //提交创建
             submitForm(formName) {
@@ -110,12 +153,12 @@
                             inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                             inputType: 'password'
                         }).then(({value}) => {
-                            if(value ===  localStorage.getItem('userPass')){
-                                var param = '{"address":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit*100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + value + '"}';
-                                console.log(param)
+                            if (value === localStorage.getItem('userPass')) {
+                                var param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + value + '"}';
+                                //console.log(param)
                                 this.$post('/consensus/agent ', param)
                                     .then((response) => {
-                                        console.log(response)
+                                        console.log("===="+response);
                                         if (response.success) {
                                             this.$message({
                                                 type: 'success', message: "恭喜您，创建成功！"
@@ -123,14 +166,14 @@
                                             this.$router.push({
                                                 name: '/consensus',
                                             })
-                                        }else {
+                                        } else {
                                             this.$message({
-                                                type: 'warning', message: "对不起，创建失败"+response.msg
+                                                type: 'warning', message: "对不起，创建失败" + response.msg
                                             });
                                         }
 
                                     })
-                            }else {
+                            } else {
                                 this.$message({
                                     type: 'warning', message: "对不起，密码错误！"
                                 });
@@ -139,9 +182,6 @@
                         })
                     }
                     else {
-                        this.$message({
-                            type: 'warning',duration:1000, message: "对不起，创建失败！"
-                        });
                         return false;
                     }
                 });

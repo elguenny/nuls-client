@@ -1,13 +1,13 @@
 <template>
 	<div class="import-account">
 		<Back :backTitle="backTitle"></Back>
-		<h1>导入账户</h1>
+		<h1>{{$t("message.inportAccount")}}</h1>
 		<ul>
 			<li @click="importKey">
-				<span>明文私钥导入</span>
+				<span>{{$t("message.key")}}</span>
 			</li>
 			<li @click="importCode">
-				<span>二维码导入</span>
+				<span>{{$t("message.code")}}</span>
 			</li>
 			<!--<li @click="importNuls">
 				<span>.NULS格式导入</span>
@@ -21,7 +21,7 @@
 	export default {
 		data() {
 			return {
-                backTitle: '创建或导入账户',
+                backTitle: this.$t("message.firstInfoTitle"),
 			}
 		},
         components: {

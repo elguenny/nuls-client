@@ -5,13 +5,13 @@
         <el-button type="primary" icon="el-icon-plus" @click="toNewAccount()" class="newAccount"
                    title="新增通讯录"></el-button>
         <el-table :data="tableData">
-            <el-table-column prop="userAddress" label="账户" min-width="60" align='center'>
+            <el-table-column prop="userAddress" label="账户" width="288" align='center'>
             </el-table-column>
-            <el-table-column prop="userAlias" label="别名" align='center'>
+            <el-table-column prop="userAlias" label="别名" width="100" align='center'>
             </el-table-column>
-            <el-table-column prop="userHelp" label="备注"  align='center'>
+            <el-table-column prop="userHelp" label="备注"  width="180" align='center'>
             </el-table-column>
-            <el-table-column label="操作" min-width="20" align='center'>
+            <el-table-column label="操作" min-width="20" width="120" align='center'>
                 <template slot-scope="scope">
                     <el-button @click="editorRow(scope.row.userAddress,scope.row.userAlias,scope.row.userHelp)"
                                type="text" size="small">
@@ -136,7 +136,6 @@
             },
             //修改一条通讯录
             editorRow(userAddress, userAlias, userHelps) {
-                console.log(userAddress + "===" + userHelps);
                 this.dialogFormVisible = true;
                 this.form.userAddress = userAddress;
                 this.form.userAlias = userAlias;

@@ -26,9 +26,9 @@
                 </p>
                 <h3>{{item.agentName}}</h3>
                 <ul>
-                    <li><label>节点来源：</label>{{ item.reward.value }}</li>
+                    <li class="overflow"><label>节点来源：</label>{{ item.agentAddress }}</li>
                     <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
-                    <li><label>保证金：</label>{{ item.owndeposit.value*0.00000001 }} NULS</li>
+                    <li><label>保证金：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                     <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                         <label class="fl cursor-p">信用值:</label>
                        <!-- <ProgressBar colorData="#f64b3e" :widthData="item.creditRatio"></ProgressBar>-->
@@ -94,9 +94,9 @@
                         if (response.success) {
                             console.log(response.data.list);
                             for (var i = 0; i < response.data.list.length; i++) {
-                                response.data.list[i].reward.value = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
+                                //response.data.list[i].agentAddress = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
                                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%';
-                                response.data.list[i].totalDeposit.value = ((response.data.list[i].totalDeposit.value / 50000000000000).toFixed()).toString() + '%';
+                                response.data.list[i].totalDeposit = ((response.data.list[i].totalDeposit / 50000000000000).toFixed()).toString() + '%';
                             }
                             this.totalAll = response.data.total;
                             this.allConsensus = response.data.list;

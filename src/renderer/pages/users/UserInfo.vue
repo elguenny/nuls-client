@@ -2,24 +2,24 @@
     <div class="users">
         <Back :backTitle="backTitle"></Back>
         <div class="freeze-list-tabs">
-            <h2>账户管理</h2>
+            <h2>{{$t('message.userInfoTitle')}}</h2>
             <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"
                        title="新增账户"></el-button>
             <el-table :data="userData">
-                <el-table-column prop="address" label="账户" min-width="50" align='center'>
+                <el-table-column prop="address" :label="$t('message.tabName')" min-width="50" align='center'>
                 </el-table-column>
-                <el-table-column label="别名" min-width="25" class="user-aliasing">
+                <el-table-column :label="$t('message.tabAlias')" min-width="25" class="user-aliasing">
                     <template slot-scope="scope">
                         <span>{{ scope.row.alias != null  ? scope.row.alias : "-" }}</span>
-                        <i class="el-icon-edit cursor-p" title="设置别名"
+                        <i class="el-icon-edit cursor-p"
                            v-show="scope.row.alias != undefined  ? false : true"
                            @click="editAliasing(scope.row.address,scope.row.alias)" ></i>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" min-width="25" align='center'>
+                <el-table-column :label="$t('message.operation')" min-width="25" align='center'>
                     <template slot-scope="scope">
-                        <el-button size="mini" type="text" @click="outUser(scope.row.address)">移除</el-button>
-                        <el-button size="mini" type="text" @click="backupUser(scope.row.address)">备份</el-button>
+                        <el-button size="mini" type="text" @click="outUser(scope.row.address)">{{$t('message.tabRemove')}}</el-button>
+                        <el-button size="mini" type="text" @click="backupUser(scope.row.address)">{{$t('message.tabBackups')}}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -35,7 +35,7 @@
     export default {
         data() {
             return {
-                backTitle: '钱包管理',
+                backTitle: this.$t('message.walletManagement'),
                 setAsAddress: localStorage.getItem('newAccountAddress'),
                 userData: [],
             }
@@ -70,12 +70,12 @@
                             .then((response) => {
                                 if(response.success){
                                     this.$message({
-                                        type: 'success', message: "恭喜您，成功移除账户！"
+                                        type: 'success', message: this.$t('message.passWordSuccess')
                                     });
                                     this.getUserList("/account/list");
                                 }else {
                                     this.$message({
-                                        type: 'success', message: "对不起！"+response.msg
+                                        type: 'success', message: this.$t('message.passWordFailed') + response.msg
                                     });
                                 }
                             })

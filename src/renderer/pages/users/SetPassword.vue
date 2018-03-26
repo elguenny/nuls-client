@@ -30,7 +30,7 @@
                 if (value === '') {
                     callback(new Error('请输入密码'));
                 } else if (!patrn.exec(value)) {
-                    callback(new Error("密码8-20位，且为字母、数字、符号等任意2种以上组合！"));
+                    callback(new Error("钱包密码(8-20位字符,需包含大、小写字母和数字)"));
                 } else {
                     if (this.passForm.checkPass !== '') {
                         this.$refs.passForm.validateField('checkPass');

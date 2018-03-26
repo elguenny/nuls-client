@@ -3,7 +3,7 @@
         <Back :backTitle="backTitle"></Back>
         <div class="deal-info-top">
             <div class="deal-left fl">
-                <div>输入<span> {{this.allInputs*0.00000001}} NULS</span></div>
+                <div>{{$t("message.input")}}<span> {{this.allInputs*0.00000001}} NULS</span></div>
                 <ul>
                     <li v-for="inItem in inputs">
                         {{ inItem.address }}<span>{{inItem.value*0.00000001}}</span>
@@ -11,7 +11,7 @@
                 </ul>
             </div>
             <div class="deal-right fr">
-                <div>输出<span>{{this.allOutputs*0.00000001}} NULS</span></div>
+                <div>{{$t("message.output")}}<span>{{this.allOutputs*0.00000001}} NULS</span></div>
                 <ul>
                     <li v-for="outItem in outputs">
                         {{ outItem.address }}<span>{{outItem.value*0.00000001}}</span>
@@ -20,15 +20,15 @@
             </div>
         </div>
         <div class="deal-case">
-            <h3>概览</h3>
+            <h3>{{$t("message.overview")}}</h3>
             <ul>
-                <li><span>交易时间 </span>{{this.times}}</li>
-                <li><span>手续费 </span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
-                <li><span>签名 </span>{{infoData.sign}}</li>
-                <li><span>交易类型 </span>{{infoData.transferType === '1' ?"转入":"转出"}}</li>
-                <li><span>交易状态 </span>{{infoData.status === '1' ? '已确认':'待确认'}}</li>
-                <li><span>区块高度 </span>{{infoData.blockHeight}}</li>
-                <li><span>备注 </span>{{infoData.remark}}</li>
+                <li><span>{{$t("message.tradingTime")}}</span>{{this.times}}</li>
+                <li><span>{{$t("message.miningFee1")}}</span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
+                <li class="overflow"><span>{{$t("message.autograph")}}</span>{{infoData.scriptSig}}</li>
+                <li><span>{{$t("message.transactionType")}}</span>{{infoData.transferType === '1' ? $t('message.rollOut'): $t('message.rollIn')}}</li>
+                <li><span>{{$t("message.transactionState")}}</span>{{infoData.status === '1' ?  $t('message.confirmed'): $t('message.confirming')}}</li>
+                <li><span>{{$t("message.blockHeight")}}</span>{{infoData.blockHeight}}</li>
+                <li><span>{{$t("message.remarks")}}</span>{{infoData.remark}}</li>
             </ul>
         </div>
 
@@ -41,7 +41,7 @@
     export default {
         data() {
             return {
-                backTitle: '交易管理',
+                backTitle: this.$t('message.transactionManagement'),
                 hash: this.$route.params.hash,
                 infoData: [],
                 inputs: [],
@@ -65,6 +65,7 @@
                 this.$fetch(url)
                     .then((response) => {
                         console.log(response)
+                        response.data
                         this.infoData = response.data;
                         this.times =  moment(response.data.time).format('YYYY-MM-DD hh:mm:ss');
                         this.inputs = response.data.inputs;
@@ -76,7 +77,6 @@
                         this.outputs = response.data.outputs;
                         if (response.data.outputs.length > 0) {
                             for (var i = 0; i < response.data.outputs.length; i++) {
-                                //console.log(parseFloat(response.data.outputs[i].value)*0.0000001);
                                 this.allOutputs = this.allOutputs + parseFloat(response.data.outputs[i].value);
                             }
                         }
@@ -93,8 +93,7 @@
         .deal-info-top {
             width: 86%;
             height: 6rem;
-            margin: auto;
-            margin-top: 1rem;
+            margin:1rem auto 0px;
             .deal-left, .deal-right {
                 width: 48%;
                 line-height: 30px;
@@ -140,15 +139,13 @@
                 ul::-webkit-scrollbar-thumb
                 {
                     border-radius: 10px;
-                    background-color: #FFF;
                     background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#222d3f), to(#82bd39), color-stop(.6,#222d3f))
                 }
             }
         }
         .deal-case {
             width: 86%;
-            margin: auto;
-            margin-top: 3px;
+            margin:3px auto 0px;
             h3 {
                 background-color: #222d3f;
                 line-height: 30px;
@@ -163,7 +160,7 @@
                     font-weight: 400;
                     span {
                         display: block;
-                        width: 5rem;
+                        width: 125px;
                         float: left;
                     }
                 }

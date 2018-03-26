@@ -32,7 +32,7 @@
             //选择账户地址
             accountAddressChecked(accountAddress) {
                 this.$emit("chenckAccountAddress",accountAddress);
-                localStorage.setItem('newAccountAddress',accountAddress)
+                localStorage.setItem('newAccountAddress',accountAddress);
             },
 		}
 	}

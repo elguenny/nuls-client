@@ -2,7 +2,7 @@
     <div class="first-info">
         <Back :backTitle="backTitle" v-show="backOk"></Back>
         <div class="backOk" v-show="backOks"></div>
-        <h2>创建或导入账户</h2>
+        <h2>{{$t("message.firstInfoTitle")}}</h2>
         <ul>
             <li @click="newAccount">
                 <span>{{$t("message.createNewAccount")}}</span>
@@ -23,7 +23,7 @@
     export default {
         data() {
             return {
-                backTitle: '账户管理',
+                backTitle: this.$t('message.accountManagement'),
                 backOk: localStorage.getItem('toUserInfo') === "1" ? true : false,
                 backOks: localStorage.getItem('toUserInfo') === "1" ? false : true,
             }
@@ -135,7 +135,7 @@
             height: 50px;
         }
         h2 {
-            width: 200px;
+            width: 270px;
             margin: auto;
             line-height: 22px;
             font-size: 16px;
@@ -145,7 +145,6 @@
             width: 60%;
             height: 50%;
             margin: 77px auto;
-
             li {
                 width: 40%;
                 height: 11rem;

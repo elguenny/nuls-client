@@ -1,8 +1,8 @@
 <template>
     <div class="import-code">
         <Back :backTitle="backTitle"></Back>
-        <h2>二维码导入</h2>
-        <p>请选择您备份的二维码图片即可导入</p>
+        <h2>{{$t("message.code")}}</h2>
+        <p>{{$t('message.keyLow')}}</p>
         <el-form >
             <el-upload class="avatar-uploader"
                        action="https://jsonplaceholder.typicode.com/posts/"
@@ -13,7 +13,7 @@
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <el-form-item>
-                <el-button type="primary" @click="codeSubmit">确定</el-button>
+                <el-button type="primary" @click="codeSubmit">{{$t('message.confirmButtonText')}}</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -25,7 +25,7 @@
     export default {
         data() {
             return {
-                backTitle: '导入账户',
+                backTitle: this.$t("message.inportAccount"),
                 imageUrl: '',
                 imagesPash:'',
             };

@@ -2,15 +2,15 @@
 	<div class="freeze-list">
 		<Back :backTitle="backTitle"></Back>
 		<div class="freeze-list-tabs">
-			<h2>冻结列表</h2>
+			<h2>{{$t('message.freezeList')}}</h2>
 			<el-table :data="freezeData" style="width: 100%">
-				<el-table-column prop="freezeType" label="类型">
+				<el-table-column prop="freezeType" :label="$t('message.type')">
 				</el-table-column>
-				<el-table-column prop="freezeMoney" label="金额">
+				<el-table-column prop="freezeMoney" :label="$t('message.amount')">
 				</el-table-column>
-				<el-table-column prop="lockTime" label="冻结时间">
+				<el-table-column prop="lockTime" :label="$t('message.freezeTime')">
 				</el-table-column>
-				<el-table-column prop="outTime" label="解冻时间">
+				<el-table-column prop="outTime" :label="$t('message.thawingTime')">
 				</el-table-column>
 			</el-table>
 			<!--<el-pagination background layout="prev, pager, next" :total="1000">
@@ -24,10 +24,9 @@
 	export default {
 		data() {
 			return {
-                backTitle:'钱包管理',
+                backTitle:this.$t('message.walletManagement'),
 				address:this.$route.params.address,
 				freezeData: []
-
 			}
 		},
         components: {
@@ -36,7 +35,7 @@
         mounted() {
             let _this = this;
             var params = {"address": this.address};
-            this.getLocked('tx/utxo/locked/',params);
+            this.getLocked('tx/locked/',params);
 		},
 		methods: {
 			getLocked(url,param){

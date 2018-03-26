@@ -24,33 +24,33 @@
             <el-tabs v-model="activeName" @tab-click="handleClick" @dblclick="tab-clicks">
                 <el-tab-pane :label="$t('message.indexAccountHome')" name="first">
                     <el-table :data="accountData">
-                        <el-table-column :label="$t('message.indexProperty')" width="50" align='center'>
+                        <el-table-column :label="$t('message.indexProperty')" width="60" align='center'>
                             <template slot-scope="scope">
                                 <span>{{ scope.row.asset }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexSum')" width="150" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.balance*0.00000001
+                                <input :type="keyShow ? 'text' : 'password'" :value=(scope.row.balance*0.00000001).toFixed(8)
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexUsable')" width="150" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=scope.row.usable*0.00000001
+                                <input :type="keyShow ? 'text' : 'password'" :value=(scope.row.usable*0.00000001).toFixed(8)
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexLock')" width="150" align='center'>
                             <template slot-scope="scope">
-                                <input :type="keyShow ? 'text' : 'password'" :value=parseFloat(scope.row.locked)*0.00000001
-                                       readonly="readonly" title="点击查看详情" class="cursor-p text-d"
+                                <input :type="keyShow ? 'text' : 'password'" :value= (scope.row.locked*0.00000001).toFixed(8)
+                                       readonly="readonly" class="cursor-p text-d"
                                        @click="toLocked(accountAddressValue)">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.operation')" align='center'>
                             <template slot-scope="scope">
-                                <span class="cursor-p text-d" @click="toTransfer(accountAddressValue)">转账</span>
+                                <span class="cursor-p text-d" @click="toTransfer(accountAddressValue)">{{$t("message.transfer")}}</span>
                             </template>
                         </el-table-column>
                         <!--<el-table-column :label= "$t('message.operation')" align='center'>
@@ -69,32 +69,33 @@
                                 prop="tag"
                                 :label="$t('message.transactionType')"
                                 width="110"
-                                align='center'
-                                :filters="[{ text: '转账', value: '转账' }, { text: '入账', value: '入账' }]"
+                                align='center'>
+                                <!--:filters="[{ text: '转账', value: '转账' }, { text: '入账', value: '入账' }]"
                                 :filter-method="filterTag"
-                                filter-placement="bottom-end">
+                                filter-placement="bottom-end"-->
                             <template slot-scope="scope">
-                                <el-tag
+                                <span>{{ scope.row.type }}</span>
+                               <!-- <el-tag
                                         :type="scope.row.transferType == '-1' ? 'primary' : 'success'"
-                                        close-transition>{{scope.row.transferType == '-1' ? '转入':'转出'}}
-                                </el-tag>
+                                        close-transition>{{scope.row.transferType == '-1' ? $t('message.rollOut'):$t('message.rollIn')}}
+                                </el-tag>-->
                             </template>
                         </el-table-column>
-                        <el-table-column label="txid" width="290" align='center'>
+                        <el-table-column label="txid" width="238" align='center'>
                             <template slot-scope="scope">
 								<span @click="toTxid(scope.row.hash)" class="cursor-p text-d overflow">
 									{{ scope.row.hash }}
 								</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.assetChange')" width="80" align='center'>
+                        <el-table-column :label="$t('message.assetChange')" width="112" align='center'>
                             <template slot-scope="scope">
                                 <span>{{ scope.row.values }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.state')" width="60" align='center'>
+                        <el-table-column :label="$t('message.state')" width="80" align='center'>
                             <template slot-scope="scope">
-                                <span>{{ scope.row.status =='1' ? '已确认':'待确认' }}</span>
+                                <span>{{ scope.row.status =='1' ? $t('message.confirmed'):$t('message.confirming') }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.time')" width="148" align='center'>
@@ -127,6 +128,19 @@
                 accountData: [],
                 dealList: [],
                 activeName: 'first',
+                objType:[
+                    {"tx1":"tx1","value":"共识奖励"},
+                    {"tx2":"tx2","value":"转账交易"},
+                    {"tx3":"tx3","value":"锁仓交易"},
+                    {"tx4":"tx4","value":"解锁交易"},
+                    {"tx5":"tx5","value":"零钱换整"},
+                    {"tx11":"tx11","value":"设置别名"},
+                    {"tx90":"tx90","value":"注册共识"},
+                    {"tx91":"tx91","value":"加入共识"},
+                    {"tx92":"tx92","value":"退出共识"},
+                    {"tx93":"tx93","value":"黄牌惩罚"},
+                    {"tx94":"tx94","value":"红牌惩罚"}
+                ],
             }
         },
         components: {
@@ -136,15 +150,19 @@
             let _this = this;
             this.getaccountAddress("/account/list");
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
-            let params = {"address":this.accountAddressValue};
-            this.getAccountTxList('/tx/list/', params);
         },
         methods: {
             //获取账户地址列表
-            getaccountAddress(api) {
-                this.$fetch(api)
+            getaccountAddress(url) {
+                this.$fetch(url)
                     .then((response) => {
-                        this.accountAddress = response.data;
+                        if(response.success){
+                            this.accountAddress = response.data;
+                        }else {
+                            console.log("获取账户地址失败！");
+                            return;
+                        }
+
                     });
             },
             //根据账户地址获取资产列表
@@ -160,10 +178,12 @@
             getAccountTxList(api, param) {
                 this.$fetch(api, param)
                     .then((response) => {
+                        console.log(response);
                         if(response.data != null){
                             if(response.data.list.length > 0){
                                 this.dealList = response.data.list;
                                 for (var i = 0; i < response.data.list.length; i++) {
+                                    this.dealList[i].type = this.objType[response.data.list[i].type].value;
                                     this.dealList[i].values = response.data.list[i].value * response.data.list[i].transferType * 0.00000001;
                                     this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
                                 }
@@ -175,22 +195,22 @@
                         }
                     });
             },
+
             //地址选择
             accountAddressChecked(value) {
                 localStorage.setItem('newAccountAddress',value);
                 this.getAccountAssets("/account/assets/" + value);
-                let params = {"address": value,"pageSize":5};
-                this.getAccountTxList("/tx/list/", params);
             },
             //tab切换
             handleClick(tab, event) {
-                //console.log(tab, event);
-                //console.log(event.target.getAttribute('id'));
-                console.log(tab.label);
-                this.walletHide = !this.walletHide;
-                this.getAccountAssets("/account/assets/" + this.accountAddressValue);
-                let params = {"address": this.accountAddressValue,"pageSize":5};
-                this.getAccountTxList('/tx/list/', params);
+                if(tab.name !== "first"){
+                    this.walletHide = false;
+                    let params = {"address": this.accountAddressValue,"pageSize":5,"pageNumber":1};
+                    this.getAccountTxList('/tx/list/', params);
+                }else {
+                    this.walletHide = true;
+                    this.getAccountAssets("/account/assets/" + this.accountAddressValue);
+                }
             },
             //复制功能
             accountCopy() {
@@ -278,7 +298,7 @@
             right: 7%;
             top: 133px;
             position: fixed;
-            z-index: 1020;
+            z-index: 800;
             .el-icon-view {
                 font-size: 1rem;
             }
@@ -301,11 +321,11 @@
                 color: #FFFFFF;
             }
             .el-tabs__nav-wrap::after {
-                background-color: #24426c;
+                background: rgba(87, 107, 139, 0.1);
             }
         }
         .el-select {
-            width: 420px;
+            width: 370px;
             margin-left: 15px;
         }
 
@@ -317,10 +337,10 @@
     }
 
     .el-table--enable-row-hover .el-table__body tr:hover > td {
-        background: rgba(87, 107, 139, 0.1);
+        background: rgba(87, 107, 139, 0.2);
         .cell {
             input {
-                background: rgba(87, 107, 139, 0.1);
+                background: rgba(87, 107, 139,0);
             }
         }
     }

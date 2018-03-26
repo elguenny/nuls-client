@@ -80,10 +80,9 @@
             return {
                 backTitle: "委托共识",
                 address: this.$route.params.address,
-                agentAddress:'',
+                agentId:'',
                 nodeData: [],
                 usable: '',
-
                 nodeForm: {
                     nodeNo: ''
                 },
@@ -101,47 +100,56 @@
         },
         mounted() {
             let _this = this;
-            this.getConsensusAddress("/consensus/agent/list/", {"address": this.address, "pageSize": "1"});
+            this.getConsensusAddress("/consensus/agent/"+this.address);
             this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'));
         },
         methods: {
             //根据address获取共识节点列表信息
-            getConsensusAddress(url, params) {
-                this.$fetch(url, params)
+            getConsensusAddress(url) {
+                this.$fetch(url)
                     .then((response) => {
+                        console.log(response)
                         if (response.success) {
-                            if (response.data.list[0].creditRatio != 0) {
-                                if (response.data.list[0].creditRatio > 0) {
-                                    response.data.list[0].creditRatio = ((((response.data.list[0].creditRatio + 1) / 2)) * 100).toFixed() + '%';
+                            if (response.data.creditRatio != 0) {
+                                if (response.data.creditRatio > 0) {
+                                    response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                 } else {
-                                    response.data.list[0].creditRatio = response.data.list[0].creditRatio * 100;
+                                    response.data.creditRatio = response.data.creditRatio * 100;
                                 }
                             } else {
-                                response.data.list[0].creditRatio = "50%";
+                                response.data.creditRatio = "50%";
                             }
-                            response.data.list[0].memberCount = (response.data.list[0].memberCount / 10).toFixed() + '%';
-                            response.data.list[0].totalDeposit.value = (response.data.list[0].totalDeposit.value / 50000000000000).toFixed() + '%';
-                            this.agentAddress = response.data.list[0].agentAddress;
-                            this.nodeData = response.data.list[0];
+                            response.data.memberCount = (response.data.memberCount / 1000).toFixed() + '%';
+                            response.data.totalDeposit = (response.data.totalDeposit / 50000000000000).toFixed() + '%';
+                            this.agentId = response.data.agentId;
+                            this.nodeData = response.data;
                         }
                     });
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
                 this.getBalanceAddress('/account/balance/' + chenckAddress);
+                this.$refs.nodeForm.validateField('nodeNo');
             },
             //根据账户地址获取账户余额
             getBalanceAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.usable = response.data.usable * 0.0000000001;
+                            this.usable = response.data.usable * 0.00000001;
                         }
                     });
             },
             //选择全部金额
             allUsable(no) {
-                this.nodeForm.nodeNo = (parseInt(no) - 0.01).toString()
+                if(no == 0){
+                    this.$message({
+                        message: '对不起，您选择的账户余额不住！',
+                        type: 'success'
+                    });
+                }else {
+                    this.nodeForm.nodeNo = (parseInt(no) - 0.01).toString()
+                }
             },
             //提交委托
             onSubmit(formName) {
@@ -154,29 +162,24 @@
                             inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                             inputType: 'password'
                         }).then(({value}) => {
-                            var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentAddress":"' + this.agentAddress + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
+                            var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
                             console.log(param)
                             this.$post('/consensus/deposit/', param)
                                 .then((response) => {
-                                    console.log(response);
-                                    /*if (response.success) {
+                                    if (response.success) {
                                         this.$message({
                                             message: '恭喜您！申请参与共识成功！',
                                             type: 'success'
                                         });
                                          this.$router.push({
-                                             path: '/consensus/nodeInfo/allPledge'
+                                             name: '/allPledge'
                                          })
                                     } else {
                                         this.$message({
                                             message: '对不起！' + response.msg,
                                             type: 'warning',
                                         });
-                                    }*/
-                                    this.$router.push({
-                                        name: '/consensus',
-                                        params: { activeName: "second"},
-                                    })
+                                    }
                                 })
                         })
                     } else {
@@ -280,7 +283,7 @@
             display: block;
             position: fixed;
             top: 69%;
-            right: 26%;
+            right: 25.5%;
         }
     }
 </style>

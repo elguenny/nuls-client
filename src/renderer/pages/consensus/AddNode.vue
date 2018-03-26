@@ -121,8 +121,8 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.placeholder = "（可用余额："+response.data.usable * 0.0000000001+"NULS）" ;
-                            this.usable = response.data.usable * 0.0000000001;
+                            this.placeholder = "（可用余额："+response.data.usable * 0.000000001+"NULS）" ;
+                            this.usable = response.data.usable * 0.000000001;
                         }
                     });
             },
@@ -141,29 +141,21 @@
                             console.log(param)
                             this.$post('/consensus/deposit/', param)
                                 .then((response) => {
-                                    this.$message({
-                                        message: '恭喜您！申请参与共识成功！',
-                                        type: 'success'
-                                    });
-                                    this.$router.push({
-                                        name: '/myNode',
-										params:{"agentAddress":this.agentAddress},
-                                    })
-                                    /*if (response.success) {
+                                    if (response.success) {
                                         this.$message({
                                             message: '恭喜您！申请参与共识成功！',
                                             type: 'success'
                                         });
                                          this.$router.push({
-                                             path: '/consensus/nodeInfo/allPledge'
+                                             name: '/myNode',
+                                             params:{"agentAddress":this.agentAddress},
                                          })
                                     } else {
                                         this.$message({
                                             message: '对不起！' + response.msg,
                                             type: 'warning',
                                         });
-                                    }*/
-
+                                    }
                                 })
                         })
                     } else {

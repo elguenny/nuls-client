@@ -23,7 +23,7 @@
 				timeOffsetOk:true,
 				connectNumber:'节点块数',
 				netWorkInfo:[],
-                iconWifi:'icon-wifi_icon'
+                iconWifi:'icon-wifi_icon',
 			}
 		},
 		mounted() {
@@ -32,6 +32,9 @@
 			this.getBottromInfo('/sys/version');
 			//get net work info
 			this.getNetWorkInfo('/network/info');
+            setInterval(()=>{
+                this.getNetWorkInfo('/network/info');
+            },3000);
 
 		},
 		methods: {
@@ -89,22 +92,24 @@
 				this.$fetch(url)
 					.then((response) => {
 					    if(response.success){
-					        //console.log(response);
+					        //console.log(response.data.timeOffset);
                             this.netWorkInfo = response.data;
                             let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
+                            this.connectNumber= this.netWorkInfo.inCount + this.netWorkInfo.outCount;
+                            //let wifi = 14;
                             if( wifi != 0){
 								if(wifi<5){
-									console.log("<5")
-                                    this.iconWifi='icon-wifi_icon';
+									//console.log("<5")
+                                    this.iconWifi='icon-wifi_icon color5';
 								}else if(5<wifi<15){
-								    console.log("6-14")
-                                    this.iconWifi='icon-wifi_icon';
+								    //console.log("6-14")
+                                    this.iconWifi='icon-wifi_icon color14';
 								}else {
-								    console.log(">15")
-                                    this.iconWifi='icon-wifi_icon';
+								    //console.log(">15")
+                                    this.iconWifi='icon-wifi_icon color15';
 								}
 							}else {
-                                this.iconWifi='icon-wifi_icon';
+                                this.iconWifi='icon-wifi_icon color0';
 							}
                             //this.netWorkInfo.inCount
 						}
@@ -143,6 +148,18 @@
 			text-align: right;
 			.icon-wifi_icon {
 				margin: 0 0.5rem;
+			}
+			.color0:before{
+				color:#3d3b3b;
+			}
+			.color5:before{
+				color:#c87d7d;
+			}
+			.color14:before{
+				color:#87c082;
+			}
+			.color15:before{
+				color:#20fa09;
 			}
 		}
 	}
