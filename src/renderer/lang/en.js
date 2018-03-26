@@ -43,8 +43,8 @@ module.exports = {
         applicationsNode: 'Applications Node',
         //set password
         set: 'Set',
-        oldPassWord: 'old passWord',
-        setPassWord: 'new passWord',
+        oldPassWord: 'old password',
+        setPassWord: 'new password',
         walletPassWord: 'Wallet password (8-20 characters, lower case letters and Numbers)',
         affirmWalletPassWord: 'Confirm password',
         passWordHint: 'Password hint',
@@ -88,10 +88,10 @@ module.exports = {
         rollIn:'Destination',
         download: 'Download',
 
-        transactionRecord: 'Transaction record',
+        transactionRecord: 'Transaction history',
         transactionType: 'Type',
         //转账
-        recorded: 'Recorded',
+        recorded: 'History',
         assetChange: 'Amount change',
         state: 'State',
         time: 'Date',
