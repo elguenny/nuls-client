@@ -54,7 +54,7 @@
                 </div>
             </div>
         </div>
-        <el-pagination layout="prev, pager, next" :page-size="6" :total=this.totalAll class="cb"
+        <el-pagination layout="prev, pager, next" :page-size="6" :total=this.totalAll  v-show="totalOK = this.totalAll > 6 ? true:false" class="cb"
                        @current-change="allConsensusSize"></el-pagination>
     </div>
 </template>
@@ -66,7 +66,7 @@
     export default {
         data() {
             return {
-                backTitle: "雷霆节点",
+                backTitle: "共识首页",
                 keyword: '',
                 selectKeyword: '',
                 creditValuesShow0: false,
@@ -84,7 +84,6 @@
         mounted() {
             let _this = this;
             this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6"});
-            /*this.getAllConsensus("/consensus/agent/1/6");*/
         },
         methods: {
             //获取全部共识列表
@@ -92,7 +91,6 @@
                 this.$fetch(url,params)
                     .then((response) => {
                         if (response.success) {
-                            console.log(response.data.list);
                             for (var i = 0; i < response.data.list.length; i++) {
                                 //response.data.list[i].agentAddress = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
                                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%';

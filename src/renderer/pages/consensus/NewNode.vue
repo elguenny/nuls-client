@@ -1,38 +1,33 @@
 <template>
     <div class="new-node">
         <Back :backTitle="backTitle"></Back>
-        <h2>自建节点共识</h2>
+        <h2>{{$t("message.c21")}}</h2>
         <div class="new-node-form">
             <el-form ref="newNodeForm" :model="newNodeForm" :rules="newNodeRules" size="mini" label-position="top">
-                <el-form-item label="共识账户：">
-                    <el-select v-model="newNodeForm.accountAddressValue" placeholder="请选择账户地址"
-                               @change="accountAddressChecked">
-                        <el-option v-for="item in accountAddress" :key="item.address"
-                                   :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
-                                   :value="item.address">
-                        </el-option>
-                    </el-select>
+                <el-form-item :label="$t('message.c22')">
+                    <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
-                <el-form-item label="出块地址：" prop="packingAddress">
+                <el-form-item :label="$t('message.c23')" prop="packingAddress">
                     <el-input v-model="newNodeForm.packingAddress"></el-input>
                 </el-form-item>
-                <el-form-item label="节点名称：" prop="agentName">
+                <el-form-item :label="$t('message.c24')" prop="agentName">
                     <el-input v-model="newNodeForm.agentName"></el-input>
                 </el-form-item>
-                <el-form-item label="保证金：" class="form-left" prop="deposit">
+                <el-form-item :label="$t('message.c25')" class="form-left" prop="deposit">
                     <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder></el-input>
                 </el-form-item>
-                <el-form-item label="代理佣金比例：" class="form-left" prop="commissionRate">
+                <el-form-item :label="$t('message.c26')" class="form-left" prop="commissionRate">
                     <el-input v-model.number="newNodeForm.commissionRate"></el-input>
                 </el-form-item>
-                <el-form-item label="节点介绍：" class="cb" prop="remark">
+                <el-form-item :label="$t('message.c27')" class="cb" prop="remark">
                     <el-input v-model="newNodeForm.remark" type="textarea" :rows="2"></el-input>
                 </el-form-item>
-                <el-form-item label="手续费：0.01NULS">
+                <el-form-item :label="$t('message.miningFee')">
 
                 </el-form-item>
                 <el-form-item size="large" class="submit">
-                    <el-button type="primary" @click="submitForm('newNodeForm')">立即创建</el-button>
+                    <el-button type="primary" @click="submitForm('newNodeForm')">{{$t("message.confirmButtonText")}}
+                    </el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -42,6 +37,7 @@
 
 <script>
     import Back from './../../components/BackBar.vue'
+    import AccountAddressBar from '@/components/AccountAddressBar.vue';
 
     export default {
         data() {
@@ -109,19 +105,22 @@
         },
         components: {
             Back,
+            AccountAddressBar,
         },
         mounted() {
             let _this = this;
-            this.getaccountAddress("/account/list");
             this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'));
         },
         methods: {
-            //获取账户地址列表
-            getaccountAddress(api) {
-                this.$fetch(api)
-                    .then((response) => {
-                        this.accountAddress = response.data;
-                    });
+            //获取下拉选择地址
+            chenckAccountAddress(chenckAddress) {
+                //this.accountAddressValue = chenckAddress;
+                this.getBalanceAddress('/account/balance/' + chenckAddress);
+                setTimeout(() => {
+                    if (this.newNodeForm.deposit !== '') {
+                        this.$refs.newNodeForm.validateField('deposit');
+                    }
+                }, 500);
             },
             //根据账户地址获取账户余额
             getBalanceAddress(url) {
@@ -133,15 +132,7 @@
                         }
                     });
             },
-            //选择账户地址
-            accountAddressChecked(value) {
-                this.getBalanceAddress('/account/balance/' + value);
-                setTimeout(() => {
-                    if (this.newNodeForm.deposit !== '') {
-                        this.$refs.newNodeForm.validateField('deposit');
-                    }
-                }, 500);
-            },
+
             //提交创建
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -156,7 +147,7 @@
                             var param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + value + '"}';
                             this.$post('/consensus/agent ', param)
                                 .then((response) => {
-                                    console.log( response);
+                                    console.log(response);
                                     if (response.success) {
                                         this.$message({
                                             type: 'success', message: "恭喜您，创建成功！"
@@ -195,6 +186,11 @@
         .new-node-form {
             width: 60%;
             margin: auto;
+            .account-address {
+                margin: 0px;
+                height: auto;
+                width: auto;
+            }
             .form-left {
                 width: 50%;
                 float: left;
@@ -204,6 +200,11 @@
             }
             .el-input__inner {
                 width: 410px;
+            }
+            .el-input--suffix{
+                .el-input__inner {
+                    width: 410px;
+                }
             }
             .el-textarea__inner {
                 width: 410px;

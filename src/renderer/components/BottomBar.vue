@@ -6,7 +6,6 @@
 		</el-col>
 		<el-col :span="12" class='footer-right'>
 			{{$t("message.blockState")}}：{{$t("message.local")}} {{ netWorkInfo.localBestHeight }}<span v-show="timeOffsetOk">({{$t("message.backward")}} {{ netWorkInfo.timeOffset }})</span> / {{$t("message.theMain")}} {{netWorkInfo.netBestHeight}}
-			<!--<i class="icon-wifi_icon" :title="connectNumber"></i>-->
 			<i :class="iconWifi" :title="connectNumber"></i>
 		</el-col>
 	</footer>
@@ -23,7 +22,7 @@
 				timeOffsetOk:true,
 				connectNumber:'节点块数',
 				netWorkInfo:[],
-                iconWifi:'icon-wifi_icon',
+                iconWifi:'no-wifi_icon',
 			}
 		},
 		mounted() {
@@ -92,28 +91,22 @@
 				this.$fetch(url)
 					.then((response) => {
 					    if(response.success){
-					        //console.log(response.data.timeOffset);
                             this.netWorkInfo = response.data;
                             let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
                             this.connectNumber= this.netWorkInfo.inCount + this.netWorkInfo.outCount;
-                            //let wifi = 14;
                             if( wifi != 0){
-								if(wifi<5){
-									//console.log("<5")
-                                    this.iconWifi='icon-wifi_icon color5';
-								}else if(5<wifi<15){
-								    //console.log("6-14")
-                                    this.iconWifi='icon-wifi_icon color14';
+								if(wifi<15){
+                                    this.iconWifi='two-wifi_icon';
+                                    if(wifi<5){
+                                        this.iconWifi='one-wifi_icon';
+                                    }
 								}else {
-								    //console.log(">15")
-                                    this.iconWifi='icon-wifi_icon color15';
+                                    this.iconWifi='wifi_icon';
 								}
 							}else {
-                                this.iconWifi='icon-wifi_icon color0';
+                                this.iconWifi='no-wifi_icon';
 							}
-                            //this.netWorkInfo.inCount
 						}
-
 					});
 			},
 			//测试清理数据
@@ -130,6 +123,7 @@
 	}
 </script>
 <style lang="less">
+	@import './../assets/css/style.less';
 	footer {
 		width: 100%;
 		height: 2rem;
@@ -146,20 +140,27 @@
 		}
 		.footer-right {
 			text-align: right;
-			.icon-wifi_icon {
-				margin: 0 0.5rem;
+			i{
+				width: 20px;
+				height: 30px;
+				display: block;
+				margin-top: -5px;
+				margin-left: 5px;
+				float: right;
+				background-size: @bg-size;
+				background: @bg-image
 			}
-			.color0:before{
-				color:#3d3b3b;
+			.no-wifi_icon{
+				background-position: -129px -34px;
 			}
-			.color5:before{
-				color:#c87d7d;
+			.one-wifi_icon{
+				background-position: -90px -36px;
 			}
-			.color14:before{
-				color:#87c082;
+			.two-wifi_icon{
+				background-position: -58px -36px;
 			}
-			.color15:before{
-				color:#20fa09;
+			.wifi_icon {
+				background-position: -20px -36px;
 			}
 		}
 	}

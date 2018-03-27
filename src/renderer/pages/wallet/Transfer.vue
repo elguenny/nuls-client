@@ -14,7 +14,7 @@
                 </el-form-item>
                 <el-form-item :label="$t('message.destinationAddress')" class="join-address" prop="joinAddress">
                     <el-input type="text" v-model="transferForm.joinAddress"></el-input>
-                    <i @click="toUsersAddressList"></i>
+                    <i class="cursor-p" @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')" prop="joinNo" class="join-nos">
                     <span class="allUsable">{{$t("message.currentBalance")}}:{{ usable }} NULS</span>
@@ -133,8 +133,9 @@
         },
         mounted() {
             let _this = this;
+            this.openDB();
             this.getaccountAddress("/account/list");
-                this.getBalanceAddress('/account/balance/' + this.transferForm.address);
+            this.getBalanceAddress('/account/balance/' + this.transferForm.address);
         },
         methods: {
             //获取账户地址列表
@@ -171,6 +172,17 @@
                     });
                 }else {
                     this.transferForm.joinNo = no-0.01;
+                }
+            },
+            //创建usersDB
+            openDB() {
+                var request = indexedDB.open('usersDB', 1);
+                request.onupgradeneeded = function (e) {
+                    var db = e.target.result;
+                    // 如果不存在Users对象仓库则创建
+                    if (!db.objectStoreNames.contains('usersDB')) {
+                        var store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false});
+                    }
                 }
             },
             //选择通讯录
@@ -215,7 +227,6 @@
                             inputType: 'password'
                         }).then(({value}) => {
                             var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
-                            console.log(param);
                             this.$post('/wallet/transfer/', param)
                                 .then((response) => {
                                     if (response.success) {
@@ -245,16 +256,6 @@
 
 <style lang="less">
     @import url("../../assets/css/style.less");
-
-    #top-bg() {
-        display: block;
-        width: 2rem;
-        height: 2rem;
-        background-repeat: no-repeat;
-        background-image: url(../../assets/images/top-icon.png);
-        background-size: 200px;
-    }
-
     .transfer {
         width: 100%;
         margin: auto;
@@ -285,13 +286,15 @@
             }
             .join-address {
                 i {
-                    #top-bg;
+                    width: 40px;
+                    height: 40px;
+                    background-size: @bg-size;
+                    background: @bg-image -40px -67px;
                     position: relative;
                     z-index: 1025;
                     float: right;
                     margin-top: -36px;
                     margin-right: 0px;
-                    background-position: -3px -70px;
                 }
             }
             .remark {

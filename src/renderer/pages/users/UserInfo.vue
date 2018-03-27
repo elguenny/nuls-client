@@ -3,8 +3,7 @@
         <Back :backTitle="backTitle"></Back>
         <div class="freeze-list-tabs">
             <h2>{{$t('message.userInfoTitle')}}</h2>
-            <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"
-                       title="新增账户"></el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"></el-button>
             <el-table :data="userData">
                 <el-table-column prop="address" :label="$t('message.tabName')" min-width="50" align='center'>
                 </el-table-column>

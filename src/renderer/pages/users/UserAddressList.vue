@@ -176,10 +176,9 @@
             font-size: 16px;
             text-align: center;
             line-height: 20px;
-            margin-bottom: 28px;
         }
         .back {
-            margin-left: 0px;
+            margin-left: 50px;
         }
         .el-dialog {
             background-color: #0b1422;

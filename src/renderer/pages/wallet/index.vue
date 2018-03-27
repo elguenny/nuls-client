@@ -1,21 +1,16 @@
 <template>
     <div class="wallet">
         <div class="search">
-            <div class="search-account fl">
-                <label class="lable-title">{{$t("message.indexAccountAddress")}}</label>
-                <template>
-                    <el-select v-model="accountAddressValue" placeholder="请选择账户地址" @change="accountAddressChecked">
-                        <el-option v-for="item in accountAddress" :key="item.address"
-                                   :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
-                                   :value="item.address">
-                        </el-option>
-                    </el-select>
-                </template>
+            <div class="account-top">
+                <label>{{$t("message.indexAccountAddress")}}</label>
+                <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
             </div>
-            <i class="icon-copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
-               @click="accountCopy"></i>
-            <i class="icon-qr_icon cursor-p" @click="accountCode"></i>
-            <i class="icon-zhanghu_icon fr cursor-p" @click="accountChoice"></i>
+            <div class="wallet-i">
+                <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
+                   @click="accountCopy"></i>
+                <i class="qr_icon cursor-p" @click="accountCode"></i>
+                <i class="zhanghu_icon fr cursor-p" @click="accountChoice"></i>
+            </div>
             <CodeBar v-show="codeShowOk" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
         </div>
         <div class="wallet-hide" v-show="walletHide">
@@ -58,13 +53,6 @@
                                 <span class="cursor-p text-d" @click="toTransfer(accountAddressValue)">{{$t("message.transfer")}}</span>
                             </template>
                         </el-table-column>
-                        <!--<el-table-column :label= "$t('message.operation')" align='center'>
-                            <template slot-scope="scope">
-                                <router-link to='/wallet/index/transfer' title='点击查看详情' >
-                                {{ scope.row.locked == 1 ? '转账' : '下载子链' }}
-                                </router-link>
-                            </template>
-                        </el-table-column>-->
                     </el-table>
                     <!--<el-pagination layout="prev, pager, next":total="1000 "></el-pagination>-->
                 </el-tab-pane>
@@ -75,25 +63,18 @@
                                 :label="$t('message.transactionType')"
                                 width="110"
                                 align='center'>
-                            <!--:filters="[{ text: '转账', value: '转账' }, { text: '入账', value: '入账' }]"
-                            :filter-method="filterTag"
-                            filter-placement="bottom-end"-->
                             <template slot-scope="scope">
                                 <span>{{ scope.row.type }}</span>
-                                <!-- <el-tag
-                                         :type="scope.row.transferType == '-1' ? 'primary' : 'success'"
-                                         close-transition>{{scope.row.transferType == '-1' ? $t('message.rollOut'):$t('message.rollIn')}}
-                                 </el-tag>-->
                             </template>
                         </el-table-column>
-                        <el-table-column label="txid" width="238" align='center'>
+                        <el-table-column label="txid" width="215" align='center'>
                             <template slot-scope="scope">
 								<span @click="toTxid(scope.row.hash)" class="cursor-p text-d overflow">
 									{{ scope.row.hash }}
 								</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.assetChange')" width="112" align='center'>
+                        <el-table-column :label="$t('message.assetChange')" width="138" align='center'>
                             <template slot-scope="scope">
                                 <span>{{ scope.row.values }}</span>
                             </template>
@@ -103,14 +84,15 @@
                                 <span>{{ scope.row.status =='1' ? $t('message.confirmed'):$t('message.confirming') }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.time')" width="148" align='center'>
+                        <el-table-column :label="$t('message.time')" width="145" align='center'>
                             <template slot-scope="scope">
                                 <span>{{scope.row.times}}</span>
                             </template>
                         </el-table-column>
                     </el-table>
-                    <!--<el-pagination background layout="prev, pager, next" :total="1000">
-                    </el-pagination>-->
+                    <el-pagination layout="prev, pager, next" :page-size="3" :total=this.totalAll class="cb"
+                                   v-show="totalAllOk = this.totalAll>8 ?true:false"
+                                   @current-change="txIdConsensusSize"></el-pagination>
                 </el-tab-pane>
             </el-tabs>
         </div>
@@ -119,6 +101,7 @@
 
 <script>
     import CodeBar from '@/components/CodeBar.vue';
+    import AccountAddressBar from '@/components/AccountAddressBar.vue';
     import copy from 'copy-to-clipboard';
     import moment from 'moment';
 
@@ -132,44 +115,21 @@
                 accountAddressValue: localStorage.getItem('newAccountAddress'),
                 accountData: [],
                 dealList: [],
-                activeName: 'first',
-                objType: [
-                    {"tx1": "tx1", "value": "共识奖励"},
-                    {"tx2": "tx2", "value": "转账交易"},
-                    {"tx3": "tx3", "value": "锁仓交易"},
-                    {"tx4": "tx4", "value": "解锁交易"},
-                    {"tx5": "tx5", "value": "零钱换整"},
-                    {"tx11": "tx11", "value": "设置别名"},
-                    {"tx90": "tx90", "value": "注册共识"},
-                    {"tx91": "tx91", "value": "加入共识"},
-                    {"tx92": "tx92", "value": "退出共识"},
-                    {"tx93": "tx93", "value": "黄牌惩罚"},
-                    {"tx94": "tx94", "value": "红牌惩罚"}
-                ],
+                //activeName: 'first',
+                activeName: localStorage.getItem('walletActiveName') ==null ? "first":localStorage.getItem('walletActiveName'),
+                tabName:'first',
+                totalAll:0,
             }
         },
         components: {
-            CodeBar
+            CodeBar,
+            AccountAddressBar,
         },
         mounted() {
             let _this = this;
-            this.getaccountAddress("/account/list");
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
         },
         methods: {
-            //获取账户地址列表
-            getaccountAddress(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        if (response.success) {
-                            this.accountAddress = response.data;
-                        } else {
-                            console.log("获取账户地址失败！");
-                            return;
-                        }
-
-                    });
-            },
             //根据账户地址获取资产列表
             getAccountAssets(api) {
                 this.$fetch(api)
@@ -183,12 +143,14 @@
             getAccountTxList(api, param) {
                 this.$fetch(api, param)
                     .then((response) => {
+                        console.log(response);
                         if (response.data != null) {
+                            this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {
                                 this.dealList = response.data.list;
                                 for (var i = 0; i < response.data.list.length; i++) {
                                     this.dealList[i].type = this.switchTyep(response.data.list[i].type);
-                                    this.dealList[i].values = response.data.list[i].value * response.data.list[i].transferType * 0.00000001;
+                                    this.dealList[i].values = (response.data.list[i].value * 0.00000001).toFixed(8);
                                     this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
                                 }
                             } else {
@@ -199,13 +161,18 @@
                         }
                     });
             },
-
-            //地址选择
-            accountAddressChecked(value) {
-                localStorage.setItem('newAccountAddress', value);
-                this.getAccountAssets("/account/assets/" + value);
-                let params = {"address": value, "pageSize": 5, "pageNumber": 1};
-                this.getAccountTxList('/tx/list/', params);
+            //交易列表分页
+            txIdConsensusSize(events){
+                this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 10, "pageNumber": events});
+            },
+            //获取下拉选择地址
+            chenckAccountAddress(chenckAddress) {
+                this.accountAddressValue = chenckAddress;
+                if(this.tabName === "first" ){
+                    this.getAccountAssets("/account/assets/" + chenckAddress);
+                }else {
+                    this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 10, "pageNumber": 1});
+                }
             },
             //查询交易类型
             switchTyep(type) {
@@ -248,9 +215,11 @@
             },
             //tab切换
             handleClick(tab, event) {
+                this.tabName = tab.name;
                 if (tab.name !== "first") {
+                    this.activeName = "second";
                     this.walletHide = false;
-                    let params = {"address": this.accountAddressValue, "pageSize": 5, "pageNumber": 1};
+                    let params = {"address": this.accountAddressValue, "pageSize": 10, "pageNumber": 1};
                     this.getAccountTxList('/tx/list/', params);
                 } else {
                     this.walletHide = true;
@@ -319,10 +288,16 @@
 
 <style lang="less">
     @import url("../../assets/css/style.less");
-
     .wallet {
         width: 86%;
         margin: 2rem auto;
+        .account-top{
+            margin: 0px;
+            float: left;
+            .el-input__suffix{
+                right: -15px;
+            }
+        }
         .search {
             height: 2.6rem;
             .search-account {
@@ -341,9 +316,29 @@
                     font-size: 1rem;
                 }
             }
-            .icon-copy_icon,
-            .icon-qr_icon {
-                margin-left: 10px;
+            .wallet-i{
+                height: 30px;
+                width: 150px;
+                float: right;
+                margin-top: -5px;
+                i{
+                    width: 35px;
+                    height: 40px;
+                    display: block;
+                    float: left;
+                    background-size: @bg-size;
+                    background: @bg-image
+                }
+                .copy_icon{
+                    background-position: -186px -36px;
+                }
+                .qr_icon {
+                    background-position: -220px -36px;
+                }
+                .zhanghu_icon{
+                    background-position: -260px -36px;
+                    float: right;
+                }
             }
         }
         .wallet-hide {
@@ -377,8 +372,7 @@
             }
         }
         .el-select {
-            width: 370px;
-            margin-left: 15px;
+            width: 400px;
         }
 
     }

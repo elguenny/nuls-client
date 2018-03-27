@@ -27,7 +27,6 @@
 			}
 		},
 		methods: {
-
 			//下拉框数据加载
 			select(item, index) {
 				this.showData = false;
@@ -48,7 +47,6 @@
                 if (!this.$el.contains(e.target)) this.showData = false
             })
         },
-
 	}
 </script>
 <style lang="less">
@@ -56,6 +54,7 @@
 		position: relative;
 		top: 0px;
 		height: 1.25rem;
+		cursor: pointer;
 		.sub-selected-value {
 			position: absolute;
 			top: -0.35rem;
@@ -79,7 +78,6 @@
 				}
 				:hover{
 					background-color: #17202e;
-					
 				}
 			}
 			.language-img{

@@ -1,40 +1,34 @@
 <template>
     <div class="consensus-index">
-        <div class="account-address">
+        <div class="account-top">
             <label v-show="accountAddressOk">{{$t("message.indexAccountAddress")}}</label>
-            <el-select v-model="accountAddressValue" placeholder="请选择账户地址" @change="accountAddressChecked">
-                <el-option v-for="item in accountAddress" :key="item.address"
-                           :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
-                           :value="item.address">
-                </el-option>
-            </el-select>
+            <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
         </div>
         <div class="consensus-index-title">
-            <label>总抵押金额（全网）：</label>{{this.allTotalDeposit*0.00000001}} NULS,<label>总共识数：</label>{{this.allAgentCount}}
-            <!--<label>年化收益：</label>0.25%-->
+            <label>{{$t("message.c1")}}：</label>{{this.allTotalDeposit*0.00000001}} NULS,<label>{{$t("message.c2")}}：</label>{{this.allAgentCount}}
         </div>
         <div class="consensus-center">
             <ul>
                 <li class="li-bg">
-                    <label>我的总体情况：</label>
+                    <label>{{$t("message.c3")}}：</label>
                 </li>
                 <li class="li-bg">
-                    <label>累计收益：</label>{{this.reward*0.00000001}} NULS
+                    <label>{{$t("message.c7")}}：</label>{{(this.myInfoData.reward*0.00000001).toFixed(8)}} NULS
                 </li>
                 <li>
-                    <label>创建节点：</label>{{this.agentCount}} 个 <span v-show="this.agentCount > 0 ? false:true ">(<span
-                         @click="toNewNode" class="span">创建</span>)</span>
+                    <label>{{$t("message.c4")}}：</label>{{this.myInfoData.agentCount}} {{$t("message.c30")}} <span v-show="this.myInfoData.agentCount > 0 ? false:true ">(<span
+                         @click="toNewNode" class="span">{{$t("message.c5")}}</span>)</span>
                 </li>
                 <li>
-                    <label>委托节点：</label>{{this.delegateAgentCount}} 个 (<span
+                    <label>{{$t("message.c8")}}：</label>{{this.myInfoData.joinAccountCount}} 个 (<span
                                                                              @click="toAgencyNode"
-                                                                             class="span">委托</span>)
+                                                                             class="span">{{$t("message.c9")}}</span>)
                 </li>
                 <li>
-                    <label>可用余额：</label>{{this.usableBalance*.00000001}} NULS
+                    <label>{{$t("message.c6")}}：</label>{{(this.myInfoData.usableBalance*.00000001).toFixed(8)}} NULS
                 </li>
                 <li>
-                    <label>委托总数：</label><span @click="toPledgeInfo" class="span">{{this.totalDeposit*0.00000001}} NULS</span>
+                    <label>{{$t("message.c10")}}：</label><span @click="toPledgeInfo" class="span">{{(this.myInfoData.totalDeposit*0.00000001).toFixed(8)}} NULS</span>
                 </li>
 
             </ul>
@@ -42,27 +36,27 @@
         <div class="consensus-bottom">
             <template>
                 <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <el-tab-pane label="全部共识" name="first">
+                    <el-tab-pane :label="$t('message.c11')" name="first">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in allConsensus"
                              @click="toNodePage(item.agentAddress)">
-                            <p class="subscript">
+                            <p class="subscript" :class="item.statuss ==1  ? 'stay' : ''">
                                 {{item.status}}
                             </p>
                             <h3>{{item.agentName}}</h3>
                             <ul>
-                                <li class="overflow"><label>节点来源：</label>{{ item.agentAddress }}</li>
-                                <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
-                                <li><label>保证金：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
+                                <li class="overflow"><label>{{$t("message.c16")}}：</label>{{ item.agentAddress }}</li>
+                                <li><label>{{$t("message.c17")}}：</label>{{ item.commissionRate }}%</li>
+                                <li><label>{{$t("message.c25")}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
-                                    <label class="fl cursor-p">信用值:</label>
+                                    <label class="fl cursor-p">{{$t("message.c18")}}:</label>
                                     <ProgressBar colorData="#6e84f7" :widthData="item.creditRatio"></ProgressBar>
                                 </li>
                                 <li class="cb">
-                                    <label class="fl">参与人数：</label>
+                                    <label class="fl">{{$t("message.c19")}}：</label>
                                     <ProgressBar colorData="'#f64b3e'" :widthData="item.memberCount"></ProgressBar>
                                 </li>
                                 <li class="cb">
-                                    <label class="fl">抵押金额：</label>
+                                    <label class="fl">{{$t("message.c20")}}：</label>
                                     <ProgressBar colorData="#82BD39" :widthData="item.totalDeposit.value"></ProgressBar>
                                 </li>
                             </ul>
@@ -83,7 +77,7 @@
                                        v-show="totalAllOk = this.totalAll>3 ?true:false"
                                        @current-change="allConsensusSize"></el-pagination>
                     </el-tab-pane>
-                    <el-tab-pane label="我的共识" name="second">
+                    <el-tab-pane :label="$t('message.c12')" name="second">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
                              @click="toMyNode(item.agentAddress,index)">
                             <p class="subscript" :class="{stay:item.status == 2 ? false : true }">
@@ -91,19 +85,19 @@
                             </p>
                             <h3>{{item.agentName}}</h3>
                             <ul>
-                                <li class="overflow"><label>节点来源：</label>{{ item.agentAddress }}</li>
-                                <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
-                                <li><label>保证金：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
+                                <li class="overflow"><label>{{$t("message.c16")}}：</label>{{ item.agentAddress }}</li>
+                                <li><label>{{$t("message.c17")}}：</label>{{ item.commissionRate }}%</li>
+                                <li><label>{{$t("message.c25")}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
-                                    <label class="fl cursor-p">信用值:</label>
+                                    <label class="fl cursor-p">{{$t("message.c18")}}:</label>
                                     <ProgressBar colorData="#6e84f7" widthData="50%"></ProgressBar>
                                 </li>
                                 <li class="cb">
-                                    <label class="fl">参与人数：</label>
+                                    <label class="fl">{{$t("message.c19")}}：</label>
                                     <ProgressBar colorData="'#f64b3e'" widthData="80%"></ProgressBar>
                                 </li>
                                 <li class="cb">
-                                    <label class="fl">抵押金额：</label>
+                                    <label class="fl">{{$t("message.c20")}}：</label>
                                     <ProgressBar colorData="#82BD39" widthData="90%"></ProgressBar>
                                 </li>
                             </ul>
@@ -135,7 +129,7 @@
 
 <script>
     import ProgressBar from '@/components/ProgressBar.vue'
-
+    import AccountAddressBar from '@/components/AccountAddressBar.vue';
     export default {
         data() {
             return {
@@ -143,6 +137,8 @@
                 accountAddress: [],
                 accountAddressValue: localStorage.getItem('newAccountAddress'),
                 activeName: this.$route.params.activeName,
+                tabName:'first',
+
                 creditValuesShow0: false,
                 creditValuesShow1: false,
                 creditValuesShow2: false,
@@ -152,11 +148,7 @@
                 allAgentCount: 0,
                 allTotalDeposit: 0,
 
-                agentCount: 0,
-                totalDeposit: 0,
-                reward: 0,
-                usableBalance: 0,
-                delegateAgentCount: 0,
+                myInfoData:[],
 
                 creditColor: '#6e84f7',
                 totalColor: '#f64b3e',
@@ -172,29 +164,25 @@
         },
         components: {
             ProgressBar,
+            AccountAddressBar,
         },
         mounted() {
             let _this = this;
-            this.getaccountAddress("/account/list");
             this.getConsensus("/consensus");
+            console.log(localStorage.getItem('newAccountAddress'));
             this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
-
             this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
             this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
         },
         methods: {
-            //获取账户地址列表
-            getaccountAddress(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        this.accountAddress = response.data;
-                    });
-            },
-            //选择账户地址
-            accountAddressChecked(value) {
-                localStorage.setItem('newAccountAddress',value);
-                this.getConsensusAddress("/consensus/address/" + value);
-                this.getMyConsensus("/consensus/agent/address/"+ value,{"pageSize": "3"});
+            //获取下拉选择地址
+            chenckAccountAddress(chenckAddress) {
+                this.getConsensusAddress("/consensus/address/" + chenckAddress);
+                if(this.tabName === "first" ){
+                    this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
+                }else {
+                    this.getMyConsensus("/consensus/agent/address/"+ chenckAddress,{"pageSize": "3"});
+                }
             },
             //获取共识信息
             getConsensus(url) {
@@ -211,11 +199,7 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.agentCount = response.data.agentCount;
-                            this.totalDeposit = response.data.totalDeposit;
-                            this.reward = response.data.reward;
-                            this.usableBalance = response.data.usableBalance;
-                            this.delegateAgentCount = response.data.joinAccountCount;
+                            this.myInfoData = response.data;
                         }
                     });
             },
@@ -233,7 +217,6 @@
                                 this.myConsensusSizeOK = false;
                             }
                             for (var i = 0; i < response.data.list.length; i++) {
-                                //response.data.list[i].agentAddress = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
                                 if (response.data.list[i].creditRatio != 0) {
                                     if (response.data.list[i].creditRatio > 0) {
                                         response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
@@ -243,6 +226,8 @@
                                 } else {
                                     response.data.list[i].creditRatio = "50%";
                                 }
+                                response.data.list[i].statuss = response.data.list[i].status;
+                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 response.data.list[i].memberCount = (response.data.list[i].memberCount/1000).toFixed() + '%';
                                 response.data.list[i].totalDeposit = response.data.list[i].totalDeposit / 50000000000000 + '%';
                             }
@@ -263,9 +248,7 @@
                 this.$fetch(url, params)
                     .then((response) => {
                        if (response.success) {
-                           console.log(response);
                             for (var i = 0; i < response.data.list.length; i++) {
-                                //response.data.list[i].agentAddress = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
                                 if (response.data.list[i].creditRatio != 0) {
                                     if (response.data.list[i].creditRatio > 0) {
                                         response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
@@ -275,6 +258,8 @@
                                 } else {
                                     response.data.list[i].creditRatio = "50%";
                                 }
+                                response.data.list[i].statuss = response.data.list[i].status;
+                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 response.data.list[i].memberCount = (response.data.list[i].memberCount/1000).toFixed() + '%';
                                 response.data.list[i].totalDeposit = response.data.list[i].totalDeposit / 50000000000000 + '%';
                             }
@@ -286,6 +271,20 @@
             //全部共识分页
             allConsensusSize(events) {
                 this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "1"});
+            },
+            //查询共识状态
+            switchStatus(status) {
+                switch (status) {
+                    case 0:
+                        return this.$t("message.c13");
+                        break;
+                    case 1:
+                        return this.$t("message.c14");
+                        break;
+                    case 2:
+                        return this.$t("message.c15");
+                        break;
+                }
             },
             //创建节点跳转
             toNewNode() {
@@ -317,17 +316,17 @@
                 });
              },
             //我的节点跳转
-            toMyNode(addres,index) {
-                console.log(addres)
-                /*if(index !=0){
-                    this.$router.push({
-                        name: '/myNode'
-                    });
-                }else {
+            toMyNode(address,index) {
+                if(address === localStorage.getItem("newAccountAddress")){
                     this.$router.push({
                         name: '/nodeInfo'
                     });
-                }*/
+                }else {
+                   this.$router.push({
+                       name: '/myNode',
+                       params:{"agentAddress":address}
+                    });
+                }
             },
             //显示隐藏信用系数规则
             toggleShow(index) {
@@ -336,8 +335,11 @@
             },
             //切换tab
             handleClick(tab, event) {
+                this.tabName = tab.name;
                 if(tab.name !== 'first'){
-                    this.getMyConsensus("/consensus/deposit/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+                    this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+                }else {
+                    this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
                 }
             },
             //跳转加入共识列表
@@ -353,24 +355,6 @@
 <style lang="less">
     @import url("../../assets/css/style");
     .consensus-index {
-        .account-address {
-            height: 50px;
-            margin:20px auto 0px;
-            width: 68%;
-            label {
-                font-size: 14px;
-                margin-right: 15px;
-            }
-            .el-input--suffix .el-input__inner {
-                width: 410px;
-            }
-            .el-input__suffix {
-                margin-top: 1%;
-            }
-            .el-select .el-input .el-select__caret {
-                font-size: 14px;
-            }
-        }
         .consensus-index-title {
             width: 640px;
             margin: auto;

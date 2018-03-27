@@ -14,21 +14,22 @@
                     <label>佣金比例：</label>{{this.nodeData.commissionRate}}%
                 </li>
                 <li>
-                    <!--<label>保证金：</label>{{this.nodeData.owndeposit.value * 0.00000001}} NULS-->
-                    <label>保证金：</label>{{20000}} NULS
+                    <label>保证金：</label>{{(this.nodeData.owndeposit*0.00000001).toFixed(8)}} NULS
                 </li>
                 <li>
                     <label>参与人数：</label>
                     <ProgressBar colorData="#6a84f7" :widthData="this.nodeData.memberCount"></ProgressBar>
+                    <span>&nbsp;{{this.nodeData.memberCounts}}</span>
                 </li>
                 <li>
                     <label>信用值：</label>
                     <ProgressBar colorData="#82bd39" :widthData="this.nodeData.creditRatio"></ProgressBar>
+                    <span>&nbsp;{{this.nodeData.creditRatios}}</span>
                 </li>
                 <li>
                     <label>剩余可抵押：</label>
-                   <!-- <ProgressBar colorData="#58a5c9" :widthData="this.nodeData.totalDeposit.value"></ProgressBar>-->
-                    <ProgressBar colorData="#58a5c9" widthData="5%"></ProgressBar>
+                    <ProgressBar colorData="#58a5c9" :widthData="this.nodeData.totalDeposit"></ProgressBar>
+                    <span>&nbsp;{{this.nodeData.totalDeposits}}</span>
                 </li>
                 <li class="li-info overflow">
                     <label>节点介绍：</label>{{this.nodeData.introduction}}
@@ -108,8 +109,8 @@
             getConsensusAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response)
                         if (response.success) {
+                            response.data.creditRatios = response.data.creditRatio;
                             if (response.data.creditRatio != 0) {
                                 if (response.data.creditRatio > 0) {
                                     response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
@@ -119,8 +120,11 @@
                             } else {
                                 response.data.creditRatio = "50%";
                             }
-                            response.data.memberCount = (response.data.memberCount / 1000).toFixed() + '%';
-                            response.data.totalDeposit = (response.data.totalDeposit / 50000000000000).toFixed() + '%';
+
+                            response.data.memberCounts = response.data.memberCount +"/1000";
+                            response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
+                            response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
+                            response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
                             this.agentId = response.data.agentId;
                             this.nodeData = response.data;
                         }
@@ -128,6 +132,7 @@
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
+                console.log(chenckAddress);
                 this.getBalanceAddress('/account/balance/' + chenckAddress);
                 this.$refs.nodeForm.validateField('nodeNo');
             },
@@ -165,13 +170,15 @@
                             var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
                             this.$post('/consensus/deposit/', param)
                                 .then((response) => {
+                                    console.log(param);
                                     if (response.success) {
                                         this.$message({
                                             message: '恭喜您！申请参与共识成功！',
                                             type: 'success'
                                         });
                                          this.$router.push({
-                                             name: '/allPledge'
+                                             name: '/myNode',
+                                             params:{"agentAddress":this.nodeData.agentAddress}
                                          })
                                     } else {
                                         this.$message({

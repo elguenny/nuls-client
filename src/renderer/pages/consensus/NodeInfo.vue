@@ -4,16 +4,16 @@
 		<h2>{{this.myNodeInfo.agentName}}</h2>
 		<ul>
 			<li>
-				<label>出块地址</label><span>{{this.myNodeInfo.agentAddress}}</span>
+				<label>出块地址</label><span>{{this.myNodeInfo.packingAddress}}</span>
 			</li>
 			<li>
 				<label>状态</label><span>{{this.myNodeInfo.status == 2 ? "正在共识":"等待共识"}}</span>
 			</li>
 			<li>
-				<label>累计收益</label><span>{{this.myNodeInfo.reward.value*0.00000001 }} NULS</span>
+				<label>累计收益</label><span>{{this.myNodeInfo.reward*0.00000001 }} NULS</span>
 			</li>
 			<li>
-				<label>保证金</label><span>{{this.myNodeInfo.totalDeposit.value*0.00000001}}</span>
+				<label>保证金</label><span>{{this.myNodeInfo.totalDeposit*0.00000001}}</span>
 			</li>
 			<li>
 				<label>代理佣金比例</label><span>{{this.myNodeInfo.commissionRate}} %</span>
@@ -25,7 +25,7 @@
 				<label>参与人数</label><span>{{this.myNodeInfo.memberCount}}</span>
 			</li>
 			<li>
-				<label>总抵押金额</label><span class="cursor-p text-d" title="点击查看详情" @click="toallPledge">{{this.myNodeInfo.owndeposit.value*0.00000001}}</span>
+				<label>总抵押金额</label><span class="cursor-p text-d" title="点击查看详情" @click="toallPledge">{{(this.myNodeInfo.totalDeposit*0.00000001).toFixed(8)}}</span>
 			</li>
 			<li class="overflow">
 				<label>节点介绍</label><span>{{this.myNodeInfo.introduction}}！</span>
@@ -50,22 +50,22 @@
 		},
         mounted() {
             let _this = this;
-            this.getMyNodeInfo("/consensus/agent/address/"+localStorage.getItem("2CVxEw3XJXwc2H5Ue7FYn82XDEJ2Wbm"));
+            this.getMyNodeInfo("/consensus/agent/"+localStorage.getItem("newAccountAddress"));
 		},
 		methods: {
 		    //获取我创建的节点信息
             getMyNodeInfo(url){
                 this.$fetch(url)
                     .then((response) => {
+                        console.log(response)
                         if(response.success){
-                            console.log(response)
-                            this.myNodeInfo = response.data.list[0];
+                            this.myNodeInfo = response.data;
+                            console.log((this.myNodeInfo.totalDeposit*0.00000001).toFixed(8));
 						}
                     });
 			},
 			//关闭我创建的节点信息
 			closedNode() {
-
                 this.$confirm('确定关闭节点么?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -78,29 +78,38 @@
                         inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                         inputType: 'password'
                     }).then(({value}) => {
-                        console.log(value);
-                        this.$message({
-                            type: 'success',
-                            message: '恭喜您、你已经申请了关闭节点！'
-                        });
-                        //关闭我的节点方法不通，模拟数据
-                        this.$router.push({
-                            name: '/consensus'
-                        })
+                        var param = {"address": localStorage.getItem("newAccountAddress"), "password": value};
+                        this.$post('/consensus/agent/stop', param)
+                            .then((response) => {
+								if(response.success){
+                                    this.$message({
+                                        type: 'success',
+                                        message: '恭喜您、你已经申请了关闭节点！'
+                                    });
+                                    this.$router.push({
+                                        name: '/consensus',
+										params:{"activeName":"first"}
+                                    })
+								}else {
+                                    this.$message({
+                                        type: 'waring',
+                                        message: '对不起！关闭节点申请失败！'+response.msg
+                                    });
+								}
+							});
                     })
                 }).catch(() => {
 
                 });
-				console.log(localStorage.getItem("newAccountAddress"));
 
 			},
-			//查看我创建节点的抵押明细
-			toallPledge() {
-				this.$router.push({
-					name: '/allPledge',
-					params:{"agentName":this.myNodeInfo.agentName}
-				})
-			}
+            //查看我创建节点的抵押明细
+            toallPledge() {
+                this.$router.push({
+                    name: '/allPledge',
+                    params:{"agentName":this.myNodeInfo.agentName}
+                })
+            }
 		}
 	}
 </script>

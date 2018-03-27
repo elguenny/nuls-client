@@ -2,22 +2,23 @@
     <nav class="nav-top">
         <div class="logo fl"><img class="logo-img" src="../assets/logo.png"/></div>
         <ul>
-            <li @click="to('home','0')" :class="[errorClass ,isActive===0 ? activeClass : '']"><i class="icon-home_icon"></i> <span>{{$t("message.home")}}</span>
+            <li @click="to('home','0')" :class="[errorClass ,isActive===0 ? activeClass : '']"><i class="home_icon"></i><span>{{$t("message.home")}}</span>
             </li>
-            <li @click="to('wallet','1')" :class="[errorClass ,isActive===1 ? activeClass : '']"><i class="icon-page_icon"></i> <span>{{$t("message.wallet")}}</span></li>
-            <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i class="icon-consensus_icon"></i> <span>{{$t("message.consensus")}}</span></li>
-            <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i class="icon-use_icon"></i> <span>{{$t("message.applications")}}</span></li>
-            <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="icon-more_icon"></i> <span>{{$t("message.more")}}</span></li>
+            <li @click="to('wallet','1')" :class="[errorClass ,isActive===1 ? activeClass : '']"><i class="wallet_icon"></i> <span>{{$t("message.wallet")}}</span></li>
+            <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i class="consensus_icon"></i> <span>{{$t("message.consensus")}}</span></li>
+            <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i class="application_icon"></i> <span>{{$t("message.applications")}}</span></li>
+            <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="more_icon"></i> <span>{{$t("message.more")}}</span></li>
         </ul>
         <div class="top-icon fl">
-            <el-badge :value="12" class="news fl">
-                <i class="el-icon-bell" @click="news"></i>
+            <el-badge :value="12" class="news">
+                <i class="message_icon" @click="news"></i>
             </el-badge>
-            <i class="el-icon-setting" @click="toSetUp"></i>
-            <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem"
-                      :widthData="widthData"></SelecBar>
-            <i class="el-icon-minus minus-close fl" @click="toMinus"></i>
-            <i class="el-icon-close minus-close fl " @click="toClose"></i>
+            <div class="set"><i class="set_icon" @click="toSetUp"></i></div>
+            <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem" :widthData="widthData"></SelecBar>
+           <div class="minusClose">
+               <i class="el-icon-minus minus-close fl" @click="toMinus"></i>
+               <i class="el-icon-close minus-close fl " @click="toClose"></i>
+           </div>
         </div>
         <div class="news-div" v-show="newsOk">
             <h2>{{$t("message.news")}}</h2>
@@ -36,7 +37,6 @@
     import store from '@/vuex/store'
     import SelecBar from './SelecBar.vue'
     import {jquery} from '@/assets/js/jquery.min.js'
-
     export default {
         data() {
             return {
@@ -95,15 +95,22 @@
                 }
                 if (url === "wallet") {
                     this.isActive = 1;
-                    if (localStorage.getItem("fastUser") == "0" || localStorage.getItem("newAccountAddress") == null) {
-                        this.$router.push({
-                            name: '/setPassword',
-                        })
-                    } else {
-                        this.$router.push({
-                            path: '/wallet'
-                        })
-                    }
+                    //获取账户地址列表
+                    this.$fetch("/account/list")
+                        .then((response) => {
+                            if (response.data.length != 0) {
+                                if(localStorage.getItem("newAccountAddress") == null){
+                                    localStorage.setItem("newAccountAddress",response.data[0].address)
+                                }
+                                this.$router.push({
+                                    path: '/wallet'
+                                })
+                            } else {
+                                this.$router.push({
+                                    name: '/setPassword',
+                                })
+                            }
+                        });
                 }
                 if (url === "consensus") {
                     this.isActive = 2;
@@ -125,6 +132,8 @@
                     });
                 }
             },
+
+
             /**
              * method statement
              * @method news
@@ -204,10 +213,31 @@
                 height: 42px;
                 font-size: 12px;
                 text-align: center;
-                i {
-                    font-size: 16px;
-                    margin-right: 3px;
-                    line-height: 42px;
+                i{
+                    width: 35px;
+                    height: 40px;
+                    position: absolute;
+                    margin-left: 0px;
+                    background-size: @bg-size;
+                    background: @bg-image
+                }
+                .home_icon {
+                    background-position: -23px 0px;
+                }
+                .wallet_icon{
+                    background-position: -59px 0px;
+                }
+                .consensus_icon{
+                    background-position: -94px 0px;
+                }
+                .application_icon{
+                    background-position: -130px 0px;
+                }
+                .more_icon{
+                    background-position: -165px 0px;
+                }
+                span{
+                    margin-left: 20px;
                 }
             }
             li.router-link-active {
@@ -231,29 +261,52 @@
             margin-top: 0.2rem;
             float: right;
             -webkit-app-region: no-drag;
-            .news {
-                width: 2rem;
-            }
-            i {
-                font-size: 18px;
-            }
             i:hover {
                 cursor: pointer;
             }
-            i.minus-close {
-                margin-left: 65px;
-                margin-top: 10px;
-                color: #C1C5C9;
-            }
-            i.minus-close:last-child {
-                margin-left: 10px;
-            }
-            .el-icon-setting {
+            .news {
+                width: 45px;
+                height: 40px;
                 float: left;
-                width: 2rem;
-                display: block;
-                margin-top: 0.65rem;
-                text-align: center;
+                .message_icon{
+                    width: 45px;
+                    height: 40px;
+                    position: absolute;
+                    margin-left: 0px;
+                    background-size: @bg-size;
+                    background: @bg-image -188px -1px;
+                }
+            }
+            .set{
+                width: 40px;
+                height: 40px;
+                float: left;
+                .set_icon {
+                    width: 35px;
+                    height: 40px;
+                    position: absolute;
+                    margin-left: 0px;
+                    background-size: @bg-size;
+                    background: @bg-image -224px -1px;
+                }
+            }
+            .minusClose{
+                width: 80px;
+                height: 40px;
+                float: right;
+                i {
+                    font-size: 18px;
+                    float: left;
+                    text-align: center;
+                }
+                i.minus-close {
+                    margin-left: 23px;
+                    margin-top: 10px;
+                    color: #C1C5C9;
+                }
+                i.minus-close:last-child {
+                    margin-left: 10px;
+                }
             }
             .is-fixed {
                 top: 0.6rem;

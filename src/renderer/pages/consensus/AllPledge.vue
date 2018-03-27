@@ -12,7 +12,7 @@
 			<el-table-column prop="depositTime" label="加入时间" min-width="20" align='center'>
 			</el-table-column>
 		</el-table>
-		<el-pagination layout="prev, pager, next" :total=this.total class="cb"  @current-change="pledgeSize"></el-pagination>
+		<el-pagination layout="prev, pager, next" :total=this.total class="cb"  v-show="totalOK = this.total > 10 ? true:false"  @current-change="pledgeSize"></el-pagination>
 	</div>
 </template>
 

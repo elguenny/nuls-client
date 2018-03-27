@@ -124,7 +124,7 @@ const router = new VueRouter({
 
 		}, 
 		{
-			path: '/consensus/myNode/addNode :agentAddress',
+			path: '/consensus/myNode/addNode :agentAddress/:agentId',
 			name: '/addNode',
 			component: resolve => require(['../../renderer/pages/consensus/AddNode.vue'], resolve)
 

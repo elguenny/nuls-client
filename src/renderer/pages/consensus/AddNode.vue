@@ -14,7 +14,6 @@
 					<label>佣金比例：</label>{{this.agentAddressInfo.commissionRate}}%
 				</li>
 				<li>
-					<!--<label>保证金：</label>{{this.nodeData.owndeposit.value * 0.00000001}} NULS-->
 					<label>保证金：</label>{{(this.agentAddressInfo.owndeposit*0.00000001).toFixed(8)}} NULS
 				</li>
 				<li>
@@ -74,6 +73,7 @@
 			return {
 				backTitle: "委托共识",
                 agentAddress:this.$route.params.agentAddress,
+                agentId:this.$route.params.agentId,
                 agentAddressInfo:[],
                 addNodeForm: {
                     nodeNo: ''
@@ -106,17 +106,17 @@
                             response.data.creditRatios = response.data.creditRatio;
                             if (response.data.creditRatio != 0) {
                                 if (response.data.creditRatio > 0) {
-                                    response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
+                                    response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed(2) + '%';
                                 } else {
-                                    response.data.creditRatio = response.data.creditRatio * 100;
+                                    response.data.creditRatio = response.data.creditRatio * 10;
                                 }
                             } else {
                                 response.data.creditRatio = "50%";
                             }
                             response.data.memberCounts = response.data.memberCount +"/1000";
-                            response.data.memberCount = (response.data.memberCount / 1000).toFixed(3) + '%';
+                            response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
                             response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
-                            response.data.totalDeposit = (response.data.totalDeposit / 50000000000000).toFixed(2) + '%';
+                            response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
                             this.agentAddressInfo = response.data;
                         }
                     });
@@ -142,8 +142,7 @@
                             inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                             inputType: 'password'
                         }).then(({value}) => {
-                            var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentAddress":"' + this.agentAddress + '","deposit":"' + this.addNodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
-                            console.log(param);
+                            var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.addNodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
                             this.$post('/consensus/deposit/', param)
                                 .then((response) => {
                                     console.log(param);

@@ -34,7 +34,7 @@ Vue.use(Element,{
 });
 /**引入css文件**/
 import '../renderer/assets/css/base.css'
-import '../renderer/assets/css/font.css'
+/*import '../renderer/assets/css/font.css'*/
 import 'element-ui/lib/theme-chalk/index.css'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))

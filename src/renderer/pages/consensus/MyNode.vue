@@ -89,7 +89,6 @@
             getAgentAddressInfo(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
-                        console.log(response)
                         if (response.success) {
                             response.data.creditRatios = response.data.creditRatio;
                             if (response.data.creditRatio != 0) {
@@ -102,9 +101,9 @@
                                 response.data.creditRatio = "50%";
                             }
                             response.data.memberCounts = response.data.memberCount +"/1000";
-                            response.data.memberCount = (response.data.memberCount / 1000).toFixed(3) + '%';
+                            response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
                             response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
-                            response.data.totalDeposit = (response.data.totalDeposit / 50000000000000).toFixed(2) + '%';
+                            response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toFixed(2) + '%';
                             this.agentAddressInfo = response.data;
                         }
                     });
@@ -138,10 +137,9 @@
 			},*/
 			//追加共识
 			addNode(){
-			    console.log(this.agentAddress);
 				this.$router.push({
 					name: '/addNode',
-                    params: {agentAddress: this.agentAddress},
+                    params: {agentAddress: this.agentAddressInfo.agentAddress,agentId: this.agentAddressInfo.agentId},
 				});
 			},
 			//退出共识
@@ -158,9 +156,7 @@
                         inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                         inputType: 'password'
                     }).then(({value}) => {
-                        console.log(row);
                         var param = {"address": row.address, "password": value,"txHash": row.txHash};
-                        console.log(param);
                        this.$post('/consensus/withdraw/', param)
                             .then((response) => {
                                 this.$message({
