@@ -8,47 +8,47 @@
             </p>
             <ul>
                 <li class="li-bg overflow">
-                    <label>节点来源：</label>{{this.nodeData.agentAddress}}
+                    <label>{{$t('message.c16')}}：</label>{{this.nodeData.agentAddress}}
                 </li>
                 <li>
-                    <label>佣金比例：</label>{{this.nodeData.commissionRate}}%
+                    <label>{{$t('message.c17')}}：</label>{{this.nodeData.commissionRate}}%
                 </li>
                 <li>
-                    <label>保证金：</label>{{(this.nodeData.owndeposit*0.00000001).toFixed(8)}} NULS
+                    <label>{{$t('message.c25')}}：</label>{{(this.nodeData.owndeposit*0.00000001).toFixed(8)}} NULS
                 </li>
                 <li>
-                    <label>参与人数：</label>
+                    <label>{{$t('message.c19')}}：</label>
                     <ProgressBar colorData="#6a84f7" :widthData="this.nodeData.memberCount"></ProgressBar>
-                    <span>&nbsp;{{this.nodeData.memberCounts}}</span>
+                    <span>{{this.nodeData.memberCounts}}</span>
                 </li>
                 <li>
-                    <label>信用值：</label>
+                    <label>{{$t('message.c18')}}：</label>
                     <ProgressBar colorData="#82bd39" :widthData="this.nodeData.creditRatio"></ProgressBar>
-                    <span>&nbsp;{{this.nodeData.creditRatios}}</span>
+                    <span>{{this.nodeData.creditRatios}}</span>
                 </li>
                 <li>
-                    <label>剩余可抵押：</label>
+                    <label>{{$t('message.c64')}}：</label>
                     <ProgressBar colorData="#58a5c9" :widthData="this.nodeData.totalDeposit"></ProgressBar>
                     <span>&nbsp;{{this.nodeData.totalDeposits}}</span>
                 </li>
                 <li class="li-info overflow">
-                    <label>节点介绍：</label>{{this.nodeData.introduction}}
+                    <label>{{$t('message.c27')}}：</label>{{this.nodeData.introduction}}
                 </li>
             </ul>
         </div>
         <div class="node-page-bottom">
             <el-form ref="nodeForm" :model="nodeForm" :rules="nodeRules" size="mini" label-position="left">
-                <el-form-item label="账户地址:" class="account-address">
+                <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
-                <span class="allUsable">当前余额:{{ usable }} NULS</span>
-                <el-form-item label="委托保证:" class="number" prop="nodeNo">
+                <span class="allUsable">{{$t('message.currentBalance')}}:{{ usable }} NULS</span>
+                <el-form-item :label="$t('message.c25')" class="number" prop="nodeNo">
                     <el-input v-model="nodeForm.nodeNo"></el-input>
-                    <span class="allNo" @click="allUsable(usable)">全部</span>
+                    <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
                 </el-form-item>
-                <div class="procedure">手续费:<span>0.01 NULS</span></div>
+                <div class="procedure">{{$t('message.c28')}}:<span>0.01 NULS</span></div>
                 <el-form-item size="large" class="submit">
-                    <el-button type="primary" @click="onSubmit('nodeForm')">确定</el-button>
+                    <el-button type="primary" @click="onSubmit('nodeForm')">{{$t('message.confirmButtonText')}}</el-button>
                 </el-form-item>
 
             </el-form>
@@ -79,7 +79,7 @@
                 }, 100);
             };
             return {
-                backTitle: "委托共识",
+                backTitle: this.$t('message.consensusManagement'),
                 address: this.$route.params.address,
                 agentId:'',
                 nodeData: [],
@@ -120,7 +120,7 @@
                             } else {
                                 response.data.creditRatio = "50%";
                             }
-
+                            response.data.status = this.switchStatus(response.data.status);
                             response.data.memberCounts = response.data.memberCount +"/1000";
                             response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
                             response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
@@ -129,6 +129,20 @@
                             this.nodeData = response.data;
                         }
                     });
+            },
+            //查询共识状态
+            switchStatus(status) {
+                switch (status) {
+                    case 0:
+                        return this.$t("message.c13");
+                        break;
+                    case 1:
+                        return this.$t("message.c14");
+                        break;
+                    case 2:
+                        return this.$t("message.c15");
+                        break;
+                }
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
@@ -149,7 +163,7 @@
             allUsable(no) {
                 if(no == 0){
                     this.$message({
-                        message: '对不起，您选择的账户余额不住！',
+                        message: this.$t('message.creditLow'),
                         type: 'success'
                     });
                 }else {
@@ -173,7 +187,7 @@
                                     console.log(param);
                                     if (response.success) {
                                         this.$message({
-                                            message: '恭喜您！申请参与共识成功！',
+                                            message: this.$t('message.passWordSuccess'),
                                             type: 'success'
                                         });
                                          this.$router.push({
@@ -182,7 +196,7 @@
                                          })
                                     } else {
                                         this.$message({
-                                            message: '对不起！' + response.msg,
+                                            message: this.$t('message.passWordFailed') + response.msg,
                                             type: 'warning',
                                         });
                                     }
@@ -255,6 +269,7 @@
             .number {
                 .el-form-item__label {
                     margin-top: 15px;
+                    width: 68px;
                 }
             }
             .el-input__inner {

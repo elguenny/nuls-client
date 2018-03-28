@@ -1,19 +1,19 @@
 <template>
     <div class="pledge-info">
         <Back :backTitle="backTitle"></Back>
-        <h2>我的委托总额明细</h2>
+        <h2>{{$t('message.c48')}}</h2>
         <el-table :data="pledgeData" >
-            <el-table-column prop="agentName" label="节点名称" width="180" align='center'>
+            <el-table-column prop="agentName" :label="$t('message.c24')" width="180" align='center'>
             </el-table-column>
-            <el-table-column prop="amount" label="金额" width="150" align='center'>
+            <el-table-column prop="amount" :label="$t('message.amount')" width="150" align='center'>
             </el-table-column>
-            <el-table-column prop="status" label="状态"  width="100" align='center'>
+            <el-table-column prop="status" :label="$t('message.state')"  width="100" align='center'>
             </el-table-column>
-            <el-table-column prop="depositTime" label="加入时间"  width="160" align='center'>
+            <el-table-column prop="depositTime" :label="$t('message.c49')"  width="160" align='center'>
             </el-table-column>
-            <el-table-column label="操作"  width="90" align='center'>
+            <el-table-column :label="$t('message.operation')"   width="90" align='center'>
                 <template slot-scope="scope">
-                    <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+                    <el-button @click="handleClick(scope.row)" type="text" size="small">{{$t('message.c50')}}</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -27,7 +27,7 @@
     export default {
         data() {
             return {
-                backTitle: "共识首页",
+                backTitle:this.$t('message.consensusManagement'),
                 pledgeData: [],
                 total:0,
             }
@@ -50,7 +50,7 @@
                             for (var i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = response.data.list[i].amount *0.00000001;
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
-                                //response.data.list[i].status = response.data.list[i].status !=2 ?"等待共识":"正在共识";
+                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                             }
                             this.pledgeData = response.data.list;
                         }
@@ -59,6 +59,20 @@
             //分页功能
             pledgeSize(events){
                 this.getConsensusDeposit("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {"pageNumber": events, "pageSize": "8"});
+            },
+            //查询共识状态
+            switchStatus(status) {
+                switch (status) {
+                    case 0:
+                        return this.$t("message.c13");
+                        break;
+                    case 1:
+                        return this.$t("message.c14");
+                        break;
+                    case 2:
+                        return this.$t("message.c15");
+                        break;
+                }
             },
             //查看节点详情
             handleClick(row) {

@@ -23,6 +23,8 @@
 				connectNumber:'节点块数',
 				netWorkInfo:[],
                 iconWifi:'no-wifi_icon',
+				setTime:3000,
+                rejectTime:0,
 			}
 		},
 		mounted() {
@@ -31,9 +33,9 @@
 			this.getBottromInfo('/sys/version');
 			//get net work info
 			this.getNetWorkInfo('/network/info');
-            setInterval(()=>{
+            var timer = setInterval(()=>{
                 this.getNetWorkInfo('/network/info');
-            },3000);
+            },6000);
 
 		},
 		methods: {
@@ -53,19 +55,7 @@
                             if(response.data.myVersion != response.data.newestVersion){
                                 //this.updateVersion = true
                             }
-						}else {
-                            this.$confirm('似乎已断开与互联网的连接，请连接后重试。确定关闭NULS钱包客户端？', '提示', {
-                                confirmButtonText: '确定',
-                                cancelButtonText: '取消',
-                                type: 'warning'
-                            }).then(() => {
-                                var ipc = require('electron').ipcRenderer;
-                                ipc.send('window-close');
-                            }).catch(() => {
-
-                            });
 						}
-
 					});
 			},
             /** updateVersionUrl
@@ -105,9 +95,31 @@
 								}
 							}else {
                                 this.iconWifi='no-wifi_icon';
+                                this.$confirm(this.$t('message.c97'),this.$t('message.c86'), {
+                                    confirmButtonText: this.$t('message.confirmButtonText'),
+                                    cancelButtonText: this.$t('message.cancelButtonText'),
+                                    type: 'warning'
+                                }).then(() => {
+                                    var ipc = require('electron').ipcRenderer;
+                                    ipc.send('window-close');
+                                });
 							}
 						}
-					});
+					}).catch((reject) => {
+						if(reject ==="网络异常"){
+                            if(this.rejectTime == 0){
+                                this.rejectTime = this.rejectTime+1;
+                                this.$confirm(this.$t('message.c97'),this.$t('message.c86'), {
+                                    confirmButtonText: this.$t('message.confirmButtonText'),
+                                    cancelButtonText: this.$t('message.cancelButtonText'),
+                                    type: 'warning'
+                                }).then(() => {
+                                    var ipc = require('electron').ipcRenderer;
+                                    ipc.send('window-close');
+                                });
+							}
+						}
+                });
 			},
 			//测试清理数据
             clearData(){

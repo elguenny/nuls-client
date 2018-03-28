@@ -4,34 +4,34 @@
 		<h2>{{this.myNodeInfo.agentName}}</h2>
 		<ul>
 			<li>
-				<label>出块地址</label><span>{{this.myNodeInfo.packingAddress}}</span>
+				<label>{{$t('message.c16')}}</label><span>{{this.myNodeInfo.packingAddress}}</span>
 			</li>
 			<li>
-				<label>状态</label><span>{{this.myNodeInfo.status == 2 ? "正在共识":"等待共识"}}</span>
+				<label>{{$t('message.state')}}</label><span>{{this.myNodeInfo.status}}</span>
 			</li>
 			<li>
-				<label>累计收益</label><span>{{this.myNodeInfo.reward*0.00000001 }} NULS</span>
+				<label>{{$t('message.c7')}}</label><span>{{this.myNodeInfo.reward*0.00000001 }} NULS</span>
 			</li>
 			<li>
-				<label>保证金</label><span>{{this.myNodeInfo.totalDeposit*0.00000001}}</span>
+				<label>{{$t('message.c25')}}</label><span>{{this.myNodeInfo.totalDeposit*0.00000001}}</span>
 			</li>
 			<li>
-				<label>代理佣金比例</label><span>{{this.myNodeInfo.commissionRate}} %</span>
+				<label>{{$t('message.c17')}}</label><span>{{this.myNodeInfo.commissionRate}} %</span>
 			</li>
 			<li>
-				<label>信用值</label><span>{{this.myNodeInfo.creditRatio}}</span>
+				<label>{{$t('message.c18')}}</label><span>{{this.myNodeInfo.creditRatio}}</span>
 			</li>
 			<li>
-				<label>参与人数</label><span>{{this.myNodeInfo.memberCount}}</span>
+				<label>{{$t('message.c19')}}</label><span>{{this.myNodeInfo.memberCount}}</span>
 			</li>
 			<li>
-				<label>总抵押金额</label><span class="cursor-p text-d" title="点击查看详情" @click="toallPledge">{{(this.myNodeInfo.totalDeposit*0.00000001).toFixed(8)}}</span>
+				<label>{{$t('message.c1')}}</label><span class="cursor-p text-d" @click="toallPledge">{{(this.myNodeInfo.totalDeposit*0.00000001).toFixed(8)}}</span>
 			</li>
 			<li class="overflow">
-				<label>节点介绍</label><span>{{this.myNodeInfo.introduction}}！</span>
+				<label>{{$t('message.c27')}}</label><span>{{this.myNodeInfo.introduction}}！</span>
 			</li>
 		</ul>
-		<el-button @click="closedNode" type="button" class="bottom-btn">关闭节点</el-button>
+		<el-button @click="closedNode" type="button" class="bottom-btn">{{$t('message.c62')}}</el-button>
 	</div>
 </template>
 
@@ -41,7 +41,7 @@
 	export default {
 		data() {
 			return {
-				backTitle: "共识首页",
+				backTitle: this.$t('message.consensusManagement'),
 				myNodeInfo:[],
 			}
 		},
@@ -59,16 +59,30 @@
                     .then((response) => {
                         console.log(response)
                         if(response.success){
+                            response.data.status = this.switchStatus(response.data.status);
                             this.myNodeInfo = response.data;
-                            console.log((this.myNodeInfo.totalDeposit*0.00000001).toFixed(8));
 						}
                     });
 			},
+            //查询共识状态
+            switchStatus(status) {
+                switch (status) {
+                    case 0:
+                        return this.$t("message.c13");
+                        break;
+                    case 1:
+                        return this.$t("message.c14");
+                        break;
+                    case 2:
+                        return this.$t("message.c15");
+                        break;
+                }
+            },
 			//关闭我创建的节点信息
 			closedNode() {
-                this.$confirm('确定关闭节点么?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
+                this.$confirm(this.$t('message.c98')+this.myNodeInfo.agentName+this.$t('message.c99'), this.$t('message.c86'), {
+                    confirmButtonText: this.$t('message.confirmButtonText'),
+                    cancelButtonText: this.$t('message.cancelButtonText'),
                     type: 'warning'
                 }).then(() => {
                     this.$prompt(this.$t('message.passWordTitle'), '', {
@@ -84,7 +98,7 @@
 								if(response.success){
                                     this.$message({
                                         type: 'success',
-                                        message: '恭喜您、你已经申请了关闭节点！'
+                                        message: this.$t('message.passWordSuccess')
                                     });
                                     this.$router.push({
                                         name: '/consensus',
@@ -93,7 +107,7 @@
 								}else {
                                     this.$message({
                                         type: 'waring',
-                                        message: '对不起！关闭节点申请失败！'+response.msg
+                                        message: this.$t('message.passWordFailed')+response.msg
                                     });
 								}
 							});

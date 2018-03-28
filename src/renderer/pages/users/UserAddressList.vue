@@ -1,43 +1,39 @@
 <template>
     <div class="users">
         <Back :backTitle="backTitle"></Back>
-        <h2>通讯录</h2>
-        <el-button type="primary" icon="el-icon-plus" @click="toNewAccount()" class="newAccount"
-                   title="新增通讯录"></el-button>
+        <h2>{{$t('message.c93')}}</h2>
+        <el-button type="primary" icon="el-icon-plus" @click="toNewAccount()" class="newAccount"></el-button>
         <el-table :data="tableData">
-            <el-table-column prop="userAddress" label="账户" width="288" align='center'>
+            <el-table-column prop="userAddress" :label="$t('message.c69')" width="288" align='center'>
             </el-table-column>
-            <el-table-column prop="userAlias" label="别名" width="100" align='center'>
+            <el-table-column prop="userAlias" :label="$t('message.tabAlias')" width="100" align='center'>
             </el-table-column>
-            <el-table-column prop="userHelp" label="备注"  width="180" align='center'>
+            <el-table-column prop="userHelp" :label="$t('message.remarks')"  width="180" align='center'>
             </el-table-column>
-            <el-table-column label="操作" min-width="20" width="120" align='center'>
+            <el-table-column :label="$t('message.operation')" width="120" align='center'>
                 <template slot-scope="scope">
                     <el-button @click="editorRow(scope.row.userAddress,scope.row.userAlias,scope.row.userHelp)"
                                type="text" size="small">
-                        编辑
+                        {{$t('message.c94')}}
                     </el-button>
                     <el-button @click="deleteRow(scope.row.userAddress)" type="text" size="small">
-                        删除
+                        {{$t('message.c95')}}
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
-        <el-dialog title="新增通讯录" :visible.sync="dialogFormVisible">
+        <el-dialog :title="$t('message.c96')" :visible.sync="dialogFormVisible">
             <el-form :model="form" label-width="80px" :rules="formRules"  ref="form">
-                <el-form-item label="账户">
+                <el-form-item :label="$t('message.c69')">
                     <el-input v-model="form.userAddress"></el-input>
                 </el-form-item>
-                <el-form-item label="备注">
+                <el-form-item :label="$t('message.remarks')">
                     <el-input v-model="form.userHelp"></el-input>
                 </el-form-item>
-                <div class="userAlias">别名 {{form.userAlias}}</div>
-                <!-- <el-form-item label="别名">
-                     <el-input v-model="form.userAlias" disabled></el-input>
-                 </el-form-item>-->
+                <div class="userAlias">{{$t('message.tabAlias')}} {{form.userAlias}}</div>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="addUserAccount">确 定</el-button>
+                <el-button type="primary" @click="addUserAccount">{{$t('message.confirmButtonText')}}</el-button>
             </div>
         </el-dialog>
         <!--<el-pagination layout="prev, pager, next" :total="1000" class="cb"></el-pagination>-->
@@ -55,7 +51,7 @@
                 }
             };
             return {
-                backTitle: "设置",
+                backTitle: this.$t('message.setManagement'),
                 tableData: [],
                 dialogFormVisible: false,
                 form: {

@@ -8,50 +8,49 @@
 			</p>
 			<ul>
 				<li class="li-bg overflow">
-					<label>节点来源：</label>{{this.agentAddressInfo.agentAddress}}
+					<label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddress}}
 				</li>
 				<li>
-					<label>佣金比例：</label>{{this.agentAddressInfo.commissionRate}}%
+					<label>{{$t('message.c17')}}：</label>{{this.agentAddressInfo.commissionRate}}%
 				</li>
 				<li>
-					<!--<label>保证金：</label>{{this.nodeData.owndeposit.value * 0.00000001}} NULS-->
-					<label>保证金：</label>{{(this.agentAddressInfo.owndeposit*0.00000001).toFixed(8)}} NULS
+					<label>{{$t('message.c25')}}：</label>{{(this.agentAddressInfo.owndeposit*0.00000001).toFixed(8)}} NULS
 				</li>
 				<li>
-					<label>参与人数：</label>
+					<label>{{$t('message.c19')}}：</label>
 					<ProgressBar colorData="#6a84f7" :widthData="this.agentAddressInfo.memberCount"></ProgressBar>
 					<span>&nbsp;{{this.agentAddressInfo.memberCounts}}</span>
 				</li>
 				<li>
-					<label>信用值：</label>
+					<label>{{$t('message.c18')}}：</label>
 					<ProgressBar colorData="#82bd39" :widthData="this.agentAddressInfo.creditRatio"></ProgressBar>
 					<span>&nbsp;{{this.agentAddressInfo.creditRatios}}</span>
 				</li>
 				<li>
-					<label>剩余可抵押：</label>
+					<label>{{$t('message.c47')}}：</label>
 					<ProgressBar colorData="#58a5c9" :widthData="this.agentAddressInfo.totalDeposit"></ProgressBar>
 					<span>&nbsp;{{this.agentAddressInfo.totalDeposits}}</span>
 				</li>
 				<li class="li-info overflow">
-					<label>节点介绍：</label>{{this.agentAddressInfo.introduction}}
+					<label>{{$t('message.c27')}}：</label>{{this.agentAddressInfo.introduction}}
 				</li>
 			</ul>
 		</div>
 		<div class="my-node-bottom">
 			<div class="my-node-list">
-				我的抵押明细 <!--<span class="text-d cursor-p fr" @click="allOut">全部退出</span>-->
-				<span class="text-d cursor-p fr" @click="addNode">追加</span>
+				{{$t('message.c56')}}
+				<span class="text-d cursor-p fr" @click="addNode">{{$t('message.c57')}}</span>
 			</div>
 			<el-table :data="myMortgageData" style="width: 100%">
-				<el-table-column prop="amount" label="抵押保证金" min-width="20" align='center'>
+				<el-table-column prop="amount" :label="$t('message.c51')" min-width="20" align='center'>
 				</el-table-column>
-				<el-table-column prop="status" label="状态" min-width="10" align='center'>
+				<el-table-column prop="status" :label="$t('message.state')" min-width="10" align='center'>
 				</el-table-column>
-				<el-table-column prop="depositTime" label="加入时间" min-width="25" align='center'>
+				<el-table-column prop="depositTime" :label="$t('message.c49')" min-width="25" align='center'>
 				</el-table-column>
-				<el-table-column label="操作" min-width="25" align='center'>
+				<el-table-column :label="$t('message.operation')" min-width="25" align='center'>
 					<template slot-scope="scope">
-						<el-button @click="outNode(scope.row)" type="text" size="small">退出</el-button>
+						<el-button @click="outNode(scope.row)" type="text" size="small">{{$t('message.c58')}}</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
@@ -67,7 +66,7 @@
 	export default {
 		data() {
 			return {
-				backTitle: "委托共识",
+				backTitle: this.$t('message.consensusManagement'),
 				address:'',
                 agentAddress:this.$route.params.agentAddress,
                 agentAddressInfo:[],
@@ -100,6 +99,7 @@
                             } else {
                                 response.data.creditRatio = "50%";
                             }
+                            response.data.status = this.switchStatus(response.data.status);
                             response.data.memberCounts = response.data.memberCount +"/1000";
                             response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
                             response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
@@ -113,12 +113,12 @@
                 this.$fetch(url,params)
                     .then((response) => {
                         if (response.success) {
-                            //console.log(response)
+                            console.log(response)
                             this.total = response.data.total;
                             for (var i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = response.data.list[i].amount *0.00000001;
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
-                                response.data.list[i].status = response.data.list[i].status !=2 ?"等待共识":"正在共识";
+                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                             }
                             this.myMortgageData = response.data.list;
                         }
@@ -130,6 +130,20 @@
                     "pageNumber": events,
                     "pageSize": "3"
                 });
+            },
+            //查询共识状态
+            switchStatus(status) {
+                switch (status) {
+                    case 0:
+                        return this.$t("message.c13");
+                        break;
+                    case 1:
+                        return this.$t("message.c14");
+                        break;
+                    case 2:
+                        return this.$t("message.c15");
+                        break;
+                }
             },
 			//全部退出
 			/*allOut(){
@@ -144,9 +158,9 @@
 			},
 			//退出共识
 			outNode(row) {
-				this.$confirm('确定退出雷霆节点？(抵押保证金 '+row.amount+' NULS)', '退出节点', {
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
+				this.$confirm(this.$t('message.c60')+row.agentName+'？( '+this.$t('message.c51')+row.amount+' NULS)', this.$t('message.c61'), {
+					confirmButtonText: this.$t("message.confirmButtonText"),
+					cancelButtonText: this.$t("message.cancelButtonText"),
 					type: 'warning'
 				}).then(() => {
                     this.$prompt(this.$t('message.passWordTitle'), '', {
@@ -159,32 +173,21 @@
                         var param = {"address": row.address, "password": value,"txHash": row.txHash};
                        this.$post('/consensus/withdraw/', param)
                             .then((response) => {
-                                this.$message({
-                                    type: 'success',
-                                    message: '恭喜您，退出节点申请成功!'
-                                });
-                                this.myMortgageSize();
-                                //console.log(response);
-                               /* if (response.success) {
+                                if(response.success){
                                     this.$message({
                                         type: 'success',
-                                        message: '删除成功!'
+                                        message: this.$t("message.passWordSuccess")
                                     });
-
-                                }else {
-                                    this.$message({
-                                        type: 'waring',
-                                        message: '对不起，退出节点失败!'+response.msg
-                                    });
-								}*/
+                                    console.log(123123);
+                                    this.getAddressList("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+								}
                             })
-
 					});
 
 				}).catch(() => {
 					this.$message({
 						type: 'info',
-						message: '已取消删除'
+						message: this.$t("message.c59")
 					});
 				});
 			}

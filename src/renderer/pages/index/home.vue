@@ -132,9 +132,9 @@
                         }
                     }
                 });
-            setTimeout(() => {
-                this.methodsMaps(obj);
-            }, 600);
+                setTimeout(() => {
+                    this.methodsMaps(obj);
+                }, 600);
 
             if (localStorage.getItem("fastUser") == null) {
                 localStorage.setItem('fastUser', '0');

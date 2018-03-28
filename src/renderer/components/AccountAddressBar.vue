@@ -26,6 +26,8 @@
                     .then((response) => {
                         if(response.success){
                             this.accountAddress = response.data;
+						}else {
+                            console.log("获取账户列表失败！")
 						}
                     });
             },

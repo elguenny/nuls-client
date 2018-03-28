@@ -2,19 +2,21 @@
     <div class="edit-aliasing">
         <Back :backTitle="backTitle"></Back>
         <div class="edit-info">
-            <h2>{{this.alias == null ? "设置别名":"修改别名"}}</h2>
-            <el-form>
-                <el-form-item label="账户地址:">
-                    <el-input v-model="address" type="text" disabled></el-input>
+            <h2>{{$t('message.c100')}}</h2>
+
+            <el-form :model="aliasForm" :rules="aliasRules" ref="aliasForm">
+                <div class="div-text">
+                    <label>{{$t('message.c102')}}:</label>{{this.address}}
+                </div>
+                <div class="div-text">{{$t('message.c103')}}</div>
+                <el-form-item :label="$t('message.c104')" class="label-aliasing" prop="alias">
+                    <el-input v-model="aliasForm.alias" class="bt-aliasing" :placeholder="$t('message.c105')"></el-input>
                 </el-form-item>
-                <el-form-item label="别名:" class="label-aliasing">
-                    <el-input v-model="alias" class="bt-aliasing"></el-input>
-                </el-form-item>
-                <el-form-item label="手续费:">
-                    <el-input v-model="serviceNo" type="text" disabled></el-input>
-                </el-form-item>
+                <div class="div-text">
+                    <label>{{$t('message.miningFee1')}}:</label>0.01NULS
+                </div>
                 <el-form-item class="aliasing-submit">
-                    <el-button type="primary" @click="aliasingSubmit">确定</el-button>
+                    <el-button type="primary"  @click="aliasingSubmit('aliasForm')">{{$t('message.confirmButtonText')}}</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -26,11 +28,31 @@
 
     export default {
         data() {
+            var aliasing = (rule, value, callback) => {
+                if(this.usable > 1.01){
+                    if (value === '') {
+                        callback(new Error(this.$t('message.c104')));
+                    }else if(value.length > 8){
+                        callback(new Error(this.$t('message.c106')));
+                    }else{
+                        callback();
+                    }
+                }else {
+                    callback(new Error(this.$t('message.c107')));
+                }
+            };
             return {
-                backTitle: '账户管理',
-                alias: this.$route.params.alias,
+                backTitle: this.$t('message.accountManagement'),
                 address: this.$route.params.address,
-                serviceNo: '0.01NULS'
+                usable:0,
+                aliasForm: {
+                    alias: '',
+                },
+                aliasRules: {
+                    alias: [
+                        {validator: aliasing, trigger: 'blur'}
+                    ]
+                },
             }
         },
         components: {
@@ -38,36 +60,55 @@
         },
         mounted() {
             let _this = this;
+            this.getBalanceAddress('/account/balance/' +this.address);
         },
         methods: {
-            back() {
-                this.$router.go(-1);
+            //根据账户地址获取账户余额
+            getBalanceAddress(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if (response.success) {
+                            this.usable = response.data.usable * 0.000000001;
+                        }else {
+                            this.usable = 0;
+                        }
+                    });
             },
-            aliasingSubmit() {
-                this.$prompt(this.$t('message.passWordTitle'), '', {
-                    confirmButtonText: this.$t('message.confirmButtonText'),
-                    cancelButtonText: this.$t('message.cancelButtonText'),
-                    inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                    inputErrorMessage: this.$t('message.walletPassWordEmpty'),
-                    inputType:'password'
-                }).then(({value}) => {
-                    var param = {"alias": this.alias, "address": this.address, "password": value}
-                    this.$post('/account/alias/', param)
-                        .then((response) => {
-                            //console.log(response);
-                            if (response.success) {
-                                this.$message({
-                                    type: 'success', message: "别名设置完成！"
+            //修改别名
+            aliasingSubmit(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$prompt(this.$t('message.passWordTitle'), '', {
+                            confirmButtonText: this.$t('message.confirmButtonText'),
+                            cancelButtonText: this.$t('message.cancelButtonText'),
+                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                            inputType: 'password'
+                        }).then(({value}) => {
+                            var param = {"alias": this.aliasForm.alias, "address": this.address, "password": value};
+                            console.log(param);
+                            this.$post('/account/alias/', param)
+                                .then((response) => {
+                                    console.log(response);
+                                    if (response.success) {
+                                        this.$message({
+                                            type: 'success', message: this.$t('message.passWordSuccess')
+                                        });
+                                        this.$router.push({
+                                            name: '/userInfo'
+                                        })
+                                    } else {
+                                        this.$message({
+                                            type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                                        });
+                                    }
                                 });
-                                this.$router.push({
-                                    path: '/users/userInfo'
-                                })
-                            } else {
-                                this.$message({
-                                    type: 'warning', message: response.msg + ",别名设置未完成!"
-                                });
-                            }
+                        })
+                    }else {
+                        this.$message({
+                            type: 'warning', message: this.$t('message.passWordFailed')
                         });
+                    }
                 })
             }
         }
@@ -78,7 +119,7 @@
         width: 100%;
         margin: auto;
         .edit-info {
-            width: 50%;
+            width: 60%;
             margin: auto;
             h2 {
                 text-align: center;
@@ -87,19 +128,17 @@
             .aliasing-submit {
                 text-align: center;
                 button {
-                    width: 30%;
+                    width: 60%;
+                    margin-top: 50px;
                 }
             }
-            input[type="text"],
-            input[type="password"],
-            select {
-                background: #0b1422;
+            .div-text {
+                font-size: 14px;
+                line-height: 30px;
+                color: #e3dddd;
             }
-            .el-form-item__label {
-                text-align: left;
-            }
-            .el-input__inner {
-                border-color: #0b1422;
+            .el-form-item {
+                margin-bottom: 15px;
             }
             .bt-aliasing .el-input__inner {
                 border: 1px solid #24426c;
@@ -107,34 +146,11 @@
             .el-input__inner:hover {
                 border: 1px solid #658ec7;
             }
+            /**placeholder**/
+            ::-webkit-input-placeholder {
+                color: #8a929b;
+            }
         }
     }
 
-    .edit-aliasing .edit-info .el-form-item__label {
-        width: 80px;
-    }
-
-    .el-form-item__content {
-        margin-left: 80px;
-    }
-
-    .label-aliasing label {
-        float: none;
-    }
-
-    .label-aliasing .el-form-item__content {
-        margin-left: 0px;
-    }
-
-    .el-form-item {
-        margin-bottom: 0px;
-    }
-
-    .el-input__inner {
-        padding: 0px 3px;
-    }
-
-    .aliasing-submit .el-form-item__content {
-        margin-left: 0px;
-    }
 </style>

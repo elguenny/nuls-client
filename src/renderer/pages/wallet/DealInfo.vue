@@ -64,8 +64,7 @@
             getHashInfo(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response)
-                        response.data
+                        console.log(response);
                         this.infoData = response.data;
                         this.times =  moment(response.data.time).format('YYYY-MM-DD hh:mm:ss');
                         this.inputs = response.data.inputs;

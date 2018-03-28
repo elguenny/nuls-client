@@ -67,7 +67,7 @@
                                 <span>{{ scope.row.type }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column label="txid" width="215" align='center'>
+                        <el-table-column label="txid" min-width="200" align='center'>
                             <template slot-scope="scope">
 								<span @click="toTxid(scope.row.hash)" class="cursor-p text-d overflow">
 									{{ scope.row.hash }}
@@ -90,7 +90,7 @@
                             </template>
                         </el-table-column>
                     </el-table>
-                    <el-pagination layout="prev, pager, next" :page-size="3" :total=this.totalAll class="cb"
+                    <el-pagination layout="prev, pager, next" :page-size="9" :total=this.totalAll class="cb"
                                    v-show="totalAllOk = this.totalAll>8 ?true:false"
                                    @current-change="txIdConsensusSize"></el-pagination>
                 </el-tab-pane>
@@ -115,7 +115,6 @@
                 accountAddressValue: localStorage.getItem('newAccountAddress'),
                 accountData: [],
                 dealList: [],
-                //activeName: 'first',
                 activeName: localStorage.getItem('walletActiveName') ==null ? "first":localStorage.getItem('walletActiveName'),
                 tabName:'first',
                 totalAll:0,
@@ -128,11 +127,14 @@
         mounted() {
             let _this = this;
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
+            if(this.activeName === 'second'){
+                this.getAccountTxList('/tx/list/', {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": 1});
+            }
         },
         methods: {
             //根据账户地址获取资产列表
-            getAccountAssets(api) {
-                this.$fetch(api)
+            getAccountAssets(url) {
+                this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
                             this.accountData = response.data;
@@ -140,10 +142,10 @@
                     });
             },
             //根据用户地址获取用户交易列表
-            getAccountTxList(api, param) {
-                this.$fetch(api, param)
+            getAccountTxList(url, param) {
+                this.$fetch(url, param)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response)
                         if (response.data != null) {
                             this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {
@@ -163,15 +165,16 @@
             },
             //交易列表分页
             txIdConsensusSize(events){
-                this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 10, "pageNumber": events});
+                this.getAccountTxList('/tx/list/', {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": events});
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
+                console.log(chenckAddress);
                 this.accountAddressValue = chenckAddress;
                 if(this.tabName === "first" ){
                     this.getAccountAssets("/account/assets/" + chenckAddress);
                 }else {
-                    this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 10, "pageNumber": 1});
+                    this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 9, "pageNumber": 1});
                 }
             },
             //查询交易类型
@@ -219,9 +222,10 @@
                 if (tab.name !== "first") {
                     this.activeName = "second";
                     this.walletHide = false;
-                    let params = {"address": this.accountAddressValue, "pageSize": 10, "pageNumber": 1};
+                    let params = {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": 1};
                     this.getAccountTxList('/tx/list/', params);
                 } else {
+                    localStorage.setItem('walletActiveName',tab.name);
                     this.walletHide = true;
                     this.getAccountAssets("/account/assets/" + this.accountAddressValue);
                 }
@@ -261,7 +265,7 @@
             },
             //toTxid跳转
             toTxid(txId) {
-                //this.activeName='second';
+                localStorage.setItem('walletActiveName','second');
                 this.$router.push({
                     name: '/dealInfo',
                     params: {hash: txId},
@@ -346,6 +350,20 @@
             top: 133px;
             position: fixed;
             z-index: 800;
+            .icon{
+                width: 30px;
+                height: 20px;
+                display: block;
+                float: left;
+                background-size: @bg-size;
+                background: @bg-image
+            }
+            .icon-eye{
+                background-position: -159px -46px;
+            }
+            .icon-eye-blocked{
+                background-position: -226px -77px;
+            }
             .el-icon-view {
                 font-size: 1rem;
             }
@@ -356,9 +374,7 @@
                 width: 100%;
                 background-color: #0b1422;
                 text-align: center;
-
             }
-
         }
         .wallet-tab {
             .el-tabs__item {

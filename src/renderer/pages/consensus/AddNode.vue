@@ -8,42 +8,42 @@
 			</p>
 			<ul>
 				<li class="li-bg overflow">
-					<label>节点来源：</label>{{this.agentAddressInfo.agentAddress}}
+					<label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddress}}
 				</li>
 				<li>
-					<label>佣金比例：</label>{{this.agentAddressInfo.commissionRate}}%
+					<label>{{$t('message.c17')}}：</label>{{this.agentAddressInfo.commissionRate}}%
 				</li>
 				<li>
-					<label>保证金：</label>{{(this.agentAddressInfo.owndeposit*0.00000001).toFixed(8)}} NULS
+					<label>{{$t('message.c25')}}：</label>{{(this.agentAddressInfo.owndeposit*0.00000001).toFixed(8)}} NULS
 				</li>
 				<li>
-					<label>参与人数：</label>
+					<label>{{$t('message.c19')}}：</label>
 					<ProgressBar colorData="#6a84f7" :widthData="this.agentAddressInfo.memberCount"></ProgressBar>
 					<span>&nbsp;{{this.agentAddressInfo.memberCounts}}</span>
 				</li>
 				<li>
-					<label>信用值：</label>
+					<label>{{$t('message.c18')}}：</label>
 					<ProgressBar colorData="#82bd39" :widthData="this.agentAddressInfo.creditRatio"></ProgressBar>
 					<span>&nbsp;{{this.agentAddressInfo.creditRatios}}</span>
 				</li>
 				<li>
-					<label>剩余可抵押：</label>
+					<label>{{$t('message.c47')}}：</label>
 					<ProgressBar colorData="#58a5c9" :widthData="this.agentAddressInfo.totalDeposit"></ProgressBar>
 					<span>&nbsp;{{this.agentAddressInfo.totalDeposits}}</span>
 				</li>
 				<li class="li-info overflow">
-					<label>节点介绍：</label>{{this.agentAddressInfo.introduction}}
+					<label>{{$t('message.c27')}}：</label>{{this.agentAddressInfo.introduction}}
 				</li>
 			</ul>
 		</div>
 		<div class="add-node-bottom">
 			<el-form ref="addNodeForm" :model="addNodeForm" :rules="addNodeRules" size="mini" label-position="left">
-				<el-form-item label="抵押保证金" class="pledge-money" prop="nodeNo">
+				<el-form-item :label="$t('message.c51')" class="pledge-money" prop="nodeNo">
 					<el-input v-model="addNodeForm.nodeNo" :placeholder=this.placeholder></el-input>
 				</el-form-item>
-				<div class="procedure">手续费<span>0.01 NULS</span></div>
+				<div class="procedure">{{$t('message.miningFee1')}}<span>0.01 NULS</span></div>
 				<el-form-item size="large" class="submit">
-					<el-button type="primary" @click="onSubmit('addNodeForm')">确定</el-button>
+					<el-button type="primary" @click="onSubmit('addNodeForm')">{{$t('message.confirmButtonText')}}</el-button>
 				</el-form-item>
 			</el-form>
 		</div>
@@ -57,21 +57,21 @@
 		data() {
             var checkNodeNo = (rule, value, callback) => {
                 if (!value) {
-                    callback(new Error('请输入委托保证金额！'));
+                    callback(new Error(this.$t('message.c52')));
                 }
                 setTimeout(() => {
                     var re = /^\d+(?=\.{0,1}\d+$|$)/;
                     if (!re.exec(value)) {
-                        callback(new Error('请输入正确的委托保证金额为数字值！'));
+                        callback(new Error(this.$t('message.c53')));
                     } else if (value > this.usable - 0.01) {
-                        callback(new Error('委托保证金额不能大于可用余额！'));
+                        callback(new Error(this.$t('message.c54')));
                     } else {
                         callback();
                     }
                 }, 100);
             };
 			return {
-				backTitle: "委托共识",
+				backTitle: this.$t('message.consensusManagement'),
                 agentAddress:this.$route.params.agentAddress,
                 agentId:this.$route.params.agentId,
                 agentAddressInfo:[],
@@ -98,7 +98,7 @@
             this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'));
         },
 		methods: {
-            //根据agentAddress获取共识节点列表信息
+            //根据agentAddress获取共识节点信息
             getAgentAddressInfo(url) {
                 this.$fetch(url)
                     .then((response) => {
@@ -113,6 +113,7 @@
                             } else {
                                 response.data.creditRatio = "50%";
                             }
+                            response.data.status = this.switchStatus(response.data.status);
                             response.data.memberCounts = response.data.memberCount +"/1000";
                             response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
                             response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
@@ -121,12 +122,26 @@
                         }
                     });
             },
+            //查询共识状态
+            switchStatus(status) {
+                switch (status) {
+                    case 0:
+                        return this.$t("message.c13");
+                        break;
+                    case 1:
+                        return this.$t("message.c14");
+                        break;
+                    case 2:
+                        return this.$t("message.c15");
+                        break;
+                }
+            },
             //根据账户地址获取账户余额
             getBalanceAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.placeholder = "（可用余额："+response.data.usable * 0.000000001+"NULS）" ;
+                            this.placeholder = "（"+ this.$t('message.currentBalance')+response.data.usable * 0.000000001+"NULS）" ;
                             this.usable = response.data.usable * 0.000000001;
                         }
                     });

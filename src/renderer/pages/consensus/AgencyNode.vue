@@ -1,20 +1,20 @@
 <template>
     <div class="agency-node">
         <Back :backTitle="backTitle"></Back>
-        <h2>共识代理节点</h2>
+        <h2>{{$t('message.c43')}}</h2>
         <div class="agency-node-top">
             <div class="search-div fl">
-                <el-input placeholder="请输入别名或地址" v-model="keyword">
+                <el-input :placeholder="this.$t('message.c44')" v-model="keyword">
                     <template slot="append">
-                        <el-button slot="append" @click="searchConsensus">搜索</el-button>
+                        <el-button slot="append" @click="searchConsensus">{{$t('message.c45')}}</el-button>
                     </template>
                 </el-input>
             </div>
             <div class="select-div fl">
-                <el-select v-model="selectKeyword" slot="prepend" placeholder="请选择排序方式" @change="sortConsensus">
-                    <el-option label="佣金比例" value="commissionRate"></el-option>
-                    <el-option label="保证金" value="totalDeposit"></el-option>
-                    <el-option label="信用系数" value="creditRatio"></el-option>
+                <el-select v-model="selectKeyword" slot="prepend" :placeholder="$t('message.c46')" @change="sortConsensus">
+                    <el-option :label="$t('message.c17')" value="commissionRate"></el-option>
+                    <el-option :label="$t('message.c25')" value="totalDeposit"></el-option>
+                    <el-option :label="$t('message.c18')" value="creditRatio"></el-option>
                 </el-select>
             </div>
         </div>
@@ -26,18 +26,16 @@
                 </p>
                 <h3>{{item.agentName}}</h3>
                 <ul>
-                    <li class="overflow"><label>节点来源：</label>{{ item.agentAddress }}</li>
-                    <li><label>佣金比例：</label>{{ item.commissionRate }}%</li>
-                    <li><label>保证金：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
+                    <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddress }}</li>
+                    <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
+                    <li><label>{{$t('message.c25')}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                     <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
-                        <label class="fl cursor-p">信用值:</label>
-                       <!-- <ProgressBar colorData="#f64b3e" :widthData="item.creditRatio"></ProgressBar>-->
-                        <ProgressBar colorData="#f64b3e" widthData="50%"></ProgressBar>
+                        <label class="fl cursor-p">{{$t('message.c18')}}:</label>
+                        <ProgressBar colorData="#f64b3e" :widthData="item.creditRatio"></ProgressBar>
                     </li>
                     <li class="cb">
-                        <label class="fl">剩余可委托：</label>
-                        <!--<ProgressBar colorData="#58a5c9" :widthData="item.totalDeposit"></ProgressBar>-->
-                        <ProgressBar colorData="#58a5c9" widthData="85%"></ProgressBar>
+                        <label class="fl">{{$t('message.c47')}}：</label>
+                        <ProgressBar colorData="#58a5c9" :widthData="item.totalDeposit"></ProgressBar>
                     </li>
                 </ul>
                 <div class="credit-valuesDiv" v-show="creditValuesShow0">
@@ -66,7 +64,7 @@
     export default {
         data() {
             return {
-                backTitle: "共识首页",
+                backTitle:this.$t('message.consensusManagement'),
                 keyword: '',
                 selectKeyword: '',
                 creditValuesShow0: false,
@@ -90,9 +88,10 @@
             getAllConsensus(url,params) {
                 this.$fetch(url,params)
                     .then((response) => {
+                        console.log(response);
                         if (response.success) {
                             for (var i = 0; i < response.data.list.length; i++) {
-                                //response.data.list[i].agentAddress = response.data.list[i].agentAddress.substr(0, 4) + "..." + response.data.list[i].agentAddress.substr(-4);
+                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%';
                                 response.data.list[i].totalDeposit = ((response.data.list[i].totalDeposit / 50000000000000).toFixed()).toString() + '%';
                             }
@@ -105,6 +104,20 @@
             allConsensusSize(events) {
                 this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events,"pageSize": "6"});
             },
+            //查询共识状态
+            switchStatus(status) {
+                switch (status) {
+                    case 0:
+                        return this.$t("message.c13");
+                        break;
+                    case 1:
+                        return this.$t("message.c14");
+                        break;
+                    case 2:
+                        return this.$t("message.c15");
+                        break;
+                }
+            },
             //搜索功能
             searchConsensus(){
                 if(this.keyword !=''){
@@ -112,7 +125,7 @@
                     this.getAllConsensus("/consensus/agent/list/",params);
                 }else {
                     this.$message({
-                        message: '请输入搜索关键字！',
+                        message: this.$t('message.c63'),
                         type: 'warning'
                     });
                 }

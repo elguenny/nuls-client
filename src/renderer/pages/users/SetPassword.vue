@@ -11,7 +11,7 @@
             <el-form-item :label="$t('message.passWordHint')">
                 <el-input v-model.number="passForm.passHelp"></el-input>
             </el-form-item>
-            <div class="set-pass-title">请认真保存当前钱包密码，若钱包密码丢失，很可能导致您的资产丢失！</div>
+            <div class="set-pass-title">{{$t('message.passWordInfo')}}</div>
             <el-form-item>
                 <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit">{{$t('message.passWordAffirm')}}</el-button>
                 <el-button type="text" class="set-pass-reset" @click="resetForm('setPass')">
@@ -28,9 +28,9 @@
             var validatePass = (rule, value, callback) => {
                 var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/;
                 if (value === '') {
-                    callback(new Error('请输入密码'));
+                    callback(new Error(this.$t('message.walletPassWord')));
                 } else if (!patrn.exec(value)) {
-                    callback(new Error("钱包密码(8-20位字符,需包含大、小写字母和数字)"));
+                    callback(new Error(this.$t('message.walletPassWord')));
                 } else {
                     if (this.passForm.checkPass !== '') {
                         this.$refs.passForm.validateField('checkPass');
@@ -40,9 +40,9 @@
             };
             var validatePass2 = (rule, value, callback) => {
                 if (value === '') {
-                    callback(new Error('请再次输入密码'));
+                    callback(new Error(this.$t('message.affirmWalletPassWordEmpty')));
                 } else if (value !== this.passForm.pass) {
-                    callback(new Error('两次输入密码不一致!'));
+                    callback(new Error(this.$t('message.passWordAtypism')));
                 } else {
                     callback();
                 }
@@ -82,7 +82,7 @@
                         })
                     } else {
                         this.$message({
-                            type: 'success', message: "对不起！" + response.msg
+                            type: 'success', message:this.$t('message.passWordFailed') + response.msg
                         });
                         return false;
                     }

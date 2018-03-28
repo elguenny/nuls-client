@@ -122,13 +122,13 @@
                 if (url === "application") {
                     this.isActive = 3;
                     this.$message({
-                        type: 'info', message: "我们的工程师正专注研发，更多出色功能敬请期待！",duration:'800'
+                        type: 'info', message: this.$t('message.c65'),duration:'800'
                     });
                 }
                 if (url === "more") {
                     this.isActive = 4;
                     this.$message({
-                        type: 'info', message: "我们的工程师正专注研发，更多出色功能敬请期待！",duration:'800'
+                        type: 'info', message: this.$t('message.c65'),duration:'800'
                     });
                 }
             },

@@ -92,11 +92,11 @@ const router = new VueRouter({
 		},
 		{
 			path: '/wallet/users/userInfo',
-			name: '账户信息',
+			name: '/userInfo',
 			component: resolve => require(['../../renderer/pages/users/UserInfo.vue'], resolve)
 		},
 		{
-			path: '/wallet/users/editAliasing :address/:alias',
+			path: '/wallet/users/editAliasing :address',
 			name: '/editAliasing',
 			component: resolve => require(['../../renderer/pages/users/EditAliasing.vue'], resolve)
 		},

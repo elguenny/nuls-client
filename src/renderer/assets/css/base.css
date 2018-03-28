@@ -206,10 +206,9 @@ a:focus {
 }
 
 /**placeholder**/
-input::-webkit-input-placeholder {
-    color: #39404b;
-    font-size: 11px;
-    text-align: left;
+::-webkit-input-placeholder {
+    color:#8a929b;
 }
+
 
 

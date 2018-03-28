@@ -5,7 +5,7 @@
             <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
         </div>
         <div class="consensus-index-title">
-            <label>{{$t("message.c1")}}：</label>{{this.allTotalDeposit*0.00000001}} NULS,<label>{{$t("message.c2")}}：</label>{{this.allAgentCount}}
+            <label>{{$t("message.c1")}}{{$t("message.c1_1")}}：</label>{{this.allTotalDeposit*0.00000001}} NULS,<label>{{$t("message.c2")}}：</label>{{this.allAgentCount}}
         </div>
         <div class="consensus-center">
             <ul>
@@ -42,7 +42,7 @@
                             <p class="subscript" :class="item.statuss ==1  ? 'stay' : ''">
                                 {{item.status}}
                             </p>
-                            <h3>{{item.agentName}}</h3>
+                            <h3 class="overflow">{{item.agentName}}</h3>
                             <ul>
                                 <li class="overflow"><label>{{$t("message.c16")}}：</label>{{ item.agentAddress }}</li>
                                 <li><label>{{$t("message.c17")}}：</label>{{ item.commissionRate }}%</li>
@@ -169,7 +169,7 @@
         mounted() {
             let _this = this;
             this.getConsensus("/consensus");
-            console.log(localStorage.getItem('newAccountAddress'));
+
             this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
             this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
             this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
@@ -260,7 +260,7 @@
                                 }
                                 response.data.list[i].statuss = response.data.list[i].status;
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
-                                response.data.list[i].memberCount = (response.data.list[i].memberCount/1000).toFixed() + '%';
+                                response.data.list[i].memberCount = response.data.list[i].memberCount/10+ '%';
                                 response.data.list[i].totalDeposit = response.data.list[i].totalDeposit / 50000000000000 + '%';
                             }
                             this.totalAll = response.data.total;

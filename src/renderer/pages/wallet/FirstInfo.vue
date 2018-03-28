@@ -19,17 +19,20 @@
 <script>
     import moment from 'moment';
     import Back from '@/components/BackBar.vue';
+    import Password from '@/components/PasswordBar.vue';
 
     export default {
         data() {
             return {
                 backTitle: this.$t('message.accountManagement'),
+                passwordVisible:false,
                 backOk: localStorage.getItem('toUserInfo') === "1" ? true : false,
                 backOks: localStorage.getItem('toUserInfo') === "1" ? false : true,
             }
         },
         components: {
             Back,
+            Password,
         },
         methods: {
             /** newAccount

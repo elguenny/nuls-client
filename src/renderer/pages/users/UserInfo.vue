@@ -5,9 +5,9 @@
             <h2>{{$t('message.userInfoTitle')}}</h2>
             <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"></el-button>
             <el-table :data="userData">
-                <el-table-column prop="address" :label="$t('message.tabName')" min-width="50" align='center'>
+                <el-table-column prop="address" :label="$t('message.tabName')" min-width="438" align='center'>
                 </el-table-column>
-                <el-table-column :label="$t('message.tabAlias')" min-width="25" class="user-aliasing">
+                <el-table-column :label="$t('message.tabAlias')" width="100" class="user-aliasing">
                     <template slot-scope="scope">
                         <span>{{ scope.row.alias != null  ? scope.row.alias : "-" }}</span>
                         <i class="el-icon-edit cursor-p"
@@ -15,7 +15,7 @@
                            @click="editAliasing(scope.row.address,scope.row.alias)" ></i>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.operation')" min-width="25" align='center'>
+                <el-table-column :label="$t('message.operation')" width="150" align='center'>
                     <template slot-scope="scope">
                         <el-button size="mini" type="text" @click="outUser(scope.row.address)">{{$t('message.tabRemove')}}</el-button>
                         <el-button size="mini" type="text" @click="backupUser(scope.row.address)">{{$t('message.tabBackups')}}</el-button>
@@ -94,14 +94,11 @@
                 })
             },
             //修改别名
-            editAliasing(accountAddress, accountAlias) {
-                this.$message({
-                    type: 'info', message: "我们的工程师正专注研发，更多出色功能敬请期待！"
-                });
-                /*this.$router.push({
+            editAliasing(Address, accountAlias) {
+                this.$router.push({
                     name: '/editAliasing',
-                    params: {address: accountAddress, alias: accountAlias},
-                })*/
+                    params: {address: Address},
+                })
             },
             //新增账户
             toNewAccount() {

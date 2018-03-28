@@ -66,6 +66,7 @@
             var param = '{"address":"' + address + '","password":"' + password + '"}';
             this.$post('/account/prikey', param)
                 .then((response) => {
+                    console.log(response);
                     this.keyInfo = response.data;
                 });
         },
@@ -167,11 +168,11 @@
                         var dlLink = document.createElement('a');
                         dlLink.download = fileName;
                         dlLink.href = canvas.toDataURL("image/png");
-                        var fs = require('fs');
-                        fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
-                        var path = require('path');
+                        //var fs = require('fs');
+                        //fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
+                        //var path = require('path');
                         var _path = path.join(__dirname, '../../../../code.png');
-                        /*var _path = "D:/work/nuls-client/code.png";*/
+                        //var _path = "D:/work/nuls-client/code.png";
                         ipcRenderer.send('download', _path + "+" + res[0]);
                         dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
                         document.body.appendChild(dlLink);
@@ -260,19 +261,20 @@
 </script>
 
 <style lang="less">
+    @import url("../../assets/css/style.less");
     .new-account {
         width: 90%;
         height: 100%;
-        margin: auto;
-        margin-top: 4%;
+        margin:4% auto 0px;
         font-size: 14px;
         line-height: 1.6rem;
         .back {
             margin-left: 0px;
         }
         .new-account-top {
-            width: 77%;
-            margin: auto;
+            width: 90%;
+            height: 120px;
+            margin: 25px auto;
             text-align: left;
             h1 {
                 padding: 1.2rem 0;
@@ -295,9 +297,19 @@
                         border: none;
                     }
                 }
-                i {
-                    font-size: 1.5rem;
-                    margin-left: 1rem;
+                .icon{
+                    width: 30px;
+                    height: 20px;
+                    display: block;
+                    float: left;
+                    background-size: @bg-size;
+                    background: @bg-image
+                }
+                .icon-eye{
+                    background-position: -159px -46px;
+                }
+                .icon-eye-blocked{
+                    background-position: -226px -77px;
                 }
                 .modal-overlay {
                     position: absolute;

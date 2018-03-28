@@ -1,15 +1,14 @@
 <template>
-    <div id="password" class="password">
-        <!--<el-button type="text" @click="dialogFormVisible = true">打开密码输入框</el-button>-->
-        <el-dialog title="请输入钱包密码" :visible.sync="dialogFormVisible" center>
+    <div class="password">
+        <el-dialog title="请输入钱包密码" :visible.sync="passwordVisible" center>
             <el-form :model="form">
                 <el-form-item :label-width="formLabelWidth">
                     <el-input type="password" v-model="form.passwords" auto-complete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">确认提交</el-button>
+                <el-button @click="passwordVisible = false">取 消</el-button>
+                <el-button type="primary" @click="passwordVisible = false">确认提交</el-button>
             </div>
         </el-dialog>
     </div>
@@ -17,9 +16,10 @@
 
 <script>
     export default {
+        props: ['passwordVisible'],
         data() {
             return {
-                dialogFormVisible: true,
+                //passwordVisible: false,
                 form: {
                     passwords: '',
                     region: '',

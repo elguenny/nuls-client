@@ -43,35 +43,35 @@
         data() {
             var checkNodeNo = (rule, value, callback) => {
                 if (!value) {
-                    callback(new Error('请输入保证金额！'));
+                    callback(new Error(this.$t('message.c31')));
                 }
                 var re = /^\d+(?=\.{0,1}\d+$|$)/;
                 if (!re.exec(value)) {
-                    callback(new Error('请输入正确的保证金额为数字值！'));
+                    callback(new Error(this.$t('message.c32')));
                 }
                 if (value > this.usable - 0.01) {
-                    callback(new Error('保证金额不能大于可用余额！'));
+                    callback(new Error(this.$t('message.c33')));
                 } else if (value < 20000) {
-                    callback(new Error('保证金额必须大于20000!'));
+                    callback(new Error(this.$t('message.c34')));
                 } else {
                     callback();
                 }
             };
             var checkCommissionRate = (rule, value, callback) => {
                 if (!value) {
-                    callback(new Error('请输入节点佣金比例！'));
+                    callback(new Error(this.$t('message.c35')));
                 }
                 var re = /^\d+(?=\.{0,1}\d+$|$)/;
                 if (!re.exec(value)) {
-                    callback(new Error('请输入正确的节点佣金比例数字值！'));
+                    callback(new Error(this.$t('message.c36')));
                 } else if (0 > value || value > 20) {
-                    callback(new Error('节点佣金比例为：0-20'));
+                    callback(new Error(this.$t('message.c37')));
                 } else {
                     callback();
                 }
             };
             return {
-                backTitle: this.$t('message.accountManagement'),
+                backTitle: this.$t('message.consensusManagement'),
                 accountAddress: [],
                 usable: "0",
                 placeholder: "",
@@ -85,11 +85,11 @@
                 },
                 newNodeRules: {
                     packingAddress: [
-                        {required: true, message: '出块地址', trigger: 'blur'}
+                        {required: true, message:this.$t('message.c38'), trigger: 'blur'}
                     ],
                     agentName: [
-                        {required: true, message: '请输入节点名称'},
-                        {max: 50, message: '请输入节点名称', trigger: 'blur'}
+                        {required: true, message: this.$t('message.c39')},
+                        {max: 50, message: this.$t('message.c41'), trigger: 'blur'}
                     ],
                     deposit: [
                         {validator: checkNodeNo, trigger: 'blur'},
@@ -98,7 +98,7 @@
                         {validator: checkCommissionRate, trigger: 'blur'}
                     ],
                     remark: [
-                        {required: true, message: '请输入节点备注', trigger: 'blur'}
+                        {required: true, message: this.$t('message.c40'), trigger: 'blur'}
                     ],
                 },
             }
@@ -128,7 +128,7 @@
                     .then((response) => {
                         if (response.success) {
                             this.usable = response.data.usable * 0.00000001;
-                            this.placeholder = "当前余额:" + response.data.usable * 0.00000001;
+                            this.placeholder = this.$t('message.currentBalance') + response.data.usable * 0.00000001;
                         }
                     });
             },
@@ -150,14 +150,15 @@
                                     console.log(response);
                                     if (response.success) {
                                         this.$message({
-                                            type: 'success', message: "恭喜您，创建成功！"
+                                            type: 'success', message: this.$t('message.passWordSuccess')
                                         });
                                         this.$router.push({
                                             name: '/consensus',
+                                            params:{"activeName":"first"},
                                         })
                                     } else {
                                         this.$message({
-                                            type: 'warning', message: "对不起，创建失败" + response.msg
+                                            type: 'warning', message: this.$t('message.passWordFailed') + response.msg
                                         });
                                     }
                                 })

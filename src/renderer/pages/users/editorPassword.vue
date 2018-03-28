@@ -1,23 +1,22 @@
 <template>
     <div class="set-password">
         <Back :backTitle="backTitle" ></Back>
-        <h2>修改密码</h2>
-
+        <h2>{{$t("message.c80")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm"  class="set-pass">
-            <el-form-item label="旧密码:" prop="oldPass">
+            <el-form-item :label="$t('message.oldPassWord')" prop="oldPass">
                 <el-input type="password" v-model="passForm.oldPass"></el-input>
             </el-form-item>
-            <el-form-item label="新密码(8-16位字符，需包含大小写字母和数字):" prop="pass">
+            <el-form-item :label="$t('message.c90')" prop="pass">
                 <el-input type="password" v-model="passForm.pass"></el-input>
             </el-form-item>
-            <el-form-item label="确认密码:" prop="checkPass">
+            <el-form-item :label="$t('message.c91')" prop="checkPass">
                 <el-input type="password" v-model="passForm.checkPass"></el-input>
             </el-form-item>
-            <el-form-item label="密码提示(可选):">
+            <el-form-item :label="$t('message.passWordHint')">
                 <el-input v-model.number="passForm.passHelp"></el-input>
             </el-form-item>
             <el-form-item class="submitForm">
-                <el-button type="primary" @click="submitForm('passForm')">提交</el-button>
+                <el-button type="primary" @click="submitForm('passForm')">{{$t('message.passWordAffirm')}}</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -29,7 +28,7 @@
         data() {
             var validateOldPass = (rule, value, callback) => {
                 if ( value !== localStorage.getItem('userPass')) {
-                    callback(new Error('请输入正确的旧密码'));
+                    callback(new Error(this.$t('message.c92')));
                 } else {
                     if (this.passForm.checkPass !== '') {
                         this.$refs.passForm.validateField('checkPass');
@@ -40,9 +39,9 @@
             var validatePass = (rule, value, callback) => {
                 var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/;
                 if (value === '') {
-                    callback(new Error('请输入密码'));
+                    callback(new Error(this.$t('message.walletPassWord')));
                 } else if (!patrn.exec(value)) {
-                    callback(new Error("密码8-20位，且为字母、数字、符号等任意2种以上组合！"));
+                    callback(new Error(this.$t('message.walletPassWord')));
                 } else {
                     if (this.passForm.checkPass !== '') {
                         this.$refs.passForm.validateField('checkPass');
@@ -52,15 +51,15 @@
             };
             var validatePass2 = (rule, value, callback) => {
                 if (value === '') {
-                    callback(new Error('请再次输入密码'));
+                    callback(new Error(this.$t('message.affirmWalletPassWordEmpty')));
                 } else if (value !== this.passForm.pass) {
-                    callback(new Error('两次输入密码不一致!'));
+                    callback(new Error(this.$t('message.passWordAtypism')));
                 } else {
                     callback();
                 }
             };
             return {
-                backTitle: '设置',
+                backTitle: this.$t('message.setManagement'),
                 passForm: {
                     oldPass:'',
                     pass: '',

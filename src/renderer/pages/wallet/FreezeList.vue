@@ -34,13 +34,15 @@
         },
         mounted() {
             let _this = this;
-            var params = {"address": this.address};
+            var params = {"address": this.address,"pageSize":10,"pageNumber":1};
             this.getLocked('tx/locked/',params);
 		},
 		methods: {
 			getLocked(url,param){
                 this.$fetch(url, param)
                     .then((response) => {
+                        console.log(param);
+                        console.log(response)
                         this.freezeData =response.data
 					})
 			}

@@ -1,51 +1,51 @@
 <template>
 	<div class="set-page">
-		<h2>系统设置</h2>
+		<h2>{{$t('message.c66')}}</h2>
 		<div class="set-page-info">
-			<el-switch v-model="value0" :width="30" active-color="#658ec7" inactive-color="#0b1422" inactive-text="开机启动："></el-switch>
+			<el-switch v-model="value0" :width="30" active-color="#658ec7" inactive-color="#0b1422" :inactive-text="$t('message.c67')"></el-switch>
 			<el-collapse>
 				<el-collapse-item>
 					<template slot="title">
-						<el-switch v-model="value1" :width="30" active-color="#658ec7" inactive-color="#0b1422" inactive-text="消息提示："></el-switch>
+						<el-switch v-model="value1" :width="30" active-color="#658ec7" inactive-color="#0b1422" :inactive-text="$t('message.c68')"></el-switch>
 					</template>
 					<ul>
 						<li>
-							<el-switch v-model="value2" :width="30" active-color="#658ec7" inactive-color="#0b1422" inactive-text="账户"></el-switch>
+							<el-switch v-model="value2" :width="30" active-color="#658ec7" inactive-color="#0b1422" :inactive-text="$t('message.c69')"></el-switch>
 						</li>
 						<li>
-							<el-switch v-model="value3" :width="30" active-color="#658ec7" inactive-color="#0b1422" inactive-text="共识"></el-switch>
+							<el-switch v-model="value3" :width="30" active-color="#658ec7" inactive-color="#0b1422" :inactive-text="$t('message.c70')"></el-switch>
 						</li>
 						<li>
-							<el-switch v-model="value4" :width="30" active-color="#658ec7" inactive-color="#0b1422" inactive-text="账本"></el-switch>
+							<el-switch v-model="value4" :width="30" active-color="#658ec7" inactive-color="#0b1422" :inactive-text="$t('message.c71')"></el-switch>
 						</li>
 						<li>
-							<el-switch v-model="value5" :width="30" active-color="#658ec7" inactive-color="#0b1422" inactive-text="网络"></el-switch>
+							<el-switch v-model="value5" :width="30" active-color="#658ec7" inactive-color="#0b1422" :inactive-text="$t('message.c72')"></el-switch>
 						</li>
 					</ul>
 				</el-collapse-item>
 			</el-collapse>
 			<div class="set-page-div">
-				<label>日志：</label>
-				<span class="cursor-p set-page-div-span" @click="toViewLog">查看日志</span>
+				<label>{{$t('message.c73')}}：</label>
+				<span class="cursor-p set-page-div-span" @click="toViewLog">{{$t('message.c74')}}</span>
 			</div>
 			<div class="set-page-div">
-				<label>语言选择：</label>
-				<el-select v-model="value" placeholder="请选择">
-					<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+				<label>{{$t('message.c75')}}：</label>
+				<el-select v-model="value" :placeholder="$t('message.c76')"  :change="selectLanguage(value)">
+					<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" change="selectLanguage('item.value')">
 					</el-option>
 				</el-select>
 			</div>
 			<div class="set-page-div">
-				<label>通讯录管理：</label>
-				<span class="cursor-p set-page-div-span" @click="toUserAddressList">查看通讯录</span>
+				<label>{{$t('message.c77')}}：</label>
+				<span class="cursor-p set-page-div-span" @click="toUserAddressList">{{$t('message.c78')}}</span>
 			</div>
 			<div class="set-page-div">
-				<label>修改钱包密码：</label>
-				<span class="cursor-p set-page-div-span" @click="toEditPassword ">修改密码</span>
+				<label>{{$t('message.c79')}}：</label>
+				<span class="cursor-p set-page-div-span" @click="toEditPassword ">{{$t('message.c80')}}</span>
 			</div>
 			<div class="set-page-div">
-				<label>当前版本：V1.0.0</label>
-				<span class="cursor-p set-page-div-span" @click="versionUpdates">更新版本</span>
+				<label>{{$t('message.c81')}}：V1.0.0</label>
+				<span class="cursor-p set-page-div-span" @click="versionUpdates">{{$t('message.c82')}}</span>
 			</div>
 		</div>
 	</div>
@@ -62,34 +62,43 @@
 				value4: true,
 				value5: false,
 				options: [{
-					value: '简体中文',
-					label: '简体中文'
+					value: 'zh',
+					label: this.$t('message.c83')
 				}, {
-					value: 'English',
-					label: 'English'
+					value: 'en',
+					label: this.$t('message.c84')
 				}],
-				value: '简体中文'
+				value: 'zh'
 			}
 		},
 		methods: {
+
+		    //查看日志
 			toViewLog(){
 				this.$router.push({
 					path: '/users/userLog'
 				})
 			},
+			//选择语言
+            selectLanguage(value){
+               this.$i18n.locale = value;
+               localStorage.setItem("language",value);
+			},
+			//通讯录管理
 			toUserAddressList(){
 				this.$router.push({
 					path: '/users/userAddressList'
 				})
 			},
+			//修改密码
 			toEditPassword(){
 			    if(localStorage.getItem('userPass') != ''){
                     this.$router.push({
                         name: '/editorPassword',
                     })
 				}else {
-                    this.$confirm('对不起，您还没设置密码请先设置密码', '提示', {
-                        confirmButtonText: '去设置密码',
+                    this.$confirm(this.$t('message.c85'),this.$t('message.c86'), {
+                        confirmButtonText:this.$t('message.c87'),
                         type: 'warning'
                     }).then(() => {
                         this.$router.push({
@@ -98,26 +107,27 @@
                     }).catch(() => {
                         this.$message({
                             type: 'info',
-                            message: '你取消了去设置密码！'
+                            message: this.$t('message.c59')
                         });
                     });
 				}
 
 			},
+			//版本更新
 			versionUpdates() {
-				this.$confirm('确定升级到钱包版本v1.0.1（核心版本v0.1.4）？', '版本更新', {
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
+				this.$confirm(this.$t('message.c88'), this.$t('message.c89'), {
+					confirmButtonText: this.$t('message.confirmButtonText'),
+					cancelButtonText: this.$t('message.cancelButtonText'),
 					type: 'warning'
 				}).then(() => {
 					this.$message({
 						type: 'success',
-						message: '恭喜您，升级成功！'
+						message: this.$t('message.passWordSuccess'),
 					});
 				}).catch(() => {
 					this.$message({
 						type: 'info',
-						message: '对不起，升级失败！'
+                        message: this.$t('message.passWordFailed'),
 					});
 				});
 			}
