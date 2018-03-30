@@ -165,8 +165,8 @@ module.exports = {
         c29:'Determine',
         //
         c30:'',
-        c31:'Please enter the guaranteed amount！',
-        c32:'Please enter the correct guaranteed amount for the digital value！',
+        c31:'Please enter the guarantee amount！',
+        c32:'Please enter the correct guarantee amount for the digital value！',
         c33:'The amount of guarantee should not be greater than the available balance！',
         c34:'The guaranteed amount must be more than 20000！',
         c35:'The guaranteed amount must exceed 20000！',
@@ -258,6 +258,6 @@ module.exports = {
         blockState: 'Block',
         local: 'Local height',
         backward: 'Behind',
-        theMain: 'Mainnet height',
+        theMain: 'Testnet height',
     }
 }
