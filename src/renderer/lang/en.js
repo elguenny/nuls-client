@@ -43,6 +43,7 @@ module.exports = {
         pledge: 'Deposit',
         income: 'Minted',
         annualYield: 'Node',
+
         applicationsNode: 'Nodes Running',
         //set password
         set: 'Set',
@@ -251,6 +252,7 @@ module.exports = {
         c105:'Please enter an alias with no more than 8 characters, which may include Chinese, English, and underline',
         c106:'Sorry, the alias length can not be more than 8 characters.',
         c107:'I\'m sorry, your balance is to low to complete this action.',
+		
         //newAccount
         c108:'Save success! Route',
         c109:'Please select the save folder',
@@ -258,7 +260,7 @@ module.exports = {
         c111:'Already backed up',
         c112:'Backup immediately',
         c114:'Confirmation of transfer',
-
+		
         //Bottom info
         purseVersion: 'Wallet version',
         coreVersion: 'Core version',
