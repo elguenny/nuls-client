@@ -86,21 +86,8 @@
         },
         mounted() {
             let _this = this;
-
-            if (sessionStorage.getItem("homeJava") == null) {
-                var child_process = require('child_process');
-                //var _path = process.execPath.substr(0,process.execPath.length-14);
-                var _path = process.execPath.substr(0, 8);
-                child_process.execFile(_path + 'node/bin/stop.bat', null, {cwd: _path + 'node/bin/'}, function (error) {
-                    if (error !== null) {
-                        console.log('exec error: ' + error);
-                    }
-                    else {
-                        console.log('成功执行指令!');
-                    }
-                });
+            if (sessionStorage.getItem("userList") == null) {
                 this.parserequest();
-
                 setTimeout(() => {
                     this.getAccountAddress("/account/balances/");
                     this.getConsensus("/consensus");
@@ -109,7 +96,7 @@
                     setTimeout(() => {
                         this.methodsMaps(this.ipObj);
                     }, 600);
-                }, 6000);
+                }, 8000);
             }else {
                 this.getAccountAddress("/account/balances/");
                 this.getConsensus("/consensus");
@@ -130,11 +117,12 @@
             //执行java文件
             parserequest() {
                 var child_process = require('child_process');
-                //var _path = process.execPath.substr(0,process.execPath.length-14);
-                var _path = process.execPath.substr(0, 8);
-                child_process.execFile(_path + 'node\\bin\\nuls.bat', null, {cwd: _path + 'node/bin/'}, function (error) {
+                var _path = process.execPath.substr(0,process.execPath.length-14);
+                //var _path = process.execPath.substr(0, 8);
+                console.log(_path);
+                child_process.execFile(_path+ 'node\\bin\\nuls.bat', null, {cwd: _path + 'node\\bin\\'}, function (error) {
                     sessionStorage.setItem("homeJava", "1");
-                    console.log(error)
+                    console.log(error);
                     if (error !== null) {
                         console.log('exec error: ' + error);
                     }
@@ -143,7 +131,6 @@
                     }
                 });
             },
-
             //根据账户地址获取总金、冻结、可用额
             getAccountAddress(url) {
                 this.$fetch(url)
@@ -198,6 +185,7 @@
                         }
                     });
             },
+
             /** jVector Maps
              * Create a world map with markers
              * @method methodsMaps

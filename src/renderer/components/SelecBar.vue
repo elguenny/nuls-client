@@ -53,18 +53,19 @@
 	.base-select {
 		position: relative;
 		top: 0px;
-		height: 1.25rem;
+		width: 25px;
+		height: 25px;
 		cursor: pointer;
 		.sub-selected-value {
 			position: absolute;
 			top: -0.35rem;
-			width: 2rem;
 			text-align: center;
 			ul {
 				position: absolute;
 				top: 2.15rem;
 				width: 3rem;
 				z-index: 9;
+				margin-left: -5px;
 				li {
 					width: auto;
 					min-width: 2rem;

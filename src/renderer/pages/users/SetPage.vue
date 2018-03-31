@@ -75,7 +75,7 @@
                     value: 'en',
                     label: this.$t('message.c84')
                 }],
-                value: 'zh'
+                value: localStorage.getItem("language") == '' ? "zh" : localStorage.getItem("language"),
             }
         },
         methods: {
@@ -90,6 +90,16 @@
             selectLanguage(value) {
                 this.$i18n.locale = value;
                 localStorage.setItem("language", value);
+                var param = '{"language":"' + value+ '"}';
+                this.$post('/lang', param)
+                    .then((response) => {
+                        console.log(response)
+                        if(response.success){
+                            console.log('success')
+                        }else {
+                            console.log('err')
+                        }
+                    });
             },
             //通讯录管理
             toUserAddressList() {

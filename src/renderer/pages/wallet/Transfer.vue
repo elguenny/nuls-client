@@ -4,7 +4,7 @@
         <div class="transfer-info">
             <h2>{{$t('message.transfer')}}</h2>
             <el-form :model="transferForm" :rules="rules" ref="transferForm">
-                <el-form-item :label="$t('message.sourceAddress')" class="out-address">
+                <el-form-item :label="$t('message.sourceAddress')+'：'" class="out-address">
                     <el-select v-model="transferForm.address" prop="selectAddress" @change="accountAddressChecked">
                         <el-option v-for="item in accountAddress" :key="item.address"
                                    :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
@@ -12,18 +12,18 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item :label="$t('message.destinationAddress')" class="join-address" prop="joinAddress">
+                <el-form-item :label="$t('message.destinationAddress')+'：'" class="join-address" prop="joinAddress">
                     <el-input type="text" v-model.trim="transferForm.joinAddress"></el-input>
                     <i class="cursor-p" @click="toUsersAddressList"></i>
                 </el-form-item>
-                <el-form-item :label="$t('message.transferAmount')" prop="joinNo" class="join-nos">
+                <el-form-item :label="$t('message.transferAmount')+'：'" prop="joinNo" class="join-nos">
                     <span class="allUsable">{{$t("message.currentBalance")}}:{{ usable }} NULS</span>
                     <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t("message.all")}}</span>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
                 </el-form-item>
-                <el-form-item :label="$t('message.remarks')" class="remark">
+                <el-form-item :label="$t('message.remarks')+'：'" class="remark">
                     <el-input type="textarea" v-model="transferForm.remark" :maxlength="80" @input="descInput"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
@@ -328,7 +328,7 @@
         }
 
         .el-form-item {
-            margin-bottom: 0px;
+            margin-bottom: 5px;
         }
         .join-address, .join-nos {
             margin-bottom: 15px;

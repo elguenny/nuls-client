@@ -2,7 +2,7 @@
     <div class="new-account">
         <Back :backTitle="backTitle" v-show="newOks"></Back>
         <div class="new-account-top">
-            <h1 v-show="newOk"> {{$t("message.newAccountTitle")}}</h1>
+            <h1 v-show="newOk" style="text-align: center"> {{$t("message.newAccountTitle")}}</h1>
             <h2>
                 {{$t("message.Address")}}：{{ this.newAccountAddress }}
             </h2>
@@ -315,7 +315,7 @@
 <style lang="less">
     @import url("../../assets/css/style.less");
     .new-account {
-        width: 90%;
+        width: 86%;
         height: 100%;
         margin:auto;
         font-size: 14px;
@@ -324,7 +324,7 @@
             margin-left: 0px;
         }
         .new-account-top {
-            width: 90%;
+            width: 86%;
             height: 110px;
             margin: 15px auto 10px;
             text-align: left;
@@ -388,7 +388,8 @@
         ul {
             width: 65%;
             height: 50%;
-            margin: auto;
+            margin:20px auto 0px;
+
             li {
                 width: 42%;
                 height: 11rem;

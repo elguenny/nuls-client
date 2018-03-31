@@ -23,7 +23,6 @@
 				connectNumber:'0',
 				netWorkInfo:[],
                 iconWifi:'no-wifi_icon',
-				setTime:3000,
                 rejectTime:0,
 			}
 		},
@@ -82,6 +81,7 @@
 					.then((response) => {
 					    console.log(response);
 					    if(response.success){
+                            sessionStorage.setItem("userList","1")
                             this.netWorkInfo = response.data;
                             let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
                             this.connectNumber= this.netWorkInfo.inCount + this.netWorkInfo.outCount;
@@ -100,34 +100,7 @@
 						}
 					}).catch((reject) => {
 					    console.log(reject);
-						if(reject ==="网络异常"){
-                            if(this.rejectTime == 0){
-                                setTimeout(() => {
-                                    this.rejectTime = this.rejectTime + 1;
-                                    this.$confirm(this.$t('message.c97'), this.$t('message.c86'), {
-                                        confirmButtonText: this.$t('message.confirmButtonText'),
-                                        cancelButtonText: this.$t('message.cancelButtonText'),
-                                        //type: 'warning'
-                                    }).then(() => {
-                                        var child_process = require('child_process');
-                                        //调用执行文件
-                                        var _path = process.execPath.substr(0,process.execPath.length-14);
-                                        //var _path = process.execPath.substr(0,8);
-                                        child_process.execFile(_path+'node/bin/stop.bat', null, {cwd:_path+'node/bin/'}, function (error) {
-                                            if (error !== null) {
-                                                console.log('exec error: ' + error);
-                                            }
-                                            else {
-                                                console.log('成功执行指令!');
-                                            }
-                                        });
-
-                                        var ipc = require('electron').ipcRenderer;
-                                        ipc.send('window-close');
-                                    });
-                                },180000);
-							}
-						}
+                    	sessionStorage.setItem("userList","0")
                 });
 			},
 			//测试清理数据

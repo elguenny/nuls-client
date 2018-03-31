@@ -76,13 +76,13 @@
         mounted() {
             let _this = this;
             this.$i18n.locale = localStorage.getItem("language") == '' ? "zh" : localStorage.getItem("language");
-            if(localStorage.getItem("language") == 'en'){
-                this.projectName ={
+            if (localStorage.getItem("language") == 'en') {
+                this.projectName = {
                     key: "en",
                     value: "static/img/Language-en.png"
                 }
-            }else {
-                this.projectName ={
+            } else {
+                this.projectName = {
                     key: "zh",
                     value: "static/img/Language-zh.png"
                 }
@@ -99,6 +99,16 @@
              **/
             selectLanguage() {
                 this.$i18n.locale = this.projectName.key;
+                var param = '{"language":"' + this.projectName.key+ '"}';
+                this.$post('/lang', param)
+                    .then((response) => {
+                        console.log(response)
+                        if(response.success){
+                           console.log('success')
+                        }else {
+                            console.log('err')
+                        }
+                    });
             },
             //菜单跳转
             to(url, index) {
@@ -110,34 +120,18 @@
                 }
                 if (url === "wallet") {
                     this.isActive = 1;
-                    /* console.log(localStorage.getItem("newAccountAddress") == '');
-                     if(localStorage.getItem("newAccountAddress") == ''){
-
-                     }*/
                     //获取账户地址列表
-                    this.$fetch("/account/list")
-                        .then((response) => {
-                            console.log(response);
-                            if (response.data.length != 0) {
-                                if (localStorage.getItem("newAccountAddress") == '') {
-                                    localStorage.setItem("newAccountAddress", response.data[0].address)
-                                }
-                                this.$router.push({
-                                    path: '/wallet'
-                                })
-                            } else {
-                                localStorage.setItem("newAccountAddress", '');
-                                this.$router.push({
-                                    name: '/setPassword',
-                                })
-                            }
-                        }).catch((reject) => {
-                        console.log("钱包跳转获取地址：" + reject);
+                    this.getUserList("/account/list");
+                    console.log(sessionStorage.getItem("userListOK"));
+                    if (sessionStorage.getItem("userListOK") === "0") {
+                        this.$router.push({
+                            name: '/setPassword',
+                        })
+                    } else {
                         this.$router.push({
                             path: '/wallet'
                         })
-                        return false;
-                    });
+                    }
                 }
                 if (url === "consensus") {
                     this.isActive = 2;
@@ -158,6 +152,25 @@
                         type: 'info', message: this.$t('message.c65'), duration: '800'
                     });
                 }
+            },
+            //获取用户列表
+            getUserList(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if (response.success) {
+                            if (response.data.length > 0) {
+                                sessionStorage.setItem("userListOK", "1");
+                            } else {
+                                sessionStorage.setItem("userListOK", "0");
+                            }
+                        } else {
+                            sessionStorage.setItem("userListOK", "0");
+                            console.log("获取账户列表失败！");
+                        }
+                    }).catch((reject) => {
+                    console.log(reject);
+                    sessionStorage.setItem("userList", "0");
+                });
             },
             /**
              * method statement
@@ -202,9 +215,9 @@
             toClose() {
                 var child_process = require('child_process');
                 //调用执行文件
-                //var _path = process.execPath.substr(0,process.execPath.length-14);
-                var _path = process.execPath.substr(0,8);
-                child_process.execFile(_path+'node/bin/stop.bat', null, {cwd:_path+'node/bin/'}, function (error) {
+                var _path = process.execPath.substr(0,process.execPath.length-14);
+                //var _path = process.execPath.substr(0, 8);
+                child_process.execFile(_path + 'node\\bin\\stop.bat', null, {cwd: _path + 'node\\bin\\'}, function (error) {
                     if (error !== null) {
                         console.log('exec error: ' + error);
                     }
@@ -212,10 +225,10 @@
                         console.log('成功执行指令!');
                     }
                 });
-
-                var ipc = require('electron').ipcRenderer;
-                ipc.send('window-close');
-
+                setTimeout(() => {
+                    var ipc = require('electron').ipcRenderer;
+                    ipc.send('window-close');
+                }, 600);
             }
         }
     }
@@ -330,7 +343,7 @@
                 }
             }
             .minusClose {
-                width: 80px;
+                width: 75px;
                 height: 40px;
                 float: right;
                 i {

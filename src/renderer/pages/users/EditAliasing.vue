@@ -5,11 +5,11 @@
             <h2>{{$t('message.c100')}}</h2>
 
             <el-form :model="aliasForm" :rules="aliasRules" ref="aliasForm">
-                <div class="div-text">
+                <div class="div-text" style="text-align: center">
                     <label>{{$t('message.c102')}}:</label>{{this.address}}
                 </div>
                 <div class="div-text">{{$t('message.c103')}}</div>
-                <el-form-item :label="$t('message.c104')" class="label-aliasing" prop="alias">
+                <el-form-item :label="$t('message.c104')+'：'" class="label-aliasing" prop="alias" style="margin-top: 30px">
                     <el-input v-model="aliasForm.alias" class="bt-aliasing" :placeholder="$t('message.c105')"></el-input>
                 </el-form-item>
                 <div class="div-text">
@@ -84,8 +84,8 @@
                         this.$prompt(this.$t('message.passWordTitle'), '', {
                             confirmButtonText: this.$t('message.confirmButtonText'),
                             cancelButtonText: this.$t('message.cancelButtonText'),
-                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                          /*  inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
                             inputType: 'password'
                         }).then(({value}) => {
                             var param = {"alias": this.aliasForm.alias, "address": this.address, "password": value};
@@ -152,6 +152,9 @@
             /**placeholder**/
             ::-webkit-input-placeholder {
                 color: #8a929b;
+            }
+            .el-form-item__label{
+                color: white;
             }
         }
     }

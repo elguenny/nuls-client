@@ -57,6 +57,7 @@
 		}
 		.el-input--suffix .el-input__inner {
 			width: 415px;
+			color: white;
 		}
 		.el-select .el-input .el-select__caret {
 			font-size: 14px;
