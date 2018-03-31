@@ -13,7 +13,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('message.destinationAddress')" class="join-address" prop="joinAddress">
-                    <el-input type="text" v-model="transferForm.joinAddress"></el-input>
+                    <el-input type="text" v-model.trim="transferForm.joinAddress"></el-input>
                     <i class="cursor-p" @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')" prop="joinNo" class="join-nos">
@@ -24,10 +24,10 @@
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
                 </el-form-item>
                 <el-form-item :label="$t('message.remarks')" class="remark">
-                    <el-input type="textarea" v-model="transferForm.remark"></el-input>
+                    <el-input type="textarea" v-model="transferForm.remark" :maxlength="80" @input="descInput"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
-                    <el-button type="primary" @click="transferSubmit('transferForm')">{{$t("message.confirmButtonText")}}</el-button>
+                    <el-button type="primary" @click="transferSubmit('transferForm')">{{$t("message.c114")}}</el-button>
                 </el-form-item>
             </el-form>
             <el-dialog :visible.sync="dialogTableVisible">
@@ -103,8 +103,9 @@
             };
             return {
                 backTitle: this.$t('message.walletManagement'),
-                usable: '0',
+                usable: 0,
                 accountAddress: [],
+                remnant:0,
                 transferForm: {
                     address: localStorage.getItem('newAccountAddress'),
                     outName: '',
@@ -164,13 +165,14 @@
             },
             //选择全部金额
             allUsable(no) {
-                console.log(no);
                 if(no == 0){
                     this.$message({
                         message: this.$t('message.creditLow'),
                         type: 'warning '
                     });
                 }else {
+                    console.log(no);
+                    console.log(no-0.01);
                     this.transferForm.joinNo = no-0.01;
                 }
             },
@@ -215,6 +217,11 @@
                 this.transferForm.joinAddress = row.userAddress;
                 this.dialogTableVisible = false;
             },
+            //限制备注长度
+            descInput() {
+                var txtVal = this.transferForm.remark.length;
+                this.remnant = txtVal;
+            },
             //确认转账
             transferSubmit(fromName) {
                 this.$refs[fromName].validate((valid) => {
@@ -222,8 +229,8 @@
                         this.$prompt(this.$t('message.passWordTitle'), '', {
                             confirmButtonText: this.$t('message.confirmButtonText'),
                             cancelButtonText: this.$t('message.cancelButtonText'),
-                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                            /*inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
                             inputType: 'password'
                         }).then(({value}) => {
                             var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
@@ -236,7 +243,8 @@
                                         });
                                         this.transferForm.joinAddress = '';
                                         this.transferForm.joinNo = '';
-                                        this.transferForm.remark = ''
+                                        this.transferForm.remark = '';
+                                        this.getBalanceAddress('/account/balance/' + this.transferForm.address);
                                     } else {
                                         this.$message({
                                             message: this.$t('message.passWordFailed') + response.msg,
@@ -360,6 +368,7 @@
         input[type="text"], input[type="password"], select {
             border: 1px solid #24426c;
             font-size: 14px;
+            padding: 0px 2px;
         }
     }
 </style>

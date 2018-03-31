@@ -3,20 +3,20 @@
         <h2>{{$t("message.setPassWord")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
             <el-form-item :label="$t('message.walletPassWord')" prop="pass">
-                <el-input type="password" v-model="passForm.pass"></el-input>
+                <el-input type="password" v-model="passForm.pass" :maxlength=20></el-input>
             </el-form-item>
             <el-form-item :label="$t('message.affirmWalletPassWord')" prop="checkPass">
-                <el-input type="password" v-model="passForm.checkPass"></el-input>
+                <el-input type="password" v-model="passForm.checkPass" :maxlength=20></el-input>
             </el-form-item>
-            <el-form-item :label="$t('message.passWordHint')">
+            <!--<el-form-item :label="$t('message.passWordHint')">
                 <el-input v-model.number="passForm.passHelp"></el-input>
-            </el-form-item>
+            </el-form-item>-->
             <div class="set-pass-title">{{$t('message.passWordInfo')}}</div>
             <el-form-item>
                 <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit">{{$t('message.passWordAffirm')}}</el-button>
-                <el-button type="text" class="set-pass-reset" @click="resetForm('setPass')">
+               <!-- <el-button type="text" class="set-pass-reset" @click="resetForm('setPass')">
                    {{$t('message.passWordCancel')}}
-                </el-button>
+                </el-button>-->
             </el-form-item>
         </el-form>
     </div>
@@ -26,7 +26,7 @@
     export default {
         data() {
             var validatePass = (rule, value, callback) => {
-                var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/;
+                var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
                 if (value === '') {
                     callback(new Error(this.$t('message.walletPassWord')));
                 } else if (!patrn.exec(value)) {
@@ -51,7 +51,7 @@
                 passForm: {
                     pass: '',
                     checkPass: '',
-                    passHelp: ''
+                    //passHelp: ''
                 },
                 rulesPass: {
                     pass: [
@@ -75,7 +75,7 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         localStorage.setItem('userPass', this.passForm.pass);
-                        localStorage.setItem('passWordHint', this.passForm.passHelp);
+                        //localStorage.setItem('passWordHint', this.passForm.passHelp);
                         localStorage.setItem('fastUser', '1');
                         this.$router.push({
                             path: '/firstInto/firstInfo'
@@ -89,14 +89,14 @@
                 });
             },
             //不设置密码
-            resetForm() {
+            /*resetForm() {
                 localStorage.setItem('userPass', '');
-                localStorage.setItem('passWordHint', '');
+                //localStorage.setItem('passWordHint', '');
                 localStorage.setItem('fastUser', '1');
                 this.$router.push({
                     path: '/firstInto/firstInfo'
                 })
-            }
+            }*/
         }
     }
 </script>

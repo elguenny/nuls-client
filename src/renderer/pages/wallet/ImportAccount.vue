@@ -6,9 +6,9 @@
 			<li @click="importKey">
 				<span>{{$t("message.key")}}</span>
 			</li>
-			<li @click="importCode">
+			<!--<li @click="importCode">
 				<span>{{$t("message.code")}}</span>
-			</li>
+			</li>-->
 			<!--<li @click="importNuls">
 				<span>.NULS格式导入</span>
 			</li>-->
@@ -33,11 +33,11 @@
 					path: '/firstInto/firstInfo/importKey'
 				})
 			},
-			importCode() {
+			/*importCode() {
 				this.$router.push({
 					path: '/firstInto/firstInfo/importCode'
 				})
-			},
+			},*/
 			/*importNuls() {
 				this.$router.push({
 					path: '/firstInto/firstInfo/importNuls'
@@ -69,7 +69,7 @@
 				height: 11rem;
 				float: left;
 				margin-right: 50px;
-				margin-left: 70px;
+				margin-left: 225px;
 				border: 1px solid #1e314d;
 				background-color: #181f2f;
 				text-align: center;

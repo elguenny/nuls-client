@@ -2,9 +2,9 @@
     <div class="new-account">
         <Back :backTitle="backTitle" v-show="newOks"></Back>
         <div class="new-account-top">
-            <h1 v-show="newOk">{{$t("message.newAccountTitle")}}</h1>
+            <h1 v-show="newOk"> {{$t("message.newAccountTitle")}}</h1>
             <h2>
-                {{$t("message.newAccountAddress")}}:{{ newAccountAddress }}
+                {{$t("message.Address")}}：{{ this.newAccountAddress }}
             </h2>
             <div class="new-account-key">
                 <h3 class="fl">
@@ -33,6 +33,17 @@
                 {{$t("message.newAccountReset")}}
             </el-button>
         </div>
+        <el-dialog title="" :visible.sync="passwordVisible" top="20vh">
+            <el-form ref="passwordForm" :model="passwordForm" :rules="passwordRules">
+                <el-form-item :label="$t('message.passWordTitle')" prop="password">
+                    <el-input v-model="passwordForm.password" type="password"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="passwordVisible = false">{{$t('message.cancelButtonText')}}</el-button>
+                <el-button type="primary" @click="dialogSubmit('passwordForm')">{{$t('message.confirmButtonText')}}</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -52,7 +63,16 @@
                 codeShowOk: false,
                 newOk: this.$route.params.newOk,
                 newOks: this.$route.params.newOk ? false : true,
-                //address:this.$route.params.address,
+
+                passwordVisible: false,
+                passwordForm: {
+                    password: '',
+                },
+                passwordRules: {
+                    password: [
+                        {required: true, message: this.$t('message.passWordTitle'), trigger: 'blur'}
+                    ]
+                },
             }
         },
         components: {
@@ -61,16 +81,47 @@
         },
         mounted() {
             let _this = this;
-            var address = this.newAccountAddress;
-            var password = localStorage.getItem('userPass');
-            var param = '{"address":"' + address + '","password":"' + password + '"}';
-            this.$post('/account/prikey', param)
-                .then((response) => {
-                    console.log(response);
-                    this.keyInfo = response.data;
-                });
+
+            console.log(this.$route.params.address);
+            if(this.newAccountAddress != ""){
+                var address = this.newAccountAddress;
+                var password = localStorage.getItem('userPass');
+                var param = '{"address":"' + address + '","password":"' + password + '"}';
+                this.$post('/account/prikey', param)
+                    .then((response) => {
+                        console.log(response)
+                        if(response.success){
+                            this.keyInfo = response.data;
+                        }else {
+                            this.passwordVisible = true
+                        }
+                    });
+            }
         },
         methods: {
+            dialogSubmit(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        var param = '{"address":"' + this.newAccountAddress + '","password":"' + this.passwordForm.password + '"}';
+                        this.$post('/account/prikey', param)
+                            .then((response) => {
+                                if(response.success){
+                                    localStorage.setItem("fastUser","1")
+                                    this.keyInfo = response.data;
+                                    this.passwordVisible = false
+                                }else {
+                                    this.passwordVisible = true;
+                                    this.passwordForm.password='';
+                                    this.$message({
+                                        type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                                    });
+                                }
+                            })
+                    }
+                })
+            },
+
+            //二维码显示隐藏
             keyCode() {
                 this.$refs.codeBar.codeMaker(this.keyInfo)
                 this.codeShowOk = !this.codeShowOk;
@@ -86,9 +137,8 @@
              **/
             backupsKey() {
                 var path = require('path');
-                var _path = path.join(__dirname, '../../../../pubKey.txt');
-                /* var _path ="D:/work/nuls-client/pubKey.txt";*/
-                //console.log(_path)
+                var _path = path.join(__dirname, '../../../../'+this.newAccountAddress+'_privateKey.txt');
+                //var _path ="D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.txt";
                 var fs = require('fs');
                 fs.readFile(_path, 'utf8', function (err, data) {
                     if (err) return console.log(err);
@@ -114,13 +164,15 @@
                 }, function (res) {
                     if (res[0] != "") {
                         ipcRenderer.send('download', _path + "+" + res[0]);
-                        /*fs.unlink(_path, function (err) {
-                                 if (err) return console.log(err);
-                                 console.log('文件删除成功');
-                             });*/
-                        alert("保存成功！路径:" + res);
+                        setTimeout(() => {
+                            fs.unlink(_path, function (err) {
+                                if (err) return console.log(err);
+                                console.log('文件删除成功');
+                            });
+                        }, 6000);
+                        alert(res);
                     } else {
-                        alert("请选择保存文件夹！");
+                        alert(this.$t('message.c109'));
                     }
                 })
             },
@@ -141,7 +193,7 @@
                     background: "#ffffff",
                     foreground: "#000000"
                 });
-                this.exportCanvasAsPNG($(".qrcode").find("canvas")[0], "code.png");
+                this.exportCanvasAsPNG($(".qrcode").find("canvas")[0], this.newAccountAddress+"_privateKey.png");
             },
             /** Export Canvas As PNG
              * @method exportCanvasAsPNG
@@ -170,18 +222,18 @@
                         dlLink.href = canvas.toDataURL("image/png");
                         //var fs = require('fs');
                         //fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
-                        //var path = require('path');
-                        var _path = path.join(__dirname, '../../../../code.png');
-                        //var _path = "D:/work/nuls-client/code.png";
+                        var path = require('path');
+                        var _path = path.join(__dirname, process.execPath.substr(0,process.execPath.length-14)+this.newAccountAddress+'_privateKey.png');
+                        //var _path = "D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.png";
                         ipcRenderer.send('download', _path + "+" + res[0]);
                         dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
                         document.body.appendChild(dlLink);
                         dlLink.click();
                         document.body.removeChild(dlLink);
                         $('.qrcode').html("");
-                        alert("保存成功！路径:" + res);
+                        alert(res);
                     } else {
-                        alert("请选择保存文件夹！");
+                        alert(this.$t('message.c109'));
                     }
                 })
             },
@@ -213,9 +265,9 @@
                                  if (err) return console.log(err);
                                  console.log('文件删除成功');
                              });*/
-                        alert("保存成功！路径:" + res);
+                        alert(res);
                     } else {
-                        alert("请选择保存文件夹！");
+                        alert(this.$t('message.c109'));
                     }
                 })
             },
@@ -226,14 +278,14 @@
              * @version 1.0
              **/
             newSubmit() {
-                this.$confirm('请您备份好私钥！', '提示', {
-                    confirmButtonText: '已经备份',
-                    cancelButtonText: '马上备份',
-                    type: 'warning'
+                this.$confirm(this.$t('message.c110'), this.$t('message.c86'), {
+                    confirmButtonText:this.$t('message.c111'),
+                    cancelButtonText:this.$t('message.c112'),
+                   /* type: 'warning'*/
                 }).then(() => {
                     if(localStorage.getItem('toUserInfo') != "1"){
                         this.$router.push({
-                            path: '/wallet'
+                            name: '/wallet'
                         })
                     }else {
                         this.$router.push({
@@ -265,7 +317,7 @@
     .new-account {
         width: 90%;
         height: 100%;
-        margin:4% auto 0px;
+        margin:auto;
         font-size: 14px;
         line-height: 1.6rem;
         .back {
@@ -273,8 +325,8 @@
         }
         .new-account-top {
             width: 90%;
-            height: 120px;
-            margin: 25px auto;
+            height: 110px;
+            margin: 15px auto 10px;
             text-align: left;
             h1 {
                 padding: 1.2rem 0;
@@ -288,7 +340,7 @@
                 margin: auto;
                 text-align: left;
                 h3 {
-                    width: 70%;
+                    width: 72%;
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
@@ -337,7 +389,6 @@
             width: 65%;
             height: 50%;
             margin: auto;
-            margin-top: 2%;
             li {
                 width: 42%;
                 height: 11rem;
@@ -364,14 +415,13 @@
         }
         .new-bt {
             width: 60%;
-            height: 10rem;
             margin: auto;
             padding-top: 2%;
             button {
                 display: block;
                 width: 50%;
-                margin: auto;
-                margin-top: 5%;
+                margin:5% auto 0px;
+
             }
             .new-submit {
             }

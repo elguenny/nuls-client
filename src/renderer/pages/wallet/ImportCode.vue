@@ -21,7 +21,7 @@
 
 <script>
     import Back from '@/components/BackBar.vue';
-    import {qrcode} from '@/assets/js/qrcode.js';
+    import {qrcode} from './../../assets/js/qrcode.js';
     export default {
         data() {
             return {
@@ -36,7 +36,6 @@
         methods: {
             handleAvatarSuccess(res, file) {
                 this.imageUrl = URL.createObjectURL(file.raw);
-                console.log(file.raw.path);
                 this.imagesPash = file.raw.path;
                 this.getUrl();
             },
@@ -54,7 +53,11 @@
             },
             //识别二维码
             getUrl(){
-                console.log(this.imagesPash);
+                console.log(this.imageUrl);
+                qrcode.decode(this.imageUrl);
+                qrcode.callback = function(imgMsg){
+                    fn(imgMsg,url);
+                }
                 //console.log(this.qrcode.decode(this.imagesPash));
             },
             codeSubmit(){

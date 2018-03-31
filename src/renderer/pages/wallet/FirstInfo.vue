@@ -1,7 +1,8 @@
 <template>
     <div class="first-info">
-        <Back :backTitle="backTitle" v-show="backOk"></Back>
-        <div class="backOk" v-show="backOks"></div>
+        <div class="first-info-top">
+            <Back :backTitle="backTitle" v-show="backOk"></Back>
+        </div>
         <h2>{{$t("message.firstInfoTitle")}}</h2>
         <ul>
             <li @click="newAccount">
@@ -13,6 +14,7 @@
                 <label>{{$t("message.importAccountInfo")}}</label>
             </li>
         </ul>
+        <div class="backOk" v-show="backOks"></div>
     </div>
 </template>
 
@@ -25,8 +27,8 @@
         data() {
             return {
                 backTitle: this.$t('message.accountManagement'),
-                passwordVisible:false,
-                backOk: localStorage.getItem('toUserInfo') === "1" ? true : false,
+                passwordVisible: false,
+                backOk: localStorage.getItem('toUserInfo') === "1" ? false : true,
                 backOks: localStorage.getItem('toUserInfo') === "1" ? false : true,
             }
         },
@@ -42,55 +44,45 @@
              * @version 1.0
              **/
             newAccount() {
-                if (localStorage.getItem('userPass') == '') {
-                    this.$confirm('对不起，您还没设置密码请先设置密码', '提示', {
-                        confirmButtonText: '去设置密码',
-                        type: 'warning'
-                    }).then(() => {
-                        this.$router.push({
-                            name: '/setPassword',
-                        })
-                    }).catch(() => {
+                this.$prompt(this.$t('message.passWordTitle'), '', {
+                    confirmButtonText: this.$t('message.confirmButtonText'),
+                    cancelButtonText: this.$t('message.cancelButtonText'),
+                    /*inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                    inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
+                    inputType: 'password'
+                }).then(({value}) => {
+                    if(localStorage.getItem("userPass")!=value){
                         this.$message({
-                            type: 'info',
-                            message: '你取消了设置密码！'
+                            type: 'warning', message: this.$t('message.passWordCuo')
                         });
-                    });
-                } else {
-                    this.$prompt(this.$t('message.passWordTitle'), '', {
-                        confirmButtonText: this.$t('message.confirmButtonText'),
-                        cancelButtonText: this.$t('message.cancelButtonText'),
-                        inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),
-                        inputType: 'password'
-                    }).then(({value}) => {
-                        localStorage.setItem('lockTime', moment().format('h:mm:ss'));
+                    }else {
                         var param = '{"count":1,"password":"' + value + '"}';
                         this.$post('/account', param)
                             .then((response) => {
-                                console.log(response)
                                 if (response.success) {
                                     this.$message({
                                         type: 'success', message: this.$t('message.passWordSuccess')
                                     });
-                                    localStorage.setItem('newAccountAddress', response.data[0]);
+                                    localStorage.setItem('newAccountAddress', response.data);
+                                    localStorage.setItem('userPass', value);
                                     this.$router.push({
                                         name: '/newAccount',
-                                        params: {newOk: true, address: ''},
+                                        params: {newOk: true, address: ""},
                                     })
                                 } else {
                                     this.$message({
-                                        type: 'warning', message: "对不起！创建失败：" + response.msg
+                                        type: 'warning', message: this.$t('message.passWordFailed') + response.msg
                                     });
                                 }
                             });
-                    }).catch(() => {
-                        this.$message({
-                            type: 'warning',
-                            message: this.$t('message.enterCance')
-                        });
+                    }
+                }).catch(() => {
+                    this.$message({
+                        type: 'warning',
+                        message: this.$t('message.enterCance')
                     });
-                }
+                });
+
             },
             /** importAccount
              * @method importAccount
@@ -99,26 +91,9 @@
              * @version 1.0
              **/
             importAccount() {
-                if (localStorage.getItem('userPass') == '') {
-                    this.$confirm('对不起，您还没设置密码请先设置密码', '提示', {
-                        confirmButtonText: '去设置密码',
-                        type: 'warning'
-                    }).then(() => {
-                        this.$router.push({
-                            name: '/setPassword',
-                        })
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '你取消了设置密码！'
-                        });
-                    });
-                } else {
-                    this.$router.push({
-                        path: '/firstInto/firstInfo/importAccount'
-                    })
-                }
-
+                this.$router.push({
+                    path: '/firstInto/firstInfo/importAccount'
+                })
             }
         }
     }
@@ -127,20 +102,25 @@
     .first-info {
         width: 100%;
         height: 100%;
-        .backOk {
+        .first-info-top {
+            width: 100%;
             height: 50px;
+            .backOk {
+                height: 50px;
+            }
         }
+
         h2 {
             width: 270px;
             margin: auto;
-            line-height: 22px;
+            line-height: 70px;
             font-size: 16px;
             text-align: center;
         }
         ul {
             width: 60%;
             height: 50%;
-            margin: 77px auto;
+            margin: auto;
             li {
                 width: 40%;
                 height: 11rem;
@@ -162,6 +142,7 @@
                     padding: 0 1rem;
                     text-align: left;
                     color: #C1C5C9;
+                    text-align: center;
                 }
             }
             li:hover {

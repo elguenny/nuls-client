@@ -69,15 +69,16 @@ function createWindow() {
             }
         })
     });
-//窗口最小化
+    //窗口最小化
     ipc.on('window-min', function () {
         mainWindow.minimize();
-    })
-//窗口关闭
+    });
+    //窗口关闭
     ipc.on('window-close', function () {
         mainWindow.close();
-    })
-
+        process.exit();
+        app.quit();
+    });
 
     mainWindow.loadURL(winURL);
 

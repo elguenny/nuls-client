@@ -4,10 +4,25 @@
 
 <script>
 	export default {
-		props: ['backTitle'],
+        props: {
+            backTitle: {
+                type: String,
+                default: ""
+            },
+            backUrl: {
+                type: String,
+                default: "1"
+            }
+        },
 		methods: {
 			back() {
-				this.$router.go(-1);
+			    if(this.backUrl ==="1"){
+                    this.$router.go(-1);
+				}else {
+                    this.$router.push({
+                        name: this.backUrl,
+                    })
+				}
 			}
 		}
 	}

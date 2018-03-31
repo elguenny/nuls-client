@@ -60,6 +60,7 @@
         },
         mounted() {
             let _this = this;
+            console.log(this.address)
             this.getBalanceAddress('/account/balance/' +this.address);
         },
         methods: {
@@ -67,11 +68,13 @@
             getBalanceAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
+                        console.log(response)
                         if (response.success) {
                             this.usable = response.data.usable * 0.000000001;
                         }else {
                             this.usable = 0;
                         }
+                        console.log(this.usable)
                     });
             },
             //修改别名

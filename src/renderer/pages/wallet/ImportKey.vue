@@ -4,12 +4,24 @@
         <h2>{{$t("message.key")}}</h2>
         <el-form ref="keyData" :model="keyData" :rules="keyRules" label-position="top">
             <el-form-item :label="$t('message.keyLow')" prop="keyInfo">
-                <el-input type="textarea" v-model="keyData.keyInfo"></el-input>
+                <el-input type="textarea" v-model.trim="keyData.keyInfo"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="keySubmit('keyData')">{{$t('message.confirmButtonText')}}</el-button>
             </el-form-item>
         </el-form>
+
+        <el-dialog title="" :visible.sync="passwordVisible" top="35vh">
+            <el-form ref="passwordForm" :model="passwordForm" :rules="passwordRules">
+                <el-form-item :label="this.$t('message.passWordTitle')" prop="password">
+                    <el-input v-model="passwordForm.password" type="password" :maxlength=20></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="passwordVisible = false">{{$t('message.cancelButtonText')}}</el-button>
+                <el-button type="primary" @click="dialogSubmit('passwordForm')">{{$t('message.confirmButtonText')}}</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -20,6 +32,16 @@
         data() {
             return {
                 backTitle: this.$t("message.inportAccount"),
+                passwordVisible: false,
+                passwordForm: {
+                    password: '',
+                },
+                passwordRules: {
+                    password: [
+                        {required: true, message:this.$t("message.passWordTitle"), trigger: 'blur'}
+                    ]
+                },
+
                 keyData: {
                     keyInfo: ''
                 },
@@ -34,50 +56,51 @@
             Back,
         },
         methods: {
+            //弹出密码输入框
+            dialogSubmit(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        var param = '{"prikey":"' + this.keyData.keyInfo + '","password":"' + this.passwordForm.password + '"}';
+                        this.$post('/wallet/import/', param)
+                            .then((response) => {
+                                if (response.success) {
+                                    localStorage.setItem('newAccountAddress', response.data);
+                                    localStorage.setItem('userPass', this.passwordForm.password);
+                                    if (localStorage.getItem('toUserInfo') != "1") {
+                                        this.$router.push({
+                                            path: '/wallet'
+                                        })
+                                    } else {
+                                        this.$router.push({
+                                            path: '/wallet/users/userInfo'
+                                        })
+                                    }
+                                    this.$message({
+                                        type: 'success', message: this.$t('message.passWordSuccess')
+                                    });
+                                } else {
+                                    this.$message({
+                                        type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                                    });
+                                }
+                                this.passwordVisible = false;
+                            });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                })
+            },
             //提交导入明文私钥
             keySubmit(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$prompt(this.$t('message.passWordTitle'), '', {
-                            confirmButtonText: this.$t('message.confirmButtonText'),
-                            cancelButtonText: this.$t('message.cancelButtonText'),
-                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
-                            inputType: 'password'
-                        }).then(({value}) => {
-                            var param = '{"prikey":"' + this.keyData.keyInfo + '","password":"' + value + '"}';
-                            this.$post('/wallet/import/', param)
-                                .then((response) => {
-                                    console.log(response)
-                                    if (response.success) {
-                                        localStorage.setItem('newAccountAddress', '2Ck3mbLK5vh3JBKYWjeujAnY9EA6gNA');
-                                        if (localStorage.getItem('toUserInfo') != "1") {
-                                            this.$router.push({
-                                                path: '/wallet'
-                                            })
-                                        } else {
-                                            this.$router.push({
-                                                path: '/wallet/users/userInfo'
-                                            })
-                                        }
-                                        this.$message({
-                                            type: 'success', message: this.$t('message.passWordSuccess')
-                                        });
-                                        //导入成功需要返回账户地址
-                                        /*console.log(response)
-                                    localStorage.setItem('newAccountAddress', response.data[0]);*/
-
-                                    } else {
-                                        this.$message({
-                                            type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                                        });
-                                    }
-                                });
-                        })
+                        this.passwordVisible = true;
                     } else {
+                        console.log('error submit!!');
                         return false;
                     }
-                })
+                });
             }
         }
     }

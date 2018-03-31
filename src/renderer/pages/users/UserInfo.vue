@@ -1,6 +1,6 @@
 <template>
     <div class="users">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="backTitle" :backUrl="backUrl"></Back>
         <div class="freeze-list-tabs">
             <h2>{{$t('message.userInfoTitle')}}</h2>
             <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"></el-button>
@@ -12,18 +12,21 @@
                         <span>{{ scope.row.alias != null  ? scope.row.alias : "-" }}</span>
                         <i class="el-icon-edit cursor-p"
                            v-show="scope.row.alias != undefined  ? false : true"
-                           @click="editAliasing(scope.row.address,scope.row.alias)" ></i>
+                           @click="editAliasing(scope.row.address,scope.row.alias)"></i>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('message.operation')" width="150" align='center'>
                     <template slot-scope="scope">
-                        <el-button size="mini" type="text" @click="outUser(scope.row.address)">{{$t('message.tabRemove')}}</el-button>
-                        <el-button size="mini" type="text" @click="backupUser(scope.row.address)">{{$t('message.tabBackups')}}</el-button>
+                        <el-button size="mini" type="text" @click="outUser(scope.row.address)">
+                            {{$t('message.tabRemove')}}
+                        </el-button>
+                        <el-button size="mini" type="text" @click="backupUser(scope.row.address)">
+                            {{$t('message.tabBackups')}}
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
-            <!--<el-pagination background layout="prev, pager, next" :total="1000">
-            </el-pagination>-->
+            <!--<el-pagination layout="prev, pager, next" page-size=5 total=100></el-pagination>-->
         </div>
     </div>
 </template>
@@ -35,6 +38,7 @@
         data() {
             return {
                 backTitle: this.$t('message.walletManagement'),
+                backUrl:'/wallet',
                 setAsAddress: localStorage.getItem('newAccountAddress'),
                 userData: [],
             }
@@ -47,12 +51,23 @@
             this.getUserList("/account/list");
         },
         methods: {
+            back() {
+                this.$router.push({
+                    name: '/wallete',
+                })
+            },
             //获取账户列表
             getUserList(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response);
-                        this.userData = response.data;
+                       if(response.success){
+                           if(response.data.length == 0){
+                               localStorage.setItem("userPass","")
+                               localStorage.setItem("newAccountAddress","")
+                           }else {
+                               this.userData = response.data;
+                           }
+                       }
                     });
             },
             //根据账户地址移除账户
@@ -64,30 +79,25 @@
                     inputErrorMessage: this.$t('message.walletPassWordEmpty'),
                     inputType: 'password'
                 }).then(({value}) => {
-                    if (value === localStorage.getItem('userPass')) {
-                        var param = '{"address":"' + address + '","password":"' + value + '"}';
-                        this.$post('/wallet/remove/', param)
-                            .then((response) => {
-                                if(response.success){
-                                    this.$message({
-                                        type: 'success', message: this.$t('message.passWordSuccess')
-                                    });
-                                    this.getUserList("/account/list");
-                                }else {
-                                    this.$message({
-                                        type: 'success', message: this.$t('message.passWordFailed') + response.msg
-                                    });
-                                }
-                            })
-                    } else {
-                        this.$message({
-                            type: 'success', message: this.$t('message.passWordWasincorrect')
-                        });
-                    }
+                    var param = '{"address":"' + address + '","password":"' + value + '"}';
+                    this.$post('/wallet/remove/', param)
+                        .then((response) => {
+                            if (response.success) {
+                                this.$message({
+                                    type: 'success', message: this.$t('message.passWordSuccess')
+                                });
+                                this.getUserList("/account/list");
+                            } else {
+                                this.$message({
+                                    type: 'success', message: this.$t('message.passWordFailed') + response.msg
+                                });
+                            }
+                        })
                 })
             },
             //备份账户地址跳转
             backupUser(address) {
+                localStorage.setItem("fastUser","2");
                 this.$router.push({
                     name: '/newAccount',
                     params: {newOk: false, address: address},
@@ -127,7 +137,7 @@
                 float: right;
                 border: 1px solid #0b1422;
                 margin-bottom: 10px;
-                margin-right:50px ;
+                margin-right: 40px;
             }
             h2 {
                 text-align: center;

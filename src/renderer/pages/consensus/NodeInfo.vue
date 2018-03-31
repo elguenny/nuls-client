@@ -13,7 +13,7 @@
 				<label>{{$t('message.c7')}}</label><span>{{this.myNodeInfo.reward*0.00000001 }} NULS</span>
 			</li>
 			<li>
-				<label>{{$t('message.c25')}}</label><span>{{this.myNodeInfo.totalDeposit*0.00000001}}</span>
+				<label>{{$t('message.c25')}}</label><span>{{this.myNodeInfo.owndeposit*0.00000001}}</span>
 			</li>
 			<li>
 				<label>{{$t('message.c17')}}</label><span>{{this.myNodeInfo.commissionRate}} %</span>
@@ -88,8 +88,8 @@
                     this.$prompt(this.$t('message.passWordTitle'), '', {
                         confirmButtonText: this.$t('message.confirmButtonText'),
                         cancelButtonText: this.$t('message.cancelButtonText'),
-                        inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                       /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
                         inputType: 'password'
                     }).then(({value}) => {
                         var param = {"address": localStorage.getItem("newAccountAddress"), "password": value};

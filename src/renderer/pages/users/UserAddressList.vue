@@ -1,27 +1,29 @@
 <template>
     <div class="users">
         <Back :backTitle="backTitle"></Back>
-        <h2>{{$t('message.c93')}}</h2>
-        <el-button type="primary" icon="el-icon-plus" @click="toNewAccount()" class="newAccount"></el-button>
-        <el-table :data="tableData">
-            <el-table-column prop="userAddress" :label="$t('message.c69')" width="288" align='center'>
-            </el-table-column>
-            <el-table-column prop="userAlias" :label="$t('message.tabAlias')" width="100" align='center'>
-            </el-table-column>
-            <el-table-column prop="userHelp" :label="$t('message.remarks')"  width="180" align='center'>
-            </el-table-column>
-            <el-table-column :label="$t('message.operation')" width="120" align='center'>
-                <template slot-scope="scope">
-                    <el-button @click="editorRow(scope.row.userAddress,scope.row.userAlias,scope.row.userHelp)"
-                               type="text" size="small">
-                        {{$t('message.c94')}}
-                    </el-button>
-                    <el-button @click="deleteRow(scope.row.userAddress)" type="text" size="small">
-                        {{$t('message.c95')}}
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+        <div class="users-conter">
+            <h2>{{$t('message.c93')}}</h2>
+            <el-button type="primary" icon="el-icon-plus" @click="toNewAccount()" class="newAccount"></el-button>
+            <el-table :data="tableData">
+                <el-table-column prop="userAddress" :label="$t('message.c69')" width="288" align='center'>
+                </el-table-column>
+                <el-table-column prop="userAlias" :label="$t('message.tabAlias')" width="100" align='center'>
+                </el-table-column>
+                <el-table-column prop="userHelp" :label="$t('message.remarks')"  width="180" align='center'>
+                </el-table-column>
+                <el-table-column :label="$t('message.operation')" width="120" align='center'>
+                    <template slot-scope="scope">
+                        <el-button @click="editorRow(scope.row.userAddress,scope.row.userAlias,scope.row.userHelp)"
+                                   type="text" size="small">
+                            {{$t('message.c94')}}
+                        </el-button>
+                        <el-button @click="deleteRow(scope.row.userAddress)" type="text" size="small">
+                            {{$t('message.c95')}}
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
         <el-dialog :title="$t('message.c96')" :visible.sync="dialogFormVisible">
             <el-form :model="form" label-width="80px" :rules="formRules"  ref="form">
                 <el-form-item :label="$t('message.c69')">
@@ -157,25 +159,27 @@
     @import url("../../assets/css/style.less");
 
     .users {
-        width: 86%;
+        width: 100%;
         margin: auto;
-        .newAccount {
-            width: 30px;
-            line-height: 20px;
-            height: 20px;
-            background-color: #0b1422;
-            float: right;
-            border: 1px solid #0b1422;
-            margin-bottom: 10px;
+        .users-conter {
+            width: 86%;
+            margin: auto;
+            .newAccount {
+                width: 30px;
+                line-height: 20px;
+                height: 20px;
+                background-color: #0b1422;
+                float: right;
+                border: 1px solid #0b1422;
+                margin-bottom: 10px;
+            }
+            h2 {
+                font-size: 16px;
+                text-align: center;
+                line-height: 20px;
+            }
         }
-        h2 {
-            font-size: 16px;
-            text-align: center;
-            line-height: 20px;
-        }
-        .back {
-            margin-left: 50px;
-        }
+
         .el-dialog {
             background-color: #0b1422;
             .userAlias {

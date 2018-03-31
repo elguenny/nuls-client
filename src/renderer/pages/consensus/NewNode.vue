@@ -8,19 +8,19 @@
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
                 <el-form-item :label="$t('message.c23')" prop="packingAddress">
-                    <el-input v-model="newNodeForm.packingAddress"></el-input>
+                    <el-input v-model.trim="newNodeForm.packingAddress"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c24')" prop="agentName">
-                    <el-input v-model="newNodeForm.agentName"></el-input>
+                    <el-input v-model.trim="newNodeForm.agentName" :maxlength="25"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c25')" class="form-left" prop="deposit">
-                    <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder></el-input>
+                    <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder :maxlength="17"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c26')" class="form-left" prop="commissionRate">
-                    <el-input v-model.number="newNodeForm.commissionRate"></el-input>
+                    <el-input v-model.number="newNodeForm.commissionRate" :maxlength="17"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c27')" class="cb" prop="remark">
-                    <el-input v-model="newNodeForm.remark" type="textarea" :rows="2"></el-input>
+                    <el-input v-model.trim="newNodeForm.remark" type="textarea" :rows="2" :maxlength="80"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')">
 
@@ -140,8 +140,8 @@
                         this.$prompt(this.$t('message.passWordTitle'), '', {
                             confirmButtonText: this.$t('message.confirmButtonText'),
                             cancelButtonText: this.$t('message.cancelButtonText'),
-                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                           /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
                             inputType: 'password'
                         }).then(({value}) => {
                             var param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + value + '"}';

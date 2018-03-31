@@ -65,14 +65,14 @@
         data() {
             var checkNodeNo = (rule, value, callback) => {
                 if (!value) {
-                    callback(new Error('请输入委托保证金额！'));
+                    callback(new Error(this.$t('message.c52')));
                 }
                 setTimeout(() => {
                     var re = /^\d+(?=\.{0,1}\d+$|$)/;
                     if (!re.exec(value)) {
-                        callback(new Error('请输入正确的委托保证金额为数字值！'));
-                    } else if (value > this.usable - 0.01) {
-                        callback(new Error('委托保证金额不能大于可用余额！'));
+                        callback(new Error(this.$t('message.c53')));
+                    } else if (value > this.usable - 0.01 || value < 2000 ) {
+                        callback(new Error(this.$t('message.c54')));
                     } else {
                         callback();
                     }
@@ -83,7 +83,7 @@
                 address: this.$route.params.address,
                 agentId:'',
                 nodeData: [],
-                usable: '',
+                usable: 0,
                 nodeForm: {
                     nodeNo: ''
                 },
@@ -155,7 +155,7 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.usable = response.data.usable * 0.00000001;
+                            this.usable = (response.data.usable * 0.00000001).toFixed(8);
                         }
                     });
             },
@@ -177,8 +177,8 @@
                         this.$prompt(this.$t('message.passWordTitle'), '', {
                             confirmButtonText: this.$t('message.confirmButtonText'),
                             cancelButtonText: this.$t('message.cancelButtonText'),
-                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                           /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
                             inputType: 'password'
                         }).then(({value}) => {
                             var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
@@ -190,10 +190,14 @@
                                             message: this.$t('message.passWordSuccess'),
                                             type: 'success'
                                         });
-                                         this.$router.push({
+                                        this.$router.push({
+                                            name: '/consensus',
+                                            params:{"activeName":"first"}
+                                        })
+                                         /*this.$router.push({
                                              name: '/myNode',
                                              params:{"agentAddress":this.nodeData.agentAddress}
-                                         })
+                                         })*/
                                     } else {
                                         this.$message({
                                             message: this.$t('message.passWordFailed') + response.msg,

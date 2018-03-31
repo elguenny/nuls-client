@@ -24,7 +24,7 @@
             <ul>
                 <li><span>{{$t("message.tradingTime")}}</span>{{this.times}}</li>
                 <li><span>{{$t("message.miningFee1")}}</span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
-                <li class="overflow"><span>{{$t("message.autograph")}}</span>{{infoData.scriptSig}}</li>
+                <li class="overflow"><span>{{$t("message.autograph")}}</span>{{infoData.hash}}</li>
                 <li><span>{{$t("message.transactionType")}}</span>{{infoData.transferType === '1' ? $t('message.rollOut'): $t('message.rollIn')}}</li>
                 <li><span>{{$t("message.transactionState")}}</span>{{infoData.status === '1' ?  $t('message.confirmed'): $t('message.confirming')}}</li>
                 <li><span>{{$t("message.blockHeight")}}</span>{{infoData.blockHeight}}</li>

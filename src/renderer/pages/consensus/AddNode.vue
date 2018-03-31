@@ -153,8 +153,8 @@
                         this.$prompt(this.$t('message.passWordTitle'), '', {
                             confirmButtonText: this.$t('message.confirmButtonText'),
                             cancelButtonText: this.$t('message.cancelButtonText'),
-                            inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                           /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
                             inputType: 'password'
                         }).then(({value}) => {
                             var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.addNodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';

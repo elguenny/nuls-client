@@ -109,7 +109,7 @@
         data() {
             return {
                 walletHide: true,
-                keyShow: localStorage.getItem('keyShow'),
+                keyShow: false,
                 codeShowOk: false,
                 accountAddress: [],
                 accountAddressValue: localStorage.getItem('newAccountAddress'),
@@ -126,6 +126,12 @@
         },
         mounted() {
             let _this = this;
+            console.log(localStorage.getItem("keyShow") ==='true')
+            if(localStorage.getItem("keyShow") ==='true'){
+                this.keyShow=true
+            }else {
+                this.keyShow=false
+            }
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
             if(this.activeName === 'second'){
                 this.getAccountTxList('/tx/list/', {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": 1});
@@ -169,7 +175,6 @@
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
-                console.log(chenckAddress);
                 this.accountAddressValue = chenckAddress;
                 if(this.tabName === "first" ){
                     this.getAccountAssets("/account/assets/" + chenckAddress);
@@ -255,6 +260,7 @@
             },
             //金额显示隐藏
             toKeyShow() {
+                console.log(this.keyShow);
                if(this.keyShow){
                     localStorage.setItem("keyShow",false);
                     this.keyShow = false;
@@ -322,25 +328,24 @@
             }
             .wallet-i{
                 height: 30px;
-                width: 150px;
+                width: 188px;
                 float: right;
-                margin-top: -5px;
                 i{
-                    width: 35px;
-                    height: 40px;
+                    width: 30px;
+                    height: 20px;
                     display: block;
                     float: left;
                     background-size: @bg-size;
                     background: @bg-image
                 }
                 .copy_icon{
-                    background-position: -186px -36px;
+                    background-position: -190px -46px;
                 }
                 .qr_icon {
-                    background-position: -220px -36px;
+                    background-position: -227px -44px;
                 }
                 .zhanghu_icon{
-                    background-position: -260px -36px;
+                    background-position: -265px -46px;
                     float: right;
                 }
             }
@@ -397,7 +402,12 @@
         border: 1px solid #17202e;
         background-color: #17202e;
     }
-
+    .el-select-dropdown__list{
+        width: 413px;
+    }
+    .el-popper[x-placement^=bottom] .popper__arrow {
+        display: none;
+    }
     .el-table--enable-row-hover .el-table__body tr:hover > td {
         background: rgba(87, 107, 139, 0.2);
         .cell {

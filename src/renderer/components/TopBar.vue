@@ -4,21 +4,26 @@
         <ul>
             <li @click="to('home','0')" :class="[errorClass ,isActive===0 ? activeClass : '']"><i class="home_icon"></i><span>{{$t("message.home")}}</span>
             </li>
-            <li @click="to('wallet','1')" :class="[errorClass ,isActive===1 ? activeClass : '']"><i class="wallet_icon"></i> <span>{{$t("message.wallet")}}</span></li>
-            <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i class="consensus_icon"></i> <span>{{$t("message.consensus")}}</span></li>
-            <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i class="application_icon"></i> <span>{{$t("message.applications")}}</span></li>
-            <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="more_icon"></i> <span>{{$t("message.more")}}</span></li>
+            <li @click="to('wallet','1')" :class="[errorClass ,isActive===1 ? activeClass : '']"><i
+                    class="wallet_icon"></i> <span>{{$t("message.wallet")}}</span></li>
+            <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i
+                    class="consensus_icon"></i> <span>{{$t("message.consensus")}}</span></li>
+            <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i
+                    class="application_icon"></i> <span>{{$t("message.applications")}}</span></li>
+            <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="more_icon"></i>
+                <span>{{$t("message.more")}}</span></li>
         </ul>
         <div class="top-icon fl">
             <el-badge :value="12" class="news">
                 <i class="message_icon" @click="news"></i>
             </el-badge>
             <div class="set"><i class="set_icon" @click="toSetUp"></i></div>
-            <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem" :widthData="widthData"></SelecBar>
-           <div class="minusClose">
-               <i class="el-icon-minus minus-close fl" @click="toMinus"></i>
-               <i class="el-icon-close minus-close fl " @click="toClose"></i>
-           </div>
+            <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem"
+                      :widthData="widthData"></SelecBar>
+            <div class="minusClose">
+                <i class="el-icon-minus minus-close fl" @click="toMinus"></i>
+                <i class="el-icon-close minus-close fl " @click="toClose"></i>
+            </div>
         </div>
         <div class="news-div" v-show="newsOk">
             <h2>{{$t("message.news")}}</h2>
@@ -37,6 +42,7 @@
     import store from '@/vuex/store'
     import SelecBar from './SelecBar.vue'
     import {jquery} from '@/assets/js/jquery.min.js'
+
     export default {
         data() {
             return {
@@ -58,9 +64,9 @@
                 },
                 //select language initial width
                 widthData: "2rem",
-                errorClass:'',
-                activeClass:'active',
-                isActive:store.state.isActive,
+                errorClass: '',
+                activeClass: 'active',
+                isActive: store.state.isActive,
                 //isActive:0
             }
         },
@@ -69,7 +75,18 @@
         },
         mounted() {
             let _this = this;
-            this.$i18n.locale = localStorage.getItem("language") == null ? "zh" : localStorage.getItem("language");
+            this.$i18n.locale = localStorage.getItem("language") == '' ? "zh" : localStorage.getItem("language");
+            if(localStorage.getItem("language") == 'en'){
+                this.projectName ={
+                    key: "en",
+                    value: "static/img/Language-en.png"
+                }
+            }else {
+                this.projectName ={
+                    key: "zh",
+                    value: "static/img/Language-zh.png"
+                }
+            }
         },
         methods: {
             /**
@@ -85,8 +102,6 @@
             },
             //菜单跳转
             to(url, index) {
-               /* store.getters.isActive(index);
-                console.log(store.state.isActive);*/
                 if (url === "home") {
                     this.isActive = 0;
                     this.$router.push({
@@ -95,45 +110,55 @@
                 }
                 if (url === "wallet") {
                     this.isActive = 1;
+                    /* console.log(localStorage.getItem("newAccountAddress") == '');
+                     if(localStorage.getItem("newAccountAddress") == ''){
+
+                     }*/
                     //获取账户地址列表
                     this.$fetch("/account/list")
                         .then((response) => {
+                            console.log(response);
                             if (response.data.length != 0) {
-                                if(localStorage.getItem("newAccountAddress") == null){
-                                    localStorage.setItem("newAccountAddress",response.data[0].address)
+                                if (localStorage.getItem("newAccountAddress") == '') {
+                                    localStorage.setItem("newAccountAddress", response.data[0].address)
                                 }
                                 this.$router.push({
                                     path: '/wallet'
                                 })
                             } else {
+                                localStorage.setItem("newAccountAddress", '');
                                 this.$router.push({
                                     name: '/setPassword',
                                 })
                             }
-                        });
+                        }).catch((reject) => {
+                        console.log("钱包跳转获取地址：" + reject);
+                        this.$router.push({
+                            path: '/wallet'
+                        })
+                        return false;
+                    });
                 }
                 if (url === "consensus") {
                     this.isActive = 2;
                     this.$router.push({
                         name: '/consensus',
-                        params: { activeName: "first"},
+                        params: {activeName: "first"},
                     })
                 }
                 if (url === "application") {
                     this.isActive = 3;
                     this.$message({
-                        type: 'info', message: this.$t('message.c65'),duration:'800'
+                        type: 'info', message: this.$t('message.c65'), duration: '800'
                     });
                 }
                 if (url === "more") {
                     this.isActive = 4;
                     this.$message({
-                        type: 'info', message: this.$t('message.c65'),duration:'800'
+                        type: 'info', message: this.$t('message.c65'), duration: '800'
                     });
                 }
             },
-
-
             /**
              * method statement
              * @method news
@@ -175,8 +200,22 @@
              * @version 1.0
              **/
             toClose() {
+                var child_process = require('child_process');
+                //调用执行文件
+                //var _path = process.execPath.substr(0,process.execPath.length-14);
+                var _path = process.execPath.substr(0,8);
+                child_process.execFile(_path+'node/bin/stop.bat', null, {cwd:_path+'node/bin/'}, function (error) {
+                    if (error !== null) {
+                        console.log('exec error: ' + error);
+                    }
+                    else {
+                        console.log('成功执行指令!');
+                    }
+                });
+
                 var ipc = require('electron').ipcRenderer;
                 ipc.send('window-close');
+
             }
         }
     }
@@ -213,7 +252,7 @@
                 height: 42px;
                 font-size: 12px;
                 text-align: center;
-                i{
+                i {
                     width: 35px;
                     height: 40px;
                     position: absolute;
@@ -224,19 +263,19 @@
                 .home_icon {
                     background-position: -23px 0px;
                 }
-                .wallet_icon{
+                .wallet_icon {
                     background-position: -59px 0px;
                 }
-                .consensus_icon{
+                .consensus_icon {
                     background-position: -94px 0px;
                 }
-                .application_icon{
+                .application_icon {
                     background-position: -130px 0px;
                 }
-                .more_icon{
+                .more_icon {
                     background-position: -165px 0px;
                 }
-                span{
+                span {
                     margin-left: 20px;
                 }
             }
@@ -268,7 +307,7 @@
                 width: 45px;
                 height: 40px;
                 float: left;
-                .message_icon{
+                .message_icon {
                     width: 45px;
                     height: 40px;
                     position: absolute;
@@ -277,7 +316,7 @@
                     background: @bg-image -188px -1px;
                 }
             }
-            .set{
+            .set {
                 width: 40px;
                 height: 40px;
                 float: left;
@@ -290,7 +329,7 @@
                     background: @bg-image -224px -1px;
                 }
             }
-            .minusClose{
+            .minusClose {
                 width: 80px;
                 height: 40px;
                 float: right;

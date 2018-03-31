@@ -13,7 +13,7 @@
             <div class="select-div fl">
                 <el-select v-model="selectKeyword" slot="prepend" :placeholder="$t('message.c46')" @change="sortConsensus">
                     <el-option :label="$t('message.c17')" value="commissionRate"></el-option>
-                    <el-option :label="$t('message.c25')" value="totalDeposit"></el-option>
+                    <el-option :label="$t('message.c25')" value="owndeposit"></el-option>
                     <el-option :label="$t('message.c18')" value="creditRatio"></el-option>
                 </el-select>
             </div>
@@ -81,7 +81,7 @@
         },
         mounted() {
             let _this = this;
-            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6"});
+            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6","pageNumber":"1"});
         },
         methods: {
             //获取全部共识列表
@@ -97,8 +97,13 @@
                             }
                             this.totalAll = response.data.total;
                             this.allConsensus = response.data.list;
+                        }else {
+                            this.totalAll = 0;
+                            this.allConsensus = [];
                         }
-                    });
+                    }).catch((reject) => {
+                    console.log("获取全部共识列表：" + reject);
+                });
             },
             //全部共识分页
             allConsensusSize(events) {
@@ -121,19 +126,22 @@
             //搜索功能
             searchConsensus(){
                 if(this.keyword !=''){
-                    var params = {"keyword":this.keyword,"pageSize": "6"};
+                    var params = {"keyword":this.keyword,"pageSize": "6","pageNumber":"1"};
                     this.getAllConsensus("/consensus/agent/list/",params);
                 }else {
-                    this.$message({
-                        message: this.$t('message.c63'),
-                        type: 'warning'
-                    });
+                    this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6","pageNumber":"1"});
                 }
             },
             //排序共识
             sortConsensus(sort){
-                var params = {"sortType":sort,"pageSize": "6"};
-                this.getAllConsensus("/consensus/agent/list/",params);
+                if(this.keyword !=''){
+                    var params = {"keyword":this.keyword,"sortType":sort,"pageSize": "6","pageNumber":"1"};
+                    this.getAllConsensus("/consensus/agent/list/",params);
+                }else {
+                    var params = {"sortType":sort,"pageSize": "6","pageNumber":"1"};
+                    this.getAllConsensus("/consensus/agent/list/",params);
+                }
+
             },
             //显示隐藏信用值
             toggleShow(e) {
@@ -170,6 +178,9 @@
                 select {
                     background-color: #17202e;
                     border: 1px solid #658ec7;
+                }
+                .el-select-dropdown__list{
+                    width: 165px;
                 }
                 .el-input-group__append {
                     border-left: 0;

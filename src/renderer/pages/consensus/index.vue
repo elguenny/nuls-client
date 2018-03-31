@@ -135,7 +135,7 @@
             return {
                 accountAddressOk: true,
                 accountAddress: [],
-                accountAddressValue: localStorage.getItem('newAccountAddress'),
+                accountAddressValue: '',
                 activeName: this.$route.params.activeName,
                 tabName:'first',
 
@@ -170,9 +170,13 @@
             let _this = this;
             this.getConsensus("/consensus");
 
-            this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
+            if(localStorage.getItem("newAccountAddress") != ''){
+                this.accountAddressValue = localStorage.getItem("newAccountAddress");
+                this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
+                this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+            }
             this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
-            this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+
         },
         methods: {
             //获取下拉选择地址
@@ -270,7 +274,7 @@
             },
             //全部共识分页
             allConsensusSize(events) {
-                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "1"});
+                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "3"});
             },
             //查询共识状态
             switchStatus(status) {
@@ -336,10 +340,12 @@
             //切换tab
             handleClick(tab, event) {
                 this.tabName = tab.name;
-                if(tab.name !== 'first'){
-                    this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
-                }else {
-                    this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
+                if(localStorage.getItem("newAccountAddress") != ''){
+                    if(tab.name !== 'first'){
+                        this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+                    }else {
+                        this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
+                    }
                 }
             },
             //跳转加入共识列表
@@ -374,10 +380,10 @@
             ul {
                 width: 100%;
                 li {
-                    width: 35%;
+                    width: 40%;
                     height: 25px;
                     line-height: 25px;
-                    padding-left: 15%;
+                    padding-left: 10%;
                     text-align: left;
                     float: left;
                     font-size: 12px;

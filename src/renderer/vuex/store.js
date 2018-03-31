@@ -9,7 +9,7 @@ const store = new Vuex.Store({
 	state: {
 		purseVersion: '1.0.0',
 		isActive:0,
-        //codeInfo: '',
+        hoemJava: '0',
 	},
     mutations: {
         increment (state) {

@@ -37,7 +37,10 @@
         },
         mounted() {
             let _this = this;
-            this.getConsensusDeposit("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "8"});
+            if(localStorage.getItem("newAccountAddress") != ''){
+                this.getConsensusDeposit("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "8"});
+            }
+
         },
         methods: {
             //获取我的抵押总额明细列表

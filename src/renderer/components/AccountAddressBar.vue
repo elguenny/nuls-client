@@ -1,6 +1,6 @@
 <template>
 	<div class="account-address">
-		<el-select v-model="accountAddressValue" placeholder="请选择账户地址" @change="accountAddressChecked">
+		<el-select v-model="accountAddressValue" :placeholder="$t('message.addressNull')" @change="accountAddressChecked">
 			<el-option v-for="item in accountAddress" :key="item.address" :label="item.address" :value="item.address">
 			</el-option>
 		</el-select>
@@ -12,12 +12,15 @@
 		data() {
 			return {
 				accountAddress: [],
-                accountAddressValue: localStorage.getItem('newAccountAddress'),
+                accountAddressValue: '',
 			}
 		},
         mounted() {
             let _this = this;
             this.getAccountList("/account/list");
+            if(localStorage.getItem("newAccountAddress") != ''){
+				this.accountAddressValue = localStorage.getItem("newAccountAddress");
+			}
         },
         methods: {
             //获取账户地址列表
@@ -27,9 +30,12 @@
                         if(response.success){
                             this.accountAddress = response.data;
 						}else {
-                            console.log("获取账户列表失败！")
+                            console.log("获取账户列表失败！");
 						}
-                    });
+                    }).catch((reject) => {
+                        console.log(reject);
+                    	return false;
+				});
             },
             //选择账户地址
             accountAddressChecked(accountAddress) {

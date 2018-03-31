@@ -5,23 +5,27 @@
                 <div class="nav-title">{{$t("message.fund")}}</div>
                 <div class="nav-all">
                     <label class="fl">{{$t("message.fundTotal")}}：</label>
-                   <!-- <ProgressBar :colorData=this.balanceColor widthData="100%"></ProgressBar>-->
+                    <ProgressBar :colorData=this.balanceColor :widthData=this.balanceWidth></ProgressBar>
                     <span class="fr">{{(this.balanceData.balance*0.00000001).toFixed(8)}} NULS</span>
-                </div>
-                <div class="nav-usable cl">
-                    <label class="fl">{{$t("message.fundUsable")}}：</label>
-                    <!--<ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth></ProgressBar>-->
-                    <span class="fr">{{(this.balanceData.usable*0.00000001).toFixed(8)}} NULS</span>
                 </div>
                 <div class="nav-lock cl">
                     <label class="fl">{{$t("message.fundLock")}}：</label>
-                    <!--<ProgressBar :colorData=this.usableColor :widthData=this.usableWidth></ProgressBar>-->
+                    <ProgressBar :colorData=this.usableColor :widthData=this.usableWidth></ProgressBar>
                     <span class="fr">{{(this.balanceData.locked*0.00000001).toFixed(8)}} NULS</span>
+                </div>
+                <div class="nav-usable cl">
+                    <label class="fl">{{$t("message.fundUsable")}}：</label>
+                    <ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth></ProgressBar>
+                    <span class="fr">{{(this.balanceData.usable*0.00000001).toFixed(8)}} NULS</span>
                 </div>
             </div>
             <div class="home-nav-top">
                 <div class="nav-title">{{$t("message.consensus1")}}</div>
                 <ul>
+                    <li class="cl">
+                        <label class="fl">{{$t("message.annualYield")}}：</label>
+                        <span>{{this.nodeNumber}} {{$t('message.c30')}}</span>
+                    </li>
                     <li>
                         <label class="fl">{{$t("message.pledge")}}：</label>
                         <span>{{this.entrust}} NULS</span>
@@ -30,10 +34,7 @@
                         <label class="fl">{{$t("message.income")}}：</label>
                         <span>{{this.income}} NULS</span>
                     </li>
-                    <li class="cl">
-                        <label class="fl">{{$t("message.annualYield")}}：</label>
-                        <span>{{this.nodeNumber}}</span>
-                    </li>
+
                 </ul>
             </div>
             <!--<div class="home-nav-top">
@@ -41,9 +42,9 @@
         </div>
         <div class="div-title">{{$t("message.applicationsNode")}}</div>
         <div class="cl home-info">
-           <!-- <div class="home-info-consensus">-->
-               <div class="home-info-consensus" v-loading.lock="loading">
-                <div id="world-map-markers" style="height: 17rem;" >
+            <!-- <div class="home-info-consensus">-->
+            <div class="home-info-consensus" v-loading.lock="loading">
+                <div id="world-map-markers" style="height: 16rem;">
                 </div>
             </div>
         </div>
@@ -62,31 +63,21 @@
         data() {
             return {
                 loading: true,
-                balanceData:[],
+                balanceData: [],
                 balanceColor: '#658EC7',
+                balanceWidth: '0',
                 lockedColor: '#82bd39',
                 lockedWidth: '0',
                 usableColor: '#f64b3e',
                 usableWidth: '0',
 
+
                 entrust: '',
                 income: '',
                 nodeNumber: '',
-
-                /* ipData: [
-                     "186.101.196.150",
-                     "176.101.196.150",
-                     "166.101.196.150",
-                     "156.101.196.150",
-                     "146.101.196.150",
-                     "136.101.196.150",
-                     "126.101.196.150",
-                     "116.101.196.150",
-                     "106.101.196.150",
-                     "186.101.166.150"
-                 ],*/
                 ipData: [],
                 mapObj: [],
+                ipObj:[],
 
             };
         },
@@ -95,55 +86,64 @@
         },
         mounted() {
             let _this = this;
-            //this.getNetworkNodes('/network/nodes');
-            let obj = [];
-            //查询网络节点数
-            this.$fetch('/network/nodes')
-                .then((response) => {
-                    if (response.success) {
-                        //this.ipData = response.data;
-                        this.ipData = [
-                            "186.101.196.150",
-                            "176.101.196.150",
-                            "166.101.196.150",
-                            "156.101.196.150",
-                            "146.101.196.150",
-                            "136.101.196.150",
-                            "126.101.196.150",
-                            "116.101.196.150",
-                            "106.101.196.150",
-                            "186.101.166.150"
-                        ];
-                        for (var j = 0, len = this.ipData.length; j < len; j++) {
-                            axios.get('http://freegeoip.net/json/' + this.ipData[j])
-                                .then(function (response) {
-                                    var latLngs = [response.data.latitude, response.data.longitude];
-                                    var names = response.data.time_zone;
-                                    if (names == "undefined") {
-                                        names = 'anonymous'
-                                    } else {
-                                        names = names.split('/')[1]
-                                    }
-                                    obj.push({"latLng": latLngs, "name": names});
-                                })
-                                .catch(function (err) {
-                                    console.log(err);
-                                });
-                        }
+
+            if (sessionStorage.getItem("homeJava") == null) {
+                var child_process = require('child_process');
+                //var _path = process.execPath.substr(0,process.execPath.length-14);
+                var _path = process.execPath.substr(0, 8);
+                child_process.execFile(_path + 'node/bin/stop.bat', null, {cwd: _path + 'node/bin/'}, function (error) {
+                    if (error !== null) {
+                        console.log('exec error: ' + error);
+                    }
+                    else {
+                        console.log('成功执行指令!');
                     }
                 });
+                this.parserequest();
+
                 setTimeout(() => {
-                    this.methodsMaps(obj);
+                    this.getAccountAddress("/account/balances/");
+                    this.getConsensus("/consensus");
+                    //查询网络节点数
+                    this.getNetWork();
+                    setTimeout(() => {
+                        this.methodsMaps(this.ipObj);
+                    }, 600);
+                }, 6000);
+            }else {
+                this.getAccountAddress("/account/balances/");
+                this.getConsensus("/consensus");
+                //查询网络节点数
+                this.getNetWork();
+                setTimeout(() => {
+                    this.methodsMaps(this.ipObj);
                 }, 600);
+            }
 
             if (localStorage.getItem("fastUser") == null) {
                 localStorage.setItem('fastUser', '0');
-                localStorage.setItem("keyShow",false);
+                localStorage.setItem("keyShow", false);
             }
-            this.getAccountAddress("/account/balances/");
-            this.getConsensus("/consensus");
+
         },
         methods: {
+            //执行java文件
+            parserequest() {
+                var child_process = require('child_process');
+                //var _path = process.execPath.substr(0,process.execPath.length-14);
+                var _path = process.execPath.substr(0, 8);
+                child_process.execFile(_path + 'node\\bin\\nuls.bat', null, {cwd: _path + 'node/bin/'}, function (error) {
+                    sessionStorage.setItem("homeJava", "1");
+                    console.log(error)
+                    if (error !== null) {
+                        console.log('exec error: ' + error);
+                    }
+                    else {
+                        console.log('成功执行指令!');
+                    }
+                });
+            },
+
             //根据账户地址获取总金、冻结、可用额
             getAccountAddress(url) {
                 this.$fetch(url)
@@ -151,8 +151,9 @@
                         if (response.success) {
                             //console.log(response);
                             this.balanceData = response.data;
-                            this.lockedWidth = this.locked / this.balance * 100 + "%";
-                            this.usableWidth = this.usable / this.balance * 100 + "%";
+                            this.balanceWidth = this.balanceData.balance / this.balanceData.balance * 100 + "%";
+                            this.lockedWidth = this.balanceData.locked / this.balanceData.balance * 100 + "%";
+                            this.usableWidth = this.balanceData.usable / this.balanceData.balance * 100 + "%";
                         } else {
                             this.balanceColor = '';
                             this.lockedColor = '';
@@ -171,7 +172,32 @@
                         }
                     })
             },
-
+            //getNetWork
+            getNetWork(){
+                this.$fetch('/network/nodes')
+                    .then((response) => {
+                        if (response.success) {
+                            this.ipData = response.data;
+                            for (var j = 0, len = this.ipData.length; j < len; j++) {
+                                axios.get('http://freegeoip.net/json/' + this.ipData[j])
+                                    .then( (response) =>{
+                                        var latLngs = [response.data.latitude, response.data.longitude];
+                                        var names = response.data.time_zone;
+                                        if (names == "undefined") {
+                                            names = 'anonymous'
+                                        } else {
+                                            names = names.split('/')[1]
+                                        }
+                                        this.ipObj.push({"latLng": latLngs, "name": names});
+                                    })
+                                    .catch(function (err) {
+                                        console.log(err);
+                                    });
+                            }
+                            console.log(this.ipObj);
+                        }
+                    });
+            },
             /** jVector Maps
              * Create a world map with markers
              * @method methodsMaps
@@ -235,14 +261,14 @@
         margin: 24px auto;
         background-color: #0c1323;
         .home-nav {
-            width: 605px;
+            width: 630px;
             height: 122px;
             margin: auto;
             .home-nav-top {
-                width: 280px;
+                width: 302px;
                 height: 120px;
                 float: left;
-                margin-right: 40px;
+                margin-right: 20px;
                 border: 1px solid #658ec7;
                 background-color: #17202e;
                 .nav-title {
@@ -260,6 +286,11 @@
                             float: left;
                             margin-left: 1rem;
                         }
+                    }
+                }
+                .nav-all{
+                    .bar-bg{
+                        margin-top: 13px;
                     }
                 }
                 .nav-all,

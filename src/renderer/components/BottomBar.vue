@@ -5,7 +5,7 @@
 			<span @click="updateVersionUrl" v-show="updateVersion" class="cursor-p text-d" >{{$t("message.toUpdate")}}</span>
 		</el-col>
 		<el-col :span="12" class='footer-right'>
-			{{$t("message.blockState")}}：{{$t("message.local")}} {{ netWorkInfo.localBestHeight }}<span v-show="timeOffsetOk">({{$t("message.backward")}} {{ netWorkInfo.timeOffset }})</span> / {{$t("message.theMain")}} {{netWorkInfo.netBestHeight}}
+			{{$t("message.blockState")}}：{{$t("message.local")}} {{ netWorkInfo.localBestHeight }}<span v-show="timeOffsetOk">（ {{$t("message.backward")}} {{ netWorkInfo.timeOffset }} ）</span> / {{$t("message.theMain")}} {{netWorkInfo.netBestHeight}}
 			<i :class="iconWifi" :title="connectNumber"></i>
 		</el-col>
 	</footer>
@@ -20,7 +20,7 @@
 				purseVersions:store.state.purseVersion,
 				updateVersion:false,
 				timeOffsetOk:true,
-				connectNumber:'节点块数',
+				connectNumber:'0',
 				netWorkInfo:[],
                 iconWifi:'no-wifi_icon',
 				setTime:3000,
@@ -80,6 +80,7 @@
 			getNetWorkInfo(url) {
 				this.$fetch(url)
 					.then((response) => {
+					    console.log(response);
 					    if(response.success){
                             this.netWorkInfo = response.data;
                             let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
@@ -95,40 +96,48 @@
 								}
 							}else {
                                 this.iconWifi='no-wifi_icon';
-                                this.$confirm(this.$t('message.c97'),this.$t('message.c86'), {
-                                    confirmButtonText: this.$t('message.confirmButtonText'),
-                                    cancelButtonText: this.$t('message.cancelButtonText'),
-                                    type: 'warning'
-                                }).then(() => {
-                                    var ipc = require('electron').ipcRenderer;
-                                    ipc.send('window-close');
-                                });
 							}
 						}
 					}).catch((reject) => {
+					    console.log(reject);
 						if(reject ==="网络异常"){
                             if(this.rejectTime == 0){
-                                this.rejectTime = this.rejectTime+1;
-                                this.$confirm(this.$t('message.c97'),this.$t('message.c86'), {
-                                    confirmButtonText: this.$t('message.confirmButtonText'),
-                                    cancelButtonText: this.$t('message.cancelButtonText'),
-                                    type: 'warning'
-                                }).then(() => {
-                                    var ipc = require('electron').ipcRenderer;
-                                    ipc.send('window-close');
-                                });
+                                setTimeout(() => {
+                                    this.rejectTime = this.rejectTime + 1;
+                                    this.$confirm(this.$t('message.c97'), this.$t('message.c86'), {
+                                        confirmButtonText: this.$t('message.confirmButtonText'),
+                                        cancelButtonText: this.$t('message.cancelButtonText'),
+                                        //type: 'warning'
+                                    }).then(() => {
+                                        var child_process = require('child_process');
+                                        //调用执行文件
+                                        var _path = process.execPath.substr(0,process.execPath.length-14);
+                                        //var _path = process.execPath.substr(0,8);
+                                        child_process.execFile(_path+'node/bin/stop.bat', null, {cwd:_path+'node/bin/'}, function (error) {
+                                            if (error !== null) {
+                                                console.log('exec error: ' + error);
+                                            }
+                                            else {
+                                                console.log('成功执行指令!');
+                                            }
+                                        });
+
+                                        var ipc = require('electron').ipcRenderer;
+                                        ipc.send('window-close');
+                                    });
+                                },180000);
 							}
 						}
                 });
 			},
 			//测试清理数据
             clearData(){
-                localStorage.removeItem('fastUser');
-                localStorage.removeItem("language");
-                localStorage.removeItem("lockTime");
-                localStorage.removeItem("newAccountAddress");
-                localStorage.removeItem("passWordHint");
-                localStorage.removeItem("userPass");
+                localStorage.setItem('fastUser',"");
+                localStorage.setItem("language","");
+                localStorage.setItem("lockTime","");
+                localStorage.setItem("newAccountAddress","");
+                localStorage.setItem("passWordHint","");
+                localStorage.setItem("userPass","");
                 indexedDB.deleteDatabase("usersDB");
 			}
 		}

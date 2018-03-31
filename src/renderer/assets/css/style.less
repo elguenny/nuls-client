@@ -53,6 +53,7 @@ a {
     height: 24px;
     border: 1px solid #24426c;
     background-color: #17202e;
+    padding: 0px 2px;
 }
 
 .el-input__inner:hover {
@@ -384,5 +385,50 @@ select {
     color: #c1c1c1;
     span{
         margin-left: 15px;
+    }
+}
+
+/**el-dialog**/
+.el-dialog__wrapper{
+    .el-dialog{
+        background: #0c1323;
+        .el-dialog__header{
+            padding: 0px;
+        }
+        .el-dialog__body{
+         padding: 0px;
+            .el-form{
+                width: 80%;
+                margin: auto;
+                .el-form-item{
+                    margin-bottom: 25px;
+                     .el-form-item__label:before {
+                        font-size: 0px;
+                    }
+                }
+            }
+        }
+        .el-dialog__footer{
+            padding: 0px 0px 20px;
+            .el-button--default{
+                background:#658ec7;
+                padding: 5px 10px;
+                font-size: 14px;
+                border-radius: 2px;
+                color: #C1C5C9;
+                float: left;
+                margin-left: 50px;
+                border: 0px;
+            }
+            .el-button--primary{
+                background:#658ec7;
+                padding: 0px 10px;
+                font-size: 14px;
+                border-radius: 2px;
+                color: #C1C5C9;
+                width: 50px;
+                margin-right: 50px;
+            }
+        }
     }
 }

@@ -166,19 +166,20 @@
                     this.$prompt(this.$t('message.passWordTitle'), '', {
                         confirmButtonText: this.$t('message.confirmButtonText'),
                         cancelButtonText: this.$t('message.cancelButtonText'),
-                        inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),
+                       /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
+                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
                         inputType: 'password'
                     }).then(({value}) => {
                         var param = {"address": row.address, "password": value,"txHash": row.txHash};
                        this.$post('/consensus/withdraw/', param)
                             .then((response) => {
+                                //console.log(param)
+								//console.log(response);
                                 if(response.success){
                                     this.$message({
                                         type: 'success',
                                         message: this.$t("message.passWordSuccess")
                                     });
-                                    console.log(123123);
                                     this.getAddressList("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
 								}
                             })

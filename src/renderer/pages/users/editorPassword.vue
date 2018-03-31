@@ -4,17 +4,17 @@
         <h2>{{$t("message.c80")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm"  class="set-pass">
             <el-form-item :label="$t('message.oldPassWord')" prop="oldPass">
-                <el-input type="password" v-model="passForm.oldPass"></el-input>
+                <el-input type="password" v-model="passForm.oldPass" :maxlength=20 ></el-input>
             </el-form-item>
             <el-form-item :label="$t('message.c90')" prop="pass">
-                <el-input type="password" v-model="passForm.pass"></el-input>
+                <el-input type="password" v-model="passForm.pass" :maxlength=20></el-input>
             </el-form-item>
             <el-form-item :label="$t('message.c91')" prop="checkPass">
-                <el-input type="password" v-model="passForm.checkPass"></el-input>
+                <el-input type="password" v-model="passForm.checkPass" :maxlength=20></el-input>
             </el-form-item>
-            <el-form-item :label="$t('message.passWordHint')">
+            <!--<el-form-item :label="$t('message.passWordHint')">
                 <el-input v-model.number="passForm.passHelp"></el-input>
-            </el-form-item>
+            </el-form-item>-->
             <el-form-item class="submitForm">
                 <el-button type="primary" @click="submitForm('passForm')">{{$t('message.passWordAffirm')}}</el-button>
             </el-form-item>
@@ -37,7 +37,7 @@
                 }
             };
             var validatePass = (rule, value, callback) => {
-                var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/;
+                var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
                 if (value === '') {
                     callback(new Error(this.$t('message.walletPassWord')));
                 } else if (!patrn.exec(value)) {
@@ -64,7 +64,7 @@
                     oldPass:'',
                     pass: '',
                     checkPass: '',
-                    passHelp: ''
+                    //passHelp: ''
                 },
                 rulesPass: {
                     oldPass:[
@@ -103,23 +103,23 @@
                             .then((response) => {
                                 if (response.success) {
                                     this.$message({
-                                        type: 'success', message: "恭喜您！" + response.msg
+                                        type: 'success', message: this.$t('message.passWordSuccess') + response.msg
                                     });
                                     localStorage.setItem('userPass', this.passForm.pass);
-                                    localStorage.setItem('passWordHint', this.passForm.passWordHint);
+                                    //localStorage.setItem('passWordHint', this.passForm.passWordHint);
                                     this.$router.push({
                                         path: '/users/setPage'
                                     })
                                 } else {
                                     this.$message({
-                                        type: 'success', message: "对不起！" + response.msg
+                                        type: 'success',message: this.$t('message.passWordFailed') + response.msg
                                     });
                                 }
 
                             });
                     } else {
                         this.$message({
-                            type: 'success', message: "对不起！请输入正确的密码信息。"
+                            type: 'success', message: this.$t('message.passWordFailed')
                         });
                         return false;
                     }
