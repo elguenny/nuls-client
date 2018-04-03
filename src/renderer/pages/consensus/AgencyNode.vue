@@ -178,10 +178,9 @@
                 select {
                     background-color: #17202e;
                     border: 1px solid #658ec7;
+                    padding: 0 2px;
                 }
-                .el-select-dropdown__list{
-                    width: 165px;
-                }
+
                 .el-input-group__append {
                     border-left: 0;
                     background-color: #658ec7;
@@ -205,5 +204,11 @@
                 margin-right: 6px;
             }
         }
+        .el-select-dropdown__list{
+            width: 165px;
+        }
+    }
+    .el-popper[x-placement^=bottom] .popper__arrow{
+        display: none;
     }
 </style>

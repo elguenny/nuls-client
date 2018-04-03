@@ -23,18 +23,20 @@
 				connectNumber:'0',
 				netWorkInfo:[],
                 iconWifi:'no-wifi_icon',
-                rejectTime:0,
+                rejectTime:1,
 			}
 		},
 		mounted() {
 			let _this = this;
+
 			//encapsulated https
-			this.getBottromInfo('/sys/version');
-			//get net work info
-			this.getNetWorkInfo('/network/info');
-            var timer = setInterval(()=>{
+			setInterval(()=>{
                 this.getNetWorkInfo('/network/info');
             },6000);
+
+            setTimeout(()=>{
+                this.getBottromInfo('/sys/version');
+            },5000);
 
 		},
 		methods: {
@@ -49,6 +51,7 @@
 			getBottromInfo(url) {
 				this.$fetch(url)
 					.then((response) => {
+					    //console.log(response);
 					    if(response.success){
                             this.bottomItem = response.data;
                             if(response.data.myVersion != response.data.newestVersion){
@@ -79,9 +82,10 @@
 			getNetWorkInfo(url) {
 				this.$fetch(url)
 					.then((response) => {
-					    console.log(response);
+					    //console.log(response);
 					    if(response.success){
-                            sessionStorage.setItem("userList","1")
+                            sessionStorage.setItem("userList","1");
+                            this.rejectTime = 0;
                             this.netWorkInfo = response.data;
                             let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
                             this.connectNumber= this.netWorkInfo.inCount + this.netWorkInfo.outCount;
@@ -99,14 +103,15 @@
 							}
 						}
 					}).catch((reject) => {
-					    console.log(reject);
+					    //console.log(reject);
+					    this.rejectTime = this.rejectTime + 1;
                     	sessionStorage.setItem("userList","0")
                 });
 			},
 			//测试清理数据
             clearData(){
-                localStorage.setItem('fastUser',"");
-                localStorage.setItem("language","");
+                localStorage.setItem('fastUser',"0");
+                localStorage.setItem("language","en");
                 localStorage.setItem("lockTime","");
                 localStorage.setItem("newAccountAddress","");
                 localStorage.setItem("passWordHint","");

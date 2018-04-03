@@ -1,7 +1,7 @@
 <template>
 	<div class="account-address">
 		<el-select v-model="accountAddressValue" :placeholder="$t('message.addressNull')" @change="accountAddressChecked">
-			<el-option v-for="item in accountAddress" :key="item.address" :label="item.address" :value="item.address">
+			<el-option v-for="item in this.$store.state.addressList" :key="item.address" :label="item.address" :value="item.address">
 			</el-option>
 		</el-select>
 	</div>
@@ -11,16 +11,20 @@
 	export default {
 		data() {
 			return {
-				accountAddress: [],
                 accountAddressValue: '',
 			}
 		},
         mounted() {
             let _this = this;
-            this.getAccountList("/account/list");
+            //判断是不有默认账户
             if(localStorage.getItem("newAccountAddress") != ''){
 				this.accountAddressValue = localStorage.getItem("newAccountAddress");
 			}
+			//判断vuex账户列表里有没有数据
+			if(this.$store.state.addressList.length == 0){
+                this.getAccountList("/account/list");
+			}
+
         },
         methods: {
             //获取账户地址列表
@@ -28,13 +32,13 @@
                 this.$fetch(url)
                     .then((response) => {
                         if(response.success){
-                            this.accountAddress = response.data;
+                            this.$store.state.addressList = response.data;
+                            localStorage.setItem('newAccountAddress',response.data[0].address);
 						}else {
-                            console.log("获取账户列表失败！");
+                            this.$store.state.addressList = [];
 						}
                     }).catch((reject) => {
-                        console.log(reject);
-                    	return false;
+                    	this.$store.state.addressList = [];
 				});
             },
             //选择账户地址
@@ -61,6 +65,9 @@
 		}
 		.el-select .el-input .el-select__caret {
 			font-size: 14px;
+		}
+		.el-popper[x-placement^=bottom] .popper__arrow{
+			display: none;
 		}
 	}
 </style>

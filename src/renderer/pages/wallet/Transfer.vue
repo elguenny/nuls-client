@@ -17,14 +17,14 @@
                     <i class="cursor-p" @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')+'：'" prop="joinNo" class="join-nos">
-                    <span class="allUsable">{{$t("message.currentBalance")}}:{{ usable }} NULS</span>
+                    <span class="allUsable">{{$t("message.currentBalance")}}: {{ usable }} NULS</span>
                     <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t("message.all")}}</span>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
                 </el-form-item>
                 <el-form-item :label="$t('message.remarks')+'：'" class="remark">
-                    <el-input type="textarea" v-model="transferForm.remark" :maxlength="80" @input="descInput"></el-input>
+                    <el-input type="textarea" v-model="transferForm.remark" :maxlength="80" @input="descInput" style="padding: 0 2px;"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
                     <el-button type="primary" @click="transferSubmit('transferForm')">{{$t("message.c114")}}</el-button>
@@ -42,12 +42,14 @@
                     </el-table-column>
                 </el-table>
             </el-dialog>
+            <Password ref="password" @toSubmit="toSubmit"></Password>
+
         </div>
     </div>
 </template>
 <script>
     import Back from '@/components/BackBar.vue';
-
+    import Password from '@/components/PasswordBar.vue';
     export default {
         data() {
             var selectAddress = (rule, value, callback) => {
@@ -131,6 +133,7 @@
         },
         components: {
             Back,
+            Password,
         },
         mounted() {
             let _this = this;
@@ -140,8 +143,8 @@
         },
         methods: {
             //获取账户地址列表
-            getaccountAddress(api) {
-                this.$fetch(api)
+            getaccountAddress(url) {
+                this.$fetch(url)
                     .then((response) => {
                         this.accountAddress = response.data;
                     });
@@ -171,7 +174,6 @@
                         type: 'warning '
                     });
                 }else {
-                    console.log(no);
                     console.log(no-0.01);
                     this.transferForm.joinNo = no-0.01;
                 }
@@ -226,37 +228,33 @@
             transferSubmit(fromName) {
                 this.$refs[fromName].validate((valid) => {
                     if (valid) {
-                        this.$prompt(this.$t('message.passWordTitle'), '', {
-                            confirmButtonText: this.$t('message.confirmButtonText'),
-                            cancelButtonText: this.$t('message.cancelButtonText'),
-                            /*inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
-                            inputType: 'password'
-                        }).then(({value}) => {
-                            var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + value + '","remark":"' + this.transferForm.remark + '"}';
-                            this.$post('/wallet/transfer/', param)
-                                .then((response) => {
-                                    if (response.success) {
-                                        this.$message({
-                                            message: this.$t('message.passWordSuccess'),
-                                            type: 'success'
-                                        });
-                                        this.transferForm.joinAddress = '';
-                                        this.transferForm.joinNo = '';
-                                        this.transferForm.remark = '';
-                                        this.getBalanceAddress('/account/balance/' + this.transferForm.address);
-                                    } else {
-                                        this.$message({
-                                            message: this.$t('message.passWordFailed') + response.msg,
-                                            type: 'warning',
-                                        });
-                                    }
-                                })
-                        })
+                        this.$refs.password.showPassword(true);
                     } else {
                         return false;
                     }
                 });
+            },
+            //
+            toSubmit(password) {
+                var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + password + '","remark":"' + this.transferForm.remark + '"}';
+                this.$post('/wallet/transfer/', param)
+                    .then((response) => {
+                        if (response.success) {
+                            this.$message({
+                                message: this.$t('message.passWordSuccess'),
+                                type: 'success'
+                            });
+                            this.transferForm.joinAddress = '';
+                            this.transferForm.joinNo = '';
+                            this.transferForm.remark = '';
+                            this.getBalanceAddress('/account/balance/' + this.transferForm.address);
+                        } else {
+                            this.$message({
+                                message: this.$t('message.passWordFailed') + response.msg,
+                                type: 'warning',
+                            });
+                        }
+                    })
             },
         }
     }
@@ -308,6 +306,7 @@
             .remark {
                 .el-textarea__inner {
                     background-color: #17202e;
+                    padding: 0 2px;
                 }
             }
             .transfer-submit {
@@ -336,6 +335,7 @@
         .el-form-item__label {
             line-height: 25px;
             padding: 0px;
+            color: white;
         }
         .el-input__suffix {
             margin-top: 0px;
@@ -369,6 +369,21 @@
             border: 1px solid #24426c;
             font-size: 14px;
             padding: 0px 2px;
+            color: white;
         }
+        .password-dialog{
+            width: 560px;
+            margin: auto;
+        }
+        .el-select-dropdown__list{
+            width: 100%;
+        }
+
+    }
+    .el-popper[x-placement^=bottom] .popper__arrow{
+        display: none;
+    }
+    .el-select-dropdown__item{
+        padding: 0 2px;
     }
 </style>

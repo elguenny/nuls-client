@@ -67,10 +67,10 @@
                                 <span>{{ scope.row.type }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column label="txid" min-width="200" align='center'>
+                        <el-table-column label="txid" min-width="195" align='center'>
                             <template slot-scope="scope">
 								<span @click="toTxid(scope.row.hash)" class="cursor-p text-d overflow">
-									{{ scope.row.hash }}
+									{{ scope.row.hashs }}
 								</span>
                             </template>
                         </el-table-column>
@@ -79,7 +79,7 @@
                                 <span>{{ scope.row.values }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.state')" width="80" align='center'>
+                        <el-table-column :label="$t('message.state')" width="85" align='center'>
                             <template slot-scope="scope">
                                 <span>{{ scope.row.status =='1' ? $t('message.confirmed'):$t('message.confirming') }}</span>
                             </template>
@@ -115,7 +115,7 @@
                 accountAddressValue: localStorage.getItem('newAccountAddress'),
                 accountData: [],
                 dealList: [],
-                activeName: localStorage.getItem('walletActiveName') ==null ? "first":localStorage.getItem('walletActiveName'),
+                activeName: localStorage.getItem('walletActiveName') ==='' ? "first":localStorage.getItem('walletActiveName'),
                 tabName:'first',
                 totalAll:0,
             }
@@ -126,13 +126,15 @@
         },
         mounted() {
             let _this = this;
-            console.log(localStorage.getItem("keyShow") ==='true')
+
+            //判断显示隐藏数字
             if(localStorage.getItem("keyShow") ==='true'){
                 this.keyShow=true
             }else {
                 this.keyShow=false
             }
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
+            //切换交易记录tab
             if(this.activeName === 'second'){
                 this.getAccountTxList('/tx/list/', {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": 1});
             }
@@ -151,12 +153,14 @@
             getAccountTxList(url, param) {
                 this.$fetch(url, param)
                     .then((response) => {
-                        //console.log(response)
+                        console.log(response)
                         if (response.data != null) {
                             this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {
                                 this.dealList = response.data.list;
                                 for (var i = 0; i < response.data.list.length; i++) {
+                                    var length =this.dealList[i].hash.length;
+                                    this.dealList[i].hashs = this.dealList[i].hash.substr(0,10)+'...'+ this.dealList[i].hash.substr(length-10);
                                     this.dealList[i].type = this.switchTyep(response.data.list[i].type);
                                     this.dealList[i].values = (response.data.list[i].value * 0.00000001).toFixed(8);
                                     this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
@@ -176,7 +180,7 @@
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
                 this.accountAddressValue = chenckAddress;
-                if(this.tabName === "first" ){
+                if(this.activeName === "first" ){
                     this.getAccountAssets("/account/assets/" + chenckAddress);
                 }else {
                     this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 9, "pageNumber": 1});
@@ -328,7 +332,7 @@
             }
             .wallet-i{
                 height: 30px;
-                width: 188px;
+                width: 183px;
                 float: right;
                 i{
                     width: 30px;
@@ -339,10 +343,10 @@
                     background: @bg-image
                 }
                 .copy_icon{
-                    background-position: -190px -46px;
+                    background-position: -198px -46px;
                 }
                 .qr_icon {
-                    background-position: -227px -44px;
+                    background-position: -235px -44px;
                 }
                 .zhanghu_icon{
                     background-position: -265px -46px;

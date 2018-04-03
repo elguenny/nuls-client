@@ -4,12 +4,12 @@
         <div class="new-account-top">
             <h1 v-show="newOk" style="text-align: center"> {{$t("message.newAccountTitle")}}</h1>
             <h2>
-                {{$t("message.Address")}}：{{ this.newAccountAddress }}
+                {{$t('message.newAccountAddress')}}：{{ this.newAccountAddress }}
             </h2>
             <div class="new-account-key">
                 <h3 class="fl">
                     {{$t("message.newAccountKey")}}：
-                    <input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly">
+                    <input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly" style="margin-left: -5px">
                 </h3>
                 <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
                 <i class="" @click="keyCode"></i>
@@ -33,17 +33,6 @@
                 {{$t("message.newAccountReset")}}
             </el-button>
         </div>
-        <el-dialog title="" :visible.sync="passwordVisible" top="20vh">
-            <el-form ref="passwordForm" :model="passwordForm" :rules="passwordRules">
-                <el-form-item :label="$t('message.passWordTitle')" prop="password">
-                    <el-input v-model="passwordForm.password" type="password"></el-input>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="passwordVisible = false">{{$t('message.cancelButtonText')}}</el-button>
-                <el-button type="primary" @click="dialogSubmit('passwordForm')">{{$t('message.confirmButtonText')}}</el-button>
-            </div>
-        </el-dialog>
     </div>
 </template>
 
@@ -63,16 +52,6 @@
                 codeShowOk: false,
                 newOk: this.$route.params.newOk,
                 newOks: this.$route.params.newOk ? false : true,
-
-                passwordVisible: false,
-                passwordForm: {
-                    password: '',
-                },
-                passwordRules: {
-                    password: [
-                        {required: true, message: this.$t('message.passWordTitle'), trigger: 'blur'}
-                    ]
-                },
             }
         },
         components: {
@@ -81,46 +60,28 @@
         },
         mounted() {
             let _this = this;
-
-            console.log(this.$route.params.address);
-            if(this.newAccountAddress != ""){
-                var address = this.newAccountAddress;
-                var password = localStorage.getItem('userPass');
-                var param = '{"address":"' + address + '","password":"' + password + '"}';
-                this.$post('/account/prikey', param)
-                    .then((response) => {
-                        console.log(response)
-                        if(response.success){
-                            this.keyInfo = response.data;
-                        }else {
-                            this.passwordVisible = true
-                        }
-                    });
-            }
+            var params = '{"address":"' + this.newAccountAddress + '","password":"' + localStorage.getItem("userPass") + '"}';
+            this.getPrikey('/account/prikey', params);
         },
         methods: {
-            dialogSubmit(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        var param = '{"address":"' + this.newAccountAddress + '","password":"' + this.passwordForm.password + '"}';
-                        this.$post('/account/prikey', param)
-                            .then((response) => {
-                                if(response.success){
-                                    localStorage.setItem("fastUser","1")
-                                    this.keyInfo = response.data;
-                                    this.passwordVisible = false
-                                }else {
-                                    this.passwordVisible = true;
-                                    this.passwordForm.password='';
-                                    this.$message({
-                                        type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                                    });
-                                }
-                            })
-                    }
-                })
-            },
+            //获取私钥
+            getPrikey(url,params) {
+                this.$post(url, params)
+                    .then((response) => {
+                        if (response.success) {
+                            localStorage.setItem("fastUser", "1")
+                            this.keyInfo = response.data;
+                            this.passwordVisible = false
+                        } else {
+                            this.passwordVisible = true;
+                            this.passwordForm.password = '';
+                            this.$message({
+                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                            });
+                        }
+                    })
 
+            },
             //二维码显示隐藏
             keyCode() {
                 this.$refs.codeBar.codeMaker(this.keyInfo)
@@ -137,7 +98,7 @@
              **/
             backupsKey() {
                 var path = require('path');
-                var _path = path.join(__dirname, '../../../../'+this.newAccountAddress+'_privateKey.txt');
+                var _path = path.join(__dirname, '../../../../' + this.newAccountAddress + '_privateKey.txt');
                 //var _path ="D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.txt";
                 var fs = require('fs');
                 fs.readFile(_path, 'utf8', function (err, data) {
@@ -193,7 +154,7 @@
                     background: "#ffffff",
                     foreground: "#000000"
                 });
-                this.exportCanvasAsPNG($(".qrcode").find("canvas")[0], this.newAccountAddress+"_privateKey.png");
+                this.exportCanvasAsPNG($(".qrcode").find("canvas")[0], this.newAccountAddress + "_privateKey.png");
             },
             /** Export Canvas As PNG
              * @method exportCanvasAsPNG
@@ -223,7 +184,7 @@
                         //var fs = require('fs');
                         //fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
                         var path = require('path');
-                        var _path = path.join(__dirname, process.execPath.substr(0,process.execPath.length-14)+this.newAccountAddress+'_privateKey.png');
+                        var _path = path.join(__dirname, process.execPath.substr(0, process.execPath.length - 14) + this.newAccountAddress + '_privateKey.png');
                         //var _path = "D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.png";
                         ipcRenderer.send('download', _path + "+" + res[0]);
                         dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
@@ -279,15 +240,15 @@
              **/
             newSubmit() {
                 this.$confirm(this.$t('message.c110'), this.$t('message.c86'), {
-                    confirmButtonText:this.$t('message.c111'),
-                    cancelButtonText:this.$t('message.c112'),
-                   /* type: 'warning'*/
+                    confirmButtonText: this.$t('message.c111'),
+                    cancelButtonText: this.$t('message.c112'),
+                    /* type: 'warning'*/
                 }).then(() => {
-                    if(localStorage.getItem('toUserInfo') != "1"){
+                    if (localStorage.getItem('toUserInfo') != "1") {
                         this.$router.push({
                             name: '/wallet'
                         })
-                    }else {
+                    } else {
                         this.$router.push({
                             path: '/wallet/users/userInfo'
                         })
@@ -314,10 +275,11 @@
 
 <style lang="less">
     @import url("../../assets/css/style.less");
+
     .new-account {
-        width: 86%;
+        width: 88%;
         height: 100%;
-        margin:auto;
+        margin: auto;
         font-size: 14px;
         line-height: 1.6rem;
         .back {
@@ -336,7 +298,7 @@
             h2 {
             }
             .new-account-key {
-                width: 120%;
+                width: 125%;
                 margin: auto;
                 text-align: left;
                 h3 {
@@ -349,7 +311,7 @@
                         border: none;
                     }
                 }
-                .icon{
+                .icon {
                     width: 30px;
                     height: 20px;
                     display: block;
@@ -357,10 +319,10 @@
                     background-size: @bg-size;
                     background: @bg-image
                 }
-                .icon-eye{
+                .icon-eye {
                     background-position: -159px -46px;
                 }
-                .icon-eye-blocked{
+                .icon-eye-blocked {
                     background-position: -226px -77px;
                 }
                 .modal-overlay {
@@ -388,7 +350,7 @@
         ul {
             width: 65%;
             height: 50%;
-            margin:20px auto 0px;
+            margin: 20px auto 0px;
 
             li {
                 width: 42%;
@@ -421,7 +383,7 @@
             button {
                 display: block;
                 width: 50%;
-                margin:5% auto 0px;
+                margin: 5% auto 0px;
 
             }
             .new-submit {

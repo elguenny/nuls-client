@@ -50,7 +50,7 @@
                 current: 0,
                 //languageItem
                 languageItem: [{
-                    key: "zh",
+                    key: "cn",
                     value: "static/img/Language-zh.png"
                 },
                     {
@@ -59,7 +59,7 @@
                     }],
                 //select language initial info
                 projectName: {
-                    key: "zh",
+                    key: "cn",
                     value: "static/img/Language-zh.png"
                 },
                 //select language initial width
@@ -75,15 +75,15 @@
         },
         mounted() {
             let _this = this;
-            this.$i18n.locale = localStorage.getItem("language") == '' ? "zh" : localStorage.getItem("language");
-            if (localStorage.getItem("language") == 'en') {
+            this.$i18n.locale = localStorage.getItem("language") === '' ? "en" : localStorage.getItem("language");
+            if (localStorage.getItem("language") === 'en') {
                 this.projectName = {
                     key: "en",
                     value: "static/img/Language-en.png"
                 }
             } else {
                 this.projectName = {
-                    key: "zh",
+                    key: "cn",
                     value: "static/img/Language-zh.png"
                 }
             }
@@ -98,7 +98,9 @@
              * @version 1.0
              **/
             selectLanguage() {
+                console.log(this.projectName.key)
                 this.$i18n.locale = this.projectName.key;
+                //locale.use(this.projectName.key);
                 var param = '{"language":"' + this.projectName.key+ '"}';
                 this.$post('/lang', param)
                     .then((response) => {
@@ -120,26 +122,32 @@
                 }
                 if (url === "wallet") {
                     this.isActive = 1;
+                    localStorage.setItem('walletActiveName','');
                     //获取账户地址列表
-                    this.getUserList("/account/list");
-                    console.log(sessionStorage.getItem("userListOK"));
-                    if (sessionStorage.getItem("userListOK") === "0") {
+                    if(this.$store.state.addressList.length == 0){
                         this.$router.push({
                             name: '/setPassword',
                         })
-                    } else {
+                    }else {
                         this.$router.push({
-                            path: '/wallet'
+                            path: '/wallet',
                         })
                     }
+                    //this.getUserList("/account/list");
                 }
-                if (url === "consensus") {
+               if (url === "consensus") {
                     this.isActive = 2;
                     this.$router.push({
                         name: '/consensus',
                         params: {activeName: "first"},
                     })
                 }
+                /*if (url === "consensus") {
+                    this.isActive = 2;
+                    this.$message({
+                        type: 'info', message: this.$t('message.c65'), duration: '800'
+                    });
+                }*/
                 if (url === "application") {
                     this.isActive = 3;
                     this.$message({
@@ -215,9 +223,9 @@
             toClose() {
                 var child_process = require('child_process');
                 //调用执行文件
-                var _path = process.execPath.substr(0,process.execPath.length-14);
-                //var _path = process.execPath.substr(0, 8);
-                child_process.execFile(_path + 'node\\bin\\stop.bat', null, {cwd: _path + 'node\\bin\\'}, function (error) {
+                //var _path = process.execPath.substr(0,process.execPath.length-14);
+                var _path = process.execPath.substr(0, 8);
+                child_process.execFile(_path + 'nodes\\bin\\stop.bat', null, {cwd: _path + 'nodes\\bin\\'}, function (error) {
                     if (error !== null) {
                         console.log('exec error: ' + error);
                     }

@@ -1,24 +1,25 @@
 import Vue from 'Vue'
 import Vuex from 'vuex'
-import axios from 'axios'
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 const store = new Vuex.Store({
-	// 定义状态
-	state: {
-		purseVersion: '1.0.0',
-		isActive:0,
-        hoemJava: '0',
-	},
+    // 定义状态
+    state: {
+        purseVersion: '1.0.0',
+        addressList: [],
+    },
+    //方法修改
+    getters: {
+
+    },
+    //触发事件
     mutations: {
-        increment (state) {
-            // 变更状态
-            state.count++
+        showAddressList(state){
+            //console.log(state.addressList);
         }
     },
-	actions: {
-		
-	}
+    //异步操作
+    actions: {}
 })
 export default store

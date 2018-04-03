@@ -28,9 +28,9 @@
             var validatePass = (rule, value, callback) => {
                 var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
                 if (value === '') {
-                    callback(new Error(this.$t('message.walletPassWord')));
+                    callback(new Error(this.$t('message.walletPassWord1')));
                 } else if (!patrn.exec(value)) {
-                    callback(new Error(this.$t('message.walletPassWord')));
+                    callback(new Error(this.$t('message.walletPassWord1')));
                 } else {
                     if (this.passForm.checkPass !== '') {
                         this.$refs.passForm.validateField('checkPass');
@@ -147,12 +147,14 @@
             }
             .el-input__inner {
                 border: 1px solid #6290c7;
+                padding: 0 2px;
             }
             .el-form-item__label {
                 font-size: 12px;
                 color: #8a929b;
                 padding: 15px 0 10px;
                 line-height: 0px;
+                color: white;
             }
             .el-form-item__content {
                 line-height: 10px;

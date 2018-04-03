@@ -5,7 +5,7 @@
             <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
         </div>
         <div class="consensus-index-title">
-            <label>{{$t("message.c1")}}{{$t("message.c1_1")}}：</label>{{this.allTotalDeposit*0.00000001}} NULS,<label>{{$t("message.c2")}}：</label>{{this.allAgentCount}}
+            <label>{{$t("message.c1")}}{{$t("message.c1_1")}}：</label>{{this.allTotalDeposit*0.00000001}} NULS，<label>{{$t("message.c2")}}：</label>{{this.allAgentCount}}
         </div>
         <div class="consensus-center">
             <ul>

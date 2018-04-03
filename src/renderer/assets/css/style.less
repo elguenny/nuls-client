@@ -387,13 +387,19 @@ select {
         margin-left: 15px;
     }
 }
-
 /**el-dialog**/
 .el-dialog__wrapper{
     .el-dialog{
         background: #0c1323;
+        .el-form-item__label{
+            color: #ffffff;
+        }
         .el-dialog__header{
             padding: 0px;
+            .el-dialog__headerbtn{
+                top:5px;
+                right: 10px;
+            }
         }
         .el-dialog__body{
          padding: 0px;
@@ -419,6 +425,8 @@ select {
                 float: left;
                 margin-left: 50px;
                 border: 0px;
+                width: 80px;
+                height: 30px;
             }
             .el-button--primary{
                 background:#658ec7;
@@ -426,9 +434,14 @@ select {
                 font-size: 14px;
                 border-radius: 2px;
                 color: #C1C5C9;
-                width: 50px;
+                width: 80px;
+                height: 30px;
                 margin-right: 50px;
             }
         }
     }
+}
+
+.el-message-box__message{
+    text-align: center;
 }

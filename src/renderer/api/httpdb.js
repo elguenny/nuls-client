@@ -1,77 +1,73 @@
-var dbName = 'usersDB',     // 数据库名
-    daVer = 1,              // 数据库版本号
-    db = '',                // 用于数据库对象
-    dbData = [];            // 用于临时存放数据的数组
-
-// 连接数据库
-function openDB(){
-    var request = indexedDB.open(dbName, daVer);
-    request.onsuccess = function(e){
-        db = e.target.result;
-        console.log('连接数据库成功');
-        // 数据库连接成功后渲染表格
-        vm.getData();
-    }
-    request.onerror = function(){
-        console.log('连接数据库失败');
-    }
-    request.onupgradeneeded = function(e){
-        db = e.target.result;
-        // 如果不存在Users对象仓库则创建
-        if(!db.objectStoreNames.contains('Users')){
-            var store = db.createObjectStore('Users',{keyPath: 'id', autoIncrement: true});
-            var idx = store.createIndex('index','username',{unique: false})
+// 配置API接口地址
+var root = 'http://192.168.1.201:8001';
+// 引用axios
+var axios = require('axios');
+// 自定义判断元素类型JS
+function toType (obj) {
+    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+}
+// 参数过滤函数
+function filterNull (o) {
+    for (var key in o) {
+        if (o[key] === null) {
+            delete o[key]
+        }
+        if (toType(o[key]) === 'string') {
+            o[key] = o[key].trim()
+        } else if (toType(o[key]) === 'object') {
+            o[key] = filterNull(o[key])
+        } else if (toType(o[key]) === 'array') {
+            o[key] = filterNull(o[key])
         }
     }
+    return o
 }
 
-/**
- * 保存数据
- * @param {Object} data 要保存到数据库的数据对象
- */
-function saveData(data){
-    var tx = db.transaction('Users','readwrite');
-    var store = tx.objectStore('Users');
-    var req = store.put(data);
-    req.onsuccess = function(){
-        console.log('成功保存id为'+this.result+'的数据');
+function apiAxios (method, url, params, success, failure) {
+    if (params) {
+        params = filterNull(params)
     }
+    axios({
+        method: method,
+        url: url,
+        data: method === 'POST' || method === 'PUT' ? params : null,
+        params: method === 'GET' || method === 'DELETE' ? params : null,
+        baseURL: root,
+        withCredentials: false
+    })
+        .then(function (res) {
+            if (res.data.success === true) {
+                if (success) {
+                    success(res.data)
+                }
+            } else {
+                if (failure) {
+                    failure(res.data)
+                } else {
+                    window.alert('error: ' + JSON.stringify(res.data))
+                }
+            }
+        })
+        .catch(function (err) {
+            let res = err.response
+            if (err) {
+                window.alert('api error, HTTP CODE: ' + res.status)
+            }
+        })
 }
 
-/**
- * 删除单条数据
- * @param {int} id 要删除的数据主键
- */
-function deleteOneData(id){
-    var tx = db.transaction('Users','readwrite');
-    var store = tx.objectStore('Users');
-    var req = store.delete(id);
-    req.onsuccess = function(){
-        // 删除数据成功之后重新渲染表格
-        vm.getData();
-    }
-}
-
-/**
- * 检索全部数据
- * @param {function} callback 回调函数
- */
-function searchData(callback){
-    var tx = db.transaction('Users','readonly');
-    var store = tx.objectStore('Users');
-    var range = IDBKeyRange.lowerBound(1);
-    var req = store.openCursor(range,'next');
-    // 每次检索重新清空存放数据数组
-    dbData = [];
-    req.onsuccess = function(){
-        var cursor = this.result;
-        if(cursor){
-            // 把检索到的值push到数组中
-            dbData.push(cursor.value);
-            cursor.continue();
-        }else{
-            // 数据检索完成后执行回调函数
-            callback && callback();
-        }
+// 返回在vue模板中的调用接口
+export default {
+    get: function (url, params, success, failure) {
+        return apiAxios('GET', url, params, success, failure)
+    },
+    post: function (url, params, success, failure) {
+        return apiAxios('POST', url, params, success, failure)
+    },
+    put: function (url, params, success, failure) {
+        return apiAxios('PUT', url, params, success, failure)
+    },
+    delete: function (url, params, success, failure) {
+        return apiAxios('DELETE', url, params, success, failure)
     }
 }

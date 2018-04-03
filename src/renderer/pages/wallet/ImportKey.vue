@@ -91,10 +91,12 @@
                     }
                 })
             },
+
             //提交导入明文私钥
             keySubmit(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
+                        this.passwordForm.password ='';
                         this.passwordVisible = true;
                     } else {
                         console.log('error submit!!');
@@ -126,6 +128,9 @@
             button {
                 width: 30%;
             }
+        }
+        .el-form-item.is-required .el-form-item__label:before{
+            font-size: 0px;
         }
     }
 </style>

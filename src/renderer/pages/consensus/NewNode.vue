@@ -4,22 +4,22 @@
         <h2>{{$t("message.c21")}}</h2>
         <div class="new-node-form">
             <el-form ref="newNodeForm" :model="newNodeForm" :rules="newNodeRules" size="mini" label-position="top">
-                <el-form-item :label="$t('message.c22')">
+                <el-form-item :label="$t('message.c22')+':'">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
-                <el-form-item :label="$t('message.c23')" prop="packingAddress">
+                <el-form-item :label="$t('message.c23')+':'" prop="packingAddress">
                     <el-input v-model.trim="newNodeForm.packingAddress"></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('message.c24')" prop="agentName">
+                <el-form-item :label="$t('message.c24')+':'" prop="agentName">
                     <el-input v-model.trim="newNodeForm.agentName" :maxlength="25"></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('message.c25')" class="form-left" prop="deposit">
+                <el-form-item :label="$t('message.c25')+'（NULS）:'" class="form-left" prop="deposit">
                     <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder :maxlength="17"></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('message.c26')" class="form-left" prop="commissionRate">
+                <el-form-item :label="$t('message.c26')+'（%）:'" class="form-left" prop="commissionRate">
                     <el-input v-model.number="newNodeForm.commissionRate" :maxlength="17"></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('message.c27')" class="cb" prop="remark">
+                <el-form-item :label="$t('message.c27')+':'" class="cb" prop="remark">
                     <el-input v-model.trim="newNodeForm.remark" type="textarea" :rows="2" :maxlength="80"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')">
@@ -128,7 +128,7 @@
                     .then((response) => {
                         if (response.success) {
                             this.usable = response.data.usable * 0.00000001;
-                            this.placeholder = this.$t('message.currentBalance') + response.data.usable * 0.00000001;
+                            this.placeholder = this.$t('message.currentBalance') +" "+ response.data.usable * 0.00000001;
                         }
                     });
             },
@@ -222,6 +222,10 @@
             .el-form-item--mini .el-form-item__content,
             .el-form-item--mini .el-form-item__label {
                 line-height: 6px;
+                color: white;
+            }
+            .el-form-item.is-required .el-form-item__label:before{
+                font-size: 0px;
             }
             .el-form-item--mini {
                 margin-bottom: 10px;

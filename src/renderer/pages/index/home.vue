@@ -56,7 +56,7 @@
     import ProgressBar from '@/components/ProgressBar.vue'
     import '@/assets/css/jquery-jvectormap.css'
     import {jquery} from '@/assets/js/jquery.min.js'
-    import {jvectormap} from '@/assets/js/jvectormap/jquery-jvectormap-1.2.2.min.js'
+    import {jvectormap} from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
     import {jvectormap1} from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
 
     export default {
@@ -70,8 +70,6 @@
                 lockedWidth: '0',
                 usableColor: '#f64b3e',
                 usableWidth: '0',
-
-
                 entrust: '',
                 income: '',
                 nodeNumber: '',
@@ -86,11 +84,17 @@
         },
         mounted() {
             let _this = this;
-            if (sessionStorage.getItem("userList") == null) {
-                this.parserequest();
+            //判断java程序是否启动
+            if (sessionStorage.getItem("homeJava") == null) {
+                //启动java程序
+                //this.parserequest();
                 setTimeout(() => {
                     this.getAccountAddress("/account/balances/");
                     this.getConsensus("/consensus");
+                    //判断vuex账户列表里有没有数据
+                    if(this.$store.state.addressList.length == 0){
+                        this.getAccountList("/account/list");
+                    }
                     //查询网络节点数
                     this.getNetWork();
                     setTimeout(() => {
@@ -100,6 +104,10 @@
             }else {
                 this.getAccountAddress("/account/balances/");
                 this.getConsensus("/consensus");
+                //判断vuex账户列表里有没有数据
+                if(this.$store.state.addressList.length == 0){
+                    this.getAccountList("/account/list");
+                }
                 //查询网络节点数
                 this.getNetWork();
                 setTimeout(() => {
@@ -117,12 +125,12 @@
             //执行java文件
             parserequest() {
                 var child_process = require('child_process');
-                var _path = process.execPath.substr(0,process.execPath.length-14);
-                //var _path = process.execPath.substr(0, 8);
-                console.log(_path);
-                child_process.execFile(_path+ 'node\\bin\\nuls.bat', null, {cwd: _path + 'node\\bin\\'}, function (error) {
+                //var _path = process.execPath.substr(0,process.execPath.length-14);
+                var _path = process.execPath.substr(0, 8);
+                //console.log(_path);
+                child_process.execFile(_path+ 'nodes\\bin\\nuls.bat', null, {cwd: _path + 'nodes\\bin\\'}, function (error) {
                     sessionStorage.setItem("homeJava", "1");
-                    console.log(error);
+                    //console.log(error);
                     if (error !== null) {
                         console.log('exec error: ' + error);
                     }
@@ -178,14 +186,35 @@
                                         this.ipObj.push({"latLng": latLngs, "name": names});
                                     })
                                     .catch(function (err) {
-                                        console.log(err);
+                                        this.ipObj =[];
+                                        //console.log(err);
                                     });
                             }
-                            console.log(this.ipObj);
+                            this.ipObj=[
+                                {latLng: [34.62, 82.45], name: '点点1'},
+                                {latLng: [24.74, 13.66], name: '点点1'},
+                                {latLng: [39.95, 116.34], name: '点点1'},
+                                {latLng: [38.97, 11.53], name: '点点1'},
+                                {latLng: [69.88, 21.64], name: '点点1'},
+                            ];
+                            //console.log(this.ipObj);
                         }
                     });
             },
-
+            //获取账户地址列表
+            getAccountList(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if(response.success){
+                            this.$store.state.addressList = response.data;
+                            localStorage.setItem('newAccountAddress',response.data[0].address);
+                        }else {
+                            this.$store.state.addressList = [];
+                        }
+                    }).catch((reject) => {
+                    this.$store.state.addressList = [];
+                });
+            },
             /** jVector Maps
              * Create a world map with markers
              * @method methodsMaps
@@ -273,6 +302,7 @@
                             width: 55px;
                             float: left;
                             margin-left: 1rem;
+                            text-align: right;
                         }
                     }
                 }
@@ -288,6 +318,8 @@
                     line-height: 1.5rem;
                     label {
                         margin-left: 1rem;
+                        width: 60px;
+                        text-align: right;
                     }
                     span {
                         margin-right: 5px;

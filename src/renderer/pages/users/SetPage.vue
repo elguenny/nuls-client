@@ -2,7 +2,7 @@
     <div class="set-page">
         <h2>{{$t('message.c66')}}</h2>
         <div class="set-page-info">
-            <!--<el-switch v-model="value0" :width="30" active-color="#658ec7" inactive-color="#0b1422"
+            <el-switch v-model="value0" :width="30" active-color="#658ec7" inactive-color="#0b1422"
                        :inactive-text="$t('message.c67')"></el-switch>
             <el-collapse>
                 <el-collapse-item>
@@ -33,15 +33,15 @@
             <div class="set-page-div">
                 <label>{{$t('message.c73')}}：</label>
                 <span class="cursor-p set-page-div-span" @click="toViewLog">{{$t('message.c74')}}</span>
-            </div>-->
-            <div class="set-page-div">
+            </div>
+            <!--<div class="set-page-div">
                 <label>{{$t('message.c75')}}：</label>
                 <el-select v-model="value" :placeholder="$t('message.c76')" :change="selectLanguage(value)">
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"
                                change="selectLanguage('item.value')">
                     </el-option>
                 </el-select>
-            </div>
+            </div>-->
             <div class="set-page-div">
                 <label>{{$t('message.c77')}}：</label>
                 <span class="cursor-p set-page-div-span" @click="toUserAddressList">{{$t('message.c78')}}</span>
@@ -50,10 +50,10 @@
                 <label>{{$t('message.c79')}}：</label>
                 <span class="cursor-p set-page-div-span" @click="toEditPassword ">{{$t('message.c80')}}</span>
             </div>
-           <!-- <div class="set-page-div">
+            <div class="set-page-div">
                 <label>{{$t('message.c81')}}：V1.0.0</label>
                 <span class="cursor-p set-page-div-span" @click="versionUpdates">{{$t('message.c82')}}</span>
-            </div>-->
+            </div>
         </div>
     </div>
 </template>
@@ -81,13 +81,13 @@
         methods: {
 
             //查看日志
-            /*toViewLog() {
+            toViewLog() {
                 this.$router.push({
                     path: '/users/userLog'
                 })
-            },*/
+            },
             //选择语言
-            selectLanguage(value) {
+            /*selectLanguage(value) {
                 this.$i18n.locale = value;
                 localStorage.setItem("language", value);
                 var param = '{"language":"' + value+ '"}';
@@ -100,7 +100,7 @@
                             console.log('err')
                         }
                     });
-            },
+            },*/
             //通讯录管理
             toUserAddressList() {
                 this.$router.push({
@@ -127,7 +127,7 @@
                     });
             },
             //版本更新
-           /* versionUpdates() {
+            versionUpdates() {
                 this.$confirm(this.$t('message.c88'), this.$t('message.c89'), {
                     confirmButtonText: this.$t('message.confirmButtonText'),
                     cancelButtonText: this.$t('message.cancelButtonText'),
@@ -143,7 +143,7 @@
                         message: this.$t('message.passWordFailed'),
                     });
                 });
-            }*/
+            }
         }
     }
 </script>
@@ -155,7 +155,6 @@
         h2 {
             margin-top: 30px;
             font-size: 16px;
-            font-weight: 600px;
             text-align: center;
             line-height: 35px;
         }
@@ -246,6 +245,9 @@
                     }
                 }
             }
+        }
+        .el-select-dropdown__list {
+            width: 310px;
         }
     }
 </style>

@@ -15,6 +15,7 @@
             </li>
         </ul>
         <div class="backOk" v-show="backOks"></div>
+        <Password ref="password" @toSubmit="toSubmit"></Password>
     </div>
 </template>
 
@@ -27,7 +28,7 @@
         data() {
             return {
                 backTitle: this.$t('message.accountManagement'),
-                passwordVisible: false,
+                passwordValue: '',
                 backOk: localStorage.getItem('toUserInfo') === "1" ? false : true,
                 backOks: localStorage.getItem('toUserInfo') === "1" ? false : true,
             }
@@ -44,45 +45,37 @@
              * @version 1.0
              **/
             newAccount() {
-                this.$prompt(this.$t('message.passWordTitle'), '', {
-                    confirmButtonText: this.$t('message.confirmButtonText'),
-                    cancelButtonText: this.$t('message.cancelButtonText'),
-                    /*inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                    inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
-                    inputType: 'password'
-                }).then(({value}) => {
-                    if(localStorage.getItem("userPass")!=value){
-                        this.$message({
-                            type: 'warning', message: this.$t('message.passWordCuo')
-                        });
-                    }else {
-                        var param = '{"count":1,"password":"' + value + '"}';
-                        this.$post('/account', param)
-                            .then((response) => {
-                                if (response.success) {
-                                    this.$message({
-                                        type: 'success', message: this.$t('message.passWordSuccess')
-                                    });
-                                    localStorage.setItem('newAccountAddress', response.data);
-                                    localStorage.setItem('userPass', value);
-                                    this.$router.push({
-                                        name: '/newAccount',
-                                        params: {newOk: true, address: ""},
-                                    })
-                                } else {
-                                    this.$message({
-                                        type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                                    });
-                                }
-                            });
-                    }
-                }).catch(() => {
-                    this.$message({
-                        type: 'warning',
-                        message: this.$t('message.enterCance')
-                    });
-                });
+                this.$refs.password.showPassword(true);
+            },
+            //
+            toSubmit(password) {
+                this.passwordValue = password;
+                var params = '{"count":1,"password":"' + password + '"}';
+                this.postAccount('/account', params)
+            },
 
+            //输入密码提交方法
+            postAccount(url,params){
+                this.$post(url, params)
+                    .then((response) => {
+                        if (response.success) {
+                            this.$message({
+                                type: 'success', message: this.$t('message.passWordSuccess')
+                            });
+                            localStorage.setItem('newAccountAddress', response.data);
+                            localStorage.setItem('userPass', this.passwordValue);
+                            localStorage.setItem('fastUser', "1");
+                            this.$router.push({
+                                name: '/newAccount',
+                                params: {newOk: true, address: ""},
+                            })
+                        } else {
+                            localStorage.setItem('fastUser', "0");
+                            this.$message({
+                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                            });
+                        }
+                    });
             },
             /** importAccount
              * @method importAccount

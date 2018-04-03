@@ -3,13 +3,13 @@
         <Back :backTitle="backTitle" ></Back>
         <h2>{{$t("message.c80")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm"  class="set-pass">
-            <el-form-item :label="$t('message.oldPassWord')" prop="oldPass">
+            <el-form-item :label="$t('message.oldPassWord')+'：'" prop="oldPass">
                 <el-input type="password" v-model="passForm.oldPass" :maxlength=20 ></el-input>
             </el-form-item>
-            <el-form-item :label="$t('message.c90')" prop="pass">
+            <el-form-item :label="$t('message.c90')+'：'" prop="pass">
                 <el-input type="password" v-model="passForm.pass" :maxlength=20></el-input>
             </el-form-item>
-            <el-form-item :label="$t('message.c91')" prop="checkPass">
+            <el-form-item :label="$t('message.c91')+'：'" prop="checkPass">
                 <el-input type="password" v-model="passForm.checkPass" :maxlength=20></el-input>
             </el-form-item>
             <!--<el-form-item :label="$t('message.passWordHint')">
@@ -172,12 +172,14 @@
             }
             .el-input__inner {
                 border: 1px solid #6290c7;
+                padding: 0 2px;
             }
             .el-form-item__label {
                 font-size: 12px;
                 color: #8a929b;
                 padding: 15px 0 10px;
                 line-height: 0px;
+                color: white;
             }
             .el-form-item__content {
                 line-height: 10px;
