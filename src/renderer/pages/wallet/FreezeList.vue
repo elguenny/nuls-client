@@ -1,6 +1,6 @@
 <template>
 	<div class="freeze-list">
-		<Back :backTitle="backTitle"></Back>
+		<Back :backTitle="this.$t('message.freezeManagement')"></Back>
 		<div class="freeze-list-tabs">
 			<h2>{{$t('message.freezeList')}}</h2>
 			<el-table :data="freezeData">
@@ -25,7 +25,6 @@
 	export default {
 		data() {
 			return {
-                backTitle:this.$t('message.freezeManagement'),
 				address:this.$route.params.address,
 				freezeData: []
 			}

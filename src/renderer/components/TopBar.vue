@@ -89,18 +89,10 @@
             }
         },
         methods: {
-            /**
-             * method statement
-             * @method selectLanguage
-             * @return {string} select language type
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
+            //语言切换
             selectLanguage() {
-                console.log(this.projectName.key)
+                //console.log(this.projectName.key)
                 this.$i18n.locale = this.projectName.key;
-                //locale.use(this.projectName.key);
                 var param = '{"language":"' + this.projectName.key+ '"}';
                 this.$post('/lang', param)
                     .then((response) => {
@@ -133,7 +125,6 @@
                             path: '/wallet',
                         })
                     }
-                    //this.getUserList("/account/list");
                 }
                if (url === "consensus") {
                     this.isActive = 2;
@@ -142,12 +133,6 @@
                         params: {activeName: "first"},
                     })
                 }
-                /*if (url === "consensus") {
-                    this.isActive = 2;
-                    this.$message({
-                        type: 'info', message: this.$t('message.c65'), duration: '800'
-                    });
-                }*/
                 if (url === "application") {
                     this.isActive = 3;
                     this.$message({
@@ -161,65 +146,22 @@
                     });
                 }
             },
-            //获取用户列表
-            getUserList(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        if (response.success) {
-                            if (response.data.length > 0) {
-                                sessionStorage.setItem("userListOK", "1");
-                            } else {
-                                sessionStorage.setItem("userListOK", "0");
-                            }
-                        } else {
-                            sessionStorage.setItem("userListOK", "0");
-                            console.log("获取账户列表失败！");
-                        }
-                    }).catch((reject) => {
-                    console.log(reject);
-                    sessionStorage.setItem("userList", "0");
-                });
-            },
-            /**
-             * method statement
-             * @method news
-             * @author Wave
-             * @date 2018-3-5
-             * @version 1.0
-             **/
+            //消息方案
             news() {
                 /*this.newsOk = !this.newsOk*/
             },
-            /**
-             * method statement
-             * @method toSetUp
-             * @author Wave
-             * @date 2018-3-5
-             * @version 1.0
-             **/
+            //设置界面跳转
             toSetUp() {
                 this.$router.push({
                     path: '/users/setPage'
                 })
             },
-            /**
-             * method statement
-             * @method toMinus
-             * @author Wave
-             * @date 2018-3-5
-             * @version 1.0
-             **/
+            //窗体最小化
             toMinus() {
                 var ipc = require('electron').ipcRenderer;
                 ipc.send('window-min');
             },
-            /**
-             * method statement
-             * @method toClose
-             * @author Wave
-             * @date 2018-3-5
-             * @version 1.0
-             **/
+            //关闭窗体
             toClose() {
                 var child_process = require('child_process');
                 //调用执行文件

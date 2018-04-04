@@ -1,6 +1,6 @@
 <template>
     <div class="pledge-info">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{$t('message.c48')}}</h2>
         <el-table :data="pledgeData" >
             <el-table-column prop="agentName" :label="$t('message.c24')" width="180" align='center'>
@@ -17,7 +17,8 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination layout="prev, pager, next" :page-size="8" :total=this.total class="cb"  @current-change="pledgeSize" v-show="totalOK = this.total > 8 ? true:false"></el-pagination>
+        <el-pagination layout="prev, pager, next" :page-size="8" :total=this.total class="cb"
+                       @current-change="pledgeSize" v-show="totalOK = this.total > 8 ? true:false"></el-pagination>
     </div>
 </template>
 
@@ -27,7 +28,6 @@
     export default {
         data() {
             return {
-                backTitle:this.$t('message.consensusManagement'),
                 pledgeData: [],
                 total:0,
             }

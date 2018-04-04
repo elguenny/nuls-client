@@ -1,6 +1,6 @@
 <template>
     <div class="new-account">
-        <Back :backTitle="backTitle" v-show="newOks"></Back>
+        <Back :backTitle="this.$t('message.accountManagement')" v-show="newOks"></Back>
         <div class="new-account-top">
             <h1 v-show="newOk" style="text-align: center"> {{$t("message.newAccountTitle")}}</h1>
             <h2>
@@ -45,7 +45,6 @@
     export default {
         data() {
             return {
-                backTitle: this.$t('message.accountManagement'),
                 keyShow: false,
                 keyInfo: '',
                 newAccountAddress: this.$route.params.address == "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
@@ -69,7 +68,6 @@
                 this.$post(url, params)
                     .then((response) => {
                         if (response.success) {
-                            localStorage.setItem("fastUser", "1")
                             this.keyInfo = response.data;
                             this.passwordVisible = false
                         } else {
@@ -242,9 +240,8 @@
                 this.$confirm(this.$t('message.c110'), this.$t('message.c86'), {
                     confirmButtonText: this.$t('message.c111'),
                     cancelButtonText: this.$t('message.c112'),
-                    /* type: 'warning'*/
                 }).then(() => {
-                    if (localStorage.getItem('toUserInfo') != "1") {
+                    if (localStorage.getItem('fastUser') === "0") {
                         this.$router.push({
                             name: '/wallet'
                         })
@@ -253,8 +250,6 @@
                             path: '/wallet/users/userInfo'
                         })
                     }
-                }).catch(() => {
-
                 });
 
             },
@@ -393,5 +388,6 @@
                 border-color: #658cc5;
             }
         }
+
     }
 </style>

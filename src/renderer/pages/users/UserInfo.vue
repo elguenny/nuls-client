@@ -1,6 +1,6 @@
 <template>
     <div class="users">
-        <Back :backTitle="backTitle" :backUrl="backUrl"></Back>
+        <Back :backTitle="this.$t('message.walletManagement')" :backUrl="backUrl"></Back>
         <div class="freeze-list-tabs">
             <h2>{{$t('message.userInfoTitle')}}</h2>
             <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"></el-button>
@@ -35,12 +35,11 @@
 
 <script>
     import Back from '@/components/BackBar.vue';
-    import Password from '@/components/passwordBar.vue';
+    import Password from '@/components/PasswordBar.vue';
 
     export default {
         data() {
             return {
-                backTitle: this.$t('message.walletManagement'),
                 outOrBackup: 0,
                 backUrl: '/wallet',
                 setAsAddress: '',
@@ -65,14 +64,16 @@
             getUserList(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response)
                         if (response.success) {
-                            if (response.data.length == 0) {
-                                localStorage.setItem("userPass", "")
+                            if (response.data.length === 0) {
+                                localStorage.setItem('fastUser','0');
+                                localStorage.setItem("userPass", "");
                                 localStorage.setItem("newAccountAddress", "")
-                            } else {
-                                this.userData = response.data;
+                            }else {
+                                localStorage.setItem('fastUser','1');
                             }
+                            this.$store.state.addressList = response.data;
+                            this.userData = response.data;
                         }
                     });
             },
@@ -111,12 +112,11 @@
                 if (localStorage.getItem("userPass") !== '') {
                     if (password !== localStorage.getItem("userPass")) {
                         this.$message({
-                            type: 'success', message: "对不起，您的密码不对?"
+                            type: 'success', message: this.$t('message.passWordCuo')
                         });
                     } else {
                         if(this.outOrBackup == 1){
                             var params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}';
-                            //console.log(params);
                             this.outUserAddress('/wallet/remove/', params)
                         }else {
                             this.$router.push({
@@ -138,6 +138,7 @@
             },
             //新增账户
             toNewAccount() {
+                localStorage.setItem('toUserInfo',"0");
                 this.$router.push({
                     path: '/firstInto/firstInfo'
                 })

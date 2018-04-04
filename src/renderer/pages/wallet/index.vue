@@ -153,7 +153,7 @@
             getAccountTxList(url, param) {
                 this.$fetch(url, param)
                     .then((response) => {
-                        console.log(response)
+                       //console.log(response)
                         if (response.data != null) {
                             this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {
@@ -190,37 +190,37 @@
             switchTyep(type) {
                 switch (type) {
                     case 1:
-                        return "共识奖励";
+                        return this.$t('message.c118');
                         break;
                     case 2:
-                        return "转账交易";
+                        return this.$t('message.c119');
                         break;
                     case 3:
-                        return "锁仓交易";
+                        return this.$t('message.c120');
                         break;
                     case 4:
-                        return "解锁交易";
+                        return this.$t('message.c121');
                         break;
                     case 5:
-                        return "零钱换整";
+                        return this.$t('message.c122');
                         break;
                     case 11:
-                        return "设置别名";
+                        return this.$t('message.c123');
                         break;
                     case 90:
-                        return "注册共识";
+                        return this.$t('message.c124');
                         break;
                     case 91:
-                        return "加入共识";
+                        return this.$t('message.c125');
                         break;
                     case 92:
-                        return "退出共识";
+                        return this.$t('message.c126');
                         break;
                     case 93:
-                        return "黄牌惩罚";
+                        return this.$t('message.c127');
                         break;
                     case 94:
-                        return "共识奖励";
+                        return this.$t('message.c128');
                         break;
 
                 }
@@ -264,7 +264,6 @@
             },
             //金额显示隐藏
             toKeyShow() {
-                console.log(this.keyShow);
                if(this.keyShow){
                     localStorage.setItem("keyShow",false);
                     this.keyShow = false;

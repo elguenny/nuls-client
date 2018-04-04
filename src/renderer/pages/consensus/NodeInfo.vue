@@ -1,6 +1,6 @@
 <template>
 	<div class="node-info">
-		<Back :backTitle="backTitle"></Back>
+		<Back :backTitle="this.$t('message.consensusManagement')"></Back>
 		<h2>{{this.myNodeInfo.agentName}}</h2>
 		<ul>
 			<li>
@@ -41,7 +41,6 @@
 	export default {
 		data() {
 			return {
-				backTitle: this.$t('message.consensusManagement'),
 				myNodeInfo:[],
 			}
 		},

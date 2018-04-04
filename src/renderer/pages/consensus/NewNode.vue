@@ -1,6 +1,6 @@
 <template>
     <div class="new-node">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{$t("message.c21")}}</h2>
         <div class="new-node-form">
             <el-form ref="newNodeForm" :model="newNodeForm" :rules="newNodeRules" size="mini" label-position="top">
@@ -71,7 +71,6 @@
                 }
             };
             return {
-                backTitle: this.$t('message.consensusManagement'),
                 accountAddress: [],
                 usable: "0",
                 placeholder: "",

@@ -1,6 +1,6 @@
 <template>
     <div class="transfer">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.walletManagement')"></Back>
         <div class="transfer-info">
             <h2>{{$t('message.transfer')}}</h2>
             <el-form :model="transferForm" :rules="rules" ref="transferForm">
@@ -52,7 +52,7 @@
     import Password from '@/components/PasswordBar.vue';
     export default {
         data() {
-            var selectAddress = (rule, value, callback) => {
+            let selectAddress = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error(this.$t('message.addressNull')));
                 }else {
@@ -62,7 +62,7 @@
                     callback();
                 }
             };
-            var checkJoinAddress = (rule, value, callback) => {
+            let checkJoinAddress = (rule, value, callback) => {
                 if (!value) {
                     callback(new Error(this.$t('message.transferNull')));
                 }
@@ -84,7 +84,7 @@
                     }
                 }, 500);
             };
-            var checkJoinNo = (rule, value, callback) => {
+            let checkJoinNo = (rule, value, callback) => {
                 if (!value) {
                     callback(new Error(this.$t('message.transferNO')));
                 }
@@ -104,7 +104,6 @@
 
             };
             return {
-                backTitle: this.$t('message.walletManagement'),
                 usable: 0,
                 accountAddress: [],
                 remnant:0,

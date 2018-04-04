@@ -7,7 +7,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="passwordVisible = false">{{$t('message.cancelButtonText')}}</el-button>
-            <el-button type="primary" @click="dialogSubmit('passwordForm')">{{$t('message.confirmButtonText')}}
+            <el-button type="primary" @click="dialogSubmit('passwordForm')" id="passwordInfo">{{$t('message.confirmButtonText')}}
             </el-button>
         </div>
     </el-dialog>
@@ -27,6 +27,15 @@
                     ]
                 },
             };
+        },
+        mounted() {
+            var lett=this;
+            document.onkeydown=function(e){
+                var key=window.event.keyCode;
+                if(key==13){
+                    document.getElementById('passwordInfo').click();
+                }
+            }
         },
         methods: {
             showPassword(boolean) {

@@ -1,6 +1,6 @@
 <template>
 	<div class="import-account">
-		<Back :backTitle="backTitle"></Back>
+		<Back :backTitle="this.$t('message.firstInfoTitle')"></Back>
 		<h1>{{$t("message.inportAccount")}}</h1>
 		<ul>
 			<li @click="importKey">
@@ -21,7 +21,6 @@
 	export default {
 		data() {
 			return {
-                backTitle: this.$t("message.firstInfoTitle"),
 			}
 		},
         components: {

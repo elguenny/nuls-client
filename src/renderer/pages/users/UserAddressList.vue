@@ -1,6 +1,6 @@
 <template>
     <div class="users">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.setManagement')"></Back>
         <div class="users-conter">
             <h2>{{$t('message.c93')}}</h2>
             <el-button type="primary" icon="el-icon-plus" @click="toNewAccount()" class="newAccount"></el-button>
@@ -9,7 +9,7 @@
                 </el-table-column>
                 <el-table-column prop="userAlias" :label="$t('message.tabAlias')" width="100" align='center'>
                 </el-table-column>
-                <el-table-column prop="userHelp" :label="$t('message.remarks')"  width="180" align='center'>
+                <el-table-column prop="userHelp" :label="$t('message.remarks')" width="180" align='center'>
                 </el-table-column>
                 <el-table-column :label="$t('message.operation')" width="120" align='center'>
                     <template slot-scope="scope">
@@ -23,22 +23,25 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <el-pagination layout="prev, pager, next" :page-size="8" :total=this.totalAll
+                           v-show="totalAllOk = this.totalAll>8 ?true:false" class="cb" @current-change="consensusSize"></el-pagination>
         </div>
-        <el-dialog :title="$t('message.c96')" :visible.sync="dialogFormVisible">
-            <el-form :model="form" label-width="80px" :rules="formRules"  ref="form">
-                <el-form-item :label="$t('message.c69')">
-                    <el-input v-model="form.userAddress"></el-input>
+        <el-dialog :title="$t('message.c96')" :visible.sync="dialogFormVisible" top="24vh">
+            <el-form ref="userListForm" :model="userListForm" :rules="userListFormRules" label-width="80px">
+                <el-form-item :label="$t('message.c69')" prop="userAddress">
+                    <el-input v-model="userListForm.userAddress"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.remarks')">
-                    <el-input v-model="form.userHelp"></el-input>
+                    <el-input v-model="userListForm.userHelp"></el-input>
                 </el-form-item>
-                <div class="userAlias">{{$t('message.tabAlias')}} {{form.userAlias}}</div>
+                <div class="userAlias">{{$t('message.tabAlias')}} {{userListForm.userAlias}}</div>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="addUserAccount">{{$t('message.confirmButtonText')}}</el-button>
+                <el-button type="primary" @click="addUserAccount('userListForm')">{{$t('message.confirmButtonText')}}
+                </el-button>
             </div>
         </el-dialog>
-        <!--<el-pagination layout="prev, pager, next" :total="1000" class="cb"></el-pagination>-->
+
     </div>
 </template>
 
@@ -47,25 +50,20 @@
 
     export default {
         data() {
-            var userAddressRules = (rule, value, callback) => {
-                if (!value) {
-                    return callback(new Error(this.$t('message.passWordHintEmpty')));
-                }
-            };
             return {
-                backTitle: this.$t('message.setManagement'),
                 tableData: [],
                 dialogFormVisible: false,
-                form: {
+                totalAll: 10,
+                userListForm: {
                     userAddress: '',
                     userAlias: '',
                     userHelp: '',
                 },
-                formRules: {
-                    pass: [{
-                        validator: userAddressRules,
-                        trigger: 'blur'
-                    }]
+                userListFormRules: {
+                    userAddress: [
+                        {required: true, message: this.$t('message.c116'), trigger: 'blur'},
+                        {min: 10, max: 50, message: this.$t('message.c117'), trigger: 'blur'}
+                    ]
                 }
             }
         },
@@ -75,7 +73,7 @@
         mounted() {
             let _this = this;
             this.openDB();
-            this.getUserList();
+            this.getUserList(1,8);
         },
         methods: {
             //创建usersDB
@@ -90,27 +88,34 @@
                 }
             },
             //给userlist添加数据
-            addUserAccount() {
-                var request = indexedDB.open('usersDB', 1);
-                var db;
-                let value = {
-                    'userAddress': this.form.userAddress,
-                    'userAlias': this.form.userAlias,
-                    'userHelp': this.form.userHelp
-                };
-                request.onsuccess = function (event) {
-                    db = event.target.result;
-                    var tx = db.transaction('addressList', 'readwrite');
-                    var store = tx.objectStore('addressList');
-                    store.put(value);
-                }
-                this.getUserList();
-                this.form.userAddress = '';
-                this.form.userHelp = '';
-                this.dialogFormVisible = false
+            addUserAccount(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        var request = indexedDB.open('usersDB', 1);
+                        var db;
+                        let value = {
+                            'userAddress': this.userListForm.userAddress,
+                            'userAlias': this.userListForm.userAlias,
+                            'userHelp': this.userListForm.userHelp
+                        };
+                        request.onsuccess = function (event) {
+                            db = event.target.result;
+                            var tx = db.transaction('addressList', 'readwrite');
+                            var store = tx.objectStore('addressList');
+                            store.put(value);
+                        }
+                        this.getUserList(1,8);
+                        this.userListForm.userAddress = '';
+                        this.userListForm.userHelp = '';
+                        this.dialogFormVisible = false
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                })
             },
             //读取userList
-            getUserList() {
+            getUserList(pageNumber,pageSize) {
                 var request = indexedDB.open('usersDB', 1);
                 var dbData = [];
                 request.onsuccess = function (event) {
@@ -125,8 +130,21 @@
                             cursor.continue();
                         }
                     }
-                }
-                this.tableData = dbData;
+                };
+                //显示总条数
+                setTimeout(() => {
+                    this.totalAll = dbData.length;
+                    if(pageNumber === 1){
+                        //console.log(pageNumber)
+                        this.tableData = dbData.slice(0,pageSize);
+                    }else {
+                        this.tableData = dbData.slice((pageNumber-1)*8,pageNumber*8);
+                    }
+                }, 50);
+            },
+            //交易列表分页
+            consensusSize(events){
+                this.getUserList(events,8);
             },
             //新增通讯录
             toNewAccount() {
@@ -135,23 +153,32 @@
             //修改一条通讯录
             editorRow(userAddress, userAlias, userHelps) {
                 this.dialogFormVisible = true;
-                this.form.userAddress = userAddress;
-                this.form.userAlias = userAlias;
-                this.form.userHelp = userHelps;
+                this.userListForm.userAddress = userAddress;
+                this.userListForm.userAlias = userAlias;
+                this.userListForm.userHelp = userHelps;
             },
             //删除通讯录一条记录
             deleteRow(userAddress) {
-                var request = indexedDB.open('usersDB', 1);
-                var db;
-                request.onsuccess = function (event) {
-                    db = event.target.result;
-                    var tx = db.transaction('addressList', 'readwrite');
-                    var store = tx.objectStore('addressList');
-                    store.delete(userAddress);
-                };
-                this.getUserList();
+                this.$confirm(this.$t('message.c115'), this.$t('message.c86'), {
+                    confirmButtonText: this.$t('message.confirmButtonText'),
+                    cancelButtonText: this.$t('message.cancelButtonText'),
+                }).then(() => {
+                    var request = indexedDB.open('usersDB', 1);
+                    var db;
+                    request.onsuccess = function (event) {
+                        db = event.target.result;
+                        var tx = db.transaction('addressList', 'readwrite');
+                        var store = tx.objectStore('addressList');
+                        store.delete(userAddress);
+                    };
+                    this.getUserList(1,8);
+                    this.$message({
+                        type: 'success',
+                        message: this.$t('message.passWordSuccess'),
+                    });
+                }).catch(() => {
+                });
             }
-
         }
     }
 </script>
@@ -186,6 +213,7 @@
                 line-height: 20px;
                 margin-left: 40px;
                 color: #606266;
+                margin-bottom: 10px;
             }
             .el-dialog__title {
                 color: #C1C5C9;
@@ -194,8 +222,26 @@
             .el-dialog__header {
                 padding: 10px 10px 0px;
             }
+            .el-dialog__body {
+                .el-form {
+                    .el-form-item {
+                        margin-bottom: 10px;
+                        .el-input {
+                            height: 35px;
+                        }
+                        .el-form-item__error {
+                            top: 35px;
+                            padding: 0px;
+                        }
+                    }
+                }
+            }
             .el-dialog__footer {
                 text-align: center;
+                .el-button--primary {
+                    width: 145px;
+                    margin-right: 0px;
+                }
             }
         }
     }

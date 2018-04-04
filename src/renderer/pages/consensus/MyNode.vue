@@ -1,6 +1,6 @@
 <template>
 	<div class="my-node">
-		<Back :backTitle="backTitle"></Back>
+		<Back :backTitle="this.$t('message.consensusManagement')"></Back>
 		<h2>{{this.agentAddressInfo.agentName}}</h2>
 		<div class="div-icon1 node-page-top">
 			<p class="subscript">
@@ -66,7 +66,6 @@
 	export default {
 		data() {
 			return {
-				backTitle: this.$t('message.consensusManagement'),
 				address:'',
                 agentAddress:this.$route.params.agentAddress,
                 agentAddressInfo:[],

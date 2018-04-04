@@ -1,6 +1,6 @@
 <template>
     <div class="set-password">
-        <Back :backTitle="backTitle" ></Back>
+        <Back :backTitle="this.$t('message.setManagement')" ></Back>
         <h2>{{$t("message.c80")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm"  class="set-pass">
             <el-form-item :label="$t('message.oldPassWord')+'：'" prop="oldPass">
@@ -59,7 +59,6 @@
                 }
             };
             return {
-                backTitle: this.$t('message.setManagement'),
                 passForm: {
                     oldPass:'',
                     pass: '',

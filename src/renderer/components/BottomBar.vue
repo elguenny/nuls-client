@@ -112,9 +112,7 @@
             clearData(){
                 localStorage.setItem('fastUser',"0");
                 localStorage.setItem("language","en");
-                localStorage.setItem("lockTime","");
                 localStorage.setItem("newAccountAddress","");
-                localStorage.setItem("passWordHint","");
                 localStorage.setItem("userPass","");
                 indexedDB.deleteDatabase("usersDB");
 			}

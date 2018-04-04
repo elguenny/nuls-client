@@ -16,7 +16,8 @@
                     <label>{{$t("message.c7")}}：</label>{{(this.myInfoData.reward*0.00000001).toFixed(8)}} NULS
                 </li>
                 <li>
-                    <label>{{$t("message.c4")}}：</label>{{this.myInfoData.agentCount}} {{$t("message.c30")}} <span v-show="this.myInfoData.agentCount > 0 ? false:true ">(<span
+                    <label>{{$t("message.c4")}}：</label>{{this.myInfoData.agentCount}} {{$t("message.c30")}}
+                    <span v-show="this.myInfoData.agentCount > 0 ? false:true ">(<span
                          @click="toNewNode" class="span">{{$t("message.c5")}}</span>)</span>
                 </li>
                 <li>
@@ -28,7 +29,10 @@
                     <label>{{$t("message.c6")}}：</label>{{(this.myInfoData.usableBalance*.00000001).toFixed(8)}} NULS
                 </li>
                 <li>
-                    <label>{{$t("message.c10")}}：</label><span @click="toPledgeInfo" class="span">{{(this.myInfoData.totalDeposit*0.00000001).toFixed(8)}} NULS</span>
+                    <label>{{$t("message.c10")}}：</label>
+                    <span @click="toPledgeInfo" class="span">
+                    {{(this.myInfoData.totalDeposit*0.00000001).toFixed(8)}} NULS
+                    </span>
                 </li>
 
             </ul>

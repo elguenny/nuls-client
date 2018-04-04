@@ -1,9 +1,8 @@
 <template>
     <div class="edit-aliasing">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.accountManagement')"></Back>
         <div class="edit-info">
             <h2>{{$t('message.c100')}}</h2>
-
             <el-form :model="aliasForm" :rules="aliasRules" ref="aliasForm">
                 <div class="div-text" style="text-align: center">
                     <label>{{$t('message.c102')}}:</label>{{this.address}}
@@ -47,7 +46,6 @@
                 }
             };
             return {
-                backTitle: this.$t('message.accountManagement'),
                 address: this.$route.params.address,
                 usable: 0,
                 aliasForm: {

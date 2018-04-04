@@ -1,6 +1,6 @@
 <template>
     <div class="deal-info">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.transactionManagement')"></Back>
         <div class="deal-info-top">
             <div class="deal-left fl">
                 <div>{{$t("message.input")}}<span> {{this.allInputs*0.00000001}} NULS</span></div>
@@ -41,7 +41,6 @@
     export default {
         data() {
             return {
-                backTitle: this.$t('message.transactionManagement'),
                 hash: this.$route.params.hash,
                 infoData: [],
                 inputs: [],

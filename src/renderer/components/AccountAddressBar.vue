@@ -17,11 +17,11 @@
         mounted() {
             let _this = this;
             //判断是不有默认账户
-            if(localStorage.getItem("newAccountAddress") != ''){
+            if(localStorage.getItem("newAccountAddress") !== ''){
 				this.accountAddressValue = localStorage.getItem("newAccountAddress");
 			}
 			//判断vuex账户列表里有没有数据
-			if(this.$store.state.addressList.length == 0){
+			if(this.$store.state.addressList.length === 0){
                 this.getAccountList("/account/list");
 			}
 
@@ -31,6 +31,7 @@
             getAccountList(url) {
                 this.$fetch(url)
                     .then((response) => {
+                        //console.log(response);
                         if(response.success){
                             this.$store.state.addressList = response.data;
                             localStorage.setItem('newAccountAddress',response.data[0].address);

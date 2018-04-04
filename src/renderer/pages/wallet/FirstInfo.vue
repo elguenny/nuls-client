@@ -1,7 +1,7 @@
 <template>
     <div class="first-info">
         <div class="first-info-top">
-            <Back :backTitle="backTitle" v-show="backOk"></Back>
+            <Back :backTitle="this.$t('message.accountManagement')" v-show="backOk"></Back>
         </div>
         <h2>{{$t("message.firstInfoTitle")}}</h2>
         <ul>
@@ -27,7 +27,6 @@
     export default {
         data() {
             return {
-                backTitle: this.$t('message.accountManagement'),
                 passwordValue: '',
                 backOk: localStorage.getItem('toUserInfo') === "1" ? false : true,
                 backOks: localStorage.getItem('toUserInfo') === "1" ? false : true,
@@ -64,13 +63,11 @@
                             });
                             localStorage.setItem('newAccountAddress', response.data);
                             localStorage.setItem('userPass', this.passwordValue);
-                            localStorage.setItem('fastUser', "1");
                             this.$router.push({
                                 name: '/newAccount',
                                 params: {newOk: true, address: ""},
                             })
                         } else {
-                            localStorage.setItem('fastUser', "0");
                             this.$message({
                                 type: 'warning', message: this.$t('message.passWordFailed') + response.msg
                             });

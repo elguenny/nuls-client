@@ -74,15 +74,12 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        localStorage.setItem('userPass', this.passForm.pass);
-                        //localStorage.setItem('passWordHint', this.passForm.passHelp);
-                        localStorage.setItem('fastUser', '1');
                         this.$router.push({
                             path: '/firstInto/firstInfo'
                         })
                     } else {
                         this.$message({
-                            type: 'success', message:this.$t('message.passWordFailed') + response.msg
+                            type: 'success', message:this.$t('message.passWordFailed')
                         });
                         return false;
                     }

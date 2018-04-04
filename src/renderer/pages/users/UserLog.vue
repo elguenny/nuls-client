@@ -1,6 +1,6 @@
 <template>
 	<div class="users-log">
-		<Back :backTitle="backTitle"></Back>
+		<Back :backTitle="this.$t('message.set')"></Back>
 		<h2>日志</h2>
 		<div class="users-log-info">
 			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
@@ -35,7 +35,6 @@
 	export default {
 		data() {
 			return {
-				backTitle: "设置",
 			}
 		},
 		components: {

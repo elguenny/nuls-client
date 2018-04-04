@@ -1,6 +1,6 @@
 <template>
     <div class="agency-node">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{$t('message.c43')}}</h2>
         <div class="agency-node-top">
             <div class="search-div fl">
@@ -64,7 +64,6 @@
     export default {
         data() {
             return {
-                backTitle:this.$t('message.consensusManagement'),
                 keyword: '',
                 selectKeyword: '',
                 creditValuesShow0: false,

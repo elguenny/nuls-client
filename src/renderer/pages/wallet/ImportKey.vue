@@ -1,6 +1,6 @@
 <template>
     <div class="import-key">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.inportAccount')"></Back>
         <h2>{{$t("message.key")}}</h2>
         <el-form ref="keyData" :model="keyData" :rules="keyRules" label-position="top">
             <el-form-item :label="$t('message.keyLow')" prop="keyInfo">
@@ -31,7 +31,6 @@
     export default {
         data() {
             return {
-                backTitle: this.$t("message.inportAccount"),
                 passwordVisible: false,
                 passwordForm: {
                     password: '',

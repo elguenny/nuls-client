@@ -75,7 +75,7 @@
                 nodeNumber: '',
                 ipData: [],
                 mapObj: [],
-                ipObj:[],
+                ipObj: [],
 
             };
         },
@@ -85,6 +85,7 @@
         mounted() {
             let _this = this;
             //判断java程序是否启动
+            sessionStorage.setItem("homeJava", "1");
             if (sessionStorage.getItem("homeJava") == null) {
                 //启动java程序
                 //this.parserequest();
@@ -92,7 +93,7 @@
                     this.getAccountAddress("/account/balances/");
                     this.getConsensus("/consensus");
                     //判断vuex账户列表里有没有数据
-                    if(this.$store.state.addressList.length == 0){
+                    if (this.$store.state.addressList.length == 0) {
                         this.getAccountList("/account/list");
                     }
                     //查询网络节点数
@@ -101,18 +102,18 @@
                         this.methodsMaps(this.ipObj);
                     }, 600);
                 }, 8000);
-            }else {
+            } else {
                 this.getAccountAddress("/account/balances/");
                 this.getConsensus("/consensus");
                 //判断vuex账户列表里有没有数据
-                if(this.$store.state.addressList.length == 0){
+                if (this.$store.state.addressList.length == 0) {
                     this.getAccountList("/account/list");
                 }
                 //查询网络节点数
                 this.getNetWork();
                 setTimeout(() => {
                     this.methodsMaps(this.ipObj);
-                }, 600);
+                }, 300);
             }
 
             if (localStorage.getItem("fastUser") == null) {
@@ -128,7 +129,7 @@
                 //var _path = process.execPath.substr(0,process.execPath.length-14);
                 var _path = process.execPath.substr(0, 8);
                 //console.log(_path);
-                child_process.execFile(_path+ 'nodes\\bin\\nuls.bat', null, {cwd: _path + 'nodes\\bin\\'}, function (error) {
+                child_process.execFile(_path + 'nodes\\bin\\nuls.bat', null, {cwd: _path + 'nodes\\bin\\'}, function (error) {
                     sessionStorage.setItem("homeJava", "1");
                     //console.log(error);
                     if (error !== null) {
@@ -144,7 +145,6 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            //console.log(response);
                             this.balanceData = response.data;
                             this.balanceWidth = this.balanceData.balance / this.balanceData.balance * 100 + "%";
                             this.lockedWidth = this.balanceData.locked / this.balanceData.balance * 100 + "%";
@@ -168,14 +168,14 @@
                     })
             },
             //getNetWork
-            getNetWork(){
+            getNetWork() {
                 this.$fetch('/network/nodes')
                     .then((response) => {
                         if (response.success) {
                             this.ipData = response.data;
                             for (var j = 0, len = this.ipData.length; j < len; j++) {
                                 axios.get('http://freegeoip.net/json/' + this.ipData[j])
-                                    .then( (response) =>{
+                                    .then((response) => {
                                         var latLngs = [response.data.latitude, response.data.longitude];
                                         var names = response.data.time_zone;
                                         if (names == "undefined") {
@@ -186,11 +186,11 @@
                                         this.ipObj.push({"latLng": latLngs, "name": names});
                                     })
                                     .catch(function (err) {
-                                        this.ipObj =[];
+                                        this.ipObj = [];
                                         //console.log(err);
                                     });
                             }
-                            this.ipObj=[
+                            this.ipObj = [
                                 {latLng: [34.62, 82.45], name: '点点1'},
                                 {latLng: [24.74, 13.66], name: '点点1'},
                                 {latLng: [39.95, 116.34], name: '点点1'},
@@ -205,26 +205,26 @@
             getAccountList(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        if(response.success){
-                            this.$store.state.addressList = response.data;
-                            localStorage.setItem('newAccountAddress',response.data[0].address);
-                        }else {
+                        if (response.success) {
+
+                            if (response.data.length > 0) {
+                                this.$store.state.addressList = response.data;
+                                localStorage.setItem('newAccountAddress', response.data[0].address);
+                                localStorage.setItem('fastUser', '1');
+                            } else {
+                                localStorage.setItem('fastUser', '0');
+                            }
+                        } else {
                             this.$store.state.addressList = [];
+                            localStorage.setItem('fastUser', '0');
                         }
                     }).catch((reject) => {
+                    console.log(reject);
                     this.$store.state.addressList = [];
+                    localStorage.setItem('fastUser', '0');
                 });
             },
-            /** jVector Maps
-             * Create a world map with markers
-             * @method methodsMaps
-             * @for
-             * @param {Object} maps mapsObj
-             * @return
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
+            //根据坐标标注位置
             methodsMaps(maps) {
                 $('#world-map-markers').vectorMap({
                     map: 'world_mill_en',
@@ -306,8 +306,8 @@
                         }
                     }
                 }
-                .nav-all{
-                    .bar-bg{
+                .nav-all {
+                    .bar-bg {
                         margin-top: 13px;
                     }
                 }

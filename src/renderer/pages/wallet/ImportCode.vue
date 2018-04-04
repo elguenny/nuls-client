@@ -1,6 +1,6 @@
 <template>
     <div class="import-code">
-        <Back :backTitle="backTitle"></Back>
+        <Back :backTitle="this.$t('message.inportAccount')"></Back>
         <h2>{{$t("message.code")}}</h2>
         <p>{{$t('message.keyLow')}}</p>
         <el-form >
@@ -25,7 +25,6 @@
     export default {
         data() {
             return {
-                backTitle: this.$t("message.inportAccount"),
                 imageUrl: '',
                 imagesPash:'',
             };
