@@ -113,7 +113,7 @@
                 this.getNetWork();
                 setTimeout(() => {
                     this.methodsMaps(this.ipObj);
-                }, 300);
+                }, 500);
             }
 
             if (localStorage.getItem("fastUser") == null) {
@@ -145,6 +145,7 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
+                            //console.log(response)
                             this.balanceData = response.data;
                             this.balanceWidth = this.balanceData.balance / this.balanceData.balance * 100 + "%";
                             this.lockedWidth = this.balanceData.locked / this.balanceData.balance * 100 + "%";
@@ -206,10 +207,10 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-
-                            if (response.data.length > 0) {
-                                this.$store.state.addressList = response.data;
-                                localStorage.setItem('newAccountAddress', response.data[0].address);
+                            //console.log(response);
+                            if (response.data.list.length > 0) {
+                                this.$store.state.addressList = response.data.list;
+                                localStorage.setItem('newAccountAddress', response.data.list[0].address);
                                 localStorage.setItem('fastUser', '1');
                             } else {
                                 localStorage.setItem('fastUser', '0');

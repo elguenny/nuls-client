@@ -63,6 +63,7 @@
                             });
                             localStorage.setItem('newAccountAddress', response.data);
                             localStorage.setItem('userPass', this.passwordValue);
+                            this.getAccountList("/account/list");
                             this.$router.push({
                                 name: '/newAccount',
                                 params: {newOk: true, address: ""},
@@ -74,17 +75,27 @@
                         }
                     });
             },
-            /** importAccount
-             * @method importAccount
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
+            //获取账户地址列表
+            getAccountList(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        console.log(response);
+                        if(response.success){
+                            this.$store.state.addressList = response.data.list;
+                        }else {
+                            this.$store.state.addressList = [];
+                        }
+                    }).catch((reject) => {
+                    console.log("User List err"+reject);
+                    this.$store.state.addressList = [];
+                });
+            },
+            //导入账户跳转
             importAccount() {
                 this.$router.push({
                     path: '/firstInto/firstInfo/importAccount'
                 })
-            }
+            },
         }
     }
 </script>

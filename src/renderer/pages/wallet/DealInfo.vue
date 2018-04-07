@@ -24,9 +24,9 @@
             <ul>
                 <li><span>{{$t("message.tradingTime")}}</span>{{this.times}}</li>
                 <li><span>{{$t("message.miningFee1")}}</span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
-                <li class="overflow"><span>{{$t("message.autograph")}}</span>{{infoData.hash}}</li>
-                <li><span>{{$t("message.transactionType")}}</span>{{infoData.transferType === '1' ? $t('message.rollOut'): $t('message.rollIn')}}</li>
-                <li><span>{{$t("message.transactionState")}}</span>{{infoData.status === '1' ?  $t('message.confirmed'): $t('message.confirming')}}</li>
+                <li @click="hashCopy(infoData.hash)" class="cursor-p"><span>{{$t("message.autograph")}}</span>{{infoData.hash}}</li>
+                <li><span>{{$t("message.transactionType")}}</span>{{infoData.transferType == '1' ? $t('message.rollOut'): $t('message.rollIn')}}</li>
+                <li><span>{{$t("message.transactionState")}}</span>{{infoData.status == '1' ? $t('message.confirmed'):$t('message.confirming') }}</li>
                 <li><span>{{$t("message.blockHeight")}}</span>{{infoData.blockHeight}}</li>
                 <li><span>{{$t("message.remarks")}}</span>{{infoData.remark}}</li>
             </ul>
@@ -37,6 +37,7 @@
 
 <script>
     import Back from '@/components/BackBar.vue';
+    import copy from 'copy-to-clipboard';
     import moment from 'moment';
     export default {
         data() {
@@ -63,7 +64,6 @@
             getHashInfo(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response);
                         this.infoData = response.data;
                         this.times =  moment(response.data.time).format('YYYY-MM-DD hh:mm:ss');
                         this.inputs = response.data.inputs;
@@ -79,7 +79,15 @@
                             }
                         }
                     })
-            }
+            },
+            //复制功能
+            hashCopy(hash) {
+                copy(hash);
+                this.$message({
+                    message: this.$t('message.c129'),
+                    type: 'success'
+                });
+            },
         }
     }
 </script>

@@ -84,6 +84,10 @@
 					.then((response) => {
 					    //console.log(response);
 					    if(response.success){
+					        //调用用户地址列表没有就调用一下获取用户方法
+					        if( this.$store.state.addressList.length === 0 ){
+                                this.getAccountList("/account/list");
+							}
                             sessionStorage.setItem("userList","1");
                             this.rejectTime = 0;
                             this.netWorkInfo = response.data;
@@ -108,6 +112,20 @@
                     	sessionStorage.setItem("userList","0")
                 });
 			},
+            //获取账户地址列表
+            getAccountList(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if(response.success){
+                            this.$store.state.addressList = response.data.list;
+                        }else {
+                            this.$store.state.addressList = [];
+                        }
+                    }).catch((reject) => {
+                    console.log("User List err"+reject);
+                    this.$store.state.addressList = [];
+                });
+            },
 			//测试清理数据
             clearData(){
                 localStorage.setItem('fastUser',"0");

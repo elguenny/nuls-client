@@ -1,5 +1,5 @@
 <template>
-    <div class="wallet">
+    <div class="wallet" v-loading.lock="loading">
         <div class="search">
             <div class="account-top">
                 <label>{{$t("message.indexAccountAddress")}}</label>
@@ -81,7 +81,7 @@
                         </el-table-column>
                         <el-table-column :label="$t('message.state')" width="85" align='center'>
                             <template slot-scope="scope">
-                                <span>{{ scope.row.status =='1' ? $t('message.confirmed'):$t('message.confirming') }}</span>
+                                <span>{{ scope.row.status == '1' ? $t('message.confirmed'):$t('message.confirming') }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.time')" width="145" align='center'>
@@ -108,16 +108,18 @@
     export default {
         data() {
             return {
+                loading: true,
                 walletHide: true,
                 keyShow: false,
                 codeShowOk: false,
+                locale: localStorage.getItem('language'),
                 accountAddress: [],
                 accountAddressValue: localStorage.getItem('newAccountAddress'),
                 accountData: [],
                 dealList: [],
-                activeName: localStorage.getItem('walletActiveName') ==='' ? "first":localStorage.getItem('walletActiveName'),
-                tabName:'first',
-                totalAll:0,
+                activeName: localStorage.getItem('walletActiveName') === '' ? "first" : localStorage.getItem('walletActiveName'),
+                tabName: 'first',
+                totalAll: 0,
             }
         },
         components: {
@@ -126,17 +128,39 @@
         },
         mounted() {
             let _this = this;
-
+            //判断是否有地址列表
+            if (this.$store.state.addressList.length !== 0) {
+                this.loading = false;
+            }
             //判断显示隐藏数字
-            if(localStorage.getItem("keyShow") ==='true'){
-                this.keyShow=true
-            }else {
-                this.keyShow=false
+            if (localStorage.getItem("keyShow") === 'true') {
+                this.keyShow = true
+            } else {
+                this.keyShow = false
             }
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
+            //判断用户选择的语言
+            let language = localStorage.getItem('language');
+            setInterval(()=>{
+                if(language !== localStorage.getItem('language')){
+                    language = localStorage.getItem('language');
+                    this.getAccountTxList('/tx/list/', {
+                        "address": this.accountAddressValue,
+                        "pageSize": 9,
+                        "pageNumber": 1
+                    });
+                }else {
+                    language = localStorage.getItem('language');
+                }
+            },500);
+
             //切换交易记录tab
-            if(this.activeName === 'second'){
-                this.getAccountTxList('/tx/list/', {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": 1});
+            if (this.activeName === 'second') {
+                this.getAccountTxList('/tx/list/', {
+                    "address": this.accountAddressValue,
+                    "pageSize": 9,
+                    "pageNumber": 1
+                });
             }
         },
         methods: {
@@ -153,14 +177,14 @@
             getAccountTxList(url, param) {
                 this.$fetch(url, param)
                     .then((response) => {
-                       //console.log(response)
+                        //console.log(response)
                         if (response.data != null) {
                             this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {
                                 this.dealList = response.data.list;
                                 for (var i = 0; i < response.data.list.length; i++) {
-                                    var length =this.dealList[i].hash.length;
-                                    this.dealList[i].hashs = this.dealList[i].hash.substr(0,10)+'...'+ this.dealList[i].hash.substr(length-10);
+                                    var length = this.dealList[i].hash.length;
+                                    this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10);
                                     this.dealList[i].type = this.switchTyep(response.data.list[i].type);
                                     this.dealList[i].values = (response.data.list[i].value * 0.00000001).toFixed(8);
                                     this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
@@ -174,15 +198,19 @@
                     });
             },
             //交易列表分页
-            txIdConsensusSize(events){
-                this.getAccountTxList('/tx/list/', {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": events});
+            txIdConsensusSize(events) {
+                this.getAccountTxList('/tx/list/', {
+                    "address": this.accountAddressValue,
+                    "pageSize": 9,
+                    "pageNumber": events
+                });
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
                 this.accountAddressValue = chenckAddress;
-                if(this.activeName === "first" ){
+                if (this.activeName === "first") {
                     this.getAccountAssets("/account/assets/" + chenckAddress);
-                }else {
+                } else {
                     this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 9, "pageNumber": 1});
                 }
             },
@@ -234,7 +262,7 @@
                     let params = {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": 1};
                     this.getAccountTxList('/tx/list/', params);
                 } else {
-                    localStorage.setItem('walletActiveName',tab.name);
+                    localStorage.setItem('walletActiveName', tab.name);
                     this.walletHide = true;
                     this.getAccountAssets("/account/assets/" + this.accountAddressValue);
                 }
@@ -243,7 +271,7 @@
             accountCopy() {
                 copy(this.accountAddressValue);
                 this.$message({
-                    message: '复制成功！',
+                    message: this.$t('message.c129'),
                     type: 'success'
                 });
             },
@@ -264,17 +292,17 @@
             },
             //金额显示隐藏
             toKeyShow() {
-               if(this.keyShow){
-                    localStorage.setItem("keyShow",false);
+                if (this.keyShow) {
+                    localStorage.setItem("keyShow", false);
                     this.keyShow = false;
-               }else {
-                   localStorage.setItem("keyShow",true);
-                   this.keyShow = true;
-               }
+                } else {
+                    localStorage.setItem("keyShow", true);
+                    this.keyShow = true;
+                }
             },
             //toTxid跳转
             toTxid(txId) {
-                localStorage.setItem('walletActiveName','second');
+                localStorage.setItem('walletActiveName', 'second');
                 this.$router.push({
                     name: '/dealInfo',
                     params: {hash: txId},
@@ -295,19 +323,20 @@
                 })
             },
 
-        }
+        },
     }
 </script>
 
 <style lang="less">
     @import url("../../assets/css/style.less");
+
     .wallet {
         width: 86%;
         margin: 2rem auto;
-        .account-top{
+        .account-top {
             margin: 0px;
             float: left;
-            .el-input__suffix{
+            .el-input__suffix {
                 right: -15px;
             }
         }
@@ -329,11 +358,11 @@
                     font-size: 1rem;
                 }
             }
-            .wallet-i{
+            .wallet-i {
                 height: 30px;
                 width: 183px;
                 float: right;
-                i{
+                i {
                     width: 30px;
                     height: 20px;
                     display: block;
@@ -341,13 +370,13 @@
                     background-size: @bg-size;
                     background: @bg-image
                 }
-                .copy_icon{
+                .copy_icon {
                     background-position: -198px -46px;
                 }
                 .qr_icon {
                     background-position: -235px -44px;
                 }
-                .zhanghu_icon{
+                .zhanghu_icon {
                     background-position: -265px -46px;
                     float: right;
                 }
@@ -358,7 +387,7 @@
             top: 133px;
             position: fixed;
             z-index: 800;
-            .icon{
+            .icon {
                 width: 30px;
                 height: 20px;
                 display: block;
@@ -366,10 +395,10 @@
                 background-size: @bg-size;
                 background: @bg-image
             }
-            .icon-eye{
+            .icon-eye {
                 background-position: -159px -46px;
             }
-            .icon-eye-blocked{
+            .icon-eye-blocked {
                 background-position: -226px -77px;
             }
             .el-icon-view {
@@ -405,12 +434,15 @@
         border: 1px solid #17202e;
         background-color: #17202e;
     }
-    .el-select-dropdown__list{
+
+    .el-select-dropdown__list {
         width: 413px;
     }
+
     .el-popper[x-placement^=bottom] .popper__arrow {
         display: none;
     }
+
     .el-table--enable-row-hover .el-table__body tr:hover > td {
         background: rgba(87, 107, 139, 0.2);
         .cell {

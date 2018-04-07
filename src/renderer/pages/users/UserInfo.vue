@@ -65,15 +65,17 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            if (response.data.length === 0) {
+                            console.log(response.data.list.length);
+                            if (response.data.list.length === 0) {
                                 localStorage.setItem('fastUser','0');
                                 localStorage.setItem("userPass", "");
-                                localStorage.setItem("newAccountAddress", "")
+                                localStorage.setItem("newAccountAddress", "");
+                                localStorage.setItem("toUserInfo", "0");
                             }else {
                                 localStorage.setItem('fastUser','1');
                             }
-                            this.$store.state.addressList = response.data;
-                            this.userData = response.data;
+                            this.$store.state.addressList = response.data.list;
+                            this.userData = response.data.list;
                         }
                     });
             },

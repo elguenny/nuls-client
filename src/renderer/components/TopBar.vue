@@ -91,12 +91,11 @@
         methods: {
             //语言切换
             selectLanguage() {
-                //console.log(this.projectName.key)
                 this.$i18n.locale = this.projectName.key;
                 var param = '{"language":"' + this.projectName.key+ '"}';
                 this.$post('/lang', param)
                     .then((response) => {
-                        console.log(response)
+                        console.log(response);
                         if(response.success){
                            console.log('success')
                         }else {
@@ -114,15 +113,16 @@
                 }
                 if (url === "wallet") {
                     this.isActive = 1;
-                    localStorage.setItem('walletActiveName','');
+                    //localStorage.setItem('walletActiveName','');
                     //获取账户地址列表
-                    if(this.$store.state.addressList.length == 0){
+                    if(this.$store.state.addressList.length === 0){
                         this.$router.push({
                             name: '/setPassword',
                         })
                     }else {
                         this.$router.push({
-                            path: '/wallet',
+                            name: '/wallet',
+                            params:{language:index}
                         })
                     }
                 }

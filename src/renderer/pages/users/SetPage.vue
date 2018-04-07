@@ -79,28 +79,12 @@
             }
         },
         methods: {
-
             //查看日志
             toViewLog() {
                 this.$router.push({
                     path: '/users/userLog'
                 })
             },
-            //选择语言
-            /*selectLanguage(value) {
-                this.$i18n.locale = value;
-                localStorage.setItem("language", value);
-                var param = '{"language":"' + value+ '"}';
-                this.$post('/lang', param)
-                    .then((response) => {
-                        console.log(response)
-                        if(response.success){
-                            console.log('success')
-                        }else {
-                            console.log('err')
-                        }
-                    });
-            },*/
             //通讯录管理
             toUserAddressList() {
                 this.$router.push({
@@ -205,7 +189,7 @@
                 border: 1px solid #658ec7;
             }
             .el-switch__core .el-switch__button {
-                top: 0px;
+                top: 0;
                 left: 2px;
                 width: 13px;
                 height: 13px;
@@ -216,12 +200,11 @@
                 line-height: 27px;
             }
             .el-collapse-item__header {
-                height: 0px;
-                height: 0px;
+                height: 0;
                 border: none;
             }
             .el-collapse-item__arrow {
-                font-size: 0px;
+                font-size: 0;
             }
             .el-collapse-item__wrap {
                 margin-top: 38px;

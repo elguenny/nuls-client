@@ -66,6 +66,7 @@
                                     localStorage.setItem('newAccountAddress', response.data);
                                     localStorage.setItem('userPass', this.passwordForm.password);
                                     if (localStorage.getItem('toUserInfo') != "1") {
+                                        this.getAccountList("/account/list");
                                         this.$router.push({
                                             path: '/wallet'
                                         })
@@ -90,7 +91,6 @@
                     }
                 })
             },
-
             //提交导入明文私钥
             keySubmit(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -102,7 +102,22 @@
                         return false;
                     }
                 });
-            }
+            },
+            //获取账户列表
+            //获取账户地址列表
+            getAccountList(url) {
+                this.$fetch(url)
+                    .then((response) => {
+                        if(response.success){
+                            this.$store.state.addressList = response.data.list;
+                        }else {
+                            this.$store.state.addressList = [];
+                        }
+                    }).catch((reject) => {
+                    console.log("User List err"+reject);
+                    this.$store.state.addressList = [];
+                });
+            },
         }
     }
 </script>

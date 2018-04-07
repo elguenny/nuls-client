@@ -145,9 +145,8 @@
             getaccountAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        this.accountAddress = response.data;
+                        this.accountAddress = response.data.list;
                     });
-
             },
             //根据账户地址获取账户余额
             getBalanceAddress(url) {

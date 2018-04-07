@@ -3,10 +3,7 @@ import App from './app.vue'
 import router from './router'
 import Vuex from 'vuex'
 import store from './vuex/store.js'
-import ElementUI from 'element-ui'
 import i18n from './i18n/i18n';
-
-
 import axios from 'axios'
 import {post, fetch, patch, put} from './api/https'
 //定义全局变量
@@ -15,7 +12,6 @@ Vue.prototype.$fetch = fetch;
 Vue.prototype.$patch = patch;
 Vue.prototype.$put = put;
 
-Vue.use(ElementUI);
 Vue.use(Vuex);
 
 /**引入css文件**/

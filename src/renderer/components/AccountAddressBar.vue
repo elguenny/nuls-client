@@ -24,6 +24,7 @@
 			if(this.$store.state.addressList.length === 0){
                 this.getAccountList("/account/list");
 			}
+            //this.getAccountList("/account/list");
 
         },
         methods: {
@@ -31,14 +32,15 @@
             getAccountList(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        //console.log(response);
+                        console.log(response);
                         if(response.success){
-                            this.$store.state.addressList = response.data;
+                            this.$store.state.addressList = response.data.list;
                             localStorage.setItem('newAccountAddress',response.data[0].address);
 						}else {
                             this.$store.state.addressList = [];
 						}
                     }).catch((reject) => {
+                        console.log("User List err"+reject);
                     	this.$store.state.addressList = [];
 				});
             },
