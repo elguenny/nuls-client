@@ -9,7 +9,7 @@
 			</el-table-column>
 			<el-table-column prop="status" :label="$t('message.state')" min-width="12" align='center'>
 			</el-table-column>
-			<el-table-column prop="depositTime" :label="$t('message.49')" min-width="20" align='center'>
+			<el-table-column prop="depositTime" :label="$t('message.c49')" min-width="20" align='center'>
 			</el-table-column>
 		</el-table>
 		<el-pagination layout="prev, pager, next" :total=this.total class="cb"  v-show="totalOK = this.total > 10 ? true:false"  @current-change="pledgeSize"></el-pagination>

@@ -123,24 +123,32 @@
 
         },
         methods: {
-            //执行java文件
+            /**
+             * 执行java文件
+             * Execute the java file
+             */
             parserequest() {
                 var child_process = require('child_process');
                 //var _path = process.execPath.substr(0,process.execPath.length-14);
                 var _path = process.execPath.substr(0, 8);
-                //console.log(_path);
-                child_process.execFile(_path + 'nodes\\bin\\nuls.bat', null, {cwd: _path + 'nodes\\bin\\'}, function (error) {
+                //alert(_path);
+                child_process.execFile(_path + 'java\\bin\\nuls.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
                     sessionStorage.setItem("homeJava", "1");
-                    //console.log(error);
                     if (error !== null) {
+                        alert('exec error: ' + error);
                         console.log('exec error: ' + error);
                     }
                     else {
-                        console.log('成功执行指令!');
+                        alert('Execute the java file');
+                        console.log('Execute the java file');
                     }
                 });
             },
-            //根据账户地址获取总金、冻结、可用额
+            /**
+             * 根据账户地址获取总金、冻结、可用额
+             *Get the total amount, freezing and availability according to the account address.
+             * @param url
+             */
             getAccountAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
@@ -157,7 +165,11 @@
                         }
                     });
             },
-            //获取所有共识信息
+            /**
+             * 获取所有共识信息
+             * Get all the consensus information
+             * @param url
+             */
             getConsensus(url) {
                 this.$fetch(url)
                     .then((response) => {
@@ -168,7 +180,10 @@
                         }
                     })
             },
-            //getNetWork
+            /**
+             * getNetWork
+             * getNetWork
+             */
             getNetWork() {
                 this.$fetch('/network/nodes')
                     .then((response) => {
@@ -203,7 +218,13 @@
                         }
                     });
             },
-            //获取账户地址列表
+            /**
+             * 获取账户地址列表
+             * Get a list of account addresses
+             * @param url
+             * @param data
+             * @returns {Promise}
+             */
             getAccountList(url) {
                 this.$fetch(url)
                     .then((response) => {
@@ -230,7 +251,13 @@
                     localStorage.setItem('fastUser', '0');
                 });
             },
-            //根据坐标标注位置
+            /**
+             * 根据坐标标注位置
+             * According to coordinate annotation position
+             * @param url
+             * @param data
+             * @returns {Promise}
+             */
             methodsMaps(maps) {
                 $('#world-map-markers').vectorMap({
                     map: 'world_mill_en',

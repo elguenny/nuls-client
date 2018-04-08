@@ -1,8 +1,8 @@
 {
   "name": "NulsWallet",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "Bolang <986887991@qq.com>",
-  "description": "Nuls Wallet corss platform app.",
+  "description": "Nuls Wallet corss platform app",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -25,6 +25,9 @@
     "directories": {
       "output": "build"
     },
+    "extraFiles": [
+      "java/**/*"
+    ],
     "files": [
       "dist/electron/**/*"
     ],

@@ -113,7 +113,6 @@
                 }
                 if (url === "wallet") {
                     this.isActive = 1;
-                    //localStorage.setItem('walletActiveName','');
                     //获取账户地址列表
                     if(this.$store.state.addressList.length === 0){
                         this.$router.push({
@@ -167,7 +166,8 @@
                 //调用执行文件
                 //var _path = process.execPath.substr(0,process.execPath.length-14);
                 var _path = process.execPath.substr(0, 8);
-                child_process.execFile(_path + 'nodes\\bin\\stop.bat', null, {cwd: _path + 'nodes\\bin\\'}, function (error) {
+                //alert(_path);
+                child_process.execFile(_path + 'java\\bin\\stop.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
                     if (error !== null) {
                         console.log('exec error: ' + error);
                     }

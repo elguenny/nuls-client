@@ -11,7 +11,8 @@
                 </el-input>
             </div>
             <div class="select-div fl">
-                <el-select v-model="selectKeyword" slot="prepend" :placeholder="$t('message.c46')" @change="sortConsensus">
+                <el-select v-model="selectKeyword" slot="prepend" :placeholder="$t('message.c46')"
+                           @change="sortConsensus">
                     <el-option :label="$t('message.c17')" value="commissionRate"></el-option>
                     <el-option :label="$t('message.c25')" value="owndeposit"></el-option>
                     <el-option :label="$t('message.c18')" value="creditRatio"></el-option>
@@ -19,8 +20,7 @@
             </div>
         </div>
         <div class="agency-node-bottom">
-            <!--<div class="div-icon cursor-p fl" @click="toNodePage">-->
-            <div class="div-icon fl cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentAddress)">
+            <div class="div-icon cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentAddress)">
                 <p class="subscript">
                     {{item.status}}
                 </p>
@@ -52,7 +52,8 @@
                 </div>
             </div>
         </div>
-        <el-pagination layout="prev, pager, next" :page-size="6" :total=this.totalAll  v-show="totalOK = this.totalAll > 6 ? true:false" class="cb"
+        <el-pagination layout="prev, pager, next" :page-size="6" :total=this.totalAll
+                       v-show="totalOK = this.totalAll > 6 ? true:false" class="cb"
                        @current-change="allConsensusSize"></el-pagination>
     </div>
 </template>
@@ -80,14 +81,14 @@
         },
         mounted() {
             let _this = this;
-            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6","pageNumber":"1"});
+            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6", "pageNumber": "1"});
         },
         methods: {
             //获取全部共识列表
-            getAllConsensus(url,params) {
-                this.$fetch(url,params)
+            getAllConsensus(url, params) {
+                this.$fetch(url, params)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         if (response.success) {
                             for (var i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
@@ -96,7 +97,7 @@
                             }
                             this.totalAll = response.data.total;
                             this.allConsensus = response.data.list;
-                        }else {
+                        } else {
                             this.totalAll = 0;
                             this.allConsensus = [];
                         }
@@ -106,7 +107,7 @@
             },
             //全部共识分页
             allConsensusSize(events) {
-                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events,"pageSize": "6"});
+                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "6"});
             },
             //查询共识状态
             switchStatus(status) {
@@ -123,22 +124,22 @@
                 }
             },
             //搜索功能
-            searchConsensus(){
-                if(this.keyword !=''){
-                    var params = {"keyword":this.keyword,"pageSize": "6","pageNumber":"1"};
-                    this.getAllConsensus("/consensus/agent/list/",params);
-                }else {
-                    this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6","pageNumber":"1"});
+            searchConsensus() {
+                if (this.keyword != '') {
+                    var params = {"keyword": this.keyword, "pageSize": "6", "pageNumber": "1"};
+                    this.getAllConsensus("/consensus/agent/list/", params);
+                } else {
+                    this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6", "pageNumber": "1"});
                 }
             },
             //排序共识
-            sortConsensus(sort){
-                if(this.keyword !=''){
-                    var params = {"keyword":this.keyword,"sortType":sort,"pageSize": "6","pageNumber":"1"};
-                    this.getAllConsensus("/consensus/agent/list/",params);
-                }else {
-                    var params = {"sortType":sort,"pageSize": "6","pageNumber":"1"};
-                    this.getAllConsensus("/consensus/agent/list/",params);
+            sortConsensus(sort) {
+                if (this.keyword != '') {
+                    var params = {"keyword": this.keyword, "sortType": sort, "pageSize": "6", "pageNumber": "1"};
+                    this.getAllConsensus("/consensus/agent/list/", params);
+                } else {
+                    var params = {"sortType": sort, "pageSize": "6", "pageNumber": "1"};
+                    this.getAllConsensus("/consensus/agent/list/", params);
                 }
 
             },
@@ -150,7 +151,7 @@
             toNodePage(index) {
                 this.$router.push({
                     name: '/nodePage',
-                    params: {address:index},
+                    params: {address: index},
                 });
             }
         }
@@ -201,13 +202,15 @@
                 height: 145px;
                 margin-top: 15px;
                 margin-right: 6px;
+                display: inline-block;
             }
         }
-        .el-select-dropdown__list{
+        .el-select-dropdown__list {
             width: 165px;
         }
     }
-    .el-popper[x-placement^=bottom] .popper__arrow{
+
+    .el-popper[x-placement^=bottom] .popper__arrow {
         display: none;
     }
 </style>

@@ -32,12 +32,13 @@
 			</li>
 		</ul>
 		<el-button @click="closedNode" type="button" class="bottom-btn">{{$t('message.c62')}}</el-button>
+		<Password ref="password" @toSubmit="toSubmit"></Password>
 	</div>
 </template>
 
 <script>
 	import Back from './../../components/BackBar.vue'
-
+    import Password from '@/components/PasswordBar.vue';
 	export default {
 		data() {
 			return {
@@ -46,6 +47,7 @@
 		},
 		components: {
 			Back,
+            Password,
 		},
         mounted() {
             let _this = this;
@@ -84,38 +86,37 @@
                     cancelButtonText: this.$t('message.cancelButtonText'),
                     type: 'warning'
                 }).then(() => {
-                    this.$prompt(this.$t('message.passWordTitle'), '', {
-                        confirmButtonText: this.$t('message.confirmButtonText'),
-                        cancelButtonText: this.$t('message.cancelButtonText'),
-                       /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
-                        inputType: 'password'
-                    }).then(({value}) => {
-                        var param = {"address": localStorage.getItem("newAccountAddress"), "password": value};
-                        this.$post('/consensus/agent/stop', param)
-                            .then((response) => {
-								if(response.success){
-                                    this.$message({
-                                        type: 'success',
-                                        message: this.$t('message.passWordSuccess')
-                                    });
-                                    this.$router.push({
-                                        name: '/consensus',
-										params:{"activeName":"first"}
-                                    })
-								}else {
-                                    this.$message({
-                                        type: 'waring',
-                                        message: this.$t('message.passWordFailed')+response.msg
-                                    });
-								}
-							});
-                    })
+                    this.$refs.password.showPassword(true);
                 }).catch(() => {
-
+                    this.$message({
+                        type: 'waring',
+                        message: this.$t('message.c59')
+                    });
                 });
 
 			},
+            //
+            toSubmit(password) {
+                var param = {"address": localStorage.getItem("newAccountAddress"), "password": password};
+                this.$post('/consensus/agent/stop', param)
+                    .then((response) => {
+                        if(response.success){
+                            this.$message({
+                                type: 'success',
+                                message: this.$t('message.passWordSuccess')
+                            });
+                            this.$router.push({
+                                name: '/consensus',
+                                params:{"activeName":"first"}
+                            })
+                        }else {
+                            this.$message({
+                                type: 'waring',
+                                message: this.$t('message.passWordFailed')+response.msg
+                            });
+                        }
+                    });
+            },
             //查看我创建节点的抵押明细
             toallPledge() {
                 this.$router.push({

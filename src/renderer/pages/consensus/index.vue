@@ -43,7 +43,7 @@
                     <el-tab-pane :label="$t('message.c11')" name="first">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in allConsensus"
                              @click="toNodePage(item.agentAddress)">
-                            <p class="subscript" :class="item.statuss ==1  ? 'stay' : ''">
+                            <p class="subscript" :class="item.statuss === 1  ? 'stay' : ''">
                                 {{item.status}}
                             </p>
                             <h3 class="overflow">{{item.agentName}}</h3>
@@ -53,7 +53,7 @@
                                 <li><label>{{$t("message.c25")}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t("message.c18")}}:</label>
-                                    <ProgressBar colorData="#6e84f7" :widthData="item.creditRatio"></ProgressBar>
+                                    <ProgressBar :colorData="item.creditRatio < 0 ? '#82bd39':'#f64b3e'" :widthData="item.creditRatio"></ProgressBar>
                                 </li>
                                 <li class="cb">
                                     <label class="fl">{{$t("message.c19")}}：</label>
@@ -61,7 +61,7 @@
                                 </li>
                                 <li class="cb">
                                     <label class="fl">{{$t("message.c20")}}：</label>
-                                    <ProgressBar colorData="#82BD39" :widthData="item.totalDeposit.value"></ProgressBar>
+                                    <ProgressBar colorData="#82BD39" :widthData="item.totalDeposit"></ProgressBar>
                                 </li>
                             </ul>
                             <div class="credit-valuesDiv" :id=index>
@@ -84,7 +84,7 @@
                     <el-tab-pane :label="$t('message.c12')" name="second">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
                              @click="toMyNode(item.agentAddress,index)">
-                            <p class="subscript" :class="{stay:item.status == 2 ? false : true }">
+                            <p class="subscript" :class="item.statuss === 1  ? 'stay' : ''">
                                 {{item.status}}
                             </p>
                             <h3>{{item.agentName}}</h3>
@@ -234,6 +234,7 @@
                                 } else {
                                     response.data.list[i].creditRatio = "50%";
                                 }
+                                //response.data.list[i].creditRatio="-0.2";
                                 response.data.list[i].statuss = response.data.list[i].status;
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 response.data.list[i].memberCount = (response.data.list[i].memberCount/1000).toFixed() + '%';
@@ -256,6 +257,7 @@
                 this.$fetch(url, params)
                     .then((response) => {
                        if (response.success) {
+                           //console.log(response);
                             for (var i = 0; i < response.data.list.length; i++) {
                                 if (response.data.list[i].creditRatio != 0) {
                                     if (response.data.list[i].creditRatio > 0) {

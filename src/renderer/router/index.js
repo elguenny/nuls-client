@@ -47,12 +47,12 @@ const router = new VueRouter({
 
 		{
 			path: '/firstInto/firstInfo/importKey',
-			name: '明文私钥导入',
+			name: '/importKey',
 			component: resolve => require(['../../renderer/pages/wallet/ImportKey.vue'], resolve)
 		},
 		{
 			path: '/firstInto/firstInfo/importCode',
-			name: '二维码导入',
+			name: '/importCode',
 			component: resolve => require(['../../renderer/pages/wallet/ImportCode.vue'], resolve)
 		},
 		{
@@ -62,12 +62,12 @@ const router = new VueRouter({
 		},
 		{
 			path: '/users/setPassword',
-			name: '设置密码',
+			name: '/setPassword',
 			component: resolve => require(['../../renderer/pages/users/SetPassword.vue'], resolve)
 		},
 		{
 			path: '/users/userLog',
-			name: '用户日志',
+			name: '/userLog',
 			component: resolve => require(['../../renderer/pages/users/UserLog.vue'], resolve)
 		},
 		{
@@ -102,17 +102,17 @@ const router = new VueRouter({
 		},
 		{
 			path: '/users/setPage',
-			name: '设置界面',
+			name: '/setPage',
 			component: resolve => require(['../../renderer/pages/users/SetPage.vue'], resolve)
 		},
 		{
 			path: '/users/userAddressList',
-			name: '通讯录',
+			name: '/userAddressList',
 			component: resolve => require(['../../renderer/pages/users/UserAddressList.vue'], resolve)
 		},
 		{
 			//共识首页
-			path: '/consensus :activeName' ,
+			path: '/consensus :activeName',
 			name: '/consensus',
 			component: resolve => require(['../../renderer/pages/consensus/Index.vue'], resolve)
 

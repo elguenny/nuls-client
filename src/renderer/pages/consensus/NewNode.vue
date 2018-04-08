@@ -216,16 +216,15 @@
             }
             .el-form-item--mini .el-form-item__content,
             .el-form-item--mini .el-form-item__label {
-                line-height: 6px;
+                line-height: 0px;
                 color: white;
             }
             .el-form-item.is-required .el-form-item__label:before{
                 font-size: 0px;
             }
             .el-form-item--mini {
-                margin-bottom: 10px;
+                margin-bottom: 15px;
             }
-
         }
     }
 </style>
