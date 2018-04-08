@@ -21,10 +21,10 @@
                 <span>{{$t("message.newAccountBackupsKey")}}</span>
                 <label>{{$t("message.newAccountBackupsKeyInfo")}}</label>
             </li>
-            <li @click="backupsCode">
+           <!-- <li @click="backupsCode">
                 <span>{{$t("message.newAccountBackupsCode")}}</span>
                 <label>{{$t("message.newAccountBackupsCodeInfo")}}</label>
-            </li>
+            </li>-->
         </ul>
         <div class="cl new-bt">
             <el-button type="primary" class="new-submit" @click="newSubmit()">{{$t("message.newAccountSubmit")}}
@@ -243,7 +243,7 @@
                 }).then(() => {
                     if (localStorage.getItem('fastUser') === "0") {
                         this.$router.push({
-                            name: '/wallet'
+                            path: '/wallet'
                         })
                     } else {
                         this.$router.push({
@@ -352,7 +352,8 @@
                 height: 11rem;
                 float: left;
                 margin-right: 3%;
-                margin-left: 4%;
+                //margin-left: 4%;
+                margin-left: 29%;
                 border: 1px solid #658cc5;
                 background-color: #181f2f;
                 text-align: center;

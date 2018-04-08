@@ -31,14 +31,14 @@
                 </el-form-item>
             </el-form>
         </div>
-
+        <Password ref="password" @toSubmit="toSubmit"></Password>
     </div>
 </template>
 
 <script>
     import Back from './../../components/BackBar.vue'
     import AccountAddressBar from '@/components/AccountAddressBar.vue';
-
+    import Password from '@/components/PasswordBar.vue';
     export default {
         data() {
             var checkNodeNo = (rule, value, callback) => {
@@ -105,6 +105,7 @@
         components: {
             Back,
             AccountAddressBar,
+            Password,
         },
         mounted() {
             let _this = this;
@@ -136,37 +137,33 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$prompt(this.$t('message.passWordTitle'), '', {
-                            confirmButtonText: this.$t('message.confirmButtonText'),
-                            cancelButtonText: this.$t('message.cancelButtonText'),
-                           /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
-                            inputType: 'password'
-                        }).then(({value}) => {
-                            var param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + value + '"}';
-                            this.$post('/consensus/agent ', param)
-                                .then((response) => {
-                                    console.log(response);
-                                    if (response.success) {
-                                        this.$message({
-                                            type: 'success', message: this.$t('message.passWordSuccess')
-                                        });
-                                        this.$router.push({
-                                            name: '/consensus',
-                                            params:{"activeName":"first"},
-                                        })
-                                    } else {
-                                        this.$message({
-                                            type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                                        });
-                                    }
-                                })
-                        })
+                        this.$refs.password.showPassword(true);
                     }
                     else {
                         return false;
                     }
                 });
+            },
+            //
+            toSubmit(password) {
+                var param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + password + '"}';
+                this.$post('/consensus/agent ', param)
+                    .then((response) => {
+                        console.log(response);
+                        if (response.success) {
+                            this.$message({
+                                type: 'success', message: this.$t('message.passWordSuccess')
+                            });
+                            this.$router.push({
+                                name: '/consensus',
+                                params:{"activeName":"first"},
+                            })
+                        } else {
+                            this.$message({
+                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                            });
+                        }
+                    })
             },
 
         }
@@ -175,7 +172,6 @@
 
 <style lang="less">
     @import url("../../assets/css/style.less");
-
     .new-node {
         h2 {
             font-size: 16px;

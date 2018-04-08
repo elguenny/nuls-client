@@ -36,8 +36,8 @@ function createWindow() {
         //Set minimum width height.
         minWidth: 800,
         minHeight: 560,
-        maxWidth:800,
-        maxHeight:560,
+        /*maxWidth:800,
+        maxHeight:560,*/
     });
 
     ipcMain.on('download', (evt, args) => {

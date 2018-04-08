@@ -152,7 +152,7 @@
                 }else {
                     language = localStorage.getItem('language');
                 }
-            },500);
+            },1000);
 
             //切换交易记录tab
             if (this.activeName === 'second') {

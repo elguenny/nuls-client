@@ -106,7 +106,7 @@
                 this.getAccountAddress("/account/balances/");
                 this.getConsensus("/consensus");
                 //判断vuex账户列表里有没有数据
-                if (this.$store.state.addressList.length == 0) {
+                if (this.$store.state.addressList.length === 0) {
                     this.getAccountList("/account/list");
                 }
                 //查询网络节点数
@@ -173,6 +173,7 @@
                 this.$fetch('/network/nodes')
                     .then((response) => {
                         if (response.success) {
+                            //console.log(response);
                             this.ipData = response.data;
                             for (var j = 0, len = this.ipData.length; j < len; j++) {
                                 axios.get('http://freegeoip.net/json/' + this.ipData[j])
@@ -191,14 +192,14 @@
                                         //console.log(err);
                                     });
                             }
-                            this.ipObj = [
+                            /*this.ipObj = [
                                 {latLng: [34.62, 82.45], name: '点点1'},
                                 {latLng: [24.74, 13.66], name: '点点1'},
                                 {latLng: [39.95, 116.34], name: '点点1'},
                                 {latLng: [38.97, 11.53], name: '点点1'},
                                 {latLng: [69.88, 21.64], name: '点点1'},
-                            ];
-                            //console.log(this.ipObj);
+                            ];*/
+                            console.log(this.ipObj);
                         }
                     });
             },
@@ -213,15 +214,19 @@
                                 localStorage.setItem('newAccountAddress', response.data.list[0].address);
                                 localStorage.setItem('fastUser', '1');
                             } else {
+                                this.$store.state.addressList = [];
+                                localStorage.setItem('newAccountAddress', '');
                                 localStorage.setItem('fastUser', '0');
                             }
                         } else {
                             this.$store.state.addressList = [];
+                            localStorage.setItem('newAccountAddress', '');
                             localStorage.setItem('fastUser', '0');
                         }
                     }).catch((reject) => {
                     console.log(reject);
                     this.$store.state.addressList = [];
+                    localStorage.setItem('newAccountAddress', '');
                     localStorage.setItem('fastUser', '0');
                 });
             },

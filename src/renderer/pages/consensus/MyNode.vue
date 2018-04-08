@@ -42,13 +42,13 @@
 				<span class="text-d cursor-p fr" @click="addNode">{{$t('message.c57')}}</span>
 			</div>
 			<el-table :data="myMortgageData" style="width: 100%">
-				<el-table-column prop="amount" :label="$t('message.c51')" min-width="20" align='center'>
+				<el-table-column prop="amount" :label="$t('message.c51')" min-width="40" align='center'>
 				</el-table-column>
-				<el-table-column prop="status" :label="$t('message.state')" min-width="10" align='center'>
+				<el-table-column prop="status" :label="$t('message.state')" min-width="70" align='center'>
 				</el-table-column>
-				<el-table-column prop="depositTime" :label="$t('message.c49')" min-width="25" align='center'>
+				<el-table-column prop="depositTime" :label="$t('message.c49')" min-width="85" align='center'>
 				</el-table-column>
-				<el-table-column :label="$t('message.operation')" min-width="25" align='center'>
+				<el-table-column :label="$t('message.operation')" align='center'>
 					<template slot-scope="scope">
 						<el-button @click="outNode(scope.row)" type="text" size="small">{{$t('message.c58')}}</el-button>
 					</template>
@@ -56,6 +56,7 @@
 			</el-table>
 			<el-pagination layout="prev, pager, next" :page-size="3"  :total=this.total v-show="totalOK = this.total > 3 ? true:false" @current-change="myMortgageSize" class="cb"></el-pagination>
 		</div>
+		<Password ref="password" @toSubmit="toSubmit"></Password>
 	</div>
 </template>
 
@@ -63,6 +64,7 @@
 	import Back from './../../components/BackBar.vue'
 	import ProgressBar from './../../components/ProgressBar.vue'
     import moment from 'moment';
+    import Password from '@/components/PasswordBar.vue';
 	export default {
 		data() {
 			return {
@@ -71,11 +73,16 @@
                 agentAddressInfo:[],
                 myMortgageData: [],
                 total:0,
+                outInfo:{
+				    address:'',
+                    txHash:'',
+				}
 			}
 		},
 		components: {
 			Back,
 			ProgressBar,
+            Password,
 		},
         mounted() {
             let _this = this;
@@ -112,7 +119,7 @@
                 this.$fetch(url,params)
                     .then((response) => {
                         if (response.success) {
-                            console.log(response)
+                           // console.log(response)
                             this.total = response.data.total;
                             for (var i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = response.data.list[i].amount *0.00000001;
@@ -162,35 +169,33 @@
 					cancelButtonText: this.$t("message.cancelButtonText"),
 					type: 'warning'
 				}).then(() => {
-                    this.$prompt(this.$t('message.passWordTitle'), '', {
-                        confirmButtonText: this.$t('message.confirmButtonText'),
-                        cancelButtonText: this.$t('message.cancelButtonText'),
-                       /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                        inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
-                        inputType: 'password'
-                    }).then(({value}) => {
-                        var param = {"address": row.address, "password": value,"txHash": row.txHash};
-                       this.$post('/consensus/withdraw/', param)
-                            .then((response) => {
-                                //console.log(param)
-								//console.log(response);
-                                if(response.success){
-                                    this.$message({
-                                        type: 'success',
-                                        message: this.$t("message.passWordSuccess")
-                                    });
-                                    this.getAddressList("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
-								}
-                            })
-					});
-
+                    this.$refs.password.showPassword(true);
+                    this.outInfo.address = row.address;
+                    this.outInfo.txHash = row.txHash;
 				}).catch(() => {
 					this.$message({
 						type: 'info',
 						message: this.$t("message.c59")
 					});
 				});
-			}
+			},
+            //
+            toSubmit(password) {
+                var param = {"address":this.outInfo.address, "password": password,"txHash": this.outInfo.txHash};
+                this.$post('/consensus/withdraw/', param)
+                    .then((response) => {
+                        //console.log(response);
+                        if(response.success){
+                            this.$message({
+                                type: 'success',
+                                message: this.$t("message.passWordSuccess")
+                            });
+                            this.getAddressList("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+                        }
+                        this.outInfo.address = '';
+                        this.outInfo.txHash = '';
+                    })
+            },
 
 		}
 	}

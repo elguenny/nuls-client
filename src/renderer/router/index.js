@@ -71,7 +71,7 @@ const router = new VueRouter({
 			component: resolve => require(['../../renderer/pages/users/UserLog.vue'], resolve)
 		},
 		{
-			path: '/wallet :language',
+			path: '/wallet',
 			name: '/wallet',
 			component: resolve => require(['../../renderer/pages/wallet/Index.vue'], resolve)
 		},

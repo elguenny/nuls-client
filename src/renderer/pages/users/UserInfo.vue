@@ -26,7 +26,9 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <!--<el-pagination layout="prev, pager, next" page-size=5 total=100></el-pagination>-->
+            <el-pagination layout="prev, pager, next" :page-size="8" :total=this.totalAll class="cb"
+                           v-show="totalAllOk = this.totalAll>8 ?true:false"
+                           @current-change="userListSize"></el-pagination>
             <Password ref="password" @toSubmit="toSubmit"></Password>
 
         </div>
@@ -44,6 +46,7 @@
                 backUrl: '/wallet',
                 setAsAddress: '',
                 userData: [],
+                totalAll:0,
             }
         },
         components: {
@@ -52,7 +55,7 @@
         },
         mounted() {
             let _this = this;
-            this.getUserList("/account/list");
+            this.getUserList("/account/list",{"pageSize": 8, "pageNumber": 1});
         },
         methods: {
             back() {
@@ -61,11 +64,12 @@
                 })
             },
             //获取账户列表
-            getUserList(url) {
-                this.$fetch(url)
+            getUserList(url,params) {
+                this.$fetch(url,params)
                     .then((response) => {
                         if (response.success) {
-                            console.log(response.data.list.length);
+                            console.log(response);
+                            this.totalAll = response.data.total;
                             if (response.data.list.length === 0) {
                                 localStorage.setItem('fastUser','0');
                                 localStorage.setItem("userPass", "");
@@ -78,6 +82,9 @@
                             this.userData = response.data.list;
                         }
                     });
+            },
+            userListSize(events){
+                this.getUserList("/account/list",{"pageSize": 8, "pageNumber": events});
             },
             //点击根据地址移除账户事件
             outUser(address) {

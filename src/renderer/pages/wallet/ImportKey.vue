@@ -68,7 +68,7 @@
                                     if (localStorage.getItem('toUserInfo') != "1") {
                                         this.getAccountList("/account/list");
                                         this.$router.push({
-                                            path: '/wallet'
+                                            name: '/wallet'
                                         })
                                     } else {
                                         this.$router.push({

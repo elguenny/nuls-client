@@ -64,7 +64,6 @@
         },
         mounted() {
             let _this = this;
-            console.log(this.address)
             this.getBalanceAddress('/account/balance/' + this.address);
         },
         methods: {
@@ -72,13 +71,12 @@
             getBalanceAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response)
                         if (response.success) {
                             this.usable = response.data.usable * 0.000000001;
                         } else {
                             this.usable = 0;
                         }
-                        console.log(this.usable)
+                        //console.log(this.usable)
                     });
             },
             //修改别名
@@ -96,10 +94,10 @@
 
             toSubmit(password) {
                 var param = {"alias": this.aliasForm.alias, "address": this.address, "password": password};
-                console.log(param);
+                //console.log(param);
                 this.$post('/account/alias/', param)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         if (response.success) {
                             this.$message({
                                 type: 'success', message: this.$t('message.passWordSuccess')

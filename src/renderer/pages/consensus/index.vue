@@ -21,7 +21,7 @@
                          @click="toNewNode" class="span">{{$t("message.c5")}}</span>)</span>
                 </li>
                 <li>
-                    <label>{{$t("message.c8")}}：</label>{{this.myInfoData.joinAccountCount}} 个 (<span
+                    <label>{{$t("message.c8")}}：</label>{{this.myInfoData.joinAccountCount}} {{$t("message.c30")}} (<span
                                                                              @click="toAgencyNode"
                                                                              class="span">{{$t("message.c9")}}</span>)
                 </li>

@@ -50,9 +50,9 @@
                 <el-form-item size="large" class="submit">
                     <el-button type="primary" @click="onSubmit('nodeForm')">{{$t('message.confirmButtonText')}}</el-button>
                 </el-form-item>
-
             </el-form>
         </div>
+        <Password ref="password" @toSubmit="toSubmit"></Password>
     </div>
 </template>
 
@@ -60,7 +60,7 @@
     import Back from '@/components/BackBar.vue';
     import ProgressBar from '@/components/ProgressBar.vue';
     import AccountAddressBar from '@/components/AccountAddressBar.vue';
-
+    import Password from '@/components/PasswordBar.vue';
     export default {
         data() {
             var checkNodeNo = (rule, value, callback) => {
@@ -97,6 +97,7 @@
             Back,
             ProgressBar,
             AccountAddressBar,
+            Password,
         },
         mounted() {
             let _this = this;
@@ -173,43 +174,39 @@
             onSubmit(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$prompt(this.$t('message.passWordTitle'), '', {
-                            confirmButtonText: this.$t('message.confirmButtonText'),
-                            cancelButtonText: this.$t('message.cancelButtonText'),
-                           /* inputPattern: /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{9,21}$/,
-                            inputErrorMessage: this.$t('message.walletPassWordEmpty'),*/
-                            inputType: 'password'
-                        }).then(({value}) => {
-                            var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + value + '"}';
-                            this.$post('/consensus/deposit/', param)
-                                .then((response) => {
-                                    console.log(param);
-                                    if (response.success) {
-                                        this.$message({
-                                            message: this.$t('message.passWordSuccess'),
-                                            type: 'success'
-                                        });
-                                        this.$router.push({
-                                            name: '/consensus',
-                                            params:{"activeName":"first"}
-                                        })
-                                         /*this.$router.push({
-                                             name: '/myNode',
-                                             params:{"agentAddress":this.nodeData.agentAddress}
-                                         })*/
-                                    } else {
-                                        this.$message({
-                                            message: this.$t('message.passWordFailed') + response.msg,
-                                            type: 'warning',
-                                        });
-                                    }
-                                })
-                        })
+                        this.$refs.password.showPassword(true);
                     } else {
                         return false;
                     }
                 });
-            }
+            },
+            //
+            toSubmit(password) {
+                var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
+                this.$post('/consensus/deposit/', param)
+                    .then((response) => {
+                        console.log(param);
+                        if (response.success) {
+                            this.$message({
+                                message: this.$t('message.passWordSuccess'),
+                                type: 'success'
+                            });
+                            this.$router.push({
+                                name: '/consensus',
+                                params:{"activeName":"first"}
+                            });
+                            /*this.$router.push({
+                                name: '/myNode',
+                                params:{"agentAddress":this.nodeData.agentAddress}
+                            })*/
+                        } else {
+                            this.$message({
+                                message: this.$t('message.passWordFailed') + response.msg,
+                                type: 'warning',
+                            });
+                        }
+                    })
+            },
         }
     }
 </script>
