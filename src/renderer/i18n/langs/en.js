@@ -105,7 +105,7 @@ const en = {
         sourceAddress:'Source Address',
         destinationAddress:'Destination Address',
         transferAmount:'Amount',
-        currentBalance:'Current balance',
+        currentBalance:'balance',
         select:'select',
         //freezeList
         freezeList:'Frozen list',
@@ -154,7 +154,7 @@ const en = {
         c15:'Consensusing',
         c16:'address',
         c17:'commission',
-        c18:'Credit value',
+        c18:'Credit',
         c19:'participants',
         c20:'amount',
         //newNode
@@ -165,7 +165,7 @@ const en = {
         c25:'Deposit',
         c26:'Agency commission ratio%',
         c27:'Introduce',
-        c28:'Service Charge',
+        c28:'Mining fee',
         c29:'Confirm',
         //
         c30:'',
@@ -207,7 +207,7 @@ const en = {
         //nodeInfo
         c62:'Close node',
         c63:'Please enter the key word！',
-        c64:'Residual deposit',
+        c64:'Deposit',
         c65:'Our engineers are focusing on R & D, and more excellent functions are expected to look forward to！',
         //setPage
         c66:'Settings',
@@ -244,7 +244,7 @@ const en = {
         c95:'Delete',
         c96:'New contact',
         c97:'It seems that you do not have an internet connection, please try again later. Would you like to close the NULS Client??',
-        c98:'Determine to close',
+        c98:'Determine close',
         c99:'node?',
         //editAliasin
         c100:'Name Settings',
@@ -279,6 +279,8 @@ const en = {
         c128:'Red',
         c129:'Copy success',
         c130:'Congratulations, Application to participate in the consensus success',
+        c131:'In the data connection, please wait for a moment.',
+        c132:'loading...',
 		
         //Bottom info
         purseVersion: 'Wallet version',

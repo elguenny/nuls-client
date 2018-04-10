@@ -18,12 +18,13 @@
                 <li>
                     <label>{{$t("message.c4")}}：</label>{{this.myInfoData.agentCount}} {{$t("message.c30")}}
                     <span v-show="this.myInfoData.agentCount > 0 ? false:true ">(<span
-                         @click="toNewNode" class="span">{{$t("message.c5")}}</span>)</span>
+                            @click="toNewNode" class="span">{{$t("message.c5")}}</span>)</span>
                 </li>
                 <li>
-                    <label>{{$t("message.c8")}}：</label>{{this.myInfoData.joinAccountCount}} {{$t("message.c30")}} (<span
-                                                                             @click="toAgencyNode"
-                                                                             class="span">{{$t("message.c9")}}</span>)
+                    <label>{{$t("message.c8")}}：</label>{{this.myInfoData.joinAccountCount}} {{$t("message.c30")}}
+                    (<span
+                        @click="toAgencyNode"
+                        class="span">{{$t("message.c9")}}</span>)
                 </li>
                 <li>
                     <label>{{$t("message.c6")}}：</label>{{(this.myInfoData.usableBalance*.00000001).toFixed(8)}} NULS
@@ -53,11 +54,12 @@
                                 <li><label>{{$t("message.c25")}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t("message.c18")}}:</label>
-                                    <ProgressBar :colorData="item.creditRatio < 0 ? '#82bd39':'#f64b3e'" :widthData="item.creditRatio"></ProgressBar>
+                                    <ProgressBar :colorData="item.creditRatio < 0 ? '#82bd39':'#f64b3e'"
+                                                 :widthData="item.creditRatio"></ProgressBar>
                                 </li>
                                 <li class="cb">
                                     <label class="fl">{{$t("message.c19")}}：</label>
-                                    <ProgressBar colorData="'#f64b3e'" :widthData="item.memberCount"></ProgressBar>
+                                    <ProgressBar colorData="#6a84f7" :widthData="item.memberCount"></ProgressBar>
                                 </li>
                                 <li class="cb">
                                     <label class="fl">{{$t("message.c20")}}：</label>
@@ -134,6 +136,7 @@
 <script>
     import ProgressBar from '@/components/ProgressBar.vue'
     import AccountAddressBar from '@/components/AccountAddressBar.vue';
+
     export default {
         data() {
             return {
@@ -141,7 +144,7 @@
                 accountAddress: [],
                 accountAddressValue: '',
                 activeName: this.$route.params.activeName,
-                tabName:'first',
+                tabName: 'first',
 
                 creditValuesShow0: false,
                 creditValuesShow1: false,
@@ -152,7 +155,14 @@
                 allAgentCount: 0,
                 allTotalDeposit: 0,
 
-                myInfoData:[],
+                myInfoData: {
+                    reward: 0,
+                    rewardOfDay: 0,
+                    joinAccountCount: 0,
+                    totalDeposit: 0,
+                    agentCount: 0,
+                    usableBalance:0,
+                },
 
                 creditColor: '#6e84f7',
                 totalColor: '#f64b3e',
@@ -161,7 +171,7 @@
                 allConsensus: [],
                 totalAll: 0,
 
-                myConsensus:[],
+                myConsensus: [],
                 myTotalAll: 0,
 
             }
@@ -170,26 +180,42 @@
             ProgressBar,
             AccountAddressBar,
         },
-        mounted() {
-            let _this = this;
+        computed:{
+            getAddressList(){
+                return this.$store.getters.getAddressList
+            },
+        },
+        created(){
             this.getConsensus("/consensus");
-
-            if(localStorage.getItem("newAccountAddress") != ''){
+            if (localStorage.getItem("newAccountAddress") != '') {
                 this.accountAddressValue = localStorage.getItem("newAccountAddress");
                 this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
-                this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+                this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {"pageSize": "3"});
             }
             this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
-
+            //判断用户选择的语言
+            let language = localStorage.getItem('language');
+            setInterval(() => {
+                if (language !== localStorage.getItem('language')) {
+                    language = localStorage.getItem('language');
+                    if (this.tabName === 'first') {
+                        this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
+                    } else {
+                        this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {"pageSize": "3"});
+                    }
+                } else {
+                    language = localStorage.getItem('language');
+                }
+            }, 1000);
         },
         methods: {
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
                 this.getConsensusAddress("/consensus/address/" + chenckAddress);
-                if(this.tabName === "first" ){
+                if (this.tabName === "first") {
                     this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
-                }else {
-                    this.getMyConsensus("/consensus/agent/address/"+ chenckAddress,{"pageSize": "3"});
+                } else {
+                    this.getMyConsensus("/consensus/agent/address/" + chenckAddress, {"pageSize": "3"});
                 }
             },
             //获取共识信息
@@ -206,8 +232,15 @@
             getConsensusAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
+                        //console.log(response);
                         if (response.success) {
                             this.myInfoData = response.data;
+                        } else {
+                            this.myInfoData.reward = 0;
+                            this.myInfoData.rewardOfDay = 0;
+                            this.myInfoData.joinAccountCount = 0;
+                            this.myInfoData.totalDeposit = 0;
+                            this.myInfoData.agentCount = 0;
                         }
                     });
             },
@@ -237,7 +270,7 @@
                                 //response.data.list[i].creditRatio="-0.2";
                                 response.data.list[i].statuss = response.data.list[i].status;
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
-                                response.data.list[i].memberCount = (response.data.list[i].memberCount/1000).toFixed() + '%';
+                                response.data.list[i].memberCount = (response.data.list[i].memberCount / 1000).toFixed() + '%';
                                 response.data.list[i].totalDeposit = response.data.list[i].totalDeposit / 50000000000000 + '%';
                             }
                             this.myTotalAll = response.data.total;
@@ -256,22 +289,23 @@
             getAllConsensus(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
-                       if (response.success) {
-                           //console.log(response);
+                        if (response.success) {
+                            //console.log(response);
                             for (var i = 0; i < response.data.list.length; i++) {
+                                //console.log(response.data.list[i].creditRatio);
                                 if (response.data.list[i].creditRatio != 0) {
                                     if (response.data.list[i].creditRatio > 0) {
                                         response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                     } else {
-                                        response.data.list[i].creditRatio = response.data.list[i].creditRatio * 100;
+                                        response.data.list[i].creditRatio = Math.abs(response.data.list[i].creditRatio) * 100 + '%';
                                     }
                                 } else {
                                     response.data.list[i].creditRatio = "50%";
                                 }
                                 response.data.list[i].statuss = response.data.list[i].status;
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
-                                response.data.list[i].memberCount = response.data.list[i].memberCount/10+ '%';
-                                response.data.list[i].totalDeposit = response.data.list[i].totalDeposit / 50000000000000 + '%';
+                                response.data.list[i].memberCount = (response.data.list[i].memberCount / 10).toString() + '%';
+                                response.data.list[i].totalDeposit = (response.data.list[i].totalDeposit / 50000000000000).toString() + '%';
                             }
                             this.totalAll = response.data.total;
                             this.allConsensus = response.data.list;
@@ -320,21 +354,21 @@
                 });*/
             },
             //委托节点跳转
-            toAgencyNode(){
+            toAgencyNode() {
                 this.$router.push({
                     name: '/agencyNode',
                 });
-             },
+            },
             //我的节点跳转
-            toMyNode(address,index) {
-                if(address === localStorage.getItem("newAccountAddress")){
+            toMyNode(address, index) {
+                if (address === localStorage.getItem("newAccountAddress")) {
                     this.$router.push({
                         name: '/nodeInfo'
                     });
-                }else {
-                   this.$router.push({
-                       name: '/myNode',
-                       params:{"agentAddress":address}
+                } else {
+                    this.$router.push({
+                        name: '/myNode',
+                        params: {"agentAddress": address}
                     });
                 }
             },
@@ -346,16 +380,16 @@
             //切换tab
             handleClick(tab, event) {
                 this.tabName = tab.name;
-                if(localStorage.getItem("newAccountAddress") != ''){
-                    if(tab.name !== 'first'){
-                        this.getMyConsensus("/consensus/agent/address/"+localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
-                    }else {
+                if (localStorage.getItem("newAccountAddress") != '') {
+                    if (tab.name !== 'first') {
+                        this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {"pageSize": "3"});
+                    } else {
                         this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
                     }
                 }
             },
             //跳转加入共识列表
-            toNodeList(){
+            toNodeList() {
                 this.$router.push({
                     name: '/agencyNode'
                 });
@@ -366,6 +400,7 @@
 
 <style lang="less">
     @import url("../../assets/css/style");
+
     .consensus-index {
         .consensus-index-title {
             width: 640px;

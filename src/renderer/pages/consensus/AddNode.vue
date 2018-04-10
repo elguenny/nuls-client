@@ -41,7 +41,7 @@
 				<el-form-item :label="$t('message.c51')" class="pledge-money" prop="nodeNo">
 					<el-input v-model="addNodeForm.nodeNo" :placeholder=this.placeholder></el-input>
 				</el-form-item>
-				<div class="procedure">{{$t('message.miningFee1')}}<span>0.01 NULS</span></div>
+				<div class="procedure"><label>{{$t('message.c28')}}</label><span>0.01 NULS</span></div>
 				<el-form-item size="large" class="submit">
 					<el-button type="primary" @click="onSubmit('addNodeForm')">{{$t('message.confirmButtonText')}}</el-button>
 				</el-form-item>
@@ -110,7 +110,7 @@
                                 if (response.data.creditRatio > 0) {
                                     response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed(2) + '%';
                                 } else {
-                                    response.data.creditRatio = response.data.creditRatio * 10;
+                                    response.data.creditRatio = Math.abs(response.data.creditRatio) * 100+ '%';
                                 }
                             } else {
                                 response.data.creditRatio = "50%";
@@ -163,7 +163,7 @@
                 var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.addNodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
                 this.$post('/consensus/deposit/', param)
                     .then((response) => {
-                        //console.log(response);
+                        console.log(response);
                         if (response.success) {
                             this.$message({
                                 message: this.$t('message.passWordSuccess'),
@@ -243,6 +243,8 @@
 				.el-form-item__label{
 					color: #C1C5C9;
 					font-size: 12px;
+					width: 70px;
+					padding: 0 2px 0 0;
 				}
 				.el-form-item__error{
 					margin-left: 70px;

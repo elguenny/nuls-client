@@ -14,7 +14,8 @@
                     <el-input v-model.trim="newNodeForm.agentName" :maxlength="25"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c25')+'（NULS）:'" class="form-left" prop="deposit">
-                    <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder :maxlength="17"></el-input>
+                    <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder
+                              :maxlength="17"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c26')+'（%）:'" class="form-left" prop="commissionRate">
                     <el-input v-model.number="newNodeForm.commissionRate" :maxlength="17"></el-input>
@@ -39,6 +40,7 @@
     import Back from './../../components/BackBar.vue'
     import AccountAddressBar from '@/components/AccountAddressBar.vue';
     import Password from '@/components/PasswordBar.vue';
+
     export default {
         data() {
             var checkNodeNo = (rule, value, callback) => {
@@ -84,7 +86,7 @@
                 },
                 newNodeRules: {
                     packingAddress: [
-                        {required: true, message:this.$t('message.c38'), trigger: 'blur'}
+                        {required: true, message: this.$t('message.c38'), trigger: 'blur'}
                     ],
                     agentName: [
                         {required: true, message: this.$t('message.c39')},
@@ -128,7 +130,7 @@
                     .then((response) => {
                         if (response.success) {
                             this.usable = response.data.usable * 0.00000001;
-                            this.placeholder = this.$t('message.currentBalance') +" "+ response.data.usable * 0.00000001;
+                            this.placeholder = this.$t('message.currentBalance') + " " + response.data.usable * 0.00000001;
                         }
                     });
             },
@@ -156,11 +158,11 @@
                             });
                             this.$router.push({
                                 name: '/consensus',
-                                params:{"activeName":"first"},
+                                params: {"activeName": "first"},
                             })
                         } else {
                             this.$message({
-                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                                type: 'warning', message: this.$t('message.passWordFailed') + response.data
                             });
                         }
                     })
@@ -172,6 +174,7 @@
 
 <style lang="less">
     @import url("../../assets/css/style.less");
+
     .new-node {
         h2 {
             font-size: 16px;
@@ -196,14 +199,17 @@
             }
             .el-input__inner {
                 width: 410px;
+                color: #FFFFFF;
             }
-            .el-input--suffix{
+            .el-input--suffix {
                 .el-input__inner {
                     width: 410px;
                 }
             }
             .el-textarea__inner {
                 width: 410px;
+                color: #FFFFFF;
+                padding: 5px 2px;
             }
             .el-input--suffix {
                 width: 100%;
@@ -217,13 +223,18 @@
             .el-form-item--mini .el-form-item__content,
             .el-form-item--mini .el-form-item__label {
                 line-height: 0px;
-                color: white;
+                color: #FFFFFF;
             }
-            .el-form-item.is-required .el-form-item__label:before{
+            .el-form-item.is-required .el-form-item__label:before {
                 font-size: 0px;
             }
             .el-form-item--mini {
                 margin-bottom: 15px;
+            }
+            input::-webkit-input-placeholder {
+                color: #6d6e6f;
+                font-size: 10px;
+                text-align: right;
             }
         }
     }

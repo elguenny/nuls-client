@@ -1,12 +1,12 @@
 import Vue from 'vue';
-import ElementUI from 'element-ui'
+import ElementUI from 'element-ui';
 import locale from 'element-ui/lib/locale';
 import VueI18n from 'vue-i18n';
 import messages from './langs/index';
 Vue.use(VueI18n);
 
 const i18n = new VueI18n({
-    locale: sessionStorage.getItem('language') || 'en',
+    locale: localStorage.hasOwnProperty('language') || 'en',
     messages,
 });
 Vue.use(ElementUI,{

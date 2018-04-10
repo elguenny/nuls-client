@@ -1,5 +1,8 @@
 <template>
-    <div class="home">
+    <div v-loading="loadingHome"
+         :element-loading-text="this.$t('message.c132')"
+         element-loading-spinner="el-icon-loading"
+         element-loading-background="rgba(0, 0, 0, 0.8)" class="home">
         <div class="home-nav">
             <div class="home-nav-top">
                 <div class="nav-title">{{$t("message.fund")}}</div>
@@ -10,12 +13,12 @@
                 </div>
                 <div class="nav-lock cl">
                     <label class="fl">{{$t("message.fundLock")}}：</label>
-                    <ProgressBar :colorData=this.usableColor :widthData=this.usableWidth></ProgressBar>
+                    <ProgressBar :colorData=this.usableColor :widthData=this.lockedWidth></ProgressBar>
                     <span class="fr">{{(this.balanceData.locked*0.00000001).toFixed(8)}} NULS</span>
                 </div>
                 <div class="nav-usable cl">
                     <label class="fl">{{$t("message.fundUsable")}}：</label>
-                    <ProgressBar :colorData=this.lockedColor :widthData=this.lockedWidth></ProgressBar>
+                    <ProgressBar :colorData=this.lockedColor :widthData=this.usableWidth></ProgressBar>
                     <span class="fr">{{(this.balanceData.usable*0.00000001).toFixed(8)}} NULS</span>
                 </div>
             </div>
@@ -37,18 +40,17 @@
 
                 </ul>
             </div>
-            <!--<div class="home-nav-top">
-            </div>-->
         </div>
         <div class="div-title">{{$t("message.applicationsNode")}}</div>
         <div class="cl home-info">
-            <!-- <div class="home-info-consensus">-->
             <div class="home-info-consensus" v-loading.lock="loading">
-                <div id="world-map-markers" style="height: 16rem;">
+                <div id="world-map-markers" style="height: 18rem;">
                 </div>
             </div>
         </div>
     </div>
+
+
 </template>
 
 <script>
@@ -63,6 +65,7 @@
         data() {
             return {
                 loading: true,
+                loadingHome: true,
                 balanceData: [],
                 balanceColor: '#658EC7',
                 balanceWidth: '0',
@@ -76,14 +79,22 @@
                 ipData: [],
                 mapObj: [],
                 ipObj: [],
-
             };
         },
         components: {
             ProgressBar,
         },
-        mounted() {
-            let _this = this;
+        created() {
+            //判断是否连接数据库成功
+            if(sessionStorage.getItem("userList") !== '1'){
+                setInterval(()=>{
+                    if( sessionStorage.getItem("userList")=== '1'){
+                       this.loadingHome = false;
+                    }
+                },3000)
+            }else {
+                this.loadingHome = false;
+            }
             //判断java程序是否启动
             sessionStorage.setItem("homeJava", "1");
             if (sessionStorage.getItem("homeJava") == null) {
@@ -93,7 +104,7 @@
                     this.getAccountAddress("/account/balances/");
                     this.getConsensus("/consensus");
                     //判断vuex账户列表里有没有数据
-                    if (this.$store.state.addressList.length == 0) {
+                    if (this.$store.getters.getAddressList.length === 0) {
                         this.getAccountList("/account/list");
                     }
                     //查询网络节点数
@@ -106,7 +117,7 @@
                 this.getAccountAddress("/account/balances/");
                 this.getConsensus("/consensus");
                 //判断vuex账户列表里有没有数据
-                if (this.$store.state.addressList.length === 0) {
+                if (this.$store.getters.getAddressList.length === 0) {
                     this.getAccountList("/account/list");
                 }
                 //查询网络节点数
@@ -115,7 +126,6 @@
                     this.methodsMaps(this.ipObj);
                 }, 500);
             }
-
             if (localStorage.getItem("fastUser") == null) {
                 localStorage.setItem('fastUser', '0');
                 localStorage.setItem("keyShow", false);
@@ -135,11 +145,11 @@
                 child_process.execFile(_path + 'java\\bin\\nuls.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
                     sessionStorage.setItem("homeJava", "1");
                     if (error !== null) {
-                        alert('exec error: ' + error);
+                        //alert('exec error: ' + error);
                         console.log('exec error: ' + error);
                     }
                     else {
-                        alert('Execute the java file');
+                        //alert('Execute the java file');
                         console.log('Execute the java file');
                     }
                 });
@@ -155,9 +165,10 @@
                         if (response.success) {
                             //console.log(response)
                             this.balanceData = response.data;
-                            this.balanceWidth = this.balanceData.balance / this.balanceData.balance * 100 + "%";
-                            this.lockedWidth = this.balanceData.locked / this.balanceData.balance * 100 + "%";
-                            this.usableWidth = this.balanceData.usable / this.balanceData.balance * 100 + "%";
+                            this.balanceWidth = (this.balanceData.balance / this.balanceData.balance * 100).toFixed(2) + "%";
+                            this.lockedWidth = (this.balanceData.locked / this.balanceData.balance * 100).toFixed(2) + "%";
+                            this.usableWidth = (this.balanceData.usable / this.balanceData.balance * 100).toFixed(2) + "%";
+                            //console.log(this.lockedWidth+"==="+this.usableWidth);
                         } else {
                             this.balanceColor = '';
                             this.lockedColor = '';
@@ -190,22 +201,26 @@
                         if (response.success) {
                             //console.log(response);
                             this.ipData = response.data;
-                            for (var j = 0, len = this.ipData.length; j < len; j++) {
-                                axios.get('http://freegeoip.net/json/' + this.ipData[j])
-                                    .then((response) => {
-                                        var latLngs = [response.data.latitude, response.data.longitude];
-                                        var names = response.data.time_zone;
-                                        if (names == "undefined") {
-                                            names = 'anonymous'
-                                        } else {
-                                            names = names.split('/')[1]
-                                        }
-                                        this.ipObj.push({"latLng": latLngs, "name": names});
-                                    })
-                                    .catch(function (err) {
-                                        this.ipObj = [];
-                                        //console.log(err);
-                                    });
+                            if(this.ipData.length > 0){
+                                for (var j = 0, len = this.ipData.length; j < len; j++) {
+                                    axios.get('http://freegeoip.net/json/' + this.ipData[j])
+                                        .then((response) => {
+                                            console.log(response.data);
+                                            var latLngs = [response.data.latitude, response.data.longitude];
+                                            var names = response.data.time_zone;
+                                            if (names == "undefined") {
+                                                names = 'anonymous'
+                                            } else {
+                                                names = names.split('/')[1]
+                                            }
+                                            this.ipObj.push({"latLng": latLngs, "name": names});
+                                        })
+                                        .catch(function (err) {
+                                            this.ipObj = [];
+                                        });
+                                }
+                            }else {
+                                console.log("没有获取到ip")
                             }
                             /*this.ipObj = [
                                 {latLng: [34.62, 82.45], name: '点点1'},
@@ -214,7 +229,7 @@
                                 {latLng: [38.97, 11.53], name: '点点1'},
                                 {latLng: [69.88, 21.64], name: '点点1'},
                             ];*/
-                            console.log(this.ipObj);
+                            //console.log(this.ipObj);
                         }
                     });
             },
@@ -229,24 +244,21 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            //console.log(response);
                             if (response.data.list.length > 0) {
-                                this.$store.state.addressList = response.data.list;
+                                this.$store.commit("setAddressList",response.data.list);
                                 localStorage.setItem('newAccountAddress', response.data.list[0].address);
                                 localStorage.setItem('fastUser', '1');
                             } else {
-                                this.$store.state.addressList = [];
+                                this.$store.commit("setAddressList",'');
                                 localStorage.setItem('newAccountAddress', '');
                                 localStorage.setItem('fastUser', '0');
                             }
                         } else {
-                            this.$store.state.addressList = [];
+                            this.$store.commit("setAddressList",'');
                             localStorage.setItem('newAccountAddress', '');
                             localStorage.setItem('fastUser', '0');
                         }
                     }).catch((reject) => {
-                    console.log(reject);
-                    this.$store.state.addressList = [];
                     localStorage.setItem('newAccountAddress', '');
                     localStorage.setItem('fastUser', '0');
                 });
@@ -307,18 +319,19 @@
     @import url("../../assets/css/style.less");
 
     .home {
-        width: 93%;
-        margin: 24px auto;
+        width: 100%;
+        height: 100%;
+        margin: auto;
         background-color: #0c1323;
         .home-nav {
             width: 630px;
-            height: 122px;
+            height: 148px;
             margin: auto;
             .home-nav-top {
                 width: 302px;
                 height: 120px;
                 float: left;
-                margin-right: 20px;
+                margin: 24px 20px 0 0;
                 border: 1px solid #658ec7;
                 background-color: #17202e;
                 .nav-title {

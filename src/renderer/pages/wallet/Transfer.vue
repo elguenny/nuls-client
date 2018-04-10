@@ -16,15 +16,15 @@
                     <el-input type="text" v-model.trim="transferForm.joinAddress"></el-input>
                     <i class="cursor-p" @click="toUsersAddressList"></i>
                 </el-form-item>
-                <el-form-item :label="$t('message.transferAmount')+'：'" prop="joinNo" class="join-nos">
+                <el-form-item :label="$t('message.transferAmount')+'：'" class="join-nos"  prop="joinNo">
                     <span class="allUsable">{{$t("message.currentBalance")}}: {{ usable }} NULS</span>
-                    <el-input type="text" v-model.number="transferForm.joinNo" class="joinNo"></el-input>
+                    <el-input type="text" v-model.number="transferForm.joinNo" :maxlength="20"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t("message.all")}}</span>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
                 </el-form-item>
                 <el-form-item :label="$t('message.remarks')+'：'" class="remark">
-                    <el-input type="textarea" v-model="transferForm.remark" :maxlength="80" @input="descInput" style="padding: 0 2px;"></el-input>
+                    <el-input type="textarea" v-model="transferForm.remark" :maxlength="80" style="padding: 0 2px;"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
                     <el-button type="primary" @click="transferSubmit('transferForm')">{{$t("message.c114")}}</el-button>
@@ -89,7 +89,8 @@
                     callback(new Error(this.$t('message.transferNO')));
                 }
                 setTimeout(() => {
-                    var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                    //console.log(value);
+                    var re =/(^\+?|^\d?)\d*\.?\d+$/;
                     if (!re.exec(value)){
                         callback(new Error(this.$t('message.transferNO1')));
                     } else if ( value > this.usable-0.01) {
@@ -216,11 +217,6 @@
             dbcheckedAddress(row, event) {
                 this.transferForm.joinAddress = row.userAddress;
                 this.dialogTableVisible = false;
-            },
-            //限制备注长度
-            descInput() {
-                var txtVal = this.transferForm.remark.length;
-                this.remnant = txtVal;
             },
             //确认转账
             transferSubmit(fromName) {

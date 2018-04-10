@@ -1,8 +1,8 @@
 <template>
-    <el-dialog title="" :visible.sync="passwordVisible" top="35vh" class="password-dialog">
+    <el-dialog title="" :visible.sync="passwordVisible" top="35vh" class="password-dialog" @open="passwordShow" @close="passwordClose">
         <el-form ref="passwordForm" :model="passwordForm" :rules="passwordRules">
             <el-form-item :label="$t('message.passWordTitle')+':'" prop="password">
-                <el-input v-model="passwordForm.password" type="password" :autofocus="true"></el-input>
+                <el-input v-model="passwordForm.password" type="password" :autofocus="true" :maxlength="22"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -18,6 +18,7 @@
         data() {
             return {
                 passwordVisible: false,
+                passwordShows:0,
                 passwordForm: {
                     password: '',
                 },
@@ -28,17 +29,33 @@
                 },
             };
         },
-        mounted() {
-            var lett=this;
+        created() {
+            let  passwordShow = false;
+            setInterval(()=>{
+                passwordShow = this.$store.getters.getPasswordShow;
+            },500);
             document.onkeydown=function(e){
                 var key=window.event.keyCode;
-                if(key==13){
-                    document.getElementById('passwordInfo').click();
+                if(key === 13){
+                   if(passwordShow){
+                       document.getElementById('passwordInfo').click();
+                    }else {
+                        console.log(14);
+                    }
                 }
             }
         },
         methods: {
+            //密码框显示执行事件
+            passwordShow(){
+                this.$store.commit("setPasswordShow",true);
+            },
+            passwordClose(){
+                this.$store.commit("setPasswordShow",false);
+            },
+            //
             showPassword(boolean) {
+                this.$store.commit("setPasswordShow",false);
                 this.passwordForm.password = '';
                 this.passwordVisible = boolean;
             },

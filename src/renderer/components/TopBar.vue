@@ -59,32 +59,33 @@
                     }],
                 //select language initial info
                 projectName: {
-                    key: "cn",
-                    value: "static/img/Language-zh.png"
+                    key: "en",
+                    value: "static/img/Language-en.png"
                 },
                 //select language initial width
                 widthData: "2rem",
                 errorClass: '',
                 activeClass: 'active',
-                isActive: store.state.isActive,
-                //isActive:0
+                isActive: 0,
             }
         },
         components: {
             SelecBar
         },
-        mounted() {
-            let _this = this;
-            this.$i18n.locale = localStorage.getItem("language") === '' ? "en" : localStorage.getItem("language");
-            if (localStorage.getItem("language") === 'en') {
-                this.projectName = {
-                    key: "en",
-                    value: "static/img/Language-en.png"
-                }
-            } else {
+        computed:{
+
+        },
+        created(){
+            this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language'): 'en';
+            if (localStorage.getItem("language") === 'cn') {
                 this.projectName = {
                     key: "cn",
                     value: "static/img/Language-zh.png"
+                }
+            } else {
+                this.projectName = {
+                    key: "en",
+                    value: "static/img/Language-en.png"
                 }
             }
         },
@@ -92,57 +93,63 @@
             //语言切换
             selectLanguage() {
                 this.$i18n.locale = this.projectName.key;
-                var param = '{"language":"' + this.projectName.key+ '"}';
+                var param = '{"language":"' + this.projectName.key + '"}';
                 this.$post('/lang', param)
                     .then((response) => {
                         console.log(response);
-                        if(response.success){
-                           console.log('success')
-                        }else {
+                        if (response.success) {
+                            console.log('success')
+                        } else {
                             console.log('err')
                         }
                     });
             },
             //菜单跳转
             to(url, index) {
-                if (url === "home") {
-                    this.isActive = 0;
-                    this.$router.push({
-                        path: '/*',
-                    })
-                }
-                if (url === "wallet") {
-                    this.isActive = 1;
-                    //获取账户地址列表
-                    if(this.$store.state.addressList.length === 0){
+                if (sessionStorage.getItem("userList") !== '1') {
+                    this.$message({
+                        type: 'info', message: this.$t('message.c131'), duration: '800'
+                    });
+                } else {
+                    if (url === "home") {
+                        this.isActive = 0;
                         this.$router.push({
-                            name: '/setPassword',
-                        })
-                    }else {
-                        this.$router.push({
-                            name: '/wallet',
-                            params:{language:index}
+                            path: '/*',
                         })
                     }
-                }
-               if (url === "consensus") {
-                    this.isActive = 2;
-                    this.$router.push({
-                        name: '/consensus',
-                        params: {activeName: "first"},
-                    })
-                }
-                if (url === "application") {
-                    this.isActive = 3;
-                    this.$message({
-                        type: 'info', message: this.$t('message.c65'), duration: '800'
-                    });
-                }
-                if (url === "more") {
-                    this.isActive = 4;
-                    this.$message({
-                        type: 'info', message: this.$t('message.c65'), duration: '800'
-                    });
+                    if (url === "wallet") {
+                        this.isActive = 1;
+                        //获取账户地址列表
+                        if (this.$store.getters.getAddressList.length === 0) {
+                            this.$router.push({
+                                name: '/setPassword',
+                            })
+                        } else {
+                            this.$router.push({
+                                name: '/wallet',
+                                params: {language: index}
+                            })
+                        }
+                    }
+                    if (url === "consensus") {
+                        this.isActive = 2;
+                        this.$router.push({
+                            name: '/consensus',
+                            params: {activeName: "first"},
+                        })
+                    }
+                    if (url === "application") {
+                        this.isActive = 3;
+                        this.$message({
+                            type: 'info', message: this.$t('message.c65'), duration: '800'
+                        });
+                    }
+                    if (url === "more") {
+                        this.isActive = 4;
+                        this.$message({
+                            type: 'info', message: this.$t('message.c65'), duration: '800'
+                        });
+                    }
                 }
             },
             //消息方案
@@ -151,9 +158,15 @@
             },
             //设置界面跳转
             toSetUp() {
-                this.$router.push({
-                    path: '/users/setPage'
-                })
+                if (this.$store.getters.getAddressList.length === 0) {
+                    this.$router.push({
+                        name: '/setPassword',
+                    })
+                } else {
+                    this.$router.push({
+                        path: '/users/setPage'
+                    })
+                }
             },
             //窗体最小化
             toMinus() {

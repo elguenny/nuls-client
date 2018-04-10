@@ -25,16 +25,26 @@
     import Password from '@/components/PasswordBar.vue';
 
     export default {
-        data() {
+        data: function () {
             return {
                 passwordValue: '',
-                backOk: localStorage.getItem('toUserInfo') === "1" ? false : true,
-                backOks: localStorage.getItem('toUserInfo') === "1" ? false : true,
+                backOk: localStorage.getItem('toUserInfo') === '1' ? false : true,
+                backOks: localStorage.getItem('toUserInfo') === '1' ? false : true,
             }
         },
         components: {
             Back,
             Password,
+        },
+        created(){
+            document.onkeydown=function(e){
+                var key=window.event.keyCode;
+                console.log(this.passwordVisible);
+                /*if(key === 13){
+                    console.log(13);
+                    document.getElementsByClassName('passwordInfo').click();
+                }*/
+            }
         },
         methods: {
             /** newAccount
@@ -52,7 +62,6 @@
                 var params = '{"count":1,"password":"' + password + '"}';
                 this.postAccount('/account', params)
             },
-
             //输入密码提交方法
             postAccount(url,params){
                 this.$post(url, params)
@@ -79,15 +88,12 @@
             getAccountList(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         if(response.success){
-                            this.$store.state.addressList = response.data.list;
-                        }else {
-                            this.$store.state.addressList = [];
+                            this.$store.commit("setAddressList",response.data.list);
                         }
                     }).catch((reject) => {
                     console.log("User List err"+reject);
-                    this.$store.state.addressList = [];
                 });
             },
             //导入账户跳转

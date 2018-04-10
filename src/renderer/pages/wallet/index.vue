@@ -1,5 +1,5 @@
 <template>
-    <div class="wallet" v-loading.lock="loading">
+    <div class="wallet">
         <div class="search">
             <div class="account-top">
                 <label>{{$t("message.indexAccountAddress")}}</label>
@@ -128,10 +128,7 @@
         },
         mounted() {
             let _this = this;
-            //判断是否有地址列表
-            if (this.$store.state.addressList.length !== 0) {
-                this.loading = false;
-            }
+
             //判断显示隐藏数字
             if (localStorage.getItem("keyShow") === 'true') {
                 this.keyShow = true
@@ -177,7 +174,6 @@
             getAccountTxList(url, param) {
                 this.$fetch(url, param)
                     .then((response) => {
-                        //console.log(response)
                         if (response.data != null) {
                             this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {

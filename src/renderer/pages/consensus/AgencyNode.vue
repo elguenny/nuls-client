@@ -12,7 +12,7 @@
             </div>
             <div class="select-div fl">
                 <el-select v-model="selectKeyword" slot="prepend" :placeholder="$t('message.c46')"
-                           @change="sortConsensus">
+                           @change="sortConsensus" :popper-append-to-body="false">
                     <el-option :label="$t('message.c17')" value="commissionRate"></el-option>
                     <el-option :label="$t('message.c25')" value="owndeposit"></el-option>
                     <el-option :label="$t('message.c18')" value="creditRatio"></el-option>
@@ -21,7 +21,7 @@
         </div>
         <div class="agency-node-bottom">
             <div class="div-icon cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentAddress)">
-                <p class="subscript">
+                <p class="subscript" :class="item.statuss === 1  ? 'stay' : ''">
                     {{item.status}}
                 </p>
                 <h3>{{item.agentName}}</h3>
@@ -90,7 +90,8 @@
                     .then((response) => {
                         //console.log(response);
                         if (response.success) {
-                            for (var i = 0; i < response.data.list.length; i++) {
+                            for (let i = 0; i < response.data.list.length; i++) {
+                                response.data.list[i].statuss = response.data.list[i].status;
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%';
                                 response.data.list[i].totalDeposit = ((response.data.list[i].totalDeposit / 50000000000000).toFixed()).toString() + '%';
@@ -125,8 +126,10 @@
             },
             //搜索功能
             searchConsensus() {
-                if (this.keyword != '') {
-                    var params = {"keyword": this.keyword, "pageSize": "6", "pageNumber": "1"};
+                console.log(document.getElementsByClassName("el-scrollbar__view el-select-dropdown__list").value);
+                document.getElementsByClassName('el-select-dropdown__list').style.width='165px';
+                if (this.keyword !== '') {
+                    const params = {"keyword": this.keyword, "pageSize": "6", "pageNumber": "1"};
                     this.getAllConsensus("/consensus/agent/list/", params);
                 } else {
                     this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6", "pageNumber": "1"});
@@ -134,11 +137,12 @@
             },
             //排序共识
             sortConsensus(sort) {
-                if (this.keyword != '') {
-                    var params = {"keyword": this.keyword, "sortType": sort, "pageSize": "6", "pageNumber": "1"};
+
+                if (this.keyword !== '') {
+                    const params = {"keyword": this.keyword, "sortType": sort, "pageSize": "6", "pageNumber": "1"};
                     this.getAllConsensus("/consensus/agent/list/", params);
                 } else {
-                    var params = {"sortType": sort, "pageSize": "6", "pageNumber": "1"};
+                    const params = {"sortType": sort, "pageSize": "6", "pageNumber": "1"};
                     this.getAllConsensus("/consensus/agent/list/", params);
                 }
 
@@ -180,7 +184,9 @@
                     border: 1px solid #658ec7;
                     padding: 0 2px;
                 }
-
+                .el-select-dropdown__list {
+                    width: 165px;
+                }
                 .el-input-group__append {
                     border-left: 0;
                     background-color: #658ec7;
@@ -205,11 +211,13 @@
                 display: inline-block;
             }
         }
+        .el-scrollbar__wrap {
+            overflow: visible;
+        }
         .el-select-dropdown__list {
             width: 165px;
         }
     }
-
     .el-popper[x-placement^=bottom] .popper__arrow {
         display: none;
     }

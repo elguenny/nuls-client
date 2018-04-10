@@ -3,7 +3,7 @@
 		<Back :backTitle="this.$t('message.consensusManagement')"></Back>
 		<h2>{{this.agentAddressInfo.agentName}}</h2>
 		<div class="div-icon1 node-page-top">
-			<p class="subscript">
+			<p class="subscript" :class="this.agentAddressInfo.statuss === 1  ? 'stay' : ''">
 				{{this.agentAddressInfo.status}}
 			</p>
 			<ul>
@@ -100,11 +100,12 @@
                                 if (response.data.creditRatio > 0) {
                                     response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                 } else {
-                                    response.data.creditRatio = response.data.creditRatio * 100;
+                                    response.data.creditRatio = Math.abs(response.data.creditRatio) * 100+ '%';
                                 }
                             } else {
                                 response.data.creditRatio = "50%";
                             }
+                            response.data.statuss = response.data.status;
                             response.data.status = this.switchStatus(response.data.status);
                             response.data.memberCounts = response.data.memberCount +"/1000";
                             response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';

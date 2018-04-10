@@ -60,6 +60,7 @@
                     .then((response) => {
                         console.log(response)
                         if(response.success){
+                            response.data.statuss = response.data.status;
                             response.data.status = this.switchStatus(response.data.status);
                             this.myNodeInfo = response.data;
 						}

@@ -68,7 +68,7 @@
                 this.$fetch(url,params)
                     .then((response) => {
                         if (response.success) {
-                            console.log(response);
+                            //console.log(response);
                             this.totalAll = response.data.total;
                             if (response.data.list.length === 0) {
                                 localStorage.setItem('fastUser','0');
@@ -78,7 +78,7 @@
                             }else {
                                 localStorage.setItem('fastUser','1');
                             }
-                            this.$store.state.addressList = response.data.list;
+                            this.$store.commit("setAddressList",response.data.list);
                             this.userData = response.data.list;
                         }
                     });

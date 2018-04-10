@@ -3,7 +3,7 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{this.nodeData.agentName}}</h2>
         <div class="div-icon1 node-page-top">
-            <p class="subscript">
+            <p class="subscript" :class="this.nodeData.statuss === 1  ? 'stay' : ''">
                 {{this.nodeData.status}}
             </p>
             <ul>
@@ -41,12 +41,12 @@
                 <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
-                <span class="allUsable">{{$t('message.currentBalance')}}:{{ usable }} NULS</span>
+                <span class="allUsable">{{$t('message.currentBalance')}}: {{ usable }} NULS</span>
                 <el-form-item :label="$t('message.c25')" class="number" prop="nodeNo">
                     <el-input v-model="nodeForm.nodeNo"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
                 </el-form-item>
-                <div class="procedure">{{$t('message.c28')}}:<span>0.01 NULS</span></div>
+                <div class="procedure"><label>{{$t('message.c28')}}</label><span>0.01 NULS</span></div>
                 <el-form-item size="large" class="submit">
                     <el-button type="primary" @click="onSubmit('nodeForm')">{{$t('message.confirmButtonText')}}</el-button>
                 </el-form-item>
@@ -110,16 +110,18 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
+                            console.log(response);
                             response.data.creditRatios = response.data.creditRatio;
                             if (response.data.creditRatio != 0) {
                                 if (response.data.creditRatio > 0) {
                                     response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                 } else {
-                                    response.data.creditRatio = response.data.creditRatio * 100;
+                                    response.data.creditRatio = Math.abs(response.data.creditRatio) * 100+ '%';
                                 }
                             } else {
                                 response.data.creditRatio = "50%";
                             }
+                            response.data.statuss = response.data.status;
                             response.data.status = this.switchStatus(response.data.status);
                             response.data.memberCounts = response.data.memberCount +"/1000";
                             response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
@@ -146,7 +148,7 @@
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
-                console.log(chenckAddress);
+                //console.log(chenckAddress);
                 this.getBalanceAddress('/account/balance/' + chenckAddress);
                 this.$refs.nodeForm.validateField('nodeNo');
             },
@@ -264,16 +266,20 @@
                 .el-form-item__label {
                     margin-top: 20px;
                     margin-right: 0px;
+                    text-align: right;
+                    width: 67px;
                 }
             }
             .number {
                 .el-form-item__label {
                     margin-top: 15px;
                     width: 68px;
+                    text-align: right;
                 }
             }
             .el-input__inner {
                 width: 415px;
+                color: #FFFFFF;
             }
             .el-form-item {
                 width: 90%;

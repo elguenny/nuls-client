@@ -187,12 +187,19 @@
                 width: 30px;
                 height: 15px;
                 border: 1px solid #658ec7;
+                .el-switch__button {
+                    top: 0;
+                    left: 1px;
+                    width: 13px;
+                    height: 13px;
+                }
             }
-            .el-switch__core .el-switch__button {
-                top: 0;
-                left: 2px;
-                width: 13px;
-                height: 13px;
+            .is-checked{
+                .el-switch__core {
+                    .el-switch__button {
+                        left: 5px;
+                    }
+                }
             }
             .el-collapse {
                 border: none;
