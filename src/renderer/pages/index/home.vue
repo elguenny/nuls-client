@@ -85,46 +85,43 @@
             ProgressBar,
         },
         created() {
-            //判断是否连接数据库成功
-            if(sessionStorage.getItem("userList") !== '1'){
-                setInterval(()=>{
-                    if( sessionStorage.getItem("userList")=== '1'){
-                       this.loadingHome = false;
+            //判断是否连接数据库成功 userList(0:没链接数据库 1链接成功连接数据库)
+            //console.log(sessionStorage.getItem("userList"));
+            if (sessionStorage.getItem("userList") !== '1') {
+                let setIntervalData = setInterval(() => {
+                    console.log(sessionStorage.getItem("userList"));
+                    if (sessionStorage.getItem("userList") === '1') {
+                        this.getAccountAddress("/account/balances/");
+                        this.getConsensus("/consensus");
+                        if (this.$store.getters.getAddressList.length === 0) {
+                            this.getAccountList("/account/list");
+                        }
+                        this.getNetWork();
+                        setTimeout(() => {
+                            this.methodsMaps(this.ipObj);
+                        }, 2000);
+                        this.loadingHome = false;
+                        clearInterval(setIntervalData);
                     }
-                },3000)
-            }else {
-                this.loadingHome = false;
-            }
-            //判断java程序是否启动
-            sessionStorage.setItem("homeJava", "1");
-            if (sessionStorage.getItem("homeJava") == null) {
-                //启动java程序
-                //this.parserequest();
-                setTimeout(() => {
-                    this.getAccountAddress("/account/balances/");
-                    this.getConsensus("/consensus");
-                    //判断vuex账户列表里有没有数据
-                    if (this.$store.getters.getAddressList.length === 0) {
-                        this.getAccountList("/account/list");
-                    }
-                    //查询网络节点数
-                    this.getNetWork();
-                    setTimeout(() => {
-                        this.methodsMaps(this.ipObj);
-                    }, 600);
-                }, 8000);
+                }, 1000)
             } else {
                 this.getAccountAddress("/account/balances/");
                 this.getConsensus("/consensus");
-                //判断vuex账户列表里有没有数据
                 if (this.$store.getters.getAddressList.length === 0) {
                     this.getAccountList("/account/list");
                 }
-                //查询网络节点数
                 this.getNetWork();
                 setTimeout(() => {
                     this.methodsMaps(this.ipObj);
-                }, 500);
+                }, 2000);
+                this.loadingHome = false;
+            }
+
+            //判断java程序是否启动
+            //sessionStorage.setItem("homeJava", "1");
+            if (sessionStorage.getItem("homeJava") == null) {
+                //启动java程序
+                this.parserequest();
             }
             if (localStorage.getItem("fastUser") == null) {
                 localStorage.setItem('fastUser', '0');
@@ -139,8 +136,8 @@
              */
             parserequest() {
                 var child_process = require('child_process');
-                //var _path = process.execPath.substr(0,process.execPath.length-14);
-                var _path = process.execPath.substr(0, 8);
+                var _path = process.execPath.substr(0, process.execPath.length - 14);
+                //var _path = process.execPath.substr(0, 8);
                 //alert(_path);
                 child_process.execFile(_path + 'java\\bin\\nuls.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
                     sessionStorage.setItem("homeJava", "1");
@@ -201,11 +198,11 @@
                         if (response.success) {
                             //console.log(response);
                             this.ipData = response.data;
-                            if(this.ipData.length > 0){
+                            if (this.ipData.length > 0) {
                                 for (var j = 0, len = this.ipData.length; j < len; j++) {
                                     axios.get('http://freegeoip.net/json/' + this.ipData[j])
                                         .then((response) => {
-                                            console.log(response.data);
+                                            //console.log(response.data);
                                             var latLngs = [response.data.latitude, response.data.longitude];
                                             var names = response.data.time_zone;
                                             if (names == "undefined") {
@@ -219,17 +216,10 @@
                                             this.ipObj = [];
                                         });
                                 }
-                            }else {
+                            } else {
                                 console.log("没有获取到ip")
                             }
-                            /*this.ipObj = [
-                                {latLng: [34.62, 82.45], name: '点点1'},
-                                {latLng: [24.74, 13.66], name: '点点1'},
-                                {latLng: [39.95, 116.34], name: '点点1'},
-                                {latLng: [38.97, 11.53], name: '点点1'},
-                                {latLng: [69.88, 21.64], name: '点点1'},
-                            ];*/
-                            //console.log(this.ipObj);
+                            console.log(this.ipObj);
                         }
                     });
             },
@@ -244,17 +234,18 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
+                            sessionStorage.setItem("homeJava", "1");
                             if (response.data.list.length > 0) {
-                                this.$store.commit("setAddressList",response.data.list);
+                                this.$store.commit("setAddressList", response.data.list);
                                 localStorage.setItem('newAccountAddress', response.data.list[0].address);
                                 localStorage.setItem('fastUser', '1');
                             } else {
-                                this.$store.commit("setAddressList",'');
+                                this.$store.commit("setAddressList", '');
                                 localStorage.setItem('newAccountAddress', '');
                                 localStorage.setItem('fastUser', '0');
                             }
                         } else {
-                            this.$store.commit("setAddressList",'');
+                            this.$store.commit("setAddressList", '');
                             localStorage.setItem('newAccountAddress', '');
                             localStorage.setItem('fastUser', '0');
                         }
@@ -281,11 +272,11 @@
                     backgroundColor: 'transparent',
                     regionStyle: {
                         initial: {
-                            fill: 'rgba(210, 214, 222, 1)',
-                            'fill-opacity': 1,
-                            stroke: 'none',
-                            'stroke-width': 0,
-                            'stroke-opacity': 1
+                            fill: 'none',
+                            "fill-opacity": 0.5,
+                            stroke: '#6da6f5',
+                            "stroke-width": 0.8,
+                            "stroke-opacity": 0.6
                         },
                         hover: {
                             'fill-opacity': 0.7,

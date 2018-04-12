@@ -24,9 +24,10 @@
                 </el-table-column>
             </el-table>
             <el-pagination layout="prev, pager, next" :page-size="8" :total=this.totalAll
-                           v-show="totalAllOk = this.totalAll>8 ?true:false" class="cb" @current-change="consensusSize"></el-pagination>
+                           v-show="totalAllOk = this.totalAll>8 ?true:false" class="cb"
+                           @current-change="consensusSize"></el-pagination>
         </div>
-        <el-dialog :title="$t('message.c96')" :visible.sync="dialogFormVisible" top="24vh">
+        <el-dialog :title="$t('message.c96')" :visible.sync="dialogFormVisible" top="24vh" @close="userListClose">
             <el-form ref="userListForm" :model="userListForm" :rules="userListFormRules" label-width="80px">
                 <el-form-item :label="$t('message.c69')" prop="userAddress">
                     <el-input v-model="userListForm.userAddress"></el-input>
@@ -37,7 +38,8 @@
                 <div class="userAlias">{{$t('message.tabAlias')}} {{userListForm.userAlias}}</div>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="addUserAccount('userListForm')">{{$t('message.confirmButtonText')}}
+                <el-button type="primary" @click="addUserAccount('userListForm')" id="userList">
+                    {{$t('message.confirmButtonText')}}
                 </el-button>
             </div>
         </el-dialog>
@@ -73,7 +75,20 @@
         mounted() {
             let _this = this;
             this.openDB();
-            this.getUserList(1,8);
+            this.getUserList(1, 8);
+            let userList = false;
+            setInterval(() => {
+                userList = this.dialogFormVisible
+            }, 500);
+            document.onkeydown = function (e) {
+                let key = window.event.keyCode;
+                if (key === 13) {
+                    if (userList) {
+                        console.log(18);
+                        document.getElementById('userList').click();
+                    }
+                }
+            }
         },
         methods: {
             //创建usersDB
@@ -104,7 +119,7 @@
                             var store = tx.objectStore('addressList');
                             store.put(value);
                         }
-                        this.getUserList(1,8);
+                        this.getUserList(1, 8);
                         this.userListForm.userAddress = '';
                         this.userListForm.userHelp = '';
                         this.dialogFormVisible = false
@@ -115,7 +130,7 @@
                 })
             },
             //读取userList
-            getUserList(pageNumber,pageSize) {
+            getUserList(pageNumber, pageSize) {
                 var request = indexedDB.open('usersDB', 1);
                 var dbData = [];
                 request.onsuccess = function (event) {
@@ -134,24 +149,28 @@
                 //显示总条数
                 setTimeout(() => {
                     this.totalAll = dbData.length;
-                    if(pageNumber === 1){
+                    if (pageNumber === 1) {
                         //console.log(pageNumber)
-                        this.tableData = dbData.slice(0,pageSize);
-                    }else {
-                        this.tableData = dbData.slice((pageNumber-1)*8,pageNumber*8);
+                        this.tableData = dbData.slice(0, pageSize);
+                    } else {
+                        this.tableData = dbData.slice((pageNumber - 1) * 8, pageNumber * 8);
                     }
                 }, 50);
             },
             //交易列表分页
-            consensusSize(events){
-                this.getUserList(events,8);
+            consensusSize(events) {
+                this.getUserList(events, 8);
             },
             //新增通讯录
             toNewAccount() {
-                this.dialogFormVisible = true
+                this.dialogFormVisible = true;
+                this.userListForm.userAddress = '';
+                this.userListForm.userAlias = '';
+                this.userListForm.userHelp = '';
             },
             //修改一条通讯录
             editorRow(userAddress, userAlias, userHelps) {
+                //this.$refs['userListForm'].resetFields();
                 this.dialogFormVisible = true;
                 this.userListForm.userAddress = userAddress;
                 this.userListForm.userAlias = userAlias;
@@ -171,14 +190,18 @@
                         var store = tx.objectStore('addressList');
                         store.delete(userAddress);
                     };
-                    this.getUserList(1,8);
+                    this.getUserList(1, 8);
                     this.$message({
                         type: 'success',
                         message: this.$t('message.passWordSuccess'),
                     });
                 }).catch(() => {
                 });
-            }
+            },
+            //关闭清理数据
+            userListClose() {
+                this.$refs['userListForm'].resetFields();
+            },
         }
     }
 </script>

@@ -8,15 +8,9 @@
             <el-form-item :label="$t('message.affirmWalletPassWord')" prop="checkPass">
                 <el-input type="password" v-model="passForm.checkPass" :maxlength=20></el-input>
             </el-form-item>
-            <!--<el-form-item :label="$t('message.passWordHint')">
-                <el-input v-model.number="passForm.passHelp"></el-input>
-            </el-form-item>-->
             <div class="set-pass-title">{{$t('message.passWordInfo')}}</div>
             <el-form-item>
-                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit">{{$t('message.passWordAffirm')}}</el-button>
-               <!-- <el-button type="text" class="set-pass-reset" @click="resetForm('setPass')">
-                   {{$t('message.passWordCancel')}}
-                </el-button>-->
+                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit" id="setPass">{{$t('message.passWordAffirm')}}</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -25,8 +19,8 @@
 <script>
     export default {
         data() {
-            var validatePass = (rule, value, callback) => {
-                var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
+            let validatePass = (rule, value, callback) => {
+                let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
                 if (value === '') {
                     callback(new Error(this.$t('message.walletPassWord1')));
                 } else if (!patrn.exec(value)) {
@@ -38,7 +32,7 @@
                     callback();
                 }
             };
-            var validatePass2 = (rule, value, callback) => {
+            let validatePass2 = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error(this.$t('message.affirmWalletPassWordEmpty')));
                 } else if (value !== this.passForm.pass) {
@@ -51,7 +45,6 @@
                 passForm: {
                     pass: '',
                     checkPass: '',
-                    //passHelp: ''
                 },
                 rulesPass: {
                     pass: [
@@ -62,6 +55,14 @@
                     ]
                 }
             };
+        },
+        created() {
+            document.onkeydown=function(e){
+                let key=window.event.keyCode;
+                if(key === 13){
+                    document.getElementById('setPass').click();
+                }
+            }
         },
         methods: {
             /** Set the password for the user
@@ -78,22 +79,13 @@
                             path: '/firstInto/firstInfo'
                         })
                     } else {
-                        this.$message({
+                        /*this.$message({
                             type: 'success', message:this.$t('message.passWordFailed')
-                        });
+                        });*/
                         return false;
                     }
                 });
             },
-            //不设置密码
-            /*resetForm() {
-                localStorage.setItem('userPass', '');
-                //localStorage.setItem('passWordHint', '');
-                localStorage.setItem('fastUser', '1');
-                this.$router.push({
-                    path: '/firstInto/firstInfo'
-                })
-            }*/
         }
     }
 </script>
@@ -102,7 +94,6 @@
 
     .set-password {
         height: 100%;
-        font-family: "微软雅黑";
         margin: auto;
         h2 {
             font-size: 16px;
@@ -130,7 +121,7 @@
                 border-color: #24426c;
                 height: 30px;
                 line-height: 30px;
-                padding: 0px;
+                padding: 0;
             }
             .el-form-item__content {
                 text-align: center;
@@ -148,10 +139,9 @@
             }
             .el-form-item__label {
                 font-size: 12px;
-                color: #8a929b;
                 padding: 15px 0 10px;
-                line-height: 0px;
-                color: white;
+                line-height: 0;
+                color: #FFFFFF;
             }
             .el-form-item__content {
                 line-height: 10px;

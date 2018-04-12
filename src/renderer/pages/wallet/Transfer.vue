@@ -24,10 +24,10 @@
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
                 </el-form-item>
                 <el-form-item :label="$t('message.remarks')+'：'" class="remark">
-                    <el-input type="textarea" v-model="transferForm.remark" :maxlength="80" style="padding: 0 2px;"></el-input>
+                    <el-input type="textarea" v-model.trim="transferForm.remark" :maxlength="20" style="padding: 0 2px; color: #FFFFFF"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
-                    <el-button type="primary" @click="transferSubmit('transferForm')">{{$t("message.c114")}}</el-button>
+                    <el-button type="primary" @click="transferSubmit('transferForm')" id="transferSubmit">{{$t("message.c114")}}</el-button>
                 </el-form-item>
             </el-form>
             <el-dialog :visible.sync="dialogTableVisible">
@@ -42,7 +42,7 @@
                     </el-table-column>
                 </el-table>
             </el-dialog>
-            <Password ref="password" @toSubmit="toSubmit"></Password>
+            <Password ref="password" @toSubmit="toSubmit" :submitId="submitId"></Password>
 
         </div>
     </div>
@@ -67,7 +67,7 @@
                     callback(new Error(this.$t('message.transferNull')));
                 }
                 setTimeout(() => {
-                    console.log(this.address !== undefined);
+                    //console.log(this.address !== undefined);
                     if(this.address !== undefined){
                         if (value === this.address) {
                             callback(new Error(this.$t('message.addressOrTransfer')));
@@ -105,6 +105,7 @@
 
             };
             return {
+                submitId:"transferSubmit",
                 usable: 0,
                 accountAddress: [],
                 remnant:0,
@@ -231,8 +232,10 @@
             //
             toSubmit(password) {
                 var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + password + '","remark":"' + this.transferForm.remark + '"}';
+                console.log(param);
                 this.$post('/wallet/transfer/', param)
                     .then((response) => {
+                        console.log(response);
                         if (response.success) {
                             this.$message({
                                 message: this.$t('message.passWordSuccess'),
@@ -301,6 +304,7 @@
                 .el-textarea__inner {
                     background-color: #17202e;
                     padding: 0 2px;
+                    color: #FFFFFF;
                 }
             }
             .transfer-submit {

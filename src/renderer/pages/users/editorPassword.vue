@@ -12,11 +12,8 @@
             <el-form-item :label="$t('message.c91')+'：'" prop="checkPass">
                 <el-input type="password" v-model="passForm.checkPass" :maxlength=20></el-input>
             </el-form-item>
-            <!--<el-form-item :label="$t('message.passWordHint')">
-                <el-input v-model.number="passForm.passHelp"></el-input>
-            </el-form-item>-->
             <el-form-item class="submitForm">
-                <el-button type="primary" @click="submitForm('passForm')">{{$t('message.passWordAffirm')}}</el-button>
+                <el-button type="primary" @click="submitForm('passForm')" id="editorPassword">{{$t('message.passWordAffirm')}}</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -82,8 +79,13 @@
         components: {
             Back,
         },
-        mounted() {
-            let _this = this;
+        created() {
+            document.onkeydown=function(e){
+                let key=window.event.keyCode;
+                if(key === 13){
+                    document.getElementById('editorPassword').click();
+                }
+            }
         },
         methods: {
             /** Editor password
@@ -117,9 +119,9 @@
 
                             });
                     } else {
-                        this.$message({
+                        /*this.$message({
                             type: 'success', message: this.$t('message.passWordFailed')
-                        });
+                        });*/
                         return false;
                     }
                 });

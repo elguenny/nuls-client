@@ -38,7 +38,6 @@
 <script>
     import Back from '@/components/BackBar.vue';
     import Password from '@/components/PasswordBar.vue';
-
     export default {
         data() {
             return {

@@ -48,11 +48,11 @@
                 </el-form-item>
                 <div class="procedure"><label>{{$t('message.c28')}}</label><span>0.01 NULS</span></div>
                 <el-form-item size="large" class="submit">
-                    <el-button type="primary" @click="onSubmit('nodeForm')">{{$t('message.confirmButtonText')}}</el-button>
+                    <el-button type="primary" @click="onSubmit('nodeForm')" id="nodePage">{{$t('message.confirmButtonText')}}</el-button>
                 </el-form-item>
             </el-form>
         </div>
-        <Password ref="password" @toSubmit="toSubmit"></Password>
+        <Password ref="password" @toSubmit="toSubmit" :submitId="submitId"></Password>
     </div>
 </template>
 
@@ -79,6 +79,7 @@
                 }, 100);
             };
             return {
+                submitId:"nodePage",
                 address: this.$route.params.address,
                 agentId:'',
                 nodeData: [],

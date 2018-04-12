@@ -2,7 +2,7 @@
     <el-dialog title="" :visible.sync="passwordVisible" top="35vh" class="password-dialog" @open="passwordShow" @close="passwordClose">
         <el-form ref="passwordForm" :model="passwordForm" :rules="passwordRules">
             <el-form-item :label="$t('message.passWordTitle')+':'" prop="password">
-                <el-input v-model="passwordForm.password" type="password" :autofocus="true" :maxlength="22"></el-input>
+                <el-input v-model.focus="passwordForm.password" type="password" :autofocus="true" :maxlength="22" id="passwords"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -15,6 +15,12 @@
 
 <script>
     export default {
+        props: {
+            submitId: {
+                type: String,
+                default: "null"
+            }
+        },
         data() {
             return {
                 passwordVisible: false,
@@ -29,18 +35,27 @@
                 },
             };
         },
-        created() {
-            let  passwordShow = false;
+        mounted() {
+            let _this = this;
+            let passwordShow = false;
             setInterval(()=>{
                 passwordShow = this.$store.getters.getPasswordShow;
             },500);
+            let clickId = this.submitId;
             document.onkeydown=function(e){
-                var key=window.event.keyCode;
+                let key=window.event.keyCode;
                 if(key === 13){
+                    if(document.getElementById("passwords")){
+                        document.getElementById("passwords").focus();
+                    }
+                    //console.log(passwordShow);
                    if(passwordShow){
                        document.getElementById('passwordInfo').click();
                     }else {
-                        console.log(14);
+                       console.log(14 +"=="+clickId);
+                       if(clickId !=="null" &&  document.getElementById(clickId)){
+                           document.getElementById(clickId).click();
+                       }
                     }
                 }
             }
@@ -52,6 +67,7 @@
             },
             passwordClose(){
                 this.$store.commit("setPasswordShow",false);
+                this.$refs['passwordForm'].resetFields();
             },
             //
             showPassword(boolean) {
@@ -64,7 +80,9 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.$emit('toSubmit', this.passwordForm.password);
+                        this.$refs[formName].resetFields();
                         this.passwordVisible = false;
+                        this.submitId = 'null';
                     } else {
                         console.log('error submit!!');
                         return false;

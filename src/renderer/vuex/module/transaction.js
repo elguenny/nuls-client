@@ -1,12 +1,12 @@
 const state = {
     purseVersion: '1.0.0',
+    addressList: [],
     addressListItems: [],
-    accountTxList:[],
 };
 
 const getters = {
     getPurseVersiont: state => state.purseVersion,
-    getAddressList: state => state.addressListItems,
+    getAddressList: state => state.addressListItems
 };
 
 const mutations = {

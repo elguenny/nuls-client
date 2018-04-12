@@ -1,5 +1,6 @@
 const state = {
-    passwordShow:false
+    passwordShow:false,
+
 };
 
 const getters = {

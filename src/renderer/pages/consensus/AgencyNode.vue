@@ -82,6 +82,16 @@
         mounted() {
             let _this = this;
             this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6", "pageNumber": "1"});
+            //判断用户选择的语言
+            let language = localStorage.getItem('language');
+            setInterval(() => {
+                if (language !== localStorage.getItem('language')) {
+                    language = localStorage.getItem('language');
+                    this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6", "pageNumber": "1"});
+                } else {
+                    language = localStorage.getItem('language');
+                }
+            }, 1000);
         },
         methods: {
             //获取全部共识列表
@@ -137,7 +147,6 @@
             },
             //排序共识
             sortConsensus(sort) {
-
                 if (this.keyword !== '') {
                     const params = {"keyword": this.keyword, "sortType": sort, "pageSize": "6", "pageNumber": "1"};
                     this.getAllConsensus("/consensus/agent/list/", params);

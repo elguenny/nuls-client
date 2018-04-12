@@ -96,7 +96,7 @@
                 var param = '{"language":"' + this.projectName.key + '"}';
                 this.$post('/lang', param)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         if (response.success) {
                             console.log('success')
                         } else {
@@ -177,8 +177,8 @@
             toClose() {
                 var child_process = require('child_process');
                 //调用执行文件
-                //var _path = process.execPath.substr(0,process.execPath.length-14);
-                var _path = process.execPath.substr(0, 8);
+                var _path = process.execPath.substr(0,process.execPath.length-14);
+                //var _path = process.execPath.substr(0, 8);
                 //alert(_path);
                 child_process.execFile(_path + 'java\\bin\\stop.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
                     if (error !== null) {

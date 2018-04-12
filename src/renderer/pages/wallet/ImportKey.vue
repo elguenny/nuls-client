@@ -4,43 +4,23 @@
         <h2>{{$t("message.key")}}</h2>
         <el-form ref="keyData" :model="keyData" :rules="keyRules" label-position="top">
             <el-form-item :label="$t('message.keyLow')" prop="keyInfo">
-                <el-input type="textarea" v-model.trim="keyData.keyInfo"></el-input>
+                <el-input type="textarea" v-model.trim="keyData.keyInfo" :maxlength="100"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="keySubmit('keyData')">{{$t('message.confirmButtonText')}}</el-button>
+                <el-button type="primary" @click="keySubmit('keyData')" id="importKey">{{$t('message.confirmButtonText')}}</el-button>
             </el-form-item>
         </el-form>
-
-        <el-dialog title="" :visible.sync="passwordVisible" top="35vh">
-            <el-form ref="passwordForm" :model="passwordForm" :rules="passwordRules">
-                <el-form-item :label="this.$t('message.passWordTitle')" prop="password">
-                    <el-input v-model="passwordForm.password" type="password" :maxlength=20></el-input>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="passwordVisible = false">{{$t('message.cancelButtonText')}}</el-button>
-                <el-button type="primary" @click="dialogSubmit('passwordForm')">{{$t('message.confirmButtonText')}}</el-button>
-            </div>
-        </el-dialog>
+        <Password ref="password" @toSubmit="toSubmit" :submitId="submitId"></Password>
     </div>
 </template>
 
 <script>
     import Back from '@/components/BackBar.vue';
-
+    import Password from '@/components/PasswordBar.vue';
     export default {
         data() {
             return {
-                passwordVisible: false,
-                passwordForm: {
-                    password: '',
-                },
-                passwordRules: {
-                    password: [
-                        {required: true, message:this.$t("message.passWordTitle"), trigger: 'blur'}
-                    ]
-                },
-
+                submitId:"importKey",
                 keyData: {
                     keyInfo: ''
                 },
@@ -53,69 +33,58 @@
         },
         components: {
             Back,
+            Password,
         },
         methods: {
-            //弹出密码输入框
-            dialogSubmit(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        var param = '{"prikey":"' + this.keyData.keyInfo + '","password":"' + this.passwordForm.password + '"}';
-                        this.$post('/wallet/import/', param)
-                            .then((response) => {
-                                if (response.success) {
-                                    localStorage.setItem('newAccountAddress', response.data);
-                                    localStorage.setItem('userPass', this.passwordForm.password);
-                                    if (localStorage.getItem('toUserInfo') != "1") {
-                                        this.getAccountList("/account/list");
-                                        this.$router.push({
-                                            name: '/wallet'
-                                        })
-                                    } else {
-                                        this.$router.push({
-                                            path: '/wallet/users/userInfo'
-                                        })
-                                    }
-                                    this.$message({
-                                        type: 'success', message: this.$t('message.passWordSuccess')
-                                    });
-                                } else {
-                                    this.$message({
-                                        type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                                    });
-                                }
-                                this.passwordVisible = false;
-                            });
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                })
-            },
             //提交导入明文私钥
             keySubmit(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.passwordForm.password ='';
-                        this.passwordVisible = true;
+                        this.$refs.password.showPassword(true);
                     } else {
                         console.log('error submit!!');
                         return false;
                     }
                 });
             },
-            //获取账户列表
+            //
+            toSubmit(password) {
+                var param = '{"prikey":"' + this.keyData.keyInfo + '","password":"' + password + '"}';
+                this.$post('/wallet/import/', param)
+                    .then((response) => {
+                        if (response.success) {
+                            localStorage.setItem('newAccountAddress', response.data);
+                            localStorage.setItem('userPass', password);
+                            if (localStorage.getItem('toUserInfo') !== "1") {
+                                this.getAccountList("/account/list");
+                                this.$router.push({
+                                    name: '/wallet'
+                                })
+                            } else {
+                                this.$router.push({
+                                    path: '/wallet/users/userInfo'
+                                })
+                            }
+                            this.$message({
+                                type: 'success', message: this.$t('message.passWordSuccess')
+                            });
+                        } else {
+                            this.$message({
+                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                            });
+                        }
+                        this.passwordVisible = false;
+                    });
+            },
             //获取账户地址列表
             getAccountList(url) {
                 this.$fetch(url)
                     .then((response) => {
                         if(response.success){
-                            this.$store.state.addressList = response.data.list;
-                        }else {
-                            this.$store.state.addressList = [];
+                            this.$store.commit("setAddressList",response.data.list);
                         }
                     }).catch((reject) => {
                     console.log("User List err"+reject);
-                    this.$store.state.addressList = [];
                 });
             },
         }
@@ -136,6 +105,8 @@
         }
         .el-textarea__inner {
             background-color: #17202e;
+            padding: 0 2px;
+            color: #FFFFFF;
         }
         .el-form-item__content {
             text-align: center;

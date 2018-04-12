@@ -17,7 +17,7 @@
 </template>
 
 <script>
-	import Back from './../../components/BackBar.vue'
+	import Back from './../../components/BackBar.vue';
     import moment from 'moment';
 	export default {
 		data() {
@@ -32,7 +32,7 @@
 		},
         mounted() {
             let _this = this;
-            this.getConsensusDeposit("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "10"});
+            this.getConsensusDeposit("/consensus/deposit/agent/" + localStorage.getItem('newAccountAddress'),{"pageSize": "10","pageNumber":"1"});
         },
 		methods: {
             //获取我的抵押总额明细列表
@@ -44,16 +44,15 @@
                             for (var i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = response.data.list[i].amount *0.00000001;
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
-                                response.data.list[i].status = response.data.list[i].status !=2 ?"等待共识":"正在共识";
+                                response.data.list[i].status = response.data.list[i].status !==2 ?this.$t('message.c14'):this.$t('message.c15');
                             }
-                            console.log(response)
                             this.pledgeData = response.data.list;
                         }
                     });
             },
             //分页功能
             pledgeSize(events){
-                this.getConsensusDeposit("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {"pageNumber": events, "pageSize": "10"});
+                this.getConsensusDeposit("/consensus/deposit/agent/" + localStorage.getItem('newAccountAddress'), {"pageNumber": events, "pageSize": "10"});
             },
 		}
 	}

@@ -27,12 +27,12 @@
 
                 </el-form-item>
                 <el-form-item size="large" class="submit">
-                    <el-button type="primary" @click="submitForm('newNodeForm')">{{$t("message.confirmButtonText")}}
+                    <el-button type="primary" @click="submitForm('newNodeForm')" id="newNode">{{$t("message.confirmButtonText")}}
                     </el-button>
                 </el-form-item>
             </el-form>
         </div>
-        <Password ref="password" @toSubmit="toSubmit"></Password>
+        <Password ref="password" @toSubmit="toSubmit" :submitId="submitId"></Password>
     </div>
 </template>
 
@@ -73,6 +73,7 @@
                 }
             };
             return {
+                submitId:"newNode",
                 accountAddress: [],
                 usable: "0",
                 placeholder: "",

@@ -2,7 +2,7 @@
     <footer>
         <el-col :span="10" class='footer-left'>
             <span @click="clearData">{{$t("message.purseVersion")}}</span>：V{{this.$store.getters.getPurseVersiont}}（{{$t("message.coreVersion")}}
-            V{{ bottomItem.myVersion }}）
+            V{{ this.bottomItem.myVersion }}）
             <span @click="updateVersionUrl" v-show="updateVersion"
                   class="cursor-p text-d">{{$t("message.toUpdate")}}</span>
         </el-col>
@@ -69,11 +69,11 @@
                     }
                 }
                 this.getNetWorkInfo('/network/info');
-            }, 6000);
+            }, 5000);
 
             setTimeout(() => {
                 this.getBottromInfo('/sys/version');
-            }, 5000);
+            }, 9000);
 
         },
         methods: {
@@ -147,9 +147,7 @@
                             }
                         }
                     }).catch((reject) => {
-                    //console.log(reject);
                     this.rejectTime = this.rejectTime + 1;
-                    console.log(this.rejectTime);
                     sessionStorage.setItem("userList", "0")
                 });
             },
@@ -158,13 +156,10 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.$store.state.addressList = response.data.list;
-                        } else {
-                            this.$store.state.addressList = [];
+                            this.$store.commit("setAddressList",response.data.list);
                         }
                     }).catch((reject) => {
                     console.log("User List err" + reject);
-                    this.$store.state.addressList = [];
                 });
             },
             //测试清理数据

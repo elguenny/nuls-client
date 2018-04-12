@@ -126,9 +126,7 @@
             CodeBar,
             AccountAddressBar,
         },
-        mounted() {
-            let _this = this;
-
+        created() {
             //判断显示隐藏数字
             if (localStorage.getItem("keyShow") === 'true') {
                 this.keyShow = true
@@ -178,8 +176,9 @@
                             this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {
                                 this.dealList = response.data.list;
-                                for (var i = 0; i < response.data.list.length; i++) {
-                                    var length = this.dealList[i].hash.length;
+                                //this.$store.commit("setAccountTxList",response.data.list);
+                                for (let i = 0; i < response.data.list.length; i++) {
+                                    let length = this.dealList[i].hash.length;
                                     this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10);
                                     this.dealList[i].type = this.switchTyep(response.data.list[i].type);
                                     this.dealList[i].values = (response.data.list[i].value * 0.00000001).toFixed(8);
