@@ -34,7 +34,7 @@
         },
         mounted() {
             let _this = this;
-            var params = {"address": this.address,"pageSize":10,"pageNumber":1};
+            let params = {"address": this.address,"pageSize":10,"pageNumber":1};
             this.getLocked('tx/locked/',params);
 		},
 		methods: {
@@ -42,11 +42,11 @@
                 this.$fetch(url, param)
                     .then((response) => {
 						if(response.success){
-                            for(var i=0;i<response.data.list.length;i++){
+                            for(let i=0;i<response.data.list.length;i++){
                                 response.data.list[i].status = this.switchTyep(response.data.list[i].status);
                                 response.data.list[i].value = (response.data.list[i].value * 0.00000001).toFixed(8);
                                 response.data.list[i].createTime = moment(response.data.list[i].createTime).format('YYYY-MM-DD hh:mm:ss');
-                                response.data.list[i].lockTime = response.data.list[i].lockTime==0 ? '': moment(response.data.list[i].lockTime).format('YYYY-MM-DD hh:mm:ss');
+                                response.data.list[i].lockTime = response.data.list[i].lockTime===0 ? '': moment(response.data.list[i].lockTime).format('YYYY-MM-DD hh:mm:ss');
                             }
                             this.freezeData =response.data.list
 						}else {

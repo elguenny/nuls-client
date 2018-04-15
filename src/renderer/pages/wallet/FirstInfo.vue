@@ -38,7 +38,7 @@
         },
         created(){
             document.onkeydown=function(e){
-                var key=window.event.keyCode;
+                let key=window.event.keyCode;
                 console.log(this.passwordVisible);
                 /*if(key === 13){
                     console.log(13);
@@ -59,7 +59,7 @@
             //
             toSubmit(password) {
                 this.passwordValue = password;
-                var params = '{"count":1,"password":"' + password + '"}';
+                let params = '{"count":1,"password":"' + password + '"}';
                 this.postAccount('/account', params)
             },
             //输入密码提交方法
@@ -147,7 +147,6 @@
                     display: block;
                     font-size: 12px;
                     padding: 0 1rem;
-                    text-align: left;
                     color: #C1C5C9;
                     text-align: center;
                 }
@@ -157,7 +156,7 @@
                 border-color: #658ec7;
             }
             li:last-child {
-                margin-right: 0px;
+                margin-right: 0;
             }
         }
     }

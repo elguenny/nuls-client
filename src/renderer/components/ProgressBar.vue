@@ -21,7 +21,6 @@
 		},
 		mounted() {
             let _this = this;
-            //console.log(this.widthData);
 		}
 	}
 </script>

@@ -43,11 +43,11 @@
 
     export default {
         data() {
-            var checkNodeNo = (rule, value, callback) => {
+            let checkNodeNo = (rule, value, callback) => {
                 if (!value) {
                     callback(new Error(this.$t('message.c31')));
                 }
-                var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                let re = /^\d+(?=\.{0,1}\d+$|$)/;
                 if (!re.exec(value)) {
                     callback(new Error(this.$t('message.c32')));
                 }
@@ -59,11 +59,11 @@
                     callback();
                 }
             };
-            var checkCommissionRate = (rule, value, callback) => {
+            let checkCommissionRate = (rule, value, callback) => {
                 if (!value) {
                     callback(new Error(this.$t('message.c35')));
                 }
-                var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                let re = /^\d+(?=\.{0,1}\d+$|$)/;
                 if (!re.exec(value)) {
                     callback(new Error(this.$t('message.c36')));
                 } else if (0 > value || value > 20) {
@@ -149,7 +149,7 @@
             },
             //
             toSubmit(password) {
-                var param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + password + '"}';
+                let param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + password + '"}';
                 this.$post('/consensus/agent ', param)
                     .then((response) => {
                         console.log(response);
@@ -186,10 +186,9 @@
         .new-node-form {
             width: 60%;
             margin: auto;
-            .account-address {
-                margin: 0px;
-                height: auto;
-                width: auto;
+            .address-select {
+                width: 402px;
+                right: 70px;
             }
             .form-left {
                 width: 50%;
@@ -216,18 +215,18 @@
                 width: 100%;
             }
             .el-input__suffix {
-                margin-top: 0px;
+                margin-top: 0;
             }
             .el-select .el-input .el-select__caret {
                 font-size: 14px;
             }
             .el-form-item--mini .el-form-item__content,
             .el-form-item--mini .el-form-item__label {
-                line-height: 0px;
+                line-height: 0;
                 color: #FFFFFF;
             }
             .el-form-item.is-required .el-form-item__label:before {
-                font-size: 0px;
+                font-size: 0;
             }
             .el-form-item--mini {
                 margin-bottom: 15px;

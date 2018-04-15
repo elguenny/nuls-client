@@ -9,7 +9,7 @@ const cn = {
         consensusManagement:'共识',
         setManagement:'设置',
         all: '全部',
-        miningFee: '手续费： 0.01 NULS',
+        miningFee: '手续费：0.01 NULS',
         remarks: '备注',
         addressNull: '请选择账户地址！',
         transferNull: '请输入转账地址！',
@@ -195,7 +195,7 @@ const cn = {
         c51:'委托保证金',
         c52:'请输入委托保证金额！',
         c53:'请输入正确的委托保证金额为数字值',
-        c54:'委托保证金额不能大于可用余额',
+        c54:'保证金额必须大于2000、小于于可用余额',
         //allPledge
         c55:'委托总额明细',
         //myNode
@@ -281,6 +281,8 @@ const cn = {
         c130:'恭喜您！申请参与共识成功！',
         c131:'数据连接中，请耐心等待一下！',
         c132:'拼命加载中',
+        c133:'请稍等，区块高度同步中....',
+        c134:'暂无数据，请添加后再操作',
 
         //bottomInfo
         purseVersion: '钱包版本',

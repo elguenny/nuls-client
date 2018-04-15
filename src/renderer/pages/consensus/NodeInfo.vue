@@ -58,7 +58,7 @@
             getMyNodeInfo(url){
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response)
+                        console.log(response);
                         if(response.success){
                             response.data.statuss = response.data.status;
                             response.data.status = this.switchStatus(response.data.status);
@@ -82,23 +82,23 @@
             },
 			//关闭我创建的节点信息
 			closedNode() {
-                this.$confirm(this.$t('message.c98')+this.myNodeInfo.agentName+this.$t('message.c99'), this.$t('message.c86'), {
+                this.$confirm(this.$t('message.c98')+this.myNodeInfo.agentName+this.$t('message.c99')+this.$t('message.miningFee'), this.$t('message.c86'), {
                     confirmButtonText: this.$t('message.confirmButtonText'),
                     cancelButtonText: this.$t('message.cancelButtonText'),
-                    type: 'warning'
                 }).then(() => {
                     this.$refs.password.showPassword(true);
                 }).catch(() => {
                     this.$message({
                         type: 'waring',
-                        message: this.$t('message.c59')
+                        message: this.$t('message.c59'),
+                        duration: '1000'
                     });
                 });
 
 			},
             //
             toSubmit(password) {
-                var param = {"address": localStorage.getItem("newAccountAddress"), "password": password};
+                let param = {"address": localStorage.getItem("newAccountAddress"), "password": password};
                 this.$post('/consensus/agent/stop', param)
                     .then((response) => {
                         if(response.success){
@@ -141,10 +141,8 @@
 		ul {
 			width: 80%;
 			height: 100%;
-			margin: auto;
-			margin-top: 18px;
+			margin:18px auto 0;
 			font-size: 12px;
-			font-family: "微软雅黑";
 			li {
 				color: #c1c5c9;
 				line-height: 34px;
@@ -157,6 +155,11 @@
 				}
 				span {}
 			}
+		}
+	}
+	.el-message--waring{
+		p.el-message__content{
+			color: #909399;
 		}
 	}
 </style>

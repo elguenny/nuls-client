@@ -41,7 +41,7 @@
                     .then((response) => {
                         if (response.success) {
                             this.total = response.data.total;
-                            for (var i = 0; i < response.data.list.length; i++) {
+                            for (let i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = response.data.list[i].amount *0.00000001;
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
                                 response.data.list[i].status = response.data.list[i].status !==2 ?this.$t('message.c14'):this.$t('message.c15');

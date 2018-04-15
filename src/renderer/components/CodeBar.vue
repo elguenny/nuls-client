@@ -46,8 +46,8 @@
 <style lang="less">
     .modal-overlay {
         position: absolute;
-        left: 0px;
-        top: 0px;
+        left: 0;
+        top: 0;
         width: 100%;
         height: 100%;
         text-align: center;

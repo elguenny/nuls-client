@@ -57,12 +57,12 @@
     import Password from '@/components/PasswordBar.vue';
 	export default {
 		data() {
-            var checkNodeNo = (rule, value, callback) => {
+            let checkNodeNo = (rule, value, callback) => {
                 if (!value) {
                     callback(new Error(this.$t('message.c52')));
                 }
                 setTimeout(() => {
-                    var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                    let re = /^\d+(?=\.{0,1}\d+$|$)/;
                     if (!re.exec(value)) {
                         callback(new Error(this.$t('message.c53')));
                     } else if (value > this.usable - 0.01) {
@@ -107,7 +107,7 @@
                     .then((response) => {
                         if (response.success) {
                             response.data.creditRatios = response.data.creditRatio;
-                            if (response.data.creditRatio != 0) {
+                            if (response.data.creditRatio !== 0) {
                                 if (response.data.creditRatio > 0) {
                                     response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed(2) + '%';
                                 } else {
@@ -161,7 +161,7 @@
 			},
             //
             toSubmit(password) {
-                var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.addNodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
+                let param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.addNodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
                 this.$post('/consensus/deposit/', param)
                     .then((response) => {
                         console.log(response);
@@ -229,7 +229,7 @@
 		.add-node-bottom {
 			width: 80%;
 			height: 145px;
-			margin: 20px auto 0px;
+			margin: 20px auto 0;
 			border: 1px solid #658ec7;
 			background-color: #17202e;
 			.el-input__inner {

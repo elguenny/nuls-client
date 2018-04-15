@@ -16,6 +16,7 @@
 </template>
 
 <script>
+    import { ipcRenderer } from "electron";
     export default {
         data() {
             return {
@@ -26,12 +27,27 @@
                 netWorkInfo: [],
                 iconWifi: 'no-wifi_icon',
                 rejectTime: 0,
-                rejectOut: 3,
+                rejectOut: 6,
                 messageBox: 0,
             }
         },
         mounted() {
             let _this = this;
+
+            /*ipcRenderer.on("message", (event, text) => {
+                console.log(arguments);
+                this.tips = text;
+            });
+            ipcRenderer.on("downloadProgress", (event, progressObj)=> {
+                console.log(progressObj);
+                this.downloadPercent = progressObj.percent || 0;
+            });
+            ipcRenderer.on("isUpdateNow", () => {
+                ipcRenderer.send("isUpdateNow");
+            });
+            //组件销毁前移除所有事件监听channel
+            ipcRenderer.removeAll(["message", "downloadProgress", "isUpdateNow"]);*/
+
             //encapsulated https
             setInterval(() => {
                 //根据messageBox判断弹框只执行一次
@@ -44,9 +60,9 @@
                             confirmButtonText: this.$t('message.c98'),
                             cancelButtonText: this.$t('message.cancelButtonText'),
                         }).then(() => {
-                            var child_process = require('child_process');
+                            let child_process = require('child_process');
                             //调用执行文件
-                            var _path = process.execPath.substr(0, process.execPath.length - 14);
+                            let _path = process.execPath.substr(0, process.execPath.length - 14);
                             //var _path = process.execPath.substr(0, 8);
                             //alert(_path);
                             child_process.execFile(_path + 'java\\bin\\stop.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
@@ -58,7 +74,7 @@
                                 }
                             });
                             setTimeout(() => {
-                                var ipc = require('electron').ipcRenderer;
+                                const ipc = require('electron').ipcRenderer;
                                 ipc.send('window-close');
                             }, 600);
                         }).catch(() => {
@@ -69,7 +85,7 @@
                     }
                 }
                 this.getNetWorkInfo('/network/info');
-            }, 5000);
+            }, 1000);
 
             setTimeout(() => {
                 this.getBottromInfo('/sys/version');
@@ -77,6 +93,7 @@
 
         },
         methods: {
+
             /** getBottromInfo
              * @method getBottromInfo
              * @param {string} urlAdderss
@@ -91,7 +108,7 @@
                         //console.log(response);
                         if (response.success) {
                             this.bottomItem = response.data;
-                            if (response.data.myVersion != response.data.newestVersion) {
+                            if (response.data.myVersion !== response.data.newestVersion) {
                                 //this.updateVersion = true
                             }
                         }
@@ -106,7 +123,9 @@
              * @version 1.0
              **/
             updateVersionUrl() {
-                console.log('更新！');
+                //console.log('更新！');
+                alert("开始更新....");
+                //ipcRenderer.send("checkForUpdate");
             },
             /** getNetWorkInfo
              * @method getNetWorkInfo
@@ -131,9 +150,10 @@
                             sessionStorage.setItem("userList", "1");
                             this.rejectTime = 0;
                             this.netWorkInfo = response.data;
+                            this.$store.commit("setNetWorkInfo",response.data);
                             let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
                             this.connectNumber = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
-                            if (wifi != 0) {
+                            if (wifi !== 0) {
                                 if (wifi < 15) {
                                     this.iconWifi = 'two-wifi_icon';
                                     if (wifi < 5) {
@@ -164,25 +184,24 @@
             },
             //测试清理数据
             clearData() {
-                localStorage.setItem('fastUser', "0");
+                /*localStorage.setItem('fastUser', "0");
                 localStorage.setItem("language", "en");
                 localStorage.setItem("newAccountAddress", "");
                 localStorage.setItem("userPass", "");
-                indexedDB.deleteDatabase("usersDB");
+                indexedDB.deleteDatabase("usersDB");*/
             }
         }
     }
 </script>
 <style lang="less">
     @import './../assets/css/style.less';
-
     footer {
         width: 100%;
         height: 2rem;
         line-height: 2rem;
         position: fixed;
         z-index: 999;
-        bottom: 0rem;
+        bottom: 0;
         font-size: 12px;
         .footer-left {
             text-indent: 2rem;

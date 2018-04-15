@@ -11,12 +11,19 @@
                 </el-input>
             </div>
             <div class="select-div fl">
-                <el-select v-model="selectKeyword" slot="prepend" :placeholder="$t('message.c46')"
-                           @change="sortConsensus" :popper-append-to-body="false">
-                    <el-option :label="$t('message.c17')" value="commissionRate"></el-option>
-                    <el-option :label="$t('message.c25')" value="owndeposit"></el-option>
-                    <el-option :label="$t('message.c18')" value="creditRatio"></el-option>
-                </el-select>
+                <div class="address-select sort-select" @click="showDataList">
+                    <div class="sub-selected-value">
+                        {{this.sortValue}}
+                        <div class="sub-select-list" v-if="showData">
+                            <div class="sub-select-item sort-select-item" v-for="item in sortConsensusList"
+                                 @click.stop="sortConsensus(item.sortName,item.sortKey)">
+                                {{item.sortName}}
+                            </div>
+                        </div>
+                    </div>
+                    <i class="el-icon-arrow-up" :class="showData ? 'i_reverse':''"></i>
+                </div>
+
             </div>
         </div>
         <div class="agency-node-bottom">
@@ -26,7 +33,7 @@
                 </p>
                 <h3>{{item.agentName}}</h3>
                 <ul>
-                    <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddress }}</li>
+                    <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                     <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
                     <li><label>{{$t('message.c25')}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
                     <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
@@ -65,6 +72,14 @@
     export default {
         data() {
             return {
+                showData: false,
+                sortValue: this.$t('message.c46'),
+                sortConsensusList: [
+                    {sortName: this.$t('message.c46'), sortKey: ''},
+                    {sortName: this.$t('message.c17'), sortKey: 'commissionRate'},
+                    {sortName: this.$t('message.c25'), sortKey: 'owndeposit'},
+                    {sortName: this.$t('message.c18'), sortKey: 'creditRatio'}
+                ],
                 keyword: '',
                 selectKeyword: '',
                 creditValuesShow0: false,
@@ -98,9 +113,10 @@
             getAllConsensus(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
-                        //console.log(response);
+                        console.log(params);
                         if (response.success) {
                             for (let i = 0; i < response.data.list.length; i++) {
+                                response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + "..." + (response.data.list[i].agentAddress).substr(-6);
                                 response.data.list[i].statuss = response.data.list[i].status;
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%';
@@ -134,10 +150,11 @@
                         break;
                 }
             },
+            showDataList() {
+                this.showData = !this.showData;
+            },
             //搜索功能
             searchConsensus() {
-                console.log(document.getElementsByClassName("el-scrollbar__view el-select-dropdown__list").value);
-                document.getElementsByClassName('el-select-dropdown__list').style.width='165px';
                 if (this.keyword !== '') {
                     const params = {"keyword": this.keyword, "pageSize": "6", "pageNumber": "1"};
                     this.getAllConsensus("/consensus/agent/list/", params);
@@ -146,12 +163,14 @@
                 }
             },
             //排序共识
-            sortConsensus(sort) {
-                if (this.keyword !== '') {
-                    const params = {"keyword": this.keyword, "sortType": sort, "pageSize": "6", "pageNumber": "1"};
+            sortConsensus(sortName,sortKey){
+                this.showData=false;
+                this.sortValue = sortName;
+                if (this.keyword!== '') {
+                    const params = {"keyword": this.keyword, "sortType": sortKey, "pageSize": "6", "pageNumber": "1"};
                     this.getAllConsensus("/consensus/agent/list/", params);
                 } else {
-                    const params = {"sortType": sort, "pageSize": "6", "pageNumber": "1"};
+                    const params = {"sortType": sortKey, "pageSize": "6", "pageNumber": "1"};
                     this.getAllConsensus("/consensus/agent/list/", params);
                 }
 
@@ -200,7 +219,7 @@
                     border-left: 0;
                     background-color: #658ec7;
                     border-color: #658ec7;
-                    border-radius: 0px;
+                    border-radius: 0;
                     color: #ffffff;
                     font-size: 12px;
                 }
@@ -208,6 +227,12 @@
             .select-div {
                 margin-left: 3%;
                 width: 165px;
+                .sort-select{
+                    width: 135px;
+                    .sort-select-item{
+                        width: 135px;
+                    }
+                }
             }
         }
         .agency-node-bottom {
@@ -223,10 +248,8 @@
         .el-scrollbar__wrap {
             overflow: visible;
         }
-        .el-select-dropdown__list {
-            width: 165px;
-        }
     }
+
     .el-popper[x-placement^=bottom] .popper__arrow {
         display: none;
     }

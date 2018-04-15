@@ -123,8 +123,8 @@
                             type: 'success', message: this.$t('message.passWordCuo')
                         });
                     } else {
-                        if(this.outOrBackup == 1){
-                            var params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}';
+                        if(this.outOrBackup === 1){
+                            let params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}';
                             this.outUserAddress('/wallet/remove/', params)
                         }else {
                             this.$router.push({

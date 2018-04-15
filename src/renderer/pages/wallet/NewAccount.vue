@@ -47,7 +47,7 @@
             return {
                 keyShow: false,
                 keyInfo: '',
-                newAccountAddress: this.$route.params.address == "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
+                newAccountAddress: this.$route.params.address === "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
                 codeShowOk: false,
                 newOk: this.$route.params.newOk,
                 newOks: this.$route.params.newOk ? false : true,
@@ -59,7 +59,7 @@
         },
         mounted() {
             let _this = this;
-            var params = '{"address":"' + this.newAccountAddress + '","password":"' + localStorage.getItem("userPass") + '"}';
+            let params = '{"address":"' + this.newAccountAddress + '","password":"' + localStorage.getItem("userPass") + '"}';
             this.getPrikey('/account/prikey', params);
         },
         methods: {
@@ -82,7 +82,7 @@
             },
             //二维码显示隐藏
             keyCode() {
-                this.$refs.codeBar.codeMaker(this.keyInfo)
+                this.$refs.codeBar.codeMaker(this.keyInfo);
                 this.codeShowOk = !this.codeShowOk;
             },
             codeShowOks() {
@@ -95,10 +95,10 @@
              * @version 1.0
              **/
             backupsKey() {
-                var path = require('path');
-                var _path = path.join(__dirname, '../../../../' + this.newAccountAddress + '_privateKey.txt');
+                let path = require('path');
+                let _path = path.join(__dirname, '../../../../' + this.newAccountAddress + '_privateKey.txt');
                 //var _path ="D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.txt";
-                var fs = require('fs');
+                let fs = require('fs');
                 fs.readFile(_path, 'utf8', function (err, data) {
                     if (err) return console.log(err);
                 });
@@ -106,7 +106,7 @@
                 fs.writeFile(_path, this.keyInfo, function (err) {
                     if (!err)
                         console.log("写入成功！" + _path)
-                })
+                });
                 /*var downloadFileAddress = "D:/work/nuls-client/pubKey.txt";*/
                 const {dialog} = require('electron').remote;
                 const {ipcRenderer} = require('electron');
@@ -121,7 +121,7 @@
                         {name: 'All', extensions: ['*']},
                     ]
                 }, function (res) {
-                    if (res[0] != "") {
+                    if (res[0] !== "") {
                         ipcRenderer.send('download', _path + "+" + res[0]);
                         setTimeout(() => {
                             fs.unlink(_path, function (err) {
@@ -174,15 +174,15 @@
                         {name: 'All', extensions: ['*']},
                     ]
                 }, function (res) {
-                    if (res[0] != "") {
+                    if (res[0] !== "") {
                         var MIME_TYPE = "image/png";
                         var dlLink = document.createElement('a');
                         dlLink.download = fileName;
                         dlLink.href = canvas.toDataURL("image/png");
                         //var fs = require('fs');
                         //fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
-                        var path = require('path');
-                        var _path = path.join(__dirname, process.execPath.substr(0, process.execPath.length - 14) + this.newAccountAddress + '_privateKey.png');
+                        let path = require('path');
+                        let _path = path.join(__dirname, process.execPath.substr(0, process.execPath.length - 14) + this.newAccountAddress + '_privateKey.png');
                         //var _path = "D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.png";
                         ipcRenderer.send('download', _path + "+" + res[0]);
                         dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
@@ -217,7 +217,7 @@
                         {name: 'All', extensions: ['*']},
                     ]
                 }, function (res) {
-                    if (res[0] != "") {
+                    if (res[0] !== "") {
                         ipcRenderer.send('download', downloadAddress + "+" + res[0]);
                         /*var fs = require('fs');
                         fs.unlink(downloadAddress, function (err) {
@@ -278,7 +278,7 @@
         font-size: 14px;
         line-height: 1.6rem;
         .back {
-            margin-left: 0px;
+            margin-left: 0;
         }
         .new-account-top {
             width: 86%;
@@ -322,8 +322,8 @@
                 }
                 .modal-overlay {
                     position: absolute;
-                    left: 0px;
-                    top: 0px;
+                    left: 0;
+                    top: 0;
                     width: 100%;
                     height: 100%;
                     text-align: center;
@@ -345,7 +345,7 @@
         ul {
             width: 65%;
             height: 50%;
-            margin: 20px auto 0px;
+            margin: 20px auto 0;
 
             li {
                 width: 42%;
@@ -379,7 +379,7 @@
             button {
                 display: block;
                 width: 50%;
-                margin: 5% auto 0px;
+                margin: 5% auto 0;
 
             }
             .new-submit {

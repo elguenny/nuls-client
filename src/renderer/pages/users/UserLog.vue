@@ -1,31 +1,12 @@
 <template>
 	<div class="users-log">
-		<Back :backTitle="this.$t('message.set')"></Back>
-		<h2>日志</h2>
+		<Back :backTitle="this.$t('message.setManagement')"></Back>
+		<h2>Log</h2>
 		<div class="users-log-info">
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
-			<p>/*Table structure for table `TbsLoginLog` */ DROP TABLE IF EXIS</p>
 		</div>
 		<div class="users-log-bottom">
-			<label>9856日志条目</label><span class="cursor-p fr">复制到剪切板</span><span class="cursor-p fr">另存为</span>
+			<!--<label>9856日志条目</label>-->
+			<span class="cursor-p fr">Copy</span><span class="cursor-p fr">Save as</span>
 		</div>
 	</div>
 </template>
@@ -76,7 +57,7 @@
 			label {}
 			span {
 				border: 1px solid #24426c;
-				padding: 0px 5px 0 5px;
+				padding: 0 5px 0 5px;
 				margin-left: 15px;
 			}
 		}

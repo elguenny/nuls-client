@@ -49,7 +49,7 @@
             },
             //
             toSubmit(password) {
-                var param = '{"prikey":"' + this.keyData.keyInfo + '","password":"' + password + '"}';
+                let param = '{"prikey":"' + this.keyData.keyInfo + '","password":"' + password + '"}';
                 this.$post('/wallet/import/', param)
                     .then((response) => {
                         if (response.success) {
@@ -115,7 +115,7 @@
             }
         }
         .el-form-item.is-required .el-form-item__label:before{
-            font-size: 0px;
+            font-size: 0;
         }
     }
 </style>

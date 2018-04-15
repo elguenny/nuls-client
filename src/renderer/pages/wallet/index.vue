@@ -136,18 +136,18 @@
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
             //判断用户选择的语言
             let language = localStorage.getItem('language');
-            setInterval(()=>{
-                if(language !== localStorage.getItem('language')){
+            setInterval(() => {
+                if (language !== localStorage.getItem('language')) {
                     language = localStorage.getItem('language');
                     this.getAccountTxList('/tx/list/', {
                         "address": this.accountAddressValue,
                         "pageSize": 9,
                         "pageNumber": 1
                     });
-                }else {
+                } else {
                     language = localStorage.getItem('language');
                 }
-            },1000);
+            }, 1000);
 
             //切换交易记录tab
             if (this.activeName === 'second') {
@@ -172,6 +172,8 @@
             getAccountTxList(url, param) {
                 this.$fetch(url, param)
                     .then((response) => {
+                        //console.log(param);
+                        //console.log(response.data.list);
                         if (response.data != null) {
                             this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {
@@ -202,6 +204,7 @@
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
+                //console.log(chenckAddress)
                 this.accountAddressValue = chenckAddress;
                 if (this.activeName === "first") {
                     this.getAccountAssets("/account/assets/" + chenckAddress);
@@ -312,10 +315,16 @@
             },
             //跳转转账
             toTransfer(address) {
-                this.$router.push({
-                    name: '/transfer',
-                    params: {address: address},
-                })
+                if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
+                    this.$router.push({
+                        name: '/transfer',
+                        params: {address: address},
+                    })
+                }else {
+                    this.$message({
+                        message: this.$t('message.c133'),
+                    });
+                }
             },
 
         },
@@ -329,7 +338,7 @@
         width: 86%;
         margin: 2rem auto;
         .account-top {
-            margin: 0px;
+            margin: 0;
             float: left;
             .el-input__suffix {
                 right: -15px;
@@ -344,7 +353,7 @@
                     margin-left: 17px;
                 }
                 .el-input__suffix {
-                    margin-top: 0px;
+                    margin-top: 0;
                 }
                 .el-input__inner {
                     border: 1px solid #658ec7;

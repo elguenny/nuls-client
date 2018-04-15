@@ -8,7 +8,7 @@
 			</p>
 			<ul>
 				<li class="li-bg overflow">
-					<label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddress}}
+					<label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddresss}}
 				</li>
 				<li>
 					<label>{{$t('message.c17')}}：</label>{{this.agentAddressInfo.commissionRate}}%
@@ -87,7 +87,7 @@
         mounted() {
             let _this = this;
             this.getAgentAddressInfo("/consensus/agent/"+this.agentAddress);
-            this.getAddressList("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "3"});
+            this.getAddressList("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"agentAddress":"this.agentAddress","pageSize": "3","pageNumber":"1"});
         },
 		methods: {
             //根据agentAddress获取共识节点列表信息
@@ -96,7 +96,7 @@
                     .then((response) => {
                         if (response.success) {
                             response.data.creditRatios = response.data.creditRatio;
-                            if (response.data.creditRatio != 0) {
+                            if (response.data.creditRatio !== 0) {
                                 if (response.data.creditRatio > 0) {
                                     response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                 } else {
@@ -105,6 +105,7 @@
                             } else {
                                 response.data.creditRatio = "50%";
                             }
+                            response.data.agentAddresss = (response.data.agentAddress).substr(0,10)+"..."+(response.data.agentAddress).substr(-10);
                             response.data.statuss = response.data.status;
                             response.data.status = this.switchStatus(response.data.status);
                             response.data.memberCounts = response.data.memberCount +"/1000";
@@ -122,7 +123,7 @@
                         if (response.success) {
                            // console.log(response)
                             this.total = response.data.total;
-                            for (var i = 0; i < response.data.list.length; i++) {
+                            for (let i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = response.data.list[i].amount *0.00000001;
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
@@ -182,7 +183,7 @@
 			},
             //
             toSubmit(password) {
-                var param = {"address":this.outInfo.address, "password": password,"txHash": this.outInfo.txHash};
+                let param = {"address":this.outInfo.address, "password": password,"txHash": this.outInfo.txHash};
                 this.$post('/consensus/withdraw/', param)
                     .then((response) => {
                         //console.log(response);
@@ -251,14 +252,13 @@
 		.el-pager {
 			width: auto;
 			height: auto;
-			padding: 0px;
+			padding: 0;
 			background-color: #17202e;
 		}
 		.my-node-bottom {
 			width: 80%;
 			height: 200px;
-			margin: auto;
-			margin-top: 20px;
+			margin:20px auto 0;
 			border: 1px solid #658ec7;
 			background-color: #17202e;
 			.my-node-list {
@@ -275,8 +275,8 @@
 				border-bottom: 1px solid #00FFFF;*/
 			}
 			.el-pagination {
-				margin-top: 0px;
-				padding: 0px;
+				margin-top: 0;
+				padding: 0;
 			}
 			.el-pagination button.disabled {
 				background-color: #17202e;

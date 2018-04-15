@@ -23,7 +23,7 @@
     import Back from '@/components/BackBar.vue';
     export default {
         data() {
-            var validateOldPass = (rule, value, callback) => {
+            let validateOldPass = (rule, value, callback) => {
                 if ( value !== localStorage.getItem('userPass')) {
                     callback(new Error(this.$t('message.c92')));
                 } else {
@@ -33,8 +33,8 @@
                     callback();
                 }
             };
-            var validatePass = (rule, value, callback) => {
-                var patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
+            let validatePass = (rule, value, callback) => {
+                let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
                 if (value === '') {
                     callback(new Error(this.$t('message.walletPassWord')));
                 } else if (!patrn.exec(value)) {
@@ -46,7 +46,7 @@
                     callback();
                 }
             };
-            var validatePass2 = (rule, value, callback) => {
+            let validatePass2 = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error(this.$t('message.affirmWalletPassWordEmpty')));
                 } else if (value !== this.passForm.pass) {
@@ -72,7 +72,6 @@
                     checkPass: [
                         { validator: validatePass2, trigger: 'blur' }
                     ]
-
                 }
             };
         },
@@ -134,7 +133,6 @@
 
     .set-password {
         height: 100%;
-        font-family: "微软雅黑";
         margin: auto;
         h2 {
             font-size: 16px;
@@ -159,7 +157,7 @@
                 border-color: #24426c;
                 height: 30px;
                 line-height: 30px;
-                padding: 0px;
+                padding: 0;
             }
             .el-form-item__content {
                 text-align: center;
@@ -177,10 +175,9 @@
             }
             .el-form-item__label {
                 font-size: 12px;
-                color: #8a929b;
+                color: #FFFFFF;
                 padding: 15px 0 10px;
-                line-height: 0px;
-                color: white;
+                line-height: 0;
             }
             .el-form-item__content {
                 line-height: 10px;

@@ -15,12 +15,12 @@
 
 <script>
     export default {
-        props: {
+        /*props: {
             submitId: {
                 type: String,
                 default: "null"
             }
-        },
+        },*/
         data() {
             return {
                 passwordVisible: false,
@@ -41,11 +41,13 @@
             setInterval(()=>{
                 passwordShow = this.$store.getters.getPasswordShow;
             },500);
-            let clickId = this.submitId;
+            //let clickId = this.submitId;
             document.onkeydown=function(e){
                 let key=window.event.keyCode;
                 if(key === 13){
-                    if(document.getElementById("passwords")){
+                    return false;
+                    //alert("回车设计");
+                    /*if(document.getElementById("passwords")){
                         document.getElementById("passwords").focus();
                     }
                     //console.log(passwordShow);
@@ -56,7 +58,7 @@
                        if(clickId !=="null" &&  document.getElementById(clickId)){
                            document.getElementById(clickId).click();
                        }
-                    }
+                    }*/
                 }
             }
         },
@@ -94,9 +96,6 @@
 </script>
 
 <style>
-    .password {
-        margin-top: 5rem;
-    }
     input[type="text"], input[type="password"], select{
         padding: 0 2px;
     }

@@ -4,7 +4,7 @@ import VueRouter from 'vue-router'
 /**
  *  加载模块
  */
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 /**
  *  路由配置
  */
@@ -172,7 +172,7 @@ const router = new VueRouter({
 		}*/
 
 	]
-})
+});
 
 /**
  *  路由出口

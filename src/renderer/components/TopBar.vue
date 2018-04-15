@@ -14,7 +14,7 @@
                 <span>{{$t("message.more")}}</span></li>
         </ul>
         <div class="top-icon fl">
-            <el-badge :value="12" class="news">
+            <el-badge :value="0" class="news">
                 <i class="message_icon" @click="news"></i>
             </el-badge>
             <div class="set"><i class="set_icon" @click="toSetUp"></i></div>
@@ -49,14 +49,16 @@
                 newsOk: false,
                 current: 0,
                 //languageItem
-                languageItem: [{
-                    key: "cn",
-                    value: "static/img/Language-zh.png"
-                },
+                languageItem: [
+                    {
+                        key: "cn",
+                        value: "static/img/Language-zh.png"
+                    },
                     {
                         key: "en",
                         value: "static/img/Language-en.png"
-                    }],
+                    }
+                ],
                 //select language initial info
                 projectName: {
                     key: "en",
@@ -72,11 +74,9 @@
         components: {
             SelecBar
         },
-        computed:{
-
-        },
-        created(){
-            this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language'): 'en';
+        computed: {},
+        created() {
+            this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en';
             if (localStorage.getItem("language") === 'cn') {
                 this.projectName = {
                     key: "cn",
@@ -93,7 +93,7 @@
             //语言切换
             selectLanguage() {
                 this.$i18n.locale = this.projectName.key;
-                var param = '{"language":"' + this.projectName.key + '"}';
+                let param = '{"language":"' + this.projectName.key + '"}';
                 this.$post('/lang', param)
                     .then((response) => {
                         //console.log(response);
@@ -170,14 +170,14 @@
             },
             //窗体最小化
             toMinus() {
-                var ipc = require('electron').ipcRenderer;
+                let ipc = require('electron').ipcRenderer;
                 ipc.send('window-min');
             },
             //关闭窗体
             toClose() {
-                var child_process = require('child_process');
+                let child_process = require('child_process');
                 //调用执行文件
-                var _path = process.execPath.substr(0,process.execPath.length-14);
+                let _path = process.execPath.substr(0, process.execPath.length - 14);
                 //var _path = process.execPath.substr(0, 8);
                 //alert(_path);
                 child_process.execFile(_path + 'java\\bin\\stop.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
@@ -189,7 +189,7 @@
                     }
                 });
                 setTimeout(() => {
-                    var ipc = require('electron').ipcRenderer;
+                    let ipc = require('electron').ipcRenderer;
                     ipc.send('window-close');
                 }, 600);
             }
@@ -198,11 +198,8 @@
 </script>
 <style lang="less">
     @import './../assets/css/style.less';
-
-    @div-width: 100%;
-    @div-height: 100%;
     .nav-top {
-        width: @div-width;
+        width: 100%;
         height: 42px;
         line-height: 42px;
         background-color: #17202e;
@@ -217,12 +214,11 @@
         }
         ul {
             width: 500px;
-            height: @div-height;
+            height: 100%;
             float: left;
             -webkit-app-region: no-drag;
             li {
                 width: 100px;
-                height: @div-height;
                 float: left;
                 color: #FFFFFF;
                 height: 42px;
@@ -232,24 +228,24 @@
                     width: 35px;
                     height: 40px;
                     position: absolute;
-                    margin-left: 0px;
+                    margin-left: 0;
                     background-size: @bg-size;
                     background: @bg-image
                 }
                 .home_icon {
-                    background-position: -23px 0px;
+                    background-position: -23px 0;
                 }
                 .wallet_icon {
-                    background-position: -59px 0px;
+                    background-position: -59px 0;
                 }
                 .consensus_icon {
-                    background-position: -94px 0px;
+                    background-position: -94px 0;
                 }
                 .application_icon {
-                    background-position: -130px 0px;
+                    background-position: -130px 0;
                 }
                 .more_icon {
-                    background-position: -165px 0px;
+                    background-position: -165px 0;
                 }
                 span {
                     margin-left: 20px;
@@ -280,27 +276,27 @@
                 cursor: pointer;
             }
             .news {
-                width: 45px;
+                width: 35px;
                 height: 40px;
                 float: left;
                 .message_icon {
-                    width: 45px;
+                    width: 35px;
                     height: 40px;
                     position: absolute;
-                    margin-left: 0px;
+                    margin-left: 0;
                     background-size: @bg-size;
                     background: @bg-image -188px -1px;
                 }
             }
             .set {
-                width: 40px;
+                width: 45px;
                 height: 40px;
                 float: left;
                 .set_icon {
                     width: 35px;
                     height: 40px;
                     position: absolute;
-                    margin-left: 0px;
+                    margin-left: 0;
                     background-size: @bg-size;
                     background: @bg-image -224px -1px;
                 }
@@ -338,7 +334,7 @@
             border: 1px solid #24426c;
             position: fixed;
             top: 40px;
-            right: 0px;
+            right: 0;
             z-index: 9999;
             background-color: #0b1422;
             h2 {

@@ -93,12 +93,12 @@
         methods: {
             //创建usersDB
             openDB() {
-                var request = indexedDB.open('usersDB', 1);
+                let request = indexedDB.open('usersDB', 1);
                 request.onupgradeneeded = function (e) {
-                    var db = e.target.result;
+                    let db = e.target.result;
                     // 如果不存在Users对象仓库则创建
                     if (!db.objectStoreNames.contains('usersDB')) {
-                        var store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false});
+                        let store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false});
                     }
                 }
             },
@@ -106,8 +106,8 @@
             addUserAccount(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        var request = indexedDB.open('usersDB', 1);
-                        var db;
+                        let request = indexedDB.open('usersDB', 1);
+                        let db;
                         let value = {
                             'userAddress': this.userListForm.userAddress,
                             'userAlias': this.userListForm.userAlias,
@@ -115,10 +115,10 @@
                         };
                         request.onsuccess = function (event) {
                             db = event.target.result;
-                            var tx = db.transaction('addressList', 'readwrite');
-                            var store = tx.objectStore('addressList');
+                            let tx = db.transaction('addressList', 'readwrite');
+                            let store = tx.objectStore('addressList');
                             store.put(value);
-                        }
+                        };
                         this.getUserList(1, 8);
                         this.userListForm.userAddress = '';
                         this.userListForm.userHelp = '';
@@ -131,15 +131,15 @@
             },
             //读取userList
             getUserList(pageNumber, pageSize) {
-                var request = indexedDB.open('usersDB', 1);
-                var dbData = [];
+                let request = indexedDB.open('usersDB', 1);
+                let dbData = [];
                 request.onsuccess = function (event) {
-                    var db = event.target.result;
-                    var tx = db.transaction('addressList', 'readonly');
-                    var store = tx.objectStore('addressList');
+                    let db = event.target.result;
+                    let tx = db.transaction('addressList', 'readonly');
+                    let store = tx.objectStore('addressList');
                     // 打开游标，遍历customers中所有数据
                     store.openCursor().onsuccess = function (event) {
-                        var cursor = event.target.result;
+                        let cursor = event.target.result;
                         if (cursor) {
                             dbData.push(cursor.value);
                             cursor.continue();
@@ -182,12 +182,12 @@
                     confirmButtonText: this.$t('message.confirmButtonText'),
                     cancelButtonText: this.$t('message.cancelButtonText'),
                 }).then(() => {
-                    var request = indexedDB.open('usersDB', 1);
-                    var db;
+                    let request = indexedDB.open('usersDB', 1);
+                    let db;
                     request.onsuccess = function (event) {
                         db = event.target.result;
-                        var tx = db.transaction('addressList', 'readwrite');
-                        var store = tx.objectStore('addressList');
+                        let tx = db.transaction('addressList', 'readwrite');
+                        let store = tx.objectStore('addressList');
                         store.delete(userAddress);
                     };
                     this.getUserList(1, 8);
@@ -243,7 +243,7 @@
                 font-size: 14px;
             }
             .el-dialog__header {
-                padding: 10px 10px 0px;
+                padding: 10px 10px 0;
             }
             .el-dialog__body {
                 .el-form {
@@ -254,7 +254,7 @@
                         }
                         .el-form-item__error {
                             top: 35px;
-                            padding: 0px;
+                            padding: 0;
                         }
                     }
                 }
@@ -263,7 +263,7 @@
                 text-align: center;
                 .el-button--primary {
                     width: 145px;
-                    margin-right: 0px;
+                    margin-right: 0;
                 }
             }
         }

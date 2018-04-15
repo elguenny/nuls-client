@@ -76,7 +76,6 @@
                         } else {
                             this.usable = 0;
                         }
-                        //console.log(this.usable)
                     });
             },
             //修改别名
@@ -84,33 +83,35 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.$refs.password.showPassword(true);
-                    } else {
-                        this.$message({
-                            type: 'warning', message: this.$t('message.passWordFailed')
-                        });
                     }
                 })
             },
-
+            //
             toSubmit(password) {
-                var param = {"alias": this.aliasForm.alias, "address": this.address, "password": password};
-                //console.log(param);
-                this.$post('/account/alias/', param)
-                    .then((response) => {
-                        //console.log(response);
-                        if (response.success) {
-                            this.$message({
-                                type: 'success', message: this.$t('message.passWordSuccess')
-                            });
-                            this.$router.push({
-                                name: '/userInfo'
-                            })
-                        } else {
-                            this.$message({
-                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                            });
-                        }
-                    })
+                if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
+                    var param = {"alias": this.aliasForm.alias, "address": this.address, "password": password};
+                    //console.log(param);
+                    this.$post('/account/alias/', param)
+                        .then((response) => {
+                            //console.log(response);
+                            if (response.success) {
+                                this.$message({
+                                    type: 'success', message: this.$t('message.passWordSuccess')
+                                });
+                                this.$router.push({
+                                    name: '/userInfo'
+                                })
+                            } else {
+                                this.$message({
+                                    type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                                });
+                            }
+                        })
+                }else {
+                    this.$message({
+                        message: this.$t('message.c133'),
+                    });
+                }
             }
         }
     }

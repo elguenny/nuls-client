@@ -1,16 +1,23 @@
 <template>
-    <div class="account-address">
-        <el-select v-model="accountAddressValue" :placeholder="$t('message.addressNull')" @change="accountAddressChecked">
-            <el-option v-for="item in getAddressList" :key="item.address" :label="item.address" :value="item.address">
-            </el-option>
-        </el-select>
+    <!--下拉单选框-->
+    <div class="address-select" @click="showDataList">
+        <div class="sub-selected-value">
+            {{accountAddressValue}}
+            <div class="sub-select-list" v-if="showData">
+                <div class="sub-select-item" v-for="item in getAddressList" @click.stop="accountAddressChecked(item.address)">
+                    {{item.address}}
+                </div>
+            </div>
+        </div>
+        <i class="el-icon-arrow-up" :class="showData ? 'i_reverse':''"></i>
     </div>
 </template>
 
 <script>
-    export default {
-        data() {
-            return {
+    export default{
+        data(){
+            return{
+                showData: false,
                 accountAddressValue: '',
             }
         },
@@ -23,14 +30,29 @@
             //判断是不有默认账户
             if (localStorage.getItem("newAccountAddress") !== '') {
                 this.accountAddressValue = localStorage.getItem("newAccountAddress");
+            }else {
+                this.accountAddressValue = this.$t('message.addressNull');
             }
             //判断vuex账户列表里有没有数据
             if (this.$store.getters.getAddressList.length === 0) {
                 this.getAccountList("/account/list");
             }
         },
-
         methods: {
+            showDataList(){
+                if(this.$store.getters.getAddressList.length !== 0){
+                    this.showData=!this.showData;
+                }else {
+                    //console.log(sessionStorage.getItem('userList')==='1');
+                    if(sessionStorage.getItem('userList')!=='1'){
+                        this.$message({
+                            type: 'info', message: this.$t('message.c131'), duration: '800'
+                        });
+                    }else {
+                        this.accountAddressValue = this.$t('message.c134');
+                    }
+                }
+            },
             //获取账户地址列表
             getAccountList(url) {
                 this.$fetch(url)
@@ -47,32 +69,70 @@
                 });
             },
             //选择账户地址
-            accountAddressChecked(accountAddress) {
+            accountAddressChecked(accountAddress){
+                this.showData=false;
+                this.accountAddressValue=accountAddress;
                 this.$emit("chenckAccountAddress", accountAddress);
                 localStorage.setItem('newAccountAddress', accountAddress);
-            },
-        }
+                //console.log(accountAddress);
+            }
+        },
     }
 </script>
-
 <style lang="less">
-    .account-address {
-        height: 50px;
-        margin: 20px auto 0px;
-        width: 440px;
-        label {
-            font-size: 14px;
-            margin-right: 15px;
+    .address-select {
+        position: relative;
+        float: right;
+        border: 1px solid #658ec7;
+        height: 24px;
+        width: 410px;
+        color: #FFFFFF;
+        right: 20px;
+        font-size: 14px;
+        line-height: 24px;
+        padding: 0 0 0 5px;
+        cursor: pointer;
+        i {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            content: '';
+            width: 20px;
+            height: 15px;
+            color: #FFFFFF;
+            text-align: center;
+            transform: rotateZ(180deg);
+            transition: transform .3s;
+            &.i_reverse{
+                transform: rotateZ(0);
+            }
         }
-        .el-input--suffix .el-input__inner {
-            width: 415px;
-            color: white;
-        }
-        .el-select .el-input .el-select__caret {
-            font-size: 14px;
-        }
-        .el-popper[x-placement^=bottom] .popper__arrow {
-            display: none;
+
+        .sub-selected-value {
+            position: absolute;
+            .sub-select-list {
+                position: absolute;
+                top: 35px;
+                background: white;
+                border: 1px solid #658ec7;
+                z-index: 9;
+                margin-left: -6px;
+                max-height: 500px;
+                transition: transform .3s;
+                .sub-select-item {
+                    width: 410px;
+                    height: 26px;
+                    line-height: 26px;
+                    position: relative;
+                    text-align: left;
+                    color: #FFFFFF;
+                    background-color: #0c1323;
+                    padding: 0 0 0 5px;
+                    &:hover{
+                        background-color: #17202e;
+                    }
+                }
+            }
         }
     }
 </style>

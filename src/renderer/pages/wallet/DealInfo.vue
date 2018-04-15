@@ -69,13 +69,13 @@
                         this.times =  moment(response.data.time).format('YYYY-MM-DD hh:mm:ss');
                         this.inputs = response.data.inputs;
                         if (response.data.inputs.length > 0) {
-                            for (var i = 0; i < response.data.inputs.length; i++) {
+                            for (let i = 0; i < response.data.inputs.length; i++) {
                                 this.allInputs = this.allInputs + parseFloat(response.data.inputs[i].value);
                             }
                         }
                         this.outputs = response.data.outputs;
                         if (response.data.outputs.length > 0) {
-                            for (var i = 0; i < response.data.outputs.length; i++) {
+                            for (let i = 0; i < response.data.outputs.length; i++) {
                                 this.allOutputs = this.allOutputs + parseFloat(response.data.outputs[i].value);
                             }
                         }
@@ -100,7 +100,7 @@
         .deal-info-top {
             width: 86%;
             height: 6rem;
-            margin:1rem auto 0px;
+            margin:1rem auto 0;
             .deal-left, .deal-right {
                 width: 48%;
                 line-height: 30px;
@@ -152,7 +152,7 @@
         }
         .deal-case {
             width: 86%;
-            margin:3px auto 0px;
+            margin:3px auto 0;
             h3 {
                 background-color: #222d3f;
                 line-height: 30px;

@@ -8,7 +8,7 @@
             </p>
             <ul>
                 <li class="li-bg overflow">
-                    <label>{{$t('message.c16')}}：</label>{{this.nodeData.agentAddress}}
+                    <label>{{$t('message.c16')}}：</label>{{this.nodeData.agentAddresss}}
                 </li>
                 <li>
                     <label>{{$t('message.c17')}}：</label>{{this.nodeData.commissionRate}}%
@@ -17,14 +17,12 @@
                     <label>{{$t('message.c25')}}：</label>{{(this.nodeData.owndeposit*0.00000001).toFixed(8)}} NULS
                 </li>
                 <li>
-                    <label>{{$t('message.c19')}}：</label>
-                    <ProgressBar colorData="#6a84f7" :widthData="this.nodeData.memberCount"></ProgressBar>
-                    <span>{{this.nodeData.memberCounts}}</span>
+                    <label>{{$t('message.c19')}}：</label>{{this.nodeData.memberCount}}
                 </li>
                 <li>
                     <label>{{$t('message.c18')}}：</label>
                     <ProgressBar colorData="#82bd39" :widthData="this.nodeData.creditRatio"></ProgressBar>
-                    <span>{{this.nodeData.creditRatios}}</span>
+                    <span>&nbsp;{{this.nodeData.creditRatios}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c64')}}：</label>
@@ -63,12 +61,12 @@
     import Password from '@/components/PasswordBar.vue';
     export default {
         data() {
-            var checkNodeNo = (rule, value, callback) => {
+            let checkNodeNo = (rule, value, callback) => {
                 if (!value) {
                     callback(new Error(this.$t('message.c52')));
                 }
                 setTimeout(() => {
-                    var re = /^\d+(?=\.{0,1}\d+$|$)/;
+                    let re = /^\d+(?=\.{0,1}\d+$|$)/;
                     if (!re.exec(value)) {
                         callback(new Error(this.$t('message.c53')));
                     } else if (value > this.usable - 0.01 || value < 2000 ) {
@@ -113,7 +111,7 @@
                         if (response.success) {
                             console.log(response);
                             response.data.creditRatios = response.data.creditRatio;
-                            if (response.data.creditRatio != 0) {
+                            if (response.data.creditRatio !== 0) {
                                 if (response.data.creditRatio > 0) {
                                     response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                 } else {
@@ -122,10 +120,9 @@
                             } else {
                                 response.data.creditRatio = "50%";
                             }
+                            response.data.agentAddresss = (response.data.agentAddress).substr(0,10)+"..."+(response.data.agentAddress).substr(-10);
                             response.data.statuss = response.data.status;
                             response.data.status = this.switchStatus(response.data.status);
-                            response.data.memberCounts = response.data.memberCount +"/1000";
-                            response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
                             response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
                             response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
                             this.agentId = response.data.agentId;
@@ -164,13 +161,13 @@
             },
             //选择全部金额
             allUsable(no) {
-                if(no == 0){
+                if(no === 0){
                     this.$message({
                         message: this.$t('message.creditLow'),
                         type: 'success'
                     });
                 }else {
-                    this.nodeForm.nodeNo = (parseInt(no) - 0.01).toString()
+                    this.nodeForm.nodeNo = (parseFloat(no) - 0.01).toString()
                 }
             },
             //提交委托
@@ -185,7 +182,7 @@
             },
             //
             toSubmit(password) {
-                var param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
+                let param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
                 this.$post('/consensus/deposit/', param)
                     .then((response) => {
                         console.log(param);
@@ -269,6 +266,10 @@
                     margin-right: 0px;
                     text-align: right;
                     width: 67px;
+                }
+                .address-select{
+                    right: 90px;
+                    top: 20px;
                 }
             }
             .number {

@@ -5,12 +5,7 @@
             <h2>{{$t('message.transfer')}}</h2>
             <el-form :model="transferForm" :rules="rules" ref="transferForm">
                 <el-form-item :label="$t('message.sourceAddress')+'：'" class="out-address">
-                    <el-select v-model="transferForm.address" prop="selectAddress" @change="accountAddressChecked">
-                        <el-option v-for="item in accountAddress" :key="item.address"
-                                   :label="item.address + item.alias == null ? '('+item.alias+')' : '' "
-                                   :value="item.address">
-                        </el-option>
-                    </el-select>
+                    <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
                 <el-form-item :label="$t('message.destinationAddress')+'：'" class="join-address" prop="joinAddress">
                     <el-input type="text" v-model.trim="transferForm.joinAddress"></el-input>
@@ -49,6 +44,7 @@
 </template>
 <script>
     import Back from '@/components/BackBar.vue';
+    import AccountAddressBar from '@/components/AccountAddressBar.vue';
     import Password from '@/components/PasswordBar.vue';
     export default {
         data() {
@@ -134,22 +130,15 @@
         },
         components: {
             Back,
+            AccountAddressBar,
             Password,
         },
         mounted() {
             let _this = this;
             this.openDB();
-            this.getaccountAddress("/account/list");
             this.getBalanceAddress('/account/balance/' + this.transferForm.address);
         },
         methods: {
-            //获取账户地址列表
-            getaccountAddress(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        this.accountAddress = response.data.list;
-                    });
-            },
             //根据账户地址获取账户余额
             getBalanceAddress(url) {
                 this.$fetch(url)
@@ -159,54 +148,53 @@
                         }
                     });
             },
-            //选择账户地址
-            accountAddressChecked(value) {
-                this.address = value;
-                this.getBalanceAddress('/account/balance/' + value);
+            //获取下拉选择地址
+            chenckAccountAddress(chenckAddress) {
+                this.address = chenckAddress;
+                this.getBalanceAddress('/account/balance/' + chenckAddress);
                 this.$refs.transferForm.validateField('joinAddress');
                 this.$refs.transferForm.validateField('joinNo');
             },
             //选择全部金额
             allUsable(no) {
-                if(no == 0){
+                if(no === 0){
                     this.$message({
                         message: this.$t('message.creditLow'),
                         type: 'warning '
                     });
                 }else {
-                    console.log(no-0.01);
-                    this.transferForm.joinNo = no-0.01;
+                    this.transferForm.joinNo = parseFloat(no)-0.01;
                 }
             },
             //创建usersDB
             openDB() {
-                var request = indexedDB.open('usersDB', 1);
+                let request = indexedDB.open('usersDB', 1);
                 request.onupgradeneeded = function (e) {
-                    var db = e.target.result;
+                    let db = e.target.result;
                     // 如果不存在Users对象仓库则创建
                     if (!db.objectStoreNames.contains('usersDB')) {
-                        var store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false});
+                        let store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false});
                     }
                 }
             },
             //选择通讯录
             toUsersAddressList() {
                 this.dialogTableVisible = true;
-                var request = indexedDB.open('usersDB', 1);
-                var dbData = [];
+                let request = indexedDB.open('usersDB', 1);
+                let dbData = [];
                 request.onsuccess = function (event) {
-                    var db = event.target.result;
-                    var tx = db.transaction('addressList', 'readonly');
-                    var store = tx.objectStore('addressList');
+                    let db = event.target.result;
+                    let tx = db.transaction('addressList', 'readonly');
+                    let store = tx.objectStore('addressList');
                     // 打开游标，遍历customers中所有数据
                     store.openCursor().onsuccess = function (event) {
-                        var cursor = event.target.result;
+                        let cursor = event.target.result;
                         if (cursor) {
                             dbData.push(cursor.value);
                             cursor.continue();
                         }
                     }
-                }
+                };
                 this.userAddressList = dbData;
             },
             //选中通讯录地址
@@ -231,7 +219,7 @@
             },
             //
             toSubmit(password) {
-                var param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + password + '","remark":"' + this.transferForm.remark + '"}';
+                let param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + password + '","remark":"' + this.transferForm.remark + '"}';
                 console.log(param);
                 this.$post('/wallet/transfer/', param)
                     .then((response) => {
@@ -283,8 +271,12 @@
                 }
             }
             .out-address {
-                .el-select {
-                    width: 100%;
+                .address-select {
+                    width: 553px;
+                    right: 0;
+                    .sub-select-item {
+                        width: 553px;
+                    }
                 }
             }
             .join-address {
@@ -294,10 +286,10 @@
                     background-size: @bg-size;
                     background: @bg-image -40px -67px;
                     position: relative;
-                    z-index: 1025;
+                    z-index: 8;
                     float: right;
                     margin-top: -36px;
-                    margin-right: 0px;
+                    margin-right: 0;
                 }
             }
             .remark {
@@ -332,11 +324,11 @@
         }
         .el-form-item__label {
             line-height: 25px;
-            padding: 0px;
+            padding: 0;
             color: white;
         }
         .el-input__suffix {
-            margin-top: 0px;
+            margin-top: 0;
         }
         .el-select .el-input .el-select__caret {
             font-size: 14px;
@@ -357,16 +349,16 @@
         .el-dialog {
             width: 70%;
             .el-dialog__header {
-                padding: 0px;
+                padding: 0;
             }
             .el-dialog__body {
-                padding: 0px;
+                padding: 0;
             }
         }
         input[type="text"], input[type="password"], select {
             border: 1px solid #24426c;
             font-size: 14px;
-            padding: 0px 2px;
+            padding: 0 2px;
             color: white;
         }
         .password-dialog{

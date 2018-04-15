@@ -75,7 +75,6 @@
                     value: 'en',
                     label: this.$t('message.c84')
                 }],
-                value: localStorage.getItem("language") == '' ? "zh" : localStorage.getItem("language"),
             }
         },
         methods: {
