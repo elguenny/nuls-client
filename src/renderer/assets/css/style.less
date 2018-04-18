@@ -18,7 +18,7 @@ a {
     margin: 30px auto;
     label {
         font-size: 14px;
-        width: 70px;
+        max-width: 70px;
         height: 30px;
         line-height: 22px;
         float: left;
@@ -375,7 +375,7 @@ select {
         margin-right: -30px;
         font-size: 12px;
         cursor: pointer;
-        margin-top: -30px;
+        margin-top: -15px;
     }
 }
 
@@ -400,6 +400,8 @@ select {
         background: #0c1323;
         .el-form-item__label{
             color: #ffffff;
+            line-height: 0px;
+            padding: 28px 0 20px 0;
         }
         .el-dialog__header{
             padding: 0px;
@@ -414,24 +416,30 @@ select {
                 width: 80%;
                 margin: auto;
                 .el-form-item{
+                    .el-form-item__content{
+                        line-height: 0;
+                        .el-form-item__error{
+                            padding-top: 8px;
+                        }
+                    }
                     margin-bottom: 25px;
                      .el-form-item__label:before {
-                        font-size: 0px;
+                        font-size: 0;
                     }
                 }
             }
         }
         .el-dialog__footer{
-            padding: 0px 0px 20px;
+            padding: 20px 0 20px;
             .el-button--default{
-                background:#658ec7;
+                background:#0c1323;
+                border: #658ec7 1px solid;
                 padding: 5px 10px;
                 font-size: 14px;
                 border-radius: 2px;
                 color: #C1C5C9;
                 float: left;
                 margin-left: 50px;
-                border: 0px;
                 width: 80px;
                 height: 30px;
             }

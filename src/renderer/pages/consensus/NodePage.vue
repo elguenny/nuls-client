@@ -39,7 +39,7 @@
                 <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
-                <span class="allUsable">{{$t('message.currentBalance')}}: {{ usable }} NULS</span>
+                <span class="allUsable">{{$t('message.currentBalance')}}: {{ usable*0.00000001 }} NULS</span>
                 <el-form-item :label="$t('message.c25')" class="number" prop="nodeNo">
                     <el-input v-model="nodeForm.nodeNo"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
@@ -83,7 +83,7 @@
                 nodeData: [],
                 usable: 0,
                 nodeForm: {
-                    nodeNo: ''
+                    nodeNo: 0,
                 },
                 nodeRules: {
                     nodeNo: [
@@ -115,7 +115,7 @@
                                 if (response.data.creditRatio > 0) {
                                     response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                 } else {
-                                    response.data.creditRatio = Math.abs(response.data.creditRatio) * 100+ '%';
+                                    response.data.creditRatio = (parseFloat(response.data.creditRatio) * 100).toFixed(6).substr(1,5)+'%';
                                 }
                             } else {
                                 response.data.creditRatio = "50%";
@@ -123,8 +123,13 @@
                             response.data.agentAddresss = (response.data.agentAddress).substr(0,10)+"..."+(response.data.agentAddress).substr(-10);
                             response.data.statuss = response.data.status;
                             response.data.status = this.switchStatus(response.data.status);
-                            response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
-                            response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
+                            response.data.totalDeposits = (response.data.totalDeposit*0.00000001).toFixed(0) +"/500000";
+                            if(response.data.totalDeposit > 50000000000000){
+                                response.data.totalDeposit ='100%';
+                            }else {
+                                response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%';
+                            }
+                            //response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
                             this.agentId = response.data.agentId;
                             this.nodeData = response.data;
                         }
@@ -155,7 +160,7 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.usable = (response.data.usable * 0.00000001).toFixed(8);
+                            this.usable = response.data.usable ;
                         }
                     });
             },
@@ -167,7 +172,8 @@
                         type: 'success'
                     });
                 }else {
-                    this.nodeForm.nodeNo = (parseFloat(no) - 0.01).toString()
+                    //console.log(no-1000000);
+                    this.nodeForm.nodeNo = (no-1000000)*0.00000001
                 }
             },
             //提交委托
@@ -270,6 +276,7 @@
                 .address-select{
                     right: 90px;
                     top: 20px;
+                    margin-left: 90px;
                 }
             }
             .number {
@@ -307,12 +314,13 @@
                 margin-right: 128px;
                 position: relative;
             }
+            .allNo {
+                display: block;
+                position: fixed;
+                top: 65.3%;
+                right: 25.8%;
+            }
         }
-        .allNo {
-            display: block;
-            position: fixed;
-            top: 69%;
-            right: 25.5%;
-        }
+
     }
 </style>

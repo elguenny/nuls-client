@@ -12,14 +12,14 @@
                     <i class="cursor-p" @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')+'：'" class="join-nos"  prop="joinNo">
-                    <span class="allUsable">{{$t("message.currentBalance")}}: {{ usable }} NULS</span>
-                    <el-input type="text" v-model.number="transferForm.joinNo" :maxlength="20"></el-input>
+                    <span class="allUsable">{{$t("message.currentBalance")}}: {{usable}} NULS</span>
+                    <el-input type="text" v-model.number="transferForm.joinNo" :maxlength="17"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t("message.all")}}</span>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
                 </el-form-item>
                 <el-form-item :label="$t('message.remarks')+'：'" class="remark">
-                    <el-input type="textarea" v-model.trim="transferForm.remark" :maxlength="20" style="padding: 0 2px; color: #FFFFFF"></el-input>
+                    <el-input type="textarea" v-model.trim="transferForm.remark" :maxlength="20"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
                     <el-button type="primary" @click="transferSubmit('transferForm')" id="transferSubmit">{{$t("message.c114")}}</el-button>
@@ -46,6 +46,7 @@
     import Back from '@/components/BackBar.vue';
     import AccountAddressBar from '@/components/AccountAddressBar.vue';
     import Password from '@/components/PasswordBar.vue';
+    import * as config from '@/config.js';
     export default {
         data() {
             let selectAddress = (rule, value, callback) => {
@@ -86,14 +87,17 @@
                 }
                 setTimeout(() => {
                     //console.log(value);
-                    var re =/(^\+?|^\d?)\d*\.?\d+$/;
+                    let re =/(^\+?|^\d?)\d*\.?\d+$/;
+                    let res = /^\d{1,8}(\.\d{1,8})?$/;
                     if (!re.exec(value)){
                         callback(new Error(this.$t('message.transferNO1')));
                     } else if ( value > this.usable-0.01) {
                         callback(new Error(this.$t('message.transferNO2')));
                     }else if(value < 0.01){
                         callback(new Error(this.$t('message.transferNO3')));
-                    } else {
+                    }else if(!res.exec(value)){
+                        callback(new Error(this.$t('message.c136')));
+                    }else {
                         callback();
                     }
 
@@ -144,26 +148,28 @@
                 this.$fetch(url)
                     .then((response) => {
                         if(response.success){
-                            this.usable = (response.data.usable * 0.00000001).toFixed(8);
+                            this.usable = config.FloatMul(response.data.usable,0.00000001);
                         }
                     });
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
                 this.address = chenckAddress;
+                localStorage.setItem('newAccountAddress',this.address);
                 this.getBalanceAddress('/account/balance/' + chenckAddress);
                 this.$refs.transferForm.validateField('joinAddress');
                 this.$refs.transferForm.validateField('joinNo');
             },
             //选择全部金额
-            allUsable(no) {
-                if(no === 0){
+            allUsable(balance) {
+                if(balance === 0){
                     this.$message({
                         message: this.$t('message.creditLow'),
                         type: 'warning '
                     });
                 }else {
-                    this.transferForm.joinNo = parseFloat(no)-0.01;
+                    console.log(balance);
+                    this.transferForm.joinNo =  config.FloatSub(balance,0.01)
                 }
             },
             //创建usersDB
@@ -219,11 +225,11 @@
             },
             //
             toSubmit(password) {
-                let param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + this.transferForm.joinNo * 100000000 + '","password":"' + password + '","remark":"' + this.transferForm.remark + '"}';
+                let param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + config.FloatMul(this.transferForm.joinNo,100000000) + '","password":"' + password + '","remark":"' + this.transferForm.remark + '"}';
                 console.log(param);
                 this.$post('/wallet/transfer/', param)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         if (response.success) {
                             this.$message({
                                 message: this.$t('message.passWordSuccess'),
@@ -272,23 +278,24 @@
             }
             .out-address {
                 .address-select {
-                    width: 553px;
+                    width: 560px;
                     right: 0;
+                    margin-left: 0;
                     .sub-select-item {
-                        width: 553px;
+                        width: 560px;
                     }
                 }
             }
             .join-address {
                 i {
-                    width: 40px;
-                    height: 40px;
+                    width: 25px;
+                    height: 25px;
                     background-size: @bg-size;
-                    background: @bg-image -40px -67px;
+                    background: @bg-image -54px -74px;
                     position: relative;
                     z-index: 8;
                     float: right;
-                    margin-top: -36px;
+                    margin-top: -27px;
                     margin-right: 0;
                 }
             }
@@ -299,81 +306,50 @@
                     color: #FFFFFF;
                 }
             }
+            h2 {
+                text-align: center;
+                padding: 20px 0 20px;
+            }
             .transfer-submit {
                 text-align: center;
                 button {
                     width: 30%;
                 }
             }
-            h2 {
-                text-align: center;
-                line-height: 3rem;
-            }
-            input[type="text"],
-            input[type="password"],
-            select {
-                background: #17202e;
-            }
-        }
+            .el-form{
+                .el-form-item{
+                    margin-bottom: 0;
+                    height: 70px;
+                    .el-form-item__label{
+                        line-height: 0;
+                        height: 20px;
+                    }
+                    .el-form-item__content{
+                        line-height: 0;
+                        .el-input{
+                            input{
+                                font-size: 12px;
+                            }
+                        }
+                        .el-input__inner{
+                            color: #FFFFFF;
+                        }
+                        .el-form-item__error{
+                            padding-top: 0px;
+                        }
+                    }
+                }
+                .service-no{
+                    height: 30px;
+                    margin-top: -3px;
+                }
+                .transfer-submit{
+                    .el-form-item__content{
+                        margin-top: 20px;
+                    }
 
-        .el-form-item {
-            margin-bottom: 5px;
-        }
-        .join-address, .join-nos {
-            margin-bottom: 15px;
-        }
-        .el-form-item__label {
-            line-height: 25px;
-            padding: 0;
-            color: white;
-        }
-        .el-input__suffix {
-            margin-top: 0;
-        }
-        .el-select .el-input .el-select__caret {
-            font-size: 14px;
-        }
-        .el-form-item__content {
-            line-height: 30px;
-        }
-        .el-select-dropdown {
-            background-color: #17202e;
-        }
-        .el-select-dropdown__item.hover,
-        .el-select-dropdown__item:hover {
-            background-color: #17202e;
-        }
-        .transfer-submit {
-            margin-top: 30px;
-        }
-        .el-dialog {
-            width: 70%;
-            .el-dialog__header {
-                padding: 0;
-            }
-            .el-dialog__body {
-                padding: 0;
+                }
             }
         }
-        input[type="text"], input[type="password"], select {
-            border: 1px solid #24426c;
-            font-size: 14px;
-            padding: 0 2px;
-            color: white;
-        }
-        .password-dialog{
-            width: 560px;
-            margin: auto;
-        }
-        .el-select-dropdown__list{
-            width: 100%;
-        }
-
-    }
-    .el-popper[x-placement^=bottom] .popper__arrow{
-        display: none;
-    }
-    .el-select-dropdown__item{
-        padding: 0 2px;
     }
 </style>

@@ -5,10 +5,10 @@
             <h2>{{$t('message.c93')}}</h2>
             <el-button type="primary" icon="el-icon-plus" @click="toNewAccount()" class="newAccount"></el-button>
             <el-table :data="tableData">
-                <el-table-column prop="userAddress" :label="$t('message.c69')" width="288" align='center'>
+                <el-table-column prop="userAddress" :label="$t('message.c69')" min-width="288" align='center'>
                 </el-table-column>
-                <el-table-column prop="userAlias" :label="$t('message.tabAlias')" width="100" align='center'>
-                </el-table-column>
+                <!--<el-table-column prop="userAlias" :label="$t('message.tabAlias')" width="100" align='center'>
+                </el-table-column>-->
                 <el-table-column prop="userHelp" :label="$t('message.remarks')" width="180" align='center'>
                 </el-table-column>
                 <el-table-column :label="$t('message.operation')" width="120" align='center'>
@@ -35,7 +35,7 @@
                 <el-form-item :label="$t('message.remarks')">
                     <el-input v-model="userListForm.userHelp"></el-input>
                 </el-form-item>
-                <div class="userAlias">{{$t('message.tabAlias')}} {{userListForm.userAlias}}</div>
+                <!--<div class="userAlias">{{$t('message.tabAlias')}} {{userListForm.userAlias}}</div>-->
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="addUserAccount('userListForm')" id="userList">
@@ -248,12 +248,18 @@
             .el-dialog__body {
                 .el-form {
                     .el-form-item {
+                        .el-form-item__label{
+                            padding: 13px 10px 0 0;
+                        }
                         margin-bottom: 10px;
                         .el-input {
                             height: 35px;
+                            input{
+                                padding: 0 5px;
+                            }
                         }
                         .el-form-item__error {
-                            top: 35px;
+                            top: 20px;
                             padding: 0;
                         }
                     }

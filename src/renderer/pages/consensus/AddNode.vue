@@ -8,7 +8,7 @@
 			</p>
 			<ul>
 				<li class="li-bg overflow">
-					<label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddress}}
+					<label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddresss}}
 				</li>
 				<li>
 					<label>{{$t('message.c17')}}：</label>{{this.agentAddressInfo.commissionRate}}%
@@ -17,9 +17,7 @@
 					<label>{{$t('message.c25')}}：</label>{{(this.agentAddressInfo.owndeposit*0.00000001).toFixed(8)}} NULS
 				</li>
 				<li>
-					<label>{{$t('message.c19')}}：</label>
-					<ProgressBar colorData="#6a84f7" :widthData="this.agentAddressInfo.memberCount"></ProgressBar>
-					<span>&nbsp;{{this.agentAddressInfo.memberCounts}}</span>
+					<label>{{$t('message.c19')}}：</label>{{this.agentAddressInfo.memberCount}}
 				</li>
 				<li>
 					<label>{{$t('message.c18')}}：</label>
@@ -116,11 +114,14 @@
                             } else {
                                 response.data.creditRatio = "50%";
                             }
+                            response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + "..." + (response.data.agentAddress).substr(-10);
                             response.data.status = this.switchStatus(response.data.status);
-                            response.data.memberCounts = response.data.memberCount +"/1000";
-                            response.data.memberCount = (response.data.memberCount / 10).toFixed(2) + '%';
-                            response.data.totalDeposits = response.data.totalDeposit*0.00000001 +"/500000";
-                            response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
+                            response.data.totalDeposits = (response.data.totalDeposit*0.00000001).toFixed(0) +"/500000";
+                            if(response.data.totalDeposit > 50000000000000){
+                                response.data.totalDeposit ='100%';
+                            }else {
+                                response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%';
+                            }
                             this.agentAddressInfo = response.data;
                         }
                     });
@@ -145,7 +146,7 @@
                     .then((response) => {
                         if (response.success) {
                             this.placeholder = "（"+ this.$t('message.currentBalance')+response.data.usable * 0.000000001+"NULS）" ;
-                            this.usable = response.data.usable * 0.000000001;
+                            this.usable = response.data.usable * 0.00000001;
                         }
                     });
             },

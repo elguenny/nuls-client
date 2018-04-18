@@ -73,7 +73,7 @@
                 this.showData=false;
                 this.accountAddressValue=accountAddress;
                 this.$emit("chenckAccountAddress", accountAddress);
-                localStorage.setItem('newAccountAddress', accountAddress);
+                localStorage.setItem('newAccountAddress', accountAddress);0
                 //console.log(accountAddress);
             }
         },
@@ -82,19 +82,21 @@
 <style lang="less">
     .address-select {
         position: relative;
-        float: right;
+        float: left;
         border: 1px solid #658ec7;
         height: 24px;
         width: 410px;
         color: #FFFFFF;
-        right: 20px;
-        font-size: 14px;
+        right: 0;
+        top: -1px;
+        font-size: 12px;
         line-height: 24px;
         padding: 0 0 0 5px;
         cursor: pointer;
+        margin-left:12px;
         i {
             position: absolute;
-            top: 5px;
+            top: 3px;
             right: 5px;
             content: '';
             width: 20px;
@@ -105,9 +107,9 @@
             transition: transform .3s;
             &.i_reverse{
                 transform: rotateZ(0);
+                top: 5px;
             }
         }
-
         .sub-selected-value {
             position: absolute;
             .sub-select-list {
@@ -134,5 +136,6 @@
                 }
             }
         }
+
     }
 </style>

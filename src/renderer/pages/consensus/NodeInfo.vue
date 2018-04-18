@@ -31,7 +31,7 @@
 				<label>{{$t('message.c27')}}</label><span>{{this.myNodeInfo.introduction}}！</span>
 			</li>
 		</ul>
-		<el-button @click="closedNode" type="button" class="bottom-btn">{{$t('message.c62')}}</el-button>
+		<el-button @click="closedNode" type="button" class="bottom-btn" v-show="closedNode=false">{{$t('message.c62')}}</el-button>
 		<Password ref="password" @toSubmit="toSubmit"></Password>
 	</div>
 </template>

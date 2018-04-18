@@ -114,17 +114,16 @@
                 this.$confirm(this.$t('message.c88'), this.$t('message.c89'), {
                     confirmButtonText: this.$t('message.confirmButtonText'),
                     cancelButtonText: this.$t('message.cancelButtonText'),
-                    type: 'warning'
                 }).then(() => {
-                    this.$message({
+                    /*this.$message({
                         type: 'success',
                         message: this.$t('message.passWordSuccess'),
-                    });
+                    });*/
                 }).catch(() => {
-                    this.$message({
+                    /*this.$message({
                         type: 'info',
                         message: this.$t('message.passWordFailed'),
-                    });
+                    });*/
                 });
             }
         }
@@ -181,6 +180,7 @@
                 line-height: 24px;
                 font-size: 12px;
                 color: #C1C5C9;
+                padding-left: 8px;
             }
             .el-switch__core {
                 width: 30px;

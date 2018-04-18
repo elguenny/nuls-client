@@ -1,8 +1,8 @@
 import axios from 'axios';
+import * as config from '../config.js'
 
-axios.defaults.timeout = 5000;
-axios.defaults.baseURL = 'http://192.168.1.201:8001';
-/*axios.defaults.baseURL = 'http://127.0.0.1:8001';*/
+axios.defaults.timeout = config.API_TIME;
+axios.defaults.baseURL = config.API_ROOT;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 /**

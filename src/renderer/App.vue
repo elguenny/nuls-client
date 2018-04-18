@@ -15,23 +15,33 @@
         <!--bottom end -->
         <el-dialog title="Language" :visible.sync="selectedValueVisible" top="35vh" :show-close="false"
                    :close-on-click-modal="false" :close-on-press-escape="false">
-            <el-form :model="form">
-                <el-form-item label="Language:" :label-width="formLabelWidth">
-                    <el-select v-model="form.region">
-                        <el-option label="English" value="en"></el-option>
-                        <el-option label="简体中文" value="cn"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-form>
+            <div class="app">
+                <label>Language:</label>
+                <div class="language-select" @click="showLanguageList">
+                    <div class="language-selected-value">
+                        {{this.languageValue}}
+                        <div class="language-select-list" v-if="showLanguageData">
+                            <div class="language-select-item" v-for="item in languageList"
+                                 @click.stop="selectedValue(item.languageName,item.languageKey)">
+                                {{item.languageName}}
+                            </div>
+                        </div>
+                    </div>
+                    <i class="el-icon-arrow-up" :class="showLanguageData ? 'i_reverse':''"></i>
+                </div>
+            </div>
             <div slot="footer" class="dialog-footer" style="text-align: center">
-                <el-button type="primary" @click="selectedValue" style="margin-right: 0px; width: 250px">OK</el-button>
+                <el-button type="primary" @click="selectedValue"
+                           style="margin-right: 0px; width: 180px; margin-top: 20px">OK
+                </el-button>
             </div>
         </el-dialog>
     </div>
 </template>
 <script>
-    import Top from './components/TopBar.vue'
-    import Bottom from './components/BottomBar.vue'
+    import Top from './components/TopBar.vue';
+    import Bottom from './components/BottomBar.vue';
+    import * as config from '@/config.js';
 
     export default {
         name: 'app',
@@ -41,15 +51,18 @@
                 loadingHome: true,
                 bottomOk: false,
                 selectedValueVisible: false,
-                form: {
-                    region: 'en',
-                },
-                formLabelWidth: '100px'
+                languageValue: 'English',
+                showLanguageData: false,
+                languageList: [
+                    {languageName: 'English', languageKey: 'en'},
+                    {languageName: '简体中文', languageKey: 'cn'},
+                ],
+                javaNumber: 0,
             }
         },
         components: {
             Top,
-            Bottom
+            Bottom,
         },
         created() {
             let appSet = setInterval(() => {
@@ -65,23 +78,56 @@
                         this.selectedValueVisible = true;
                         clearInterval(appSet);
                     }
+                    sessionStorage.setItem('walletActiveName', 'first');
+                    sessionStorage.setItem('consensusTabName', 'first');
+                }
+                else {
+                    console.log(this.javaNumber);
+                    if (this.javaNumber === 0 || this.javaNumber === 6 || this.javaNumber === 10) {
+                        let fileName = 'nuls';
+                        config.JavaFile(fileName);
+                    }else if(this.javaNumber === 15){
+                        this.$alert(this.$t('message.c137'), this.$t('message.c138'), {
+                            confirmButtonText: this.$t('message.confirmButtonText'),
+                            showClose:false,
+                            callback: action => {
+                                let fileName = 'stop';
+                                config.JavaFile(fileName);
+                                setTimeout(() => {
+                                    const ipc = require('electron').ipcRenderer;
+                                    ipc.send('window-close');
+                                }, 500);
+                            }
+                        });
+                        clearInterval(appSet);
+                    }
                 }
             }, 3000);
         },
         methods: {
-            selectedValue() {
-                this.$i18n.locale = this.form.region;
+            showLanguageList() {
+                this.showLanguageData = !this.showLanguageData;
+            },
+            selectedValue(languageName, languageKey) {
+                if (languageKey !== "cn") {
+                    languageKey = 'en'
+                }
+                this.languageValue = languageName;
+                this.$i18n.locale = languageKey;
                 this.loadingHome = false;
                 this.bottomOk = true;
-                localStorage.setItem("language", this.form.region);
+                localStorage.setItem("language", languageKey);
                 this.selectedValueVisible = false;
             },
-            //根据账户地址获取资产列表
+            //获取版本信息
             getBottromInfo() {
                 this.$fetch('/sys/version')
                     .then((response) => {
+                        //console.log(response);
                         sessionStorage.setItem("homeJava", "1")
                     }).catch((reject) => {
+                    this.javaNumber++;
+                    //console.log(reject);
                     sessionStorage.setItem("homeJava", "0")
                 });
             },
@@ -91,5 +137,64 @@
 <style lang="less">
     .el-dialog__title {
         color: #0c1323;
+    }
+
+    .app {
+        width: 250px;
+        height: 25px;
+        margin: 0 auto 10px;
+        label {
+            width: 80px;
+            float: left;
+            display: block;
+        }
+        .language-select {
+            width: 120px;
+            height: 25px;
+            float: left;
+            padding-left: 5px;
+            border: 1px solid #0d5aa7;
+            i {
+                position: absolute;
+                top: 29px;
+                right: 133px;
+                content: '';
+                width: 20px;
+                height: 15px;
+                color: #FFFFFF;
+                text-align: center;
+                transform: rotateZ(180deg);
+                transition: transform .3s;
+                &.i_reverse {
+                    transform: rotateZ(0);
+                }
+            }
+            .language-selected-value {
+                position: absolute;
+                .language-select-list {
+                    position: absolute;
+                    top: 35px;
+                    background: white;
+                    border: 1px solid #658ec7;
+                    z-index: 9;
+                    margin-left: -6px;
+                    max-height: 500px;
+                    transition: transform .3s;
+                    .language-select-item {
+                        width: 120px;
+                        height: 26px;
+                        line-height: 26px;
+                        position: relative;
+                        text-align: left;
+                        color: #FFFFFF;
+                        background-color: #0c1323;
+                        padding: 0 0 0 5px;
+                        &:hover {
+                            background-color: #17202e;
+                        }
+                    }
+                }
+            }
+        }
     }
 </style>

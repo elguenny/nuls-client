@@ -117,7 +117,7 @@
         methods: {
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
-                //this.accountAddressValue = chenckAddress;
+                this.newNodeForm.accountAddressValue= chenckAddress;
                 this.getBalanceAddress('/account/balance/' + chenckAddress);
                 setTimeout(() => {
                     if (this.newNodeForm.deposit !== '') {
@@ -135,7 +135,6 @@
                         }
                     });
             },
-
             //提交创建
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -152,7 +151,7 @@
                 let param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + password + '"}';
                 this.$post('/consensus/agent ', param)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         if (response.success) {
                             this.$message({
                                 type: 'success', message: this.$t('message.passWordSuccess')
@@ -168,7 +167,6 @@
                         }
                     })
             },
-
         }
     }
 </script>
@@ -187,27 +185,33 @@
             width: 60%;
             margin: auto;
             .address-select {
-                width: 402px;
-                right: 70px;
+                width: 396px;
+                right: 0;
+                margin-left: 0;
+                .sub-select-list{
+                    .sub-select-item{
+                        width: 396px;
+                    }
+                }
             }
             .form-left {
                 width: 50%;
                 float: left;
                 .el-input__inner {
-                    width: 170px;
+                    width: 159px;
                 }
             }
             .el-input__inner {
-                width: 410px;
+                width: 403px;
                 color: #FFFFFF;
             }
             .el-input--suffix {
                 .el-input__inner {
-                    width: 410px;
+                    width: 403px;
                 }
             }
             .el-textarea__inner {
-                width: 410px;
+                width: 403px;
                 color: #FFFFFF;
                 padding: 5px 2px;
             }

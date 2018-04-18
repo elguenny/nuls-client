@@ -29,21 +29,21 @@
                         <el-table-column :label="$t('message.indexSum')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=(scope.row.balance*0.00000001).toFixed(8)
+                                       :value=scope.row.balance
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexUsable')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=(scope.row.usable*0.00000001).toFixed(8)
+                                       :value=scope.row.usable
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexLock')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=(scope.row.locked*0.00000001).toFixed(8)
+                                       :value=scope.row.locked
                                        readonly="readonly" class="cursor-p text-d"
                                        @click="toLocked(accountAddressValue)">
                             </template>
@@ -104,6 +104,7 @@
     import AccountAddressBar from '@/components/AccountAddressBar.vue';
     import copy from 'copy-to-clipboard';
     import moment from 'moment';
+    import * as config from '@/config.js';
 
     export default {
         data() {
@@ -117,7 +118,7 @@
                 accountAddressValue: localStorage.getItem('newAccountAddress'),
                 accountData: [],
                 dealList: [],
-                activeName: localStorage.getItem('walletActiveName') === '' ? "first" : localStorage.getItem('walletActiveName'),
+                activeName: sessionStorage.getItem('walletActiveName'),
                 tabName: 'first',
                 totalAll: 0,
             }
@@ -163,8 +164,14 @@
             getAccountAssets(url) {
                 this.$fetch(url)
                     .then((response) => {
+                        //console.log(response);
                         if (response.success) {
-                            this.accountData = response.data;
+                            for(let i=0; i<response.data.length;i++){
+                                response.data[i].balance = config.FloatMul(response.data[i].balance,0.00000001);
+                                response.data[i].locked = config.FloatMul(response.data[i].locked,0.00000001);
+                                response.data[i].usable = config.FloatMul(response.data[i].usable,0.00000001);
+                            }
+                           this.accountData = response.data;
                         }
                     });
             },
@@ -183,7 +190,7 @@
                                     let length = this.dealList[i].hash.length;
                                     this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10);
                                     this.dealList[i].type = this.switchTyep(response.data.list[i].type);
-                                    this.dealList[i].values = (response.data.list[i].value * 0.00000001).toFixed(8);
+                                    this.dealList[i].values = config.FloatMul(response.data.list[i].value,0.00000001);
                                     this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
                                 }
                             } else {
@@ -248,6 +255,9 @@
                     case 94:
                         return this.$t('message.c128');
                         break;
+                    case 95:
+                        return this.$t('message.c135');
+                        break;
 
                 }
             },
@@ -260,7 +270,7 @@
                     let params = {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": 1};
                     this.getAccountTxList('/tx/list/', params);
                 } else {
-                    localStorage.setItem('walletActiveName', tab.name);
+                    sessionStorage.setItem('walletActiveName', tab.name);
                     this.walletHide = true;
                     this.getAccountAssets("/account/assets/" + this.accountAddressValue);
                 }
@@ -300,7 +310,7 @@
             },
             //toTxid跳转
             toTxid(txId) {
-                localStorage.setItem('walletActiveName', 'second');
+                sessionStorage.setItem('walletActiveName', 'second');
                 this.$router.push({
                     name: '/dealInfo',
                     params: {hash: txId},
@@ -320,7 +330,7 @@
                         name: '/transfer',
                         params: {address: address},
                     })
-                }else {
+                } else {
                     this.$message({
                         message: this.$t('message.c133'),
                     });
@@ -340,12 +350,13 @@
         .account-top {
             margin: 0;
             float: left;
+            width: 485px;
             .el-input__suffix {
                 right: -15px;
             }
         }
         .search {
-            height: 2.6rem;
+            height: 35px;
             .search-account {
                 width: 523px;
                 .lable-title {
@@ -364,7 +375,7 @@
             }
             .wallet-i {
                 height: 30px;
-                width: 183px;
+                width: 180px;
                 float: right;
                 i {
                     width: 30px;
@@ -415,6 +426,9 @@
                 width: 100%;
                 background-color: #0b1422;
                 text-align: center;
+            }
+            span {
+                font-size: 12px;
             }
         }
         .wallet-tab {

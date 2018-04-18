@@ -39,9 +39,9 @@
 </template>
 
 <script>
-    import store from '@/vuex/store'
-    import SelecBar from './SelecBar.vue'
-    import {jquery} from '@/assets/js/jquery.min.js'
+    import SelecBar from './SelecBar.vue';
+    import {jquery} from '@/assets/js/jquery.min.js';
+    import * as config from '@/config.js';
 
     export default {
         data() {
@@ -175,19 +175,8 @@
             },
             //关闭窗体
             toClose() {
-                let child_process = require('child_process');
-                //调用执行文件
-                let _path = process.execPath.substr(0, process.execPath.length - 14);
-                //var _path = process.execPath.substr(0, 8);
-                //alert(_path);
-                child_process.execFile(_path + 'java\\bin\\stop.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
-                    if (error !== null) {
-                        console.log('exec error: ' + error);
-                    }
-                    else {
-                        console.log('成功执行指令!');
-                    }
-                });
+                let fileName = 'stop';
+                config.JavaFile(fileName);
                 setTimeout(() => {
                     let ipc = require('electron').ipcRenderer;
                     ipc.send('window-close');

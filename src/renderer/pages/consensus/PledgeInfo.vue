@@ -3,9 +3,9 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{$t('message.c48')}}</h2>
         <el-table :data="pledgeData" >
-            <el-table-column prop="agentName" :label="$t('message.c24')" width="180" align='center'>
+            <el-table-column prop="agentName" :label="$t('message.c24')" width="120" align='center'>
             </el-table-column>
-            <el-table-column prop="amount" :label="$t('message.amount')" width="150" align='center'>
+            <el-table-column prop="amount" :label="$t('message.amount')" min-width="210" align='center'>
             </el-table-column>
             <el-table-column prop="status" :label="$t('message.state')"  width="100" align='center'>
             </el-table-column>
@@ -47,11 +47,11 @@
             getConsensusDeposit(url,params) {
                 this.$fetch(url,params)
                     .then((response) => {
-                        //console.log(response);
+                        console.log(response);
                         if (response.success) {
                             this.total = response.data.total;
                             for (let i = 0; i < response.data.list.length; i++) {
-                                response.data.list[i].amount = response.data.list[i].amount *0.00000001;
+                                response.data.list[i].amount = (response.data.list[i].amount *0.00000001).toFixed(8);
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                             }

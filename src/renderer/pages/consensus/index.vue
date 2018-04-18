@@ -52,13 +52,13 @@
                                 <li class="overflow"><label>{{$t("message.c16")}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t("message.c17")}}：</label>{{ item.commissionRate }}%</li>
                                 <li><label>{{$t("message.c25")}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
+                                <li class="cb">
+                                    <label class="fl">{{$t("message.c19")}}：</label>{{item.memberCount}}
+                                </li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t("message.c18")}}:</label>
                                     <ProgressBar :colorData="item.creditRatio < 0 ? '#82bd39':'#f64b3e'"
                                                  :widthData="item.creditRatio"></ProgressBar>
-                                </li>
-                                <li class="cb">
-                                    <label class="fl">{{$t("message.c19")}}：</label>{{item.memberCount}}
                                 </li>
                                 <li class="cb">
                                     <label class="fl">{{$t("message.c20")}}：</label>
@@ -88,18 +88,18 @@
                             <p class="subscript" :class="item.statuss === 1  ? 'stay' : ''">
                                 {{item.status}}
                             </p>
-                            <h3>{{item.agentName}}</h3>
+                            <h3 class="overflow">{{item.agentName}}</h3>
                             <ul>
                                 <li class="overflow"><label>{{$t("message.c16")}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t("message.c17")}}：</label>{{ item.commissionRate }}%</li>
                                 <li><label>{{$t("message.c25")}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
+                                <li class="cb">
+                                    <label class="fl">{{$t("message.c19")}}：</label>{{item.memberCount}}
+                                </li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t("message.c18")}}:</label>
                                     <ProgressBar :colorData="item.creditRatio < 50 ? '#82bd39':'#f64b3e'"
                                                  :widthData="item.creditRatio"></ProgressBar>
-                                </li>
-                                <li class="cb">
-                                    <label class="fl">{{$t("message.c19")}}：</label>{{item.memberCount}}
                                 </li>
                                 <li class="cb">
                                     <label class="fl">{{$t("message.c20")}}：</label>
@@ -130,7 +130,7 @@
                 accountAddressOk: true,
                 accountAddress: [],
                 accountAddressValue: '',
-                activeName: sessionStorage.getItem('consensusTabName') === '' ? 'first':sessionStorage.getItem('consensusTabName'),
+                activeName: sessionStorage.getItem('consensusTabName'),
                 tabName: 'first',
 
                 creditValuesShow0: false,
@@ -143,12 +143,11 @@
                 allTotalDeposit: 0,
 
                 myInfoData: {
-                    reward: 0,
-                    rewardOfDay: 0,
-                    joinAccountCount: 0,
-                    totalDeposit: 0,
-                    agentCount: 0,
+                    reward:0,
+                    agentCount:0,
+                    joinAccountCount:0,
                     usableBalance:0,
+                    totalDeposit:0,
                 },
 
                 creditColor: '#6e84f7',
@@ -156,9 +155,11 @@
                 memberColor: '#82BD39',
 
                 allConsensus: [],
+                allEvents:1,
                 totalAll: 0,
 
                 myConsensus: [],
+                myEvents:1,
                 myTotalAll: 0,
 
             }
@@ -177,9 +178,10 @@
             if (localStorage.getItem("newAccountAddress") !== '') {
                 this.accountAddressValue = localStorage.getItem("newAccountAddress");
                 this.getConsensusAddress("/consensus/address/" + localStorage.getItem('newAccountAddress'));
-                this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {"pageSize": "3"});
+                this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {"pageSize": "3","pageNumber":"1"});
             }
-            this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
+            this.getAllConsensus("/consensus/agent/list", {"pageSize": "3","pageNumber":"1"});
+
             //判断用户选择的语言
             let language = localStorage.getItem('language');
             setInterval(() => {
@@ -200,9 +202,9 @@
             chenckAccountAddress(chenckAddress) {
                 this.getConsensusAddress("/consensus/address/" + chenckAddress);
                 if (this.tabName === "first") {
-                    this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
+                    this.getAllConsensus("/consensus/agent/list", {"pageSize": "3", "pageNumber":"1"});
                 } else {
-                    this.getMyConsensus("/consensus/agent/address/" + chenckAddress, {"pageSize": "3"});
+                    this.getMyConsensus("/consensus/agent/address/" + chenckAddress, {"pageSize": "3", "pageNumber":"1"});
                 }
             },
             //获取共识信息
@@ -235,7 +237,7 @@
             getMyConsensus(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         this.myTotalAll = 1;
                         if (response.success) {
                             if (response.data.list.length !== 0) {
@@ -250,7 +252,7 @@
                                     if (response.data.list[i].creditRatio > 0) {
                                         response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                     } else {
-                                        response.data.list[i].creditRatio = response.data.list[i].creditRatio * 100;
+                                        response.data.list[i].creditRatio = (parseFloat(response.data.list[i].creditRatio) * 100).toFixed(6).substr(1,5)+'%';
                                     }
                                 } else {
                                     response.data.list[i].creditRatio = "50%";
@@ -258,7 +260,11 @@
                                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0,6)+"..."+(response.data.list[i].agentAddress).substr(-6);
                                 response.data.list[i].statuss = response.data.list[i].status;
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
-                                response.data.list[i].totalDeposit = response.data.list[i].totalDeposit / 500000000000 + '%';
+                                if(response.data.list[i].totalDeposit > 50000000000000){
+                                    response.data.list[i].totalDeposit ='100%';
+                                }else {
+                                    response.data.list[i].totalDeposit = (response.data.list[i].totalDeposit / 500000000000).toString() + '%';
+                                }
                             }
                             this.myTotalAll = response.data.total;
                             this.myConsensus = response.data.list;
@@ -267,6 +273,7 @@
             },
             //我的共识列表分页
             myConsensusSize(events) {
+                this.myEvents = events;
                 this.getMyConsensus("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {
                     "pageNumber": events,
                     "pageSize": "3"
@@ -277,13 +284,13 @@
                 this.$fetch(url, params)
                     .then((response) => {
                         if (response.success) {
-                            console.log(response);
+                            //console.log(response);
                             for (let i = 0; i < response.data.list.length; i++) {
                                 if (response.data.list[i].creditRatio !== 0) {
                                     if (response.data.list[i].creditRatio > 0) {
                                         response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%';
                                     } else {
-                                        response.data.list[i].creditRatio = Math.abs(response.data.list[i].creditRatio) * 100 + '%';
+                                        response.data.list[i].creditRatio = (parseFloat(response.data.list[i].creditRatio) * 100).toFixed(6).substr(1,5)+'%';
                                     }
                                 } else {
                                     response.data.list[i].creditRatio = "50%";
@@ -291,7 +298,11 @@
                                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0,6)+"..."+(response.data.list[i].agentAddress).substr(-6);
                                 response.data.list[i].statuss = response.data.list[i].status;
                                 response.data.list[i].status = this.switchStatus(response.data.list[i].status);
-                                response.data.list[i].totalDeposit = (response.data.list[i].totalDeposit / 500000000000).toString() + '%';
+                                if(response.data.list[i].totalDeposit > 50000000000000){
+                                    response.data.list[i].totalDeposit ='100%';
+                                }else {
+                                    response.data.list[i].totalDeposit = (response.data.list[i].totalDeposit / 500000000000).toString() + '%';
+                                }
                             }
                             this.totalAll = response.data.total;
                             this.allConsensus = response.data.list;
@@ -300,6 +311,7 @@
             },
             //全部共识分页
             allConsensusSize(events) {
+                this.allEvents = events;
                 this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "3"});
             },
             //查询共识状态
@@ -369,9 +381,11 @@
                 sessionStorage.setItem('consensusTabName', this.tabName);
                 if (localStorage.getItem("newAccountAddress") !== '') {
                     if (tab.name !== 'first') {
-                        this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {"pageSize": "3"});
+                        //this.myConsensusSize(this.myEvents);
+                        this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {"pageSize": "3","pageNumber":"1"});
                     } else {
-                        this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
+                        this.allConsensusSize(this.allEvents);
+                        //this.getAllConsensus("/consensus/agent/list", {"pageSize": "3","pageNumber":"1"});
                     }
                 }
             },
@@ -394,7 +408,7 @@
             margin: auto;
             font-size: 12px;
             line-height: 32px;
-            color: #658ec7;
+            color: #7b8eac;
             label {
             }
         }

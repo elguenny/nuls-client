@@ -3,18 +3,18 @@
         <Back :backTitle="this.$t('message.transactionManagement')"></Back>
         <div class="deal-info-top">
             <div class="deal-left fl">
-                <div>{{$t("message.input")}}<span> {{this.allInputs*0.00000001}} NULS</span></div>
+                <div>{{$t("message.input")}}<span> {{(this.allInputs*0.00000001).toFixed(8)}} NULS</span></div>
                 <ul>
                     <li v-for="inItem in inputs">
-                        {{ inItem.address }}<span>{{inItem.value*0.00000001}}</span>
+                        {{ inItem.address }}<span>{{(inItem.value*0.00000001).toFixed(8)}}</span>
                     </li>
                 </ul>
             </div>
             <div class="deal-right fr">
-                <div>{{$t("message.output")}}<span>{{this.allOutputs*0.00000001}} NULS</span></div>
+                <div>{{$t("message.output")}}<span>{{(this.allOutputs*0.00000001).toFixed(8)}} NULS</span></div>
                 <ul>
                     <li v-for="outItem in outputs">
-                        {{ outItem.address }}<span>{{outItem.value*0.00000001}}</span>
+                        {{ outItem.address }}<span>{{(outItem.value*0.00000001).toFixed(8)}}</span>
                     </li>
                 </ul>
             </div>
@@ -70,12 +70,14 @@
                         this.inputs = response.data.inputs;
                         if (response.data.inputs.length > 0) {
                             for (let i = 0; i < response.data.inputs.length; i++) {
+                                response.data.inputs[i].address= response.data.inputs[i].address.substr(0, 10) + '...' +  response.data.inputs[i].address.substr(length - 10);
                                 this.allInputs = this.allInputs + parseFloat(response.data.inputs[i].value);
                             }
                         }
                         this.outputs = response.data.outputs;
                         if (response.data.outputs.length > 0) {
                             for (let i = 0; i < response.data.outputs.length; i++) {
+                                response.data.outputs[i].address= response.data.outputs[i].address.substr(0, 10) + '...' +  response.data.outputs[i].address.substr(length - 10);
                                 this.allOutputs = this.allOutputs + parseFloat(response.data.outputs[i].value);
                             }
                         }
@@ -102,14 +104,15 @@
             height: 6rem;
             margin:1rem auto 0;
             .deal-left, .deal-right {
-                width: 48%;
+                width: 48.2%;
                 line-height: 30px;
                 font-size: 12px;
                 div {
                     width: 100%;
                     background-color: #222d3f;
                     text-align: left;
-                    padding-left: 5px;
+                    padding-left: 12px;
+                    font-size: 12px;
                     span {
                         float: right;
                         padding-right: 5px;
@@ -124,6 +127,7 @@
                         width: 100%;
                         text-align: left;
                         padding-left: 5px;
+                        font-size: 9px;
                         span {
                             float: right;
                             padding-right: 5px;

@@ -87,7 +87,7 @@
 				text-align: center;
 			}
 			.el-table th {
-				background-color: #17202e;
+				background-color: #222d3f;
 			}
 			.el-table tr {
 				background-color: #0c1323;

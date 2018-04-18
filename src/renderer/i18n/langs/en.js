@@ -40,10 +40,10 @@ const en = {
         fundTotal: 'Balance',
         fundUsable: 'Available',
         fundLock: 'Frozen',
-        consensus1: 'All Consensus',
-        pledge: 'Deposit',
-        income: 'Income',
-        annualYield: 'Nodes',
+        consensus1: 'Consensus info of testnet',
+        pledge: 'Total deposits',
+        income: 'Total Minted',
+        annualYield: 'Agent Nodes',
 
         applicationsNode: 'Nodes Running',
         //set password
@@ -136,11 +136,11 @@ const en = {
         blockHeight: 'Block Height',
 
         //consensus
-        c1:'Total deposit amount',
-        c1_1:'(all over)',
-        c2:'Total consensus',
+        c1:'Total deposit of testnet',
+        c1_1:'',
+        c2:'Running agent nodes',
         c3:'Profile',
-        c4:'Create',
+        c4:'My agent',
         c5:'Create',
         c6:'Balance',
         c7:'Income',
@@ -232,7 +232,7 @@ const en = {
         c85:'Sorry, you have not set the password, please set the password first',
         c86:'Notifications',
         c87:'To set password',
-        c88:'Be sure to upgrade to the wallet version？',
+        c88:'The current version of V0.01, the latest version of V0.0.1',
         c89:'Version update',
         //editorPassword
         c90:'New cipher (8-16 bit characters, include letters and numbers)',
@@ -283,6 +283,10 @@ const en = {
         c132:'loading...',
         c133:'Please wait a moment, the block is in high synchronization....',
         c134:'No data, please add it again',
+        c135:'Delete node',
+        c136:'The most eight bits before and after the decimal point',
+        c137:'Sorry, the program failed to start. Please contact the administrator Email:wave98688@gmail.com',
+        c138:'Startup failure',
 		
         //Bottom info
         purseVersion: 'Wallet version',

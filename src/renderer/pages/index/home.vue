@@ -7,19 +7,19 @@
                     <label class="fl">{{$t("message.fundTotal")}}：</label>
                     <ProgressBar :colorData=this.balanceData.balanceColor
                                  :widthData=this.balanceData.balanceWidth></ProgressBar>
-                    <span class="fr">{{this.balanceData.balance}} NULS</span>
+                    <label class="number">{{this.balanceData.balance}} NULS</label>
                 </div>
                 <div class="nav-lock cl">
                     <label class="fl">{{$t("message.fundLock")}}：</label>
                     <ProgressBar :colorData=this.balanceData.usableColor
                                  :widthData=this.balanceData.lockedWidth></ProgressBar>
-                    <span class="fr">{{this.balanceData.locked}} NULS</span>
+                    <label class="number">{{this.balanceData.locked}} NULS</label>
                 </div>
                 <div class="nav-usable cl">
                     <label class="fl">{{$t("message.fundUsable")}}：</label>
                     <ProgressBar :colorData=this.balanceData.lockedColor
                                  :widthData=this.balanceData.usableWidth></ProgressBar>
-                    <span class="fr">{{this.balanceData.usable}} NULS</span>
+                    <label class="number">{{this.balanceData.usable}} NULS</label>
                 </div>
             </div>
             <div class="home-nav-top">
@@ -31,13 +31,12 @@
                     </li>
                     <li>
                         <label class="fl">{{$t("message.pledge")}}：</label>
-                        <span>{{this.allNodeList.entrust}} NULS</span>
+                        <span class="number">{{this.allNodeList.entrust}} NULS</span>
                     </li>
                     <li class="cl">
                         <label class="fl">{{$t("message.income")}}：</label>
-                        <span>{{this.allNodeList.income}} NULS</span>
+                        <span class="number">{{this.allNodeList.income}} NULS</span>
                     </li>
-
                 </ul>
             </div>
         </div>
@@ -57,31 +56,30 @@
     import '@/assets/css/jquery-jvectormap.css';
     import {jvectormap} from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min';
     import {jvectormap1} from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js';
+    import * as config from '@/config.js';
 
     export default {
         data() {
             return {
-                //全局加载
-                loadingHome: true,
                 //地图加载
                 loading: true,
                 //我的资产Info
                 balanceData: {
-                    balance:'0',
+                    balance: 0,
                     balanceColor: '',
                     balanceWidth: '',
-                    locked:'0',
+                    locked: 0,
                     lockedColor: '',
                     lockedWidth: '',
-                    usable:'0',
+                    usable: 0,
                     usableColor: '',
                     usableWidth: '',
                 },
                 //全网共识Info
-                allNodeList:{
-                    entrust: '0',
-                    income: '0',
-                    nodeNumber: '0',
+                allNodeList: {
+                    entrust: 0,
+                    income: 0,
+                    nodeNumber: 0,
                 },
                 //ipInfo
                 ipData: [],
@@ -95,78 +93,20 @@
             ProgressBar,
         },
         created() {
-            //判断是否连接数据库成功 userList(0:没链接数据库 1链接成功连接数据库)
-            if (sessionStorage.getItem("userList") !== '1') {
-                const setIntervalData = setInterval(() => {
-                    if (sessionStorage.getItem("userList") === '1') {
-                        this.getAccountAddress("/account/balances/");
-                        this.getConsensus("/consensus");
-                        if (this.$store.getters.getAddressList.length === 0) {
-                            this.getAccountList("/account/list");
-                        }
-                        this.getNetWork();
-                        setTimeout(() => {
-                            this.methodsMaps(this.ipObj);
-                        }, 2000);
-                        this.loadingHome = false;
-                        clearInterval(setIntervalData);
-                    }
-                }, 1000)
-            } else {
-                setInterval(() => {
-                    this.getAccountAddress("/account/balances/");
-                    this.getConsensus("/consensus");
-                }, 2000);
+            this.getAccountAddress("/account/balances/");
+            this.getConsensus("/consensus");
+            this.getNetWork();
+            setTimeout(() => {
+                this.methodsMaps(this.ipObj);
+            }, 1000);
 
-                if (this.$store.getters.getAddressList.length === 0) {
-                    this.getAccountList("/account/list");
-                }
-                this.getNetWork();
-
-                setTimeout(() => {
-                    this.methodsMaps(this.ipObj);
-                }, 1000);
-                this.loadingHome = false;
-            }
-
-            //判断java程序是否启动
-            //sessionStorage.setItem("homeJava", "1");
-            if (sessionStorage.getItem("homeJava") == null) {
-                //启动java程序
-                this.parserequest();
-            }
-            if (localStorage.getItem("fastUser") == null) {
-                localStorage.setItem('fastUser', '0');
-                localStorage.setItem("keyShow", false);
-            }
-            setInterval(() => {
-                this.getNetWork();
-                //this.removeJvpMarkers(oldVals);
-                //this.addJvpMarkers(vals);
-            }, 5000);
+            //10秒循环一次我的资产和全网共识
+            const setIntervalData = setInterval(() => {
+                this.getAccountAddress("/account/balances/");
+                this.getConsensus("/consensus");
+            }, 10000);
         },
         methods: {
-            /**
-             * 执行java文件
-             * Execute the java file
-             */
-            parserequest() {
-                let child_process = require('child_process');
-                let _path = process.execPath.substr(0, process.execPath.length - 14);
-                //var _path = process.execPath.substr(0, 8);
-                //alert(_path);
-                child_process.execFile(_path + 'java\\bin\\nuls.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
-                    sessionStorage.setItem("homeJava", "1");
-                    if (error !== null) {
-                        //alert('exec error: ' + error);
-                        console.log('exec error: ' + error);
-                    }
-                    else {
-                        //alert('Execute the java file');
-                        console.log('Execute the java file');
-                    }
-                });
-            },
             /**
              * 根据账户地址获取总金、冻结、可用额
              *Get the total amount, freezing and availability according to the account address.
@@ -178,13 +118,13 @@
                         if (response.success) {
                             //console.log(response);
                             this.balanceData = response.data;
-                            this.balanceData.balance = (this.balanceData.balance*0.00000001).toFixed(8);
-                            this.balanceData.locked =(this.balanceData.locked*0.00000001).toFixed(8);
-                            this.balanceData.usable =(this.balanceData.usable*0.00000001).toFixed(8);
+                            this.balanceData.balance = config.FloatMul(this.balanceData.balance, 0.00000001);
+                            this.balanceData.locked = config.FloatMul(this.balanceData.locked, 0.00000001);
+                            this.balanceData.usable = config.FloatMul(this.balanceData.usable, 0.00000001);
                             this.balanceData.balanceColor = "#658EC7";
                             this.balanceData.lockedColor = "#82bd39";
                             this.balanceData.usableColor = "#f64b3e";
-                            if((this.balanceData.balance).toString() !== "0.00000000"){
+                            if ((this.balanceData.balance).toString() !== "0") {
                                 this.balanceData.balanceWidth = (this.balanceData.balance / this.balanceData.balance * 100).toFixed(2) + "%";
                                 this.balanceData.lockedWidth = (this.balanceData.locked / this.balanceData.balance * 100).toFixed(2) + "%";
                                 this.balanceData.usableWidth = (this.balanceData.usable / this.balanceData.balance * 100).toFixed(2) + "%";
@@ -201,9 +141,9 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.allNodeList.entrust = (response.data.totalDeposit * 0.00000001).toFixed(8);
-                            this.allNodeList.income = (response.data.rewardOfDay * 0.00000001).toFixed(8);
                             this.allNodeList.nodeNumber = response.data.agentCount;
+                            this.allNodeList.entrust = config.FloatMul(response.data.totalDeposit, 0.00000001);
+                            this.allNodeList.income = config.FloatMul(response.data.rewardOfDay, 0.00000001);
                         }
                     })
             },
@@ -218,6 +158,7 @@
                             //console.log(response);
                             this.ipData = response.data;
                             if (this.ipData.length > 0) {
+                                this.ipObj = [];
                                 for (let j = 0, len = this.ipData.length; j < len; j++) {
                                     axios.get('http://freegeoip.net/json/' + this.ipData[j])
                                         .then((response) => {
@@ -232,37 +173,6 @@
                             }
                         }
                     });
-            },
-            /**
-             * 获取账户地址列表
-             * Get a list of account addresses
-             * @param url
-             * @param data
-             * @returns {Promise}
-             */
-            getAccountList(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        if (response.success) {
-                            sessionStorage.setItem("homeJava", "1");
-                            if (response.data.list.length > 0) {
-                                this.$store.commit("setAddressList", response.data.list);
-                                localStorage.setItem('newAccountAddress', response.data.list[0].address);
-                                localStorage.setItem('fastUser', '1');
-                            } else {
-                                this.$store.commit("setAddressList", '');
-                                localStorage.setItem('newAccountAddress', '');
-                                localStorage.setItem('fastUser', '0');
-                            }
-                        } else {
-                            this.$store.commit("setAddressList", '');
-                            localStorage.setItem('newAccountAddress', '');
-                            localStorage.setItem('fastUser', '0');
-                        }
-                    }).catch((reject) => {
-                    localStorage.setItem('newAccountAddress', '');
-                    localStorage.setItem('fastUser', '0');
-                });
             },
             /**
              * 根据坐标标注位置
@@ -325,10 +235,12 @@
             }
         },
         watch: {
-            ipData: {
+            ipObj: {
                 handler: function (val, oldVal) {
                     if (val !== oldVal) {
-                        //console.log("旧数据="+val,"新数据"+oldVal);
+                        //console.log("旧数据=新数据");
+                        //this.removeJvpMarkers(oldVal);
+                        //this.addJvpMarkers(val);
                     }
                 },
                 deep: true
@@ -345,14 +257,14 @@
         margin: auto;
         background-color: #0c1323;
         .home-nav {
-            width: 630px;
+            width: 645px;
             height: 148px;
             margin: auto;
             .home-nav-top {
-                width: 302px;
+                width: 300px;
                 height: 120px;
                 float: left;
-                margin: 24px 20px 0 0;
+                margin: 24px 40px 0 0;
                 border: 1px solid #658ec7;
                 background-color: #17202e;
                 .nav-title {
@@ -366,10 +278,13 @@
                         line-height: 22px;
                         label {
                             display: block;
-                            width: 55px;
+                            max-width: 93px;
                             float: left;
-                            margin-left: 1rem;
-                            text-align: right;
+                            margin-left: 16px;
+                            text-align: left;
+                        }
+                        .number {
+
                         }
                     }
                 }
@@ -384,12 +299,19 @@
                     font-size: 12px;
                     line-height: 1.5rem;
                     label {
-                        margin-left: 1rem;
-                        width: 60px;
-                        text-align: right;
+                        margin-left: 16px;
+                        max-width: 60px;
+                        text-align: left;
                     }
                     span {
                         margin-right: 5px;
+                    }
+                    .number {
+                        display: block;
+                        float: left;
+                        text-align: right;
+                        margin-left: 5px;
+                        min-width: 150px;
                     }
                 }
             }
