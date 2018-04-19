@@ -1,7 +1,7 @@
 {
   "name": "NulsWallet",
   "version": "0.0.2",
-  "author": "Bolang <986887991@qq.com>",
+  "author": "NULS",
   "description": "Nuls Wallet corss platform app",
   "license": "MIT",
   "main": "./dist/electron/main.js",
