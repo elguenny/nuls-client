@@ -98,7 +98,7 @@
             this.getNetWork();
             setTimeout(() => {
                 this.methodsMaps(this.ipObj);
-            }, 1000);
+            }, 1500);
 
             //10秒循环一次我的资产和全网共识
             const setIntervalData = setInterval(() => {
@@ -124,7 +124,7 @@
                             this.balanceData.balanceColor = "#658EC7";
                             this.balanceData.lockedColor = "#82bd39";
                             this.balanceData.usableColor = "#f64b3e";
-                            if ((this.balanceData.balance).toString() !== "0") {
+                            if ((this.balanceData.balance).toString() !== "0.00000000") {
                                 this.balanceData.balanceWidth = (this.balanceData.balance / this.balanceData.balance * 100).toFixed(2) + "%";
                                 this.balanceData.lockedWidth = (this.balanceData.locked / this.balanceData.balance * 100).toFixed(2) + "%";
                                 this.balanceData.usableWidth = (this.balanceData.usable / this.balanceData.balance * 100).toFixed(2) + "%";

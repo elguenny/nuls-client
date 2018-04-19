@@ -47,7 +47,7 @@
             getConsensusDeposit(url,params) {
                 this.$fetch(url,params)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         if (response.success) {
                             this.total = response.data.total;
                             for (let i = 0; i < response.data.list.length; i++) {

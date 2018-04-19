@@ -39,9 +39,9 @@
                 <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
-                <span class="allUsable">{{$t('message.currentBalance')}}: {{ usable*0.00000001 }} NULS</span>
+                <span class="allUsable">{{$t('message.currentBalance')}}: {{ this.usable}} NULS</span>
                 <el-form-item :label="$t('message.c25')" class="number" prop="nodeNo">
-                    <el-input v-model="nodeForm.nodeNo"></el-input>
+                    <el-input v-model="nodeForm.nodeNo" :maxlength="17"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
                 </el-form-item>
                 <div class="procedure"><label>{{$t('message.c28')}}</label><span>0.01 NULS</span></div>
@@ -59,6 +59,7 @@
     import ProgressBar from '@/components/ProgressBar.vue';
     import AccountAddressBar from '@/components/AccountAddressBar.vue';
     import Password from '@/components/PasswordBar.vue';
+    import * as config from '@/config.js';
     export default {
         data() {
             let checkNodeNo = (rule, value, callback) => {
@@ -67,7 +68,8 @@
                 }
                 setTimeout(() => {
                     let re = /^\d+(?=\.{0,1}\d+$|$)/;
-                    if (!re.exec(value)) {
+                    let res = /^\d{1,8}(\.\d{1,8})?$/;
+                    if (!re.exec(value) || !res.exec(value)) {
                         callback(new Error(this.$t('message.c53')));
                     } else if (value > this.usable - 0.01 || value < 2000 ) {
                         callback(new Error(this.$t('message.c54')));
@@ -159,21 +161,21 @@
             getBalanceAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        if (response.success) {
-                            this.usable = response.data.usable ;
+                        if(response.success){
+                            this.usable = config.FloatMul(response.data.usable,0.00000001);
                         }
                     });
             },
             //选择全部金额
-            allUsable(no) {
-                if(no === 0){
+            allUsable(balance) {
+                if(balance === 0){
                     this.$message({
                         message: this.$t('message.creditLow'),
-                        type: 'success'
+                        type: 'warning '
                     });
                 }else {
-                    //console.log(no-1000000);
-                    this.nodeForm.nodeNo = (no-1000000)*0.00000001
+                    console.log(balance);
+                    this.nodeForm.nodeNo =  config.FloatSub(balance,0.01)
                 }
             },
             //提交委托

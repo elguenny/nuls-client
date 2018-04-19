@@ -1,6 +1,6 @@
 <template>
 	<div class="freeze-list">
-		<Back :backTitle="this.$t('message.freezeManagement')"></Back>
+		<Back :backTitle="this.$t('message.accountAssetsManagement')"></Back>
 		<div class="freeze-list-tabs">
 			<h2>{{$t('message.freezeList')}}</h2>
 			<el-table :data="freezeData">
@@ -13,9 +13,15 @@
 				<el-table-column prop="lockTime" :label="$t('message.thawingTime')" align='center'>
 				</el-table-column>
 			</el-table>
-			<!--<el-pagination background layout="prev, pager, next" :total="1000">
+			<el-pagination layout="prev, pager, next" :page-size="10" :total=this.totalAll class="cb"
+					   v-show="totalAllOk = this.totalAll>5 ? true:false"
+					   @current-change="freezeSize"></el-pagination>
+			<!--<el-pagination
+					layout="prev, pager, next"
+					:total=this.totalAll>
 			</el-pagination>-->
 		</div>
+
 	</div>
 </template>
 
@@ -26,7 +32,8 @@
 		data() {
 			return {
 				address:this.$route.params.address,
-				freezeData: []
+				freezeData: [],
+                totalAll: 0,
 			}
 		},
         components: {
@@ -41,7 +48,9 @@
 			getLocked(url,param){
                 this.$fetch(url, param)
                     .then((response) => {
+                       //console.log(response);
 						if(response.success){
+                            this.totalAll = response.data.total;
                             for(let i=0;i<response.data.list.length;i++){
                                 response.data.list[i].status = this.switchTyep(response.data.list[i].status);
                                 response.data.list[i].value = (response.data.list[i].value * 0.00000001).toFixed(8);
@@ -54,21 +63,25 @@
 						}
 					})
 			},
+            //交易列表分页
+            freezeSize(events) {
+                this.getLocked('tx/locked/', {
+                    "address": this.address,
+                    "pageSize": 10,
+                    "pageNumber": events
+                });
+            },
             //查询交易类型
             switchTyep(status) {
                 switch (status) {
                     case 0:
                         return "未花费";
-                        break;
                     case 1:
                         return "高度锁定";
-                        break;
                     case 2:
                         return "参与共识";
-                        break;
                     case 3:
                         return "已花费";
-                        break;
                 }
 			}
 		}
@@ -76,6 +89,7 @@
 </script>
 
 <style lang="less">
+	@import url("../../assets/css/style.less");
 	.freeze-list {
 		width: 100%;
 		margin: auto;

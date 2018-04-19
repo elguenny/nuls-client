@@ -171,7 +171,7 @@
                                 response.data[i].locked = config.FloatMul(response.data[i].locked,0.00000001);
                                 response.data[i].usable = config.FloatMul(response.data[i].usable,0.00000001);
                             }
-                           this.accountData = response.data;
+                            this.accountData = response.data;
                         }
                     });
             },
@@ -224,41 +224,28 @@
                 switch (type) {
                     case 1:
                         return this.$t('message.c118');
-                        break;
                     case 2:
                         return this.$t('message.c119');
-                        break;
                     case 3:
                         return this.$t('message.c120');
-                        break;
                     case 4:
                         return this.$t('message.c121');
-                        break;
                     case 5:
                         return this.$t('message.c122');
-                        break;
                     case 11:
                         return this.$t('message.c123');
-                        break;
                     case 90:
                         return this.$t('message.c124');
-                        break;
                     case 91:
                         return this.$t('message.c125');
-                        break;
                     case 92:
                         return this.$t('message.c126');
-                        break;
                     case 93:
                         return this.$t('message.c127');
-                        break;
                     case 94:
                         return this.$t('message.c128');
-                        break;
                     case 95:
                         return this.$t('message.c135');
-                        break;
-
                 }
             },
             //tab切换

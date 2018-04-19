@@ -18,7 +18,7 @@
                               :maxlength="17"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c26')+'（%）:'" class="form-left" prop="commissionRate">
-                    <el-input v-model.number="newNodeForm.commissionRate" :maxlength="17"></el-input>
+                    <el-input v-model.number="newNodeForm.commissionRate" :maxlength="5"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c27')+':'" class="cb" prop="remark">
                     <el-input v-model.trim="newNodeForm.remark" type="textarea" :rows="2" :maxlength="80"></el-input>
@@ -47,24 +47,25 @@
                 if (!value) {
                     callback(new Error(this.$t('message.c31')));
                 }
-                let re = /^\d+(?=\.{0,1}\d+$|$)/;
-                if (!re.exec(value)) {
-                    callback(new Error(this.$t('message.c32')));
-                }
-                if (value > this.usable - 0.01) {
-                    callback(new Error(this.$t('message.c33')));
-                } else if (value < 20000) {
-                    callback(new Error(this.$t('message.c34')));
-                } else {
-                    callback();
-                }
+                setTimeout(() => {
+                    let re = /^\d+(?=\.{0,1}\d+$|$)/;
+                    let res = /^\d{1,8}(\.\d{1,8})?$/;
+                    if (!re.exec(value) || !res.exec(value)) {
+                        callback(new Error(this.$t('message.c32')));
+                    } else if (value > this.usable - 0.01 || value < 2000 ) {
+                        callback(new Error(this.$t('message.c54')));
+                    } else {
+                        callback();
+                    }
+                }, 100);
             };
             let checkCommissionRate = (rule, value, callback) => {
                 if (!value) {
                     callback(new Error(this.$t('message.c35')));
                 }
                 let re = /^\d+(?=\.{0,1}\d+$|$)/;
-                if (!re.exec(value)) {
+                let res = /^\d{1,2}(\.\d{1,2})?$/;
+                if (!re.exec(value) || !res.exec(value)) {
                     callback(new Error(this.$t('message.c36')));
                 } else if (0 > value || value > 20) {
                     callback(new Error(this.$t('message.c37')));

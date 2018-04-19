@@ -2,7 +2,7 @@
     <footer>
         <el-col :span="10" class='footer-left'>
             <span>{{$t("message.purseVersion")}}</span>：V{{this.$store.getters.getPurseVersiont}}（{{$t("message.coreVersion")}}
-            V{{ this.bottomItem.myVersion }}）
+            V{{this.$store.getters.getVersionInfo.myVersion}}）
             <span @click="updateVersionUrl" v-show="updateVersion"
                   class="cursor-p text-d">{{$t("message.toUpdate")}}</span>
         </el-col>
@@ -22,7 +22,7 @@
     export default {
         data() {
             return {
-                bottomItem: [],
+                //bottomItem: [],
                 updateVersion: false,
                 timeOffsetOk: true,
                 connectNumber: '0',
@@ -35,41 +35,15 @@
         },
         mounted() {
             let _this = this;
-            /*ipcRenderer.on("message", (event, text) => {
-                console.log(arguments);
-                this.tips = text;
-            });
-            ipcRenderer.on("downloadProgress", (event, progressObj)=> {
-                console.log(progressObj);
-                this.downloadPercent = progressObj.percent || 0;
-            });
-            ipcRenderer.on("isUpdateNow", () => {
-                ipcRenderer.send("isUpdateNow");
-            });
-            //组件销毁前移除所有事件监听channel
-            ipcRenderer.removeAll(["message", "downloadProgress", "isUpdateNow"]);*/
-            this.getBottromInfo('/sys/version');
+
             this.getNetWorkInfo('/network/info');
             //2秒获取一次区块高度 encapsulated https
-             setInterval(() => {
+            setInterval(() => {
                 this.getNetWorkInfo('/network/info');
             }, 2000);
 
         },
         methods: {
-           // 获取版本信息 Get version info
-            getBottromInfo(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        //console.log(response);
-                        if (response.success) {
-                            this.bottomItem = response.data;
-                            /*if (response.data.myVersion !== response.data.newestVersion) {
-                                this.updateVersion = true
-                            }*/
-                        }
-                    });
-            },
             //更新版本 Update version
             updateVersionUrl() {
                 alert("开始更新....");

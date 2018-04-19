@@ -123,11 +123,14 @@
             getBottromInfo() {
                 this.$fetch('/sys/version')
                     .then((response) => {
-                        //console.log(response);
+                        if (response.success) {
+                            //console.log(response);
+                            this.$store.commit("setVersionInfo", response.data);
+                        }
                         sessionStorage.setItem("homeJava", "1")
                     }).catch((reject) => {
                     this.javaNumber++;
-                    //console.log(reject);
+                    console.log(reject);
                     sessionStorage.setItem("homeJava", "0")
                 });
             },

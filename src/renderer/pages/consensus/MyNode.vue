@@ -130,9 +130,8 @@
                 this.$fetch(url, params)
                     .then((response) => {
                         if (response.success) {
-                            console.log(url);
-                            console.log(params);
-                            console.log(response);
+                            //console.log(params);
+                            //console.log(response);
                             this.total = response.data.total;
                             for (let i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = (response.data.list[i].amount * 0.00000001).toFixed(8);

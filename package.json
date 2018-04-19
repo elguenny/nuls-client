@@ -1,6 +1,6 @@
 {
   "name": "NulsWallet",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Bolang <986887991@qq.com>",
   "description": "Nuls Wallet corss platform app",
   "license": "MIT",
@@ -28,7 +28,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "https://pan.baidu.com/s/114vdfDBZJAMOHQTUlnhQpA#list/path=%2Fnuls/"
+        "url": "file://192.168.1.201/share/nuls/release/"
       }
     ],
     "extraFiles": [
@@ -82,6 +82,7 @@
     "vue-electron": "^1.0.6",
     "vue-i18n": "^7.4.2",
     "vue-router": "^2.5.3",
+    "vue-socket.io": "^2.1.1-b",
     "vuex": "^2.3.1"
   },
   "devDependencies": {

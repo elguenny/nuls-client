@@ -38,6 +38,7 @@
 <script>
     import Back from '@/components/BackBar.vue';
     import Password from '@/components/PasswordBar.vue';
+
     export default {
         data() {
             return {
@@ -45,7 +46,7 @@
                 backUrl: '/wallet',
                 setAsAddress: '',
                 userData: [],
-                totalAll:0,
+                totalAll: 0,
             }
         },
         components: {
@@ -54,7 +55,7 @@
         },
         mounted() {
             let _this = this;
-            this.getUserList("/account/list",{"pageSize": 8, "pageNumber": 1});
+            this.getUserList("/account/list", {"pageSize": 8, "pageNumber": 1});
         },
         methods: {
             back() {
@@ -63,28 +64,28 @@
                 })
             },
             //获取账户列表
-            getUserList(url,params) {
-                this.$fetch(url,params)
+            getUserList(url, params) {
+                this.$fetch(url, params)
                     .then((response) => {
                         if (response.success) {
                             console.log(response);
                             this.totalAll = response.data.total;
                             if (response.data.list.length === 0) {
-                                localStorage.setItem('fastUser','0');
+                                localStorage.setItem('fastUser', '0');
                                 localStorage.setItem("userPass", "");
                                 localStorage.setItem("newAccountAddress", "");
                                 localStorage.setItem("toUserInfo", "0");
-                            }else {
-                                localStorage.setItem('fastUser','1');
-                                localStorage.setItem("newAccountAddress",response.data.list[0].address);
+                            } else {
+                                localStorage.setItem('fastUser', '1');
+                                localStorage.setItem("newAccountAddress", response.data.list[0].address);
                             }
-                            this.$store.commit("setAddressList",response.data.list);
+                            this.$store.commit("setAddressList", response.data.list);
                             this.userData = response.data.list;
                         }
                     });
             },
-            userListSize(events){
-                this.getUserList("/account/list",{"pageSize": 8, "pageNumber": events});
+            userListSize(events) {
+                this.getUserList("/account/list", {"pageSize": 8, "pageNumber": events});
             },
             //点击根据地址移除账户事件
             outUser(address) {
@@ -93,7 +94,7 @@
                 this.$refs.password.showPassword(true);
             },
             //移除账户
-            outUserAddress(url,params){
+            outUserAddress(url, params) {
                 this.$post(url, params)
                     .then((response) => {
                         if (response.success) {
@@ -117,26 +118,16 @@
             },
             //输入密码提交
             toSubmit(password) {
-                //判断密码是否正确
-                if (localStorage.getItem("userPass") !== '') {
-                    if (password !== localStorage.getItem("userPass")) {
-                        this.$message({
-                            type: 'success', message: this.$t('message.passWordCuo')
-                        });
-                    } else {
-                        if(this.outOrBackup === 1){
-                            let params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}';
-                            this.outUserAddress('/wallet/remove/', params)
-                        }else {
-                            this.$router.push({
-                                name: '/newAccount',
-                                params: {newOk: false, address: this.setAsAddress},
-                            })
-                        }
-                    }
+                if (this.outOrBackup === 1) {
+                    let params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}';
+                    this.outUserAddress('/wallet/remove/', params)
                 } else {
-                    console.log("判断老用户导入")
+                    this.$router.push({
+                        name: '/newAccount',
+                        params: {newOk: false, address: this.setAsAddress},
+                    })
                 }
+
             },
             //修改别名
             editAliasing(Address) {
@@ -147,7 +138,7 @@
             },
             //新增账户
             toNewAccount() {
-                localStorage.setItem('toUserInfo',"0");
+                localStorage.setItem('toUserInfo', "0");
                 this.$router.push({
                     path: '/firstInto/firstInfo'
                 })

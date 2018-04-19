@@ -225,8 +225,11 @@
             },
             //
             toSubmit(password) {
-                let param = '{"address":"' + this.address + '","toAddress":"' + this.transferForm.joinAddress + '","amount":"' + config.FloatMul(this.transferForm.joinNo,100000000) + '","password":"' + password + '","remark":"' + this.transferForm.remark + '"}';
-                console.log(param);
+                let param = '{"address":"' + this.address
+                    + '","toAddress":"' + this.transferForm.joinAddress
+                    + '","amount":"' + this.transferForm.joinNo*100000000
+                    + '","password":"' + password
+                    + '","remark":"' + this.transferForm.remark + '"}';
                 this.$post('/wallet/transfer/', param)
                     .then((response) => {
                         //console.log(response);
@@ -239,6 +242,10 @@
                             this.transferForm.joinNo = '';
                             this.transferForm.remark = '';
                             this.getBalanceAddress('/account/balance/' + this.transferForm.address);
+                            sessionStorage.setItem('walletActiveName','second');
+                            this.$router.push({
+                                name: '/wallet',
+                            })
                         } else {
                             this.$message({
                                 message: this.$t('message.passWordFailed') + response.msg,
@@ -278,11 +285,11 @@
             }
             .out-address {
                 .address-select {
-                    width: 560px;
+                    width: 553px;
                     right: 0;
                     margin-left: 0;
                     .sub-select-item {
-                        width: 560px;
+                        width: 553px;
                     }
                 }
             }
@@ -348,6 +355,16 @@
                         margin-top: 20px;
                     }
 
+                }
+            }
+            .el-dialog__wrapper{
+                .el-dialog{
+                    width: 70%;
+                }
+            }
+            .password-dialog{
+                .el-dialog{
+                    width: 50%;
                 }
             }
         }

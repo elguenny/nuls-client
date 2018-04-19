@@ -187,6 +187,7 @@
             setInterval(() => {
                 if (language !== localStorage.getItem('language')) {
                     language = localStorage.getItem('language');
+                    //console.log(this.tabName);
                     if (this.tabName === 'first') {
                         this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
                     } else {
@@ -198,6 +199,10 @@
             }, 1000);
         },
         methods: {
+            clickButton: function(val){
+                // $socket is socket.io-client instance
+                //this.$socket.emit('emit_method', val);
+            },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
                 this.getConsensusAddress("/consensus/address/" + chenckAddress);
@@ -274,7 +279,7 @@
             //我的共识列表分页
             myConsensusSize(events) {
                 this.myEvents = events;
-                this.getMyConsensus("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {
+                this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {
                     "pageNumber": events,
                     "pageSize": "3"
                 });

@@ -1,10 +1,8 @@
 const IS_DEV = process.env.NODE_ENV !== 'production';
 //Request url
-export const API_ROOT = IS_DEV ? 'http://192.168.1.163:8001' : 'http://127.0.0.1:8001';
+export const API_ROOT = IS_DEV ? 'http://127.0.0.1:8001' : 'http://127.0.0.1:8001';
 //Request response time
 export const API_TIME = IS_DEV ? '4000' : '5000';
-//Upload url
-export const uploadUrl = 'https://pan.baidu.com/s/114vdfDBZJAMOHQTUlnhQpA#list/path=%2Fnuls/';
 
 /**
  * 浮点数加法运算
@@ -29,7 +27,7 @@ export function FloatSub(arg1,arg2){
     m=Math.pow(10,Math.max(r1,r2));
     //动态控制精度长度
     n=(r1=r2)?r1:r2;
-    return ((arg1*m-arg2*m)/m).toFixed(n);
+    return ((arg1*m-arg2*m)/m).toFixed(8);
 }
 
 /**
@@ -49,8 +47,8 @@ export function FloatMul(arg1,arg2 ) {
  */
 export function JavaFile(fileName) {
     let child_process = require('child_process');
-    //let _path = process.execPath.substr(0, process.execPath.length - 14);
-    let _path = process.execPath.substr(0, 8);
+    let _path = process.execPath.substr(0, process.execPath.length - 14);
+    //let _path = process.execPath.substr(0, 8);
     //alert(_path);
     child_process.execFile(_path + 'java\\bin\\'+fileName+'.bat', null, {cwd: _path + 'java\\bin\\'}, function (error) {
         sessionStorage.setItem("homeJava", "1");

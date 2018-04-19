@@ -59,6 +59,8 @@
 </template>
 
 <script>
+    import {ipcRenderer} from "electron";
+
     export default {
         data() {
             return {
@@ -111,21 +113,22 @@
             },
             //版本更新
             versionUpdates() {
-                this.$confirm(this.$t('message.c88'), this.$t('message.c89'), {
-                    confirmButtonText: this.$t('message.confirmButtonText'),
-                    cancelButtonText: this.$t('message.cancelButtonText'),
-                }).then(() => {
-                    /*this.$message({
-                        type: 'success',
-                        message: this.$t('message.passWordSuccess'),
-                    });*/
+                this.$confirm(
+                    this.$t('message.c88') + this.$store.getters.getVersionInfo.myVersion + " , " +
+                    this.$t('message.c881') + this.$store.getters.getVersionInfo.newestVersion, this.$t('message.c89'),
+                    {
+                        confirmButtonText: this.$t('message.confirmButtonText'),
+                        cancelButtonText: this.$t('message.cancelButtonText'),
+                    }).then(() => {
+
+
                 }).catch(() => {
                     /*this.$message({
                         type: 'info',
                         message: this.$t('message.passWordFailed'),
                     });*/
                 });
-            }
+            },
         }
     }
 </script>
@@ -193,7 +196,7 @@
                     height: 13px;
                 }
             }
-            .is-checked{
+            .is-checked {
                 .el-switch__core {
                     .el-switch__button {
                         left: 5px;

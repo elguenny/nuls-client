@@ -37,7 +37,7 @@
 		<div class="add-node-bottom">
 			<el-form ref="addNodeForm" :model="addNodeForm" :rules="addNodeRules" size="mini" label-position="left">
 				<el-form-item :label="$t('message.c51')" class="pledge-money" prop="nodeNo">
-					<el-input v-model="addNodeForm.nodeNo" :placeholder=this.placeholder></el-input>
+					<el-input v-model="addNodeForm.nodeNo" :placeholder=this.placeholder :maxlength="17"></el-input>
 				</el-form-item>
 				<div class="procedure"><label>{{$t('message.c28')}}</label><span>0.01 NULS</span></div>
 				<el-form-item size="large" class="submit">
@@ -61,9 +61,10 @@
                 }
                 setTimeout(() => {
                     let re = /^\d+(?=\.{0,1}\d+$|$)/;
-                    if (!re.exec(value)) {
+                    let res = /^\d{1,8}(\.\d{1,8})?$/;
+                    if (!re.exec(value) || !res.exec(value)) {
                         callback(new Error(this.$t('message.c53')));
-                    } else if (value > this.usable - 0.01) {
+                    } else if (value > this.usable - 0.01 || value < 2000 ) {
                         callback(new Error(this.$t('message.c54')));
                     } else {
                         callback();
@@ -145,7 +146,7 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            this.placeholder = "（"+ this.$t('message.currentBalance')+response.data.usable * 0.000000001+"NULS）" ;
+                            this.placeholder = "（"+ this.$t('message.currentBalance')+response.data.usable * 0.00000001+"NULS）" ;
                             this.usable = response.data.usable * 0.00000001;
                         }
                     });
@@ -162,10 +163,14 @@
 			},
             //
             toSubmit(password) {
-                let param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.addNodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
+                let param = '{"address":"' + localStorage.getItem('newAccountAddress')
+					+ '","agentId":"' + this.agentId
+					+ '","deposit":"' + this.addNodeForm.nodeNo * 100000000
+					+ '","password":"' + password + '"}';
                 this.$post('/consensus/deposit/', param)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(param);
+                        //console.log(response);
                         if (response.success) {
                             this.$message({
                                 message: this.$t('message.passWordSuccess'),
