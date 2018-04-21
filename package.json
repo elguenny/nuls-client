@@ -19,7 +19,7 @@
     "unit": "karma start test/unit/karma.conf.js",
     "postinstall": ""
   },
-  "build": {
+  "build": {15/
     "productName": "NulsWallet",
     "appId": "org.simulatedgreg.electron-vue",
     "directories": {
