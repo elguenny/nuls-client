@@ -115,7 +115,8 @@
             versionUpdates() {
                 this.$confirm(
                     this.$t('message.c88') + this.$store.getters.getVersionInfo.myVersion + " , " +
-                    this.$t('message.c881') + this.$store.getters.getVersionInfo.newestVersion, this.$t('message.c89'),
+                    this.$t('message.c881') + "1.0.0", this.$t('message.c89'),
+                   /* this.$t('message.c881') + this.$store.getters.getVersionInfo.newestVersion, this.$t('message.c89'),*/
                     {
                         confirmButtonText: this.$t('message.confirmButtonText'),
                         cancelButtonText: this.$t('message.cancelButtonText'),

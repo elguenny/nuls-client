@@ -57,14 +57,30 @@
                     <!--<el-pagination layout="prev, pager, next":total="1000 "></el-pagination>-->
                 </el-tab-pane>
                 <el-tab-pane :label="$t('message.transactionRecord')" name="second">
-                    <el-table :data="dealList">
+                    <el-table :data="dealList" @filter-change="changeType"  v-loading="loading">
                         <el-table-column
-                                prop="tag"
+                                prop="type"
                                 :label="$t('message.transactionType')"
                                 width="110"
-                                align='center'>
+                                align="center"
+                                column-key="type"
+                                :filters="[
+                                    {text: this.$t('message.type1'), value: '1'},
+                                    {text: this.$t('message.type2'), value: '2'},
+                                    {text: this.$t('message.type3'), value: '3'},
+                                    {text: this.$t('message.type4'), value: '4'},
+                                    {text: this.$t('message.type5'), value: '5'},
+                                    {text: this.$t('message.type11'), value: '11'},
+                                    {text: this.$t('message.type90'), value: '90'},
+                                    {text: this.$t('message.type91'), value: '91'},
+                                    {text: this.$t('message.type92'), value: '92'},
+                                    {text: this.$t('message.type93'), value: '93'},
+                                    {text: this.$t('message.type94'), value: '94'},
+                                    {text: this.$t('message.type95'), value: '95'},
+                                ]"
+                                :filter-multiple=false>
                             <template slot-scope="scope">
-                                <span>{{ scope.row.type }}</span>
+                                {{$t('message.type'+scope.row.type)}}
                             </template>
                         </el-table-column>
                         <el-table-column label="txid" min-width="195" align='center'>
@@ -121,6 +137,8 @@
                 activeName: sessionStorage.getItem('walletActiveName'),
                 tabName: 'first',
                 totalAll: 0,
+                pages:1,
+                types:''
             }
         },
         components: {
@@ -135,20 +153,6 @@
                 this.keyShow = false
             }
             this.getAccountAssets("/account/assets/" + this.accountAddressValue);
-            //判断用户选择的语言
-            let language = localStorage.getItem('language');
-            setInterval(() => {
-                if (language !== localStorage.getItem('language')) {
-                    language = localStorage.getItem('language');
-                    this.getAccountTxList('/tx/list/', {
-                        "address": this.accountAddressValue,
-                        "pageSize": 9,
-                        "pageNumber": 1
-                    });
-                } else {
-                    language = localStorage.getItem('language');
-                }
-            }, 1000);
 
             //切换交易记录tab
             if (this.activeName === 'second') {
@@ -158,6 +162,24 @@
                     "pageNumber": 1
                 });
             }
+            //10秒查询交易列表
+            const setListData = setInterval(() => {
+                if(this.types !==''){
+                    //console.log(this.types);
+                    this.getAccountTxList('/tx/list/', {
+                        "address": this.accountAddressValue,
+                        "type":this.types,
+                        "pageSize": 9,
+                        "pageNumber":this.pages
+                    });
+                }else {
+                    this.getAccountTxList('/tx/list/', {
+                        "address": this.accountAddressValue,
+                        "pageSize": 9,
+                        "pageNumber":this.pages
+                    });
+                }
+            },10000)
         },
         methods: {
             //根据账户地址获取资产列表
@@ -166,10 +188,10 @@
                     .then((response) => {
                         //console.log(response);
                         if (response.success) {
-                            for(let i=0; i<response.data.length;i++){
-                                response.data[i].balance = config.FloatMul(response.data[i].balance,0.00000001);
-                                response.data[i].locked = config.FloatMul(response.data[i].locked,0.00000001);
-                                response.data[i].usable = config.FloatMul(response.data[i].usable,0.00000001);
+                            for (let i = 0; i < response.data.length; i++) {
+                                response.data[i].balance = config.FloatMul(response.data[i].balance, 0.00000001);
+                                response.data[i].locked = config.FloatMul(response.data[i].locked, 0.00000001);
+                                response.data[i].usable = config.FloatMul(response.data[i].usable, 0.00000001);
                             }
                             this.accountData = response.data;
                         }
@@ -179,8 +201,7 @@
             getAccountTxList(url, param) {
                 this.$fetch(url, param)
                     .then((response) => {
-                        //console.log(param);
-                        //console.log(response.data.list);
+                        //console.log(response);
                         if (response.data != null) {
                             this.totalAll = response.data.total;
                             if (response.data.list.length > 0) {
@@ -189,20 +210,23 @@
                                 for (let i = 0; i < response.data.list.length; i++) {
                                     let length = this.dealList[i].hash.length;
                                     this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10);
-                                    this.dealList[i].type = this.switchTyep(response.data.list[i].type);
-                                    this.dealList[i].values = config.FloatMul(response.data.list[i].value,0.00000001);
+                                    this.dealList[i].values = config.FloatMul(response.data.list[i].value, 0.00000001);
                                     this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
                                 }
+                                this.loading=false;
                             } else {
+                                this.loading=false;
                                 this.dealList = [];
                             }
                         } else {
+                            this.loading=false;
                             this.dealList = [];
                         }
                     });
             },
             //交易列表分页
             txIdConsensusSize(events) {
+                this.pages = events;
                 this.getAccountTxList('/tx/list/', {
                     "address": this.accountAddressValue,
                     "pageSize": 9,
@@ -219,34 +243,15 @@
                     this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 9, "pageNumber": 1});
                 }
             },
-            //查询交易类型
-            switchTyep(type) {
-                switch (type) {
-                    case 1:
-                        return this.$t('message.c118');
-                    case 2:
-                        return this.$t('message.c119');
-                    case 3:
-                        return this.$t('message.c120');
-                    case 4:
-                        return this.$t('message.c121');
-                    case 5:
-                        return this.$t('message.c122');
-                    case 11:
-                        return this.$t('message.c123');
-                    case 90:
-                        return this.$t('message.c124');
-                    case 91:
-                        return this.$t('message.c125');
-                    case 92:
-                        return this.$t('message.c126');
-                    case 93:
-                        return this.$t('message.c127');
-                    case 94:
-                        return this.$t('message.c128');
-                    case 95:
-                        return this.$t('message.c135');
-                }
+            //选择交易类型查询
+            changeType(typeValue) {
+                this.types = typeValue.type[0];
+                this.getAccountTxList('/tx/list/', {
+                    "address": this.accountAddressValue,
+                    "type": typeValue.type[0],
+                    "pageSize": 9,
+                    "pageNumber": 1
+                });
             },
             //tab切换
             handleClick(tab, event) {
@@ -254,7 +259,11 @@
                 if (tab.name !== "first") {
                     this.activeName = "second";
                     this.walletHide = false;
-                    let params = {"address": this.accountAddressValue, "pageSize": 9, "pageNumber": 1};
+                    let params = {
+                        "address": this.accountAddressValue,
+                        "pageSize": 9,
+                        "pageNumber": 1
+                    };
                     this.getAccountTxList('/tx/list/', params);
                 } else {
                     sessionStorage.setItem('walletActiveName', tab.name);
@@ -323,7 +332,6 @@
                     });
                 }
             },
-
         },
     }
 </script>
@@ -338,6 +346,12 @@
             margin: 0;
             float: left;
             width: 485px;
+            .address-select {
+                width: 403px;
+                .sub-select-item {
+                    width: 403px;
+                }
+            }
             .el-input__suffix {
                 right: -15px;
             }

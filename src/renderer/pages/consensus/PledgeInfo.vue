@@ -8,6 +8,9 @@
             <el-table-column prop="amount" :label="$t('message.amount')" min-width="210" align='center'>
             </el-table-column>
             <el-table-column prop="status" :label="$t('message.state')"  width="100" align='center'>
+                <template slot-scope="scope">
+                    {{$t('message.type'+scope.row.status)}}
+                </template>
             </el-table-column>
             <el-table-column prop="depositTime" :label="$t('message.c49')"  width="160" align='center'>
             </el-table-column>
@@ -53,7 +56,6 @@
                             for (let i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = (response.data.list[i].amount *0.00000001).toFixed(8);
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
-                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                             }
                             this.pledgeData = response.data.list;
                         }
@@ -62,20 +64,6 @@
             //分页功能
             pledgeSize(events){
                 this.getConsensusDeposit("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {"pageNumber": events, "pageSize": "8"});
-            },
-            //查询共识状态
-            switchStatus(status) {
-                switch (status) {
-                    case 0:
-                        return this.$t("message.c13");
-                        break;
-                    case 1:
-                        return this.$t("message.c14");
-                        break;
-                    case 2:
-                        return this.$t("message.c15");
-                        break;
-                }
             },
             //查看节点详情
             handleClick(row) {

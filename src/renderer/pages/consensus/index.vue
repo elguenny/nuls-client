@@ -1,13 +1,13 @@
 <template>
-    <div class="consensus-index">
-        <div class="account-top">
+    <div class="consensus-index" v-loading="loading">
+        <div class="account-top" v-show="tabelShow">
             <label v-show="accountAddressOk">{{$t("message.indexAccountAddress")}}</label>
             <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
         </div>
         <div class="consensus-index-title">
             <label>{{$t("message.c1")}}{{$t("message.c1_1")}}：</label>{{this.allTotalDeposit*0.00000001}} NULS，<label>{{$t("message.c2")}}：</label>{{this.allAgentCount}}
         </div>
-        <div class="consensus-center">
+        <div class="consensus-center" >
             <ul>
                 <li class="li-bg">
                     <label>{{$t("message.c3")}}：</label>
@@ -38,14 +38,14 @@
 
             </ul>
         </div>
-        <div class="consensus-bottom">
+        <div class="consensus-bottom" v-show="tabelShow">
             <template>
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane :label="$t('message.c11')" name="first">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in allConsensus"
                              @click="toNodePage(item.agentAddress)">
-                            <p class="subscript" :class="item.statuss === 1  ? 'stay' : ''">
-                                {{item.status}}
+                            <p class="subscript" :class="item.status === 1  ? 'stay' : ''">
+                                {{ $t('message.status'+item.status) }}
                             </p>
                             <h3 class="overflow">{{item.agentName}}</h3>
                             <ul>
@@ -85,8 +85,8 @@
                     <el-tab-pane :label="$t('message.c12')" name="second">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
                              @click="toMyNode(item.agentAddress,index)">
-                            <p class="subscript" :class="item.statuss === 1  ? 'stay' : ''">
-                                {{item.status}}
+                            <p class="subscript" :class="item.status === 1  ? 'stay' : ''">
+                                {{ $t('message.status'+item.status) }}
                             </p>
                             <h3 class="overflow">{{item.agentName}}</h3>
                             <ul>
@@ -127,6 +127,8 @@
     export default {
         data() {
             return {
+                loading: true,
+                tabelShow: false,
                 accountAddressOk: true,
                 accountAddress: [],
                 accountAddressValue: '',
@@ -182,27 +184,8 @@
             }
             this.getAllConsensus("/consensus/agent/list", {"pageSize": "3","pageNumber":"1"});
 
-            //判断用户选择的语言
-            let language = localStorage.getItem('language');
-            setInterval(() => {
-                if (language !== localStorage.getItem('language')) {
-                    language = localStorage.getItem('language');
-                    //console.log(this.tabName);
-                    if (this.tabName === 'first') {
-                        this.getAllConsensus("/consensus/agent/list", {"pageSize": "3"});
-                    } else {
-                        this.getMyConsensus("/consensus/agent/address/" + localStorage.getItem('newAccountAddress'), {"pageSize": "3"});
-                    }
-                } else {
-                    language = localStorage.getItem('language');
-                }
-            }, 1000);
         },
         methods: {
-            clickButton: function(val){
-                // $socket is socket.io-client instance
-                //this.$socket.emit('emit_method', val);
-            },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
                 this.getConsensusAddress("/consensus/address/" + chenckAddress);
@@ -263,14 +246,14 @@
                                     response.data.list[i].creditRatio = "50%";
                                 }
                                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0,6)+"..."+(response.data.list[i].agentAddress).substr(-6);
-                                response.data.list[i].statuss = response.data.list[i].status;
-                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 if(response.data.list[i].totalDeposit > 50000000000000){
                                     response.data.list[i].totalDeposit ='100%';
                                 }else {
                                     response.data.list[i].totalDeposit = (response.data.list[i].totalDeposit / 500000000000).toString() + '%';
                                 }
                             }
+                            this.loading =false;
+                            this.tabelShow =true;
                             this.myTotalAll = response.data.total;
                             this.myConsensus = response.data.list;
                         }
@@ -301,14 +284,14 @@
                                     response.data.list[i].creditRatio = "50%";
                                 }
                                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0,6)+"..."+(response.data.list[i].agentAddress).substr(-6);
-                                response.data.list[i].statuss = response.data.list[i].status;
-                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 if(response.data.list[i].totalDeposit > 50000000000000){
                                     response.data.list[i].totalDeposit ='100%';
                                 }else {
                                     response.data.list[i].totalDeposit = (response.data.list[i].totalDeposit / 500000000000).toString() + '%';
                                 }
                             }
+                            this.loading =false;
+                            this.tabelShow =true;
                             this.totalAll = response.data.total;
                             this.allConsensus = response.data.list;
                         }
@@ -319,25 +302,17 @@
                 this.allEvents = events;
                 this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "3"});
             },
-            //查询共识状态
-            switchStatus(status) {
-                switch (status) {
-                    case 0:
-                        return this.$t("message.c13");
-                        break;
-                    case 1:
-                        return this.$t("message.c14");
-                        break;
-                    case 2:
-                        return this.$t("message.c15");
-                        break;
-                }
-            },
             //创建节点跳转
             toNewNode() {
-                this.$router.push({
-                    path: '/consensus/newNode'
-                });
+                if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
+                    this.$router.push({
+                        path: '/consensus/newNode'
+                    });
+                } else {
+                    this.$message({
+                        message: this.$t('message.c133'),
+                    });
+                }
             },
             //查看抵押详情跳转
             toPledgeInfo() {

@@ -4,7 +4,7 @@
 		<h2>{{this.agentAddressInfo.agentName}}</h2>
 		<div class="div-icon1 node-page-top">
 			<p class="subscript">
-				{{this.agentAddressInfo.status}}
+				{{ $t('message.status'+this.agentAddressInfo.status) }}
 			</p>
 			<ul>
 				<li class="li-bg overflow">
@@ -116,7 +116,6 @@
                                 response.data.creditRatio = "50%";
                             }
                             response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + "..." + (response.data.agentAddress).substr(-10);
-                            response.data.status = this.switchStatus(response.data.status);
                             response.data.totalDeposits = (response.data.totalDeposit*0.00000001).toFixed(0) +"/500000";
                             if(response.data.totalDeposit > 50000000000000){
                                 response.data.totalDeposit ='100%';
@@ -126,20 +125,6 @@
                             this.agentAddressInfo = response.data;
                         }
                     });
-            },
-            //查询共识状态
-            switchStatus(status) {
-                switch (status) {
-                    case 0:
-                        return this.$t("message.c13");
-                        break;
-                    case 1:
-                        return this.$t("message.c14");
-                        break;
-                    case 2:
-                        return this.$t("message.c15");
-                        break;
-                }
             },
             //根据账户地址获取账户余额
             getBalanceAddress(url) {

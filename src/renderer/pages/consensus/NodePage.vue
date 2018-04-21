@@ -2,9 +2,9 @@
     <div class="node-page">
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{this.nodeData.agentName}}</h2>
-        <div class="div-icon1 node-page-top">
-            <p class="subscript" :class="this.nodeData.statuss === 1  ? 'stay' : ''">
-                {{this.nodeData.status}}
+        <div class="div-icon1 node-page-top" v-loading="loading">
+            <p class="subscript" :class="this.nodeData.status === 1  ? 'stay' : ''">
+                {{ $t('message.status'+this.nodeData.status) }}
             </p>
             <ul>
                 <li class="li-bg overflow">
@@ -46,7 +46,10 @@
                 </el-form-item>
                 <div class="procedure"><label>{{$t('message.c28')}}</label><span>0.01 NULS</span></div>
                 <el-form-item size="large" class="submit">
-                    <el-button type="primary" @click="onSubmit('nodeForm')" id="nodePage">{{$t('message.confirmButtonText')}}</el-button>
+                    <el-button type="primary" @click="onSubmit('nodeForm')" id="nodePage"
+                               :disabled=this.btOk>
+                    {{$t('message.confirmButtonText')}}
+                    </el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -79,6 +82,8 @@
                 }, 100);
             };
             return {
+                loading: true,
+                btOk:this.$store.getters.getNetWorkInfo.localBestHeight !== this.$store.getters.getNetWorkInfo.netBestHeight,
                 submitId:"nodePage",
                 address: this.$route.params.address,
                 agentId:'',
@@ -100,8 +105,7 @@
             AccountAddressBar,
             Password,
         },
-        mounted() {
-            let _this = this;
+        created() {
             this.getConsensusAddress("/consensus/agent/"+this.address);
             this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'));
         },
@@ -111,7 +115,7 @@
                 this.$fetch(url)
                     .then((response) => {
                         if (response.success) {
-                            console.log(response);
+                            //console.log(response);
                             response.data.creditRatios = response.data.creditRatio;
                             if (response.data.creditRatio !== 0) {
                                 if (response.data.creditRatio > 0) {
@@ -123,8 +127,6 @@
                                 response.data.creditRatio = "50%";
                             }
                             response.data.agentAddresss = (response.data.agentAddress).substr(0,10)+"..."+(response.data.agentAddress).substr(-10);
-                            response.data.statuss = response.data.status;
-                            response.data.status = this.switchStatus(response.data.status);
                             response.data.totalDeposits = (response.data.totalDeposit*0.00000001).toFixed(0) +"/500000";
                             if(response.data.totalDeposit > 50000000000000){
                                 response.data.totalDeposit ='100%';
@@ -134,22 +136,9 @@
                             //response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
                             this.agentId = response.data.agentId;
                             this.nodeData = response.data;
+                            this.loading =false;
                         }
                     });
-            },
-            //查询共识状态
-            switchStatus(status) {
-                switch (status) {
-                    case 0:
-                        return this.$t("message.c13");
-                        break;
-                    case 1:
-                        return this.$t("message.c14");
-                        break;
-                    case 2:
-                        return this.$t("message.c15");
-                        break;
-                }
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
@@ -168,7 +157,7 @@
             },
             //选择全部金额
             allUsable(balance) {
-                if(balance === 0){
+                if(balance === "0.00000000"){
                     this.$message({
                         message: this.$t('message.creditLow'),
                         type: 'warning '
@@ -193,7 +182,7 @@
                 let param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
                 this.$post('/consensus/deposit/', param)
                     .then((response) => {
-                        console.log(param);
+                        //console.log(param);
                         if (response.success) {
                             this.$message({
                                 message: this.$t('message.passWordSuccess'),
@@ -306,6 +295,7 @@
             }
             .el-button--primary {
                 margin-top: 15px;
+                margin-right: 60px;
             }
             .el-form-item__error {
                 margin-left: 70px;

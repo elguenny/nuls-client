@@ -152,7 +152,8 @@
                 let param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + password + '"}';
                 this.$post('/consensus/agent ', param)
                     .then((response) => {
-                        //console.log(response);
+                        console.log(param);
+                        console.log(response);
                         if (response.success) {
                             this.$message({
                                 type: 'success', message: this.$t('message.passWordSuccess')
@@ -163,7 +164,7 @@
                             })
                         } else {
                             this.$message({
-                                type: 'warning', message: this.$t('message.passWordFailed') + response.data
+                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
                             });
                         }
                     })

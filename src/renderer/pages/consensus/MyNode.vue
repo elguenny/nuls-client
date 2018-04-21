@@ -3,8 +3,8 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{this.agentAddressInfo.agentName}}</h2>
         <div class="div-icon1 node-page-top">
-            <p class="subscript" :class="this.agentAddressInfo.statuss === 1  ? 'stay' : ''">
-                {{this.agentAddressInfo.status}}
+            <p class="subscript" :class="this.agentAddressInfo.status === 1  ? 'stay' : ''">
+                {{ $t('message.status'+this.agentAddressInfo.status) }}
             </p>
             <ul>
                 <li class="li-bg overflow">
@@ -40,10 +40,13 @@
                 {{$t('message.c56')}}
                 <span class="text-d cursor-p fr" @click="addNode">{{$t('message.c57')}}</span>
             </div>
-            <el-table :data="myMortgageData" style="width: 100%">
+            <el-table :data="myMortgageData">
                 <el-table-column prop="amount" :label="$t('message.c51')" min-width="100" align='center'>
                 </el-table-column>
-                <el-table-column prop="status" :label="$t('message.state')" width="70" align='center'>
+                <el-table-column :label="$t('message.state')" width="70" align='center'>
+                    <template slot-scope="scope">
+                        {{$t('message.status'+scope.row.status)}}
+                    </template>
                 </el-table-column>
                 <el-table-column prop="depositTime" :label="$t('message.c49')" min-width="85" align='center'>
                 </el-table-column>
@@ -101,6 +104,7 @@
             getAgentAddressInfo(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
+                        //console.log(response);
                         if (response.success) {
                             response.data.creditRatios = response.data.creditRatio;
                             if (response.data.creditRatio !== 0) {
@@ -113,8 +117,6 @@
                                 response.data.creditRatio = "50%";
                             }
                             response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + "..." + (response.data.agentAddress).substr(-10);
-                            response.data.statuss = response.data.status;
-                            response.data.status = this.switchStatus(response.data.status);
                             response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + "/500000";
                             if (response.data.totalDeposit > 50000000000000) {
                                 response.data.totalDeposit = '100%';
@@ -136,9 +138,9 @@
                             for (let i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].amount = (response.data.list[i].amount * 0.00000001).toFixed(8);
                                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
-                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                             }
                             this.myMortgageData = response.data.list;
+                            //console.log(this.myMortgageData);
                         }
                     });
             },
@@ -150,30 +152,22 @@
                     "pageNumber": events
                 });
             },
-            //查询共识状态
-            switchStatus(status) {
-                switch (status) {
-                    case 0:
-                        return this.$t("message.c13");
-                        break;
-                    case 1:
-                        return this.$t("message.c14");
-                        break;
-                    case 2:
-                        return this.$t("message.c15");
-                        break;
-                }
-            },
             //全部退出
             /*allOut(){
                 console.log('全部退出');
             },*/
             //追加共识
             addNode() {
-                this.$router.push({
-                    name: '/addNode',
-                    params: {agentAddress: this.agentAddressInfo.agentAddress, agentId: this.agentAddressInfo.agentId},
-                });
+                if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
+                    this.$router.push({
+                        name: '/addNode',
+                        params: {agentAddress: this.agentAddressInfo.agentAddress, agentId: this.agentAddressInfo.agentId},
+                    });
+                } else {
+                    this.$message({
+                        message: this.$t('message.c133'),
+                    });
+                }
             },
             //退出共识
             outNode(row) {

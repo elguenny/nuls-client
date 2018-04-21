@@ -11,7 +11,7 @@
                     <el-input type="text" v-model.trim="transferForm.joinAddress"></el-input>
                     <i class="cursor-p" @click="toUsersAddressList"></i>
                 </el-form-item>
-                <el-form-item :label="$t('message.transferAmount')+'：'" class="join-nos"  prop="joinNo">
+                <el-form-item :label="$t('message.transferAmount')+'：'" class="join-nos" prop="joinNo">
                     <span class="allUsable">{{$t("message.currentBalance")}}: {{usable}} NULS</span>
                     <el-input type="text" v-model.number="transferForm.joinNo" :maxlength="17"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t("message.all")}}</span>
@@ -22,14 +22,19 @@
                     <el-input type="textarea" v-model.trim="transferForm.remark" :maxlength="20"></el-input>
                 </el-form-item>
                 <el-form-item class="transfer-submit">
-                    <el-button type="primary" @click="transferSubmit('transferForm')" id="transferSubmit">{{$t("message.c114")}}</el-button>
+                    <el-button type="primary" @click="transferSubmit('transferForm')" id="transferSubmit">
+                        {{$t("message.c114")}}
+                    </el-button>
                 </el-form-item>
             </el-form>
-            <el-dialog :visible.sync="dialogTableVisible">
+            <el-dialog :visible.sync="dialogTableVisible" class="transfer-dialog">
                 <el-table :data="userAddressList" @row-dblclick="dbcheckedAddress">
-                    <el-table-column property="userAddress" :label="$t('message.tabName')" width="280" align='center'></el-table-column>
-                    <el-table-column property="userAlias" :label="$t('message.tabAlias')" width="70" align='center'></el-table-column>
-                    <el-table-column property="userHelp" :label="$t('message.remarks')"  width="110" align='center'></el-table-column>
+                    <el-table-column property="userAddress" :label="$t('message.tabName')" width="280"
+                                     align='center'></el-table-column>
+                    <el-table-column property="userAlias" :label="$t('message.tabAlias')" width="70"
+                                     align='center'></el-table-column>
+                    <el-table-column property="userHelp" :label="$t('message.remarks')" width="110"
+                                     align='center'></el-table-column>
                     <el-table-column :label="$t('message.operation')" width="100" align='center'>
                         <template slot-scope="scope">
                             <span class="cursor-p text-d" @click="checkedAddress(scope.row.userAddress)">{{$t('message.select')}}</span>
@@ -47,12 +52,13 @@
     import AccountAddressBar from '@/components/AccountAddressBar.vue';
     import Password from '@/components/PasswordBar.vue';
     import * as config from '@/config.js';
+
     export default {
         data() {
             let selectAddress = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error(this.$t('message.addressNull')));
-                }else {
+                } else {
                     if (this.transferForm.checkPass !== '') {
                         this.$refs.transferForm.validateField('joinNo');
                     }
@@ -65,13 +71,13 @@
                 }
                 setTimeout(() => {
                     //console.log(this.address !== undefined);
-                    if(this.address !== undefined){
+                    if (this.address !== undefined) {
                         if (value === this.address) {
                             callback(new Error(this.$t('message.addressOrTransfer')));
                         } else {
                             callback();
                         }
-                    }else {
+                    } else {
                         this.address = localStorage.getItem("newAccountAddress");
                         if (value === this.address) {
                             callback(new Error(this.$t('message.addressOrTransfer')));
@@ -87,17 +93,17 @@
                 }
                 setTimeout(() => {
                     //console.log(value);
-                    let re =/(^\+?|^\d?)\d*\.?\d+$/;
+                    let re = /(^\+?|^\d?)\d*\.?\d+$/;
                     let res = /^\d{1,8}(\.\d{1,8})?$/;
-                    if (!re.exec(value)){
+                    if (!re.exec(value)) {
                         callback(new Error(this.$t('message.transferNO1')));
-                    } else if ( value > this.usable-0.01) {
+                    } else if (value > this.usable - 0.01) {
                         callback(new Error(this.$t('message.transferNO2')));
-                    }else if(value < 0.01){
+                    } else if (value < 0.01) {
                         callback(new Error(this.$t('message.transferNO3')));
-                    }else if(!res.exec(value)){
+                    } else if (!res.exec(value)) {
                         callback(new Error(this.$t('message.c136')));
-                    }else {
+                    } else {
                         callback();
                     }
 
@@ -105,10 +111,10 @@
 
             };
             return {
-                submitId:"transferSubmit",
+                submitId: "transferSubmit",
                 usable: 0,
                 accountAddress: [],
-                remnant:0,
+                remnant: 0,
                 transferForm: {
                     address: localStorage.getItem('newAccountAddress'),
                     outName: '',
@@ -118,7 +124,7 @@
                     remark: ''
                 },
                 rules: {
-                    selectAddress:[
+                    selectAddress: [
                         {validator: selectAddress, trigger: 'blur'}
                     ],
                     joinAddress: [
@@ -147,29 +153,29 @@
             getBalanceAddress(url) {
                 this.$fetch(url)
                     .then((response) => {
-                        if(response.success){
-                            this.usable = config.FloatMul(response.data.usable,0.00000001);
+                        if (response.success) {
+                            this.usable = config.FloatMul(response.data.usable, 0.00000001);
                         }
                     });
             },
             //获取下拉选择地址
             chenckAccountAddress(chenckAddress) {
                 this.address = chenckAddress;
-                localStorage.setItem('newAccountAddress',this.address);
+                localStorage.setItem('newAccountAddress', this.address);
                 this.getBalanceAddress('/account/balance/' + chenckAddress);
                 this.$refs.transferForm.validateField('joinAddress');
                 this.$refs.transferForm.validateField('joinNo');
             },
             //选择全部金额
             allUsable(balance) {
-                if(balance === 0){
+                if (balance === "0.00000000") {
                     this.$message({
                         message: this.$t('message.creditLow'),
                         type: 'warning '
                     });
-                }else {
+                } else {
                     console.log(balance);
-                    this.transferForm.joinNo =  config.FloatSub(balance,0.01)
+                    this.transferForm.joinNo = config.FloatSub(balance, 0.01)
                 }
             },
             //创建usersDB
@@ -227,7 +233,7 @@
             toSubmit(password) {
                 let param = '{"address":"' + this.address
                     + '","toAddress":"' + this.transferForm.joinAddress
-                    + '","amount":"' + this.transferForm.joinNo*100000000
+                    + '","amount":"' + this.transferForm.joinNo * 100000000
                     + '","password":"' + password
                     + '","remark":"' + this.transferForm.remark + '"}';
                 this.$post('/wallet/transfer/', param)
@@ -242,7 +248,7 @@
                             this.transferForm.joinNo = '';
                             this.transferForm.remark = '';
                             this.getBalanceAddress('/account/balance/' + this.transferForm.address);
-                            sessionStorage.setItem('walletActiveName','second');
+                            sessionStorage.setItem('walletActiveName', 'second');
                             this.$router.push({
                                 name: '/wallet',
                             })
@@ -260,6 +266,7 @@
 
 <style lang="less">
     @import url("../../assets/css/style.less");
+
     .transfer {
         width: 100%;
         margin: auto;
@@ -323,47 +330,72 @@
                     width: 30%;
                 }
             }
-            .el-form{
-                .el-form-item{
+            .el-form {
+                .el-form-item {
                     margin-bottom: 0;
                     height: 70px;
-                    .el-form-item__label{
+                    .el-form-item__label {
                         line-height: 0;
                         height: 20px;
                     }
-                    .el-form-item__content{
+                    .el-form-item__content {
                         line-height: 0;
-                        .el-input{
-                            input{
+                        .el-input {
+                            input {
                                 font-size: 12px;
                             }
                         }
-                        .el-input__inner{
+                        .el-input__inner {
                             color: #FFFFFF;
                         }
-                        .el-form-item__error{
+                        .el-form-item__error {
                             padding-top: 0px;
                         }
                     }
                 }
-                .service-no{
+                .service-no {
                     height: 30px;
                     margin-top: -3px;
                 }
-                .transfer-submit{
-                    .el-form-item__content{
+                .transfer-submit {
+                    .el-form-item__content {
                         margin-top: 20px;
                     }
 
                 }
             }
-            .el-dialog__wrapper{
-                .el-dialog{
+            .transfer-dialog {
+                .el-dialog__body {
+                    .el-table {
+                        max-height: 332px;
+                        overflow-y: auto;
+                        overflow-x: hidden;
+                        &::-webkit-scrollbar-track {
+                            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+                            background-color: #0c1323;
+                            border-radius: 10px;
+                        }
+                        &::-webkit-scrollbar {
+                            width: 3px;
+                            background-color: #0c1323;
+                        }
+                        &::-webkit-scrollbar-thumb {
+                            border-radius: 10px;
+                            background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#222d3f), to(#82bd39), color-stop(.6, #222d3f))
+                        }
+                        .el-table__body-wrapper {
+                            overflow-x: hidden;
+                        }
+                    }
+                }
+            }
+            .el-dialog__wrapper {
+                .el-dialog {
                     width: 70%;
                 }
             }
-            .password-dialog{
-                .el-dialog{
+            .password-dialog {
+                .el-dialog {
                     width: 50%;
                 }
             }

@@ -98,13 +98,24 @@
             this.getNetWork();
             setTimeout(() => {
                 this.methodsMaps(this.ipObj);
-            }, 1500);
-
+            }, 1000);
+        },
+        mounted(){
             //10秒循环一次我的资产和全网共识
-            const setIntervalData = setInterval(() => {
-                this.getAccountAddress("/account/balances/");
-                this.getConsensus("/consensus");
-            }, 10000);
+            setTimeout(() => {
+                let map = $('#world-map-markers').vectorMap('get', 'mapObject');
+                const setIntervalData = setInterval(() => {
+                    this.getAccountAddress("/account/balances/");
+                    this.getConsensus("/consensus");
+                    this.getNetWork();
+                    setTimeout(() => {
+                        //console.log(this.ipObj);
+                        map.addMarkers(this.ipObj);
+                    }, 1000);
+                }, 10000);
+            }, 1000);
+
+
         },
         methods: {
             /**
@@ -278,7 +289,7 @@
                         line-height: 22px;
                         label {
                             display: block;
-                            max-width: 93px;
+                            max-width: 95px;
                             float: left;
                             margin-left: 16px;
                             text-align: left;

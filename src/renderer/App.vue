@@ -82,7 +82,6 @@
                     sessionStorage.setItem('consensusTabName', 'first');
                 }
                 else {
-                    console.log(this.javaNumber);
                     if (this.javaNumber === 0 || this.javaNumber === 6 || this.javaNumber === 10) {
                         let fileName = 'nuls';
                         config.JavaFile(fileName);

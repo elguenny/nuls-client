@@ -22,7 +22,10 @@ const winURL = process.env.NODE_ENV === 'development' ?
     `file://${__dirname}/index.html`;
 
 function createWindow() {
-    //Hide the menu of the electron form
+    /**
+     *  隐藏electron 菜单
+     *  Hide the menu of the electron form
+     */
     Menu.setApplicationMenu(null);
     /**
      * Initial window options
@@ -41,12 +44,13 @@ function createWindow() {
     });
 
     ipcMain.on('download', (evt, args) => {
-        var arr = args.split("+");
+        let arr = args.split("+");
         downloadpath = arr[0];
         folderpath = arr[1];
         evt.sender.send('tips', downloadpath);
         mainWindow.webContents.downloadURL(downloadpath);
     });
+
     app.commandLine.appendSwitch('--disable-http-cache');
     mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
         // Set the save path, making Electron not to prompt a save dialog.
@@ -80,11 +84,32 @@ function createWindow() {
         process.exit();
         app.quit();
     });
-
     mainWindow.loadURL(winURL);
 
     mainWindow.on('closed', () => {
         mainWindow = null
     })
 }
+
+function launchCore() {
+    //获取路径
+    let targetPath = "..\\..\\" + __dirname;
+    console.log(targetPath);
+    //判断操作系统
+    const platform = require('os').platform();
+    //启动java
+    if(platform ==="mac"){
+        console.log("mac");
+    }else if(platform ==="linux"){
+        console.log("linux");
+    }else if(platform ==="win32" || platform ==="win64"){
+        console.log("win32,64");
+    }else {
+        console.log("当前操作系统是"+platform);
+    }
+
+    //startProcess(targetPath)
+}
+
+/*app.on('ready', launchCore);*/
 app.on('ready', createWindow);

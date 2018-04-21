@@ -19,13 +19,13 @@ const router = new VueRouter({
 		},
 		{
             //设置钱包密码
-            path: '/setPassword',
+            path: '/users/setPassword',
             name: '/setPassword',
             component: resolve => require(['@/pages/users/SetPassword.vue'], resolve),
 		},
         {
             //修改钱包密码
-            path: '/editorPassword',
+            path: '/users/editorPassword',
             name: '/editorPassword',
             component: resolve => require(['@/pages/users/EditorPassword.vue'], resolve),
         },
@@ -59,11 +59,6 @@ const router = new VueRouter({
 			path: '/firstInto/firstInfo/importNuls',
 			name: 'NULS导入',
 			component: resolve => require(['@/pages/wallet/ImportNuls.vue'], resolve)
-		},
-		{
-			path: '/users/setPassword',
-			name: '/setPassword',
-			component: resolve => require(['@/pages/users/SetPassword.vue'], resolve)
 		},
 		{
 			path: '/users/userLog',

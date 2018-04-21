@@ -28,8 +28,8 @@
         </div>
         <div class="agency-node-bottom">
             <div class="div-icon cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentAddress)">
-                <p class="subscript" :class="item.statuss === 1  ? 'stay' : ''">
-                    {{item.status}}
+                <p class="subscript" :class="item.status === 1  ? 'stay' : ''">
+                    {{ $t('message.status'+item.status) }}
                 </p>
                 <h3>{{item.agentName}}</h3>
                 <ul>
@@ -113,12 +113,10 @@
             getAllConsensus(url, params) {
                 this.$fetch(url, params)
                     .then((response) => {
-                        console.log(params);
+                        //console.log(params);
                         if (response.success) {
                             for (let i = 0; i < response.data.list.length; i++) {
                                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + "..." + (response.data.list[i].agentAddress).substr(-6);
-                                response.data.list[i].statuss = response.data.list[i].status;
-                                response.data.list[i].status = this.switchStatus(response.data.list[i].status);
                                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%';
                                 response.data.list[i].totalDeposit = ((response.data.list[i].totalDeposit / 50000000000000).toFixed()).toString() + '%';
                             }
@@ -135,20 +133,6 @@
             //全部共识分页
             allConsensusSize(events) {
                 this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "6"});
-            },
-            //查询共识状态
-            switchStatus(status) {
-                switch (status) {
-                    case 0:
-                        return this.$t("message.c13");
-                        break;
-                    case 1:
-                        return this.$t("message.c14");
-                        break;
-                    case 2:
-                        return this.$t("message.c15");
-                        break;
-                }
             },
             showDataList() {
                 this.showData = !this.showData;
