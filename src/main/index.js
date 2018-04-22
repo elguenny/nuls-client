@@ -1,6 +1,7 @@
 import electron from 'electron'
 
 const {app,ipcMain} = require('electron')
+const process = require('process')
 const BrowserWindow = electron.BrowserWindow
 const Menu = electron.Menu
 
@@ -91,25 +92,27 @@ function createWindow () {
 
 function corePath (cmd) {
   // 获取路径
-  let targetPath = require('path').resolve(__dirname, '../../java/bin')
-  console.log(targetPath)
+  const path = require('path')
 
   //判断操作系统
+  var binPath = ""
   const platform = require('os').platform()
   //启动java
   if (platform === 'darwin' ) {
-    return targetPath + cmd + '.sh'
+    let targetPath = path.resolve(process.resourcesPath, '../java/bin')
+    binPath = path.resolve(targetPath, cmd + '.sh')
   } else if (platform === 'win32' || platform === 'win64') {
-    return targetPath + cmd + '.bat'
+    let targetPath = path.resolve(process.resourcesPath, 'java/bin')
+    binPath = path.resolve(targetPath, cmd + '.bat')
   }
+  console.log(binPath)
   console.log('Current platform: ' + platform)
+  return binPath
 }
 
 function launchCmd(cmdPath) {
   let child_process = require('child_process');
   child_process.execFile(cmdPath, null, function (error) {
-
-    sessionStorage.setItem("homeJava", "1");
     if (error !== null) {
       console.log('exec error: ' + error);
     }
@@ -120,6 +123,10 @@ function launchCmd(cmdPath) {
 }
 
 ipcMain.on('CoreLauncher',function (event, arg) {
+  if (process.env.NODE_ENV === 'development') {
+    return
+  }
+
   let cmdPath = corePath(arg)
   launchCmd(cmdPath)
 })
