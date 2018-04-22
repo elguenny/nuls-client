@@ -42,6 +42,7 @@
     import Top from './components/TopBar.vue';
     import Bottom from './components/BottomBar.vue';
     import * as config from '@/config.js';
+    const ipc = require('electron').ipcRenderer;
 
     export default {
         name: 'app',
@@ -84,14 +85,13 @@
                 else {
                     if (this.javaNumber === 0 || this.javaNumber === 6 || this.javaNumber === 10) {
                         let fileName = 'nuls';
-                        config.JavaFile(fileName);
+                        ipc.send('CoreLauncher','nuls');
                     }else if(this.javaNumber === 15){
                         this.$alert(this.$t('message.c137'), this.$t('message.c138'), {
                             confirmButtonText: this.$t('message.confirmButtonText'),
                             showClose:false,
                             callback: action => {
-                                let fileName = 'stop';
-                                config.JavaFile(fileName);
+                              ipc.send('CoreLauncher','stop');
                                 setTimeout(() => {
                                     const ipc = require('electron').ipcRenderer;
                                     ipc.send('window-close');

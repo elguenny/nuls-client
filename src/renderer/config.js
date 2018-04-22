@@ -63,38 +63,4 @@ export function FloatMul(arg1, arg2) {
     return (Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m)).toFixed(8);
 }
 
-/**
- * 打开或关闭java程序
- * Open or close the Java program
- */
-export function JavaFile(fileName) {
-    //获取路径
-    let _path = process.execPath.substr(0, process.execPath.length - 14);
-    //let _path = process.execPath.substr(0, 8);
-    let _name = ".bat";
-    //判断操作系统
-    if (navigator.userAgent.indexOf("Window") > 0) {
-        console.log("Windows");
-    } else if (navigator.userAgent.indexOf("Mac OS X") > 0) {
-        console.log("Mac");
-        _name = ".sh"
-        //javaBat("../"+_path,"sh");
-    } else if (navigator.userAgent.indexOf("Linux") > 0) {
-        console.log("Linux");
-    } else {
-        console.log("NUll");
-    }
-    //执行java文件
-    let child_process = require('child_process');
-    child_process.execFile(_path + 'java\\bin\\' + fileName + _name, null, {cwd: _path + 'java\\bin\\'}, function (error) {
-        //console.log(_path + 'java\\bin\\' + fileName + _name);
-        sessionStorage.setItem("homeJava", "1");
-        if (error !== null) {
-            console.log('exec error: ' + error);
-        }
-        else {
-            console.log('Execute the java file');
-        }
-    });
-}
 
