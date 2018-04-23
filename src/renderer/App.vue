@@ -39,102 +39,102 @@
     </div>
 </template>
 <script>
-    import Top from './components/TopBar.vue';
-    import Bottom from './components/BottomBar.vue';
-    import * as config from '@/config.js';
+  import Top from './components/TopBar.vue'
+  import Bottom from './components/BottomBar.vue'
+  import * as config from '@/config.js'
 
-    export default {
-        name: 'app',
-        data() {
-            return {
-                //全局加载
-                loadingHome: true,
-                bottomOk: false,
-                selectedValueVisible: false,
-                languageValue: 'English',
-                showLanguageData: false,
-                languageList: [
-                    {languageName: 'English', languageKey: 'en'},
-                    {languageName: '简体中文', languageKey: 'cn'},
-                ],
-                javaNumber: 0,
-            }
-        },
-        components: {
-            Top,
-            Bottom,
-        },
-        created() {
-            let appSet = setInterval(() => {
-                this.getBottromInfo();
-                //判断是否连接到后台程序
-                if (sessionStorage.getItem('homeJava') === '1') {
-                    //用户是否选择语言
-                    if (localStorage.hasOwnProperty("language")) {
-                        this.loadingHome = false;
-                        this.bottomOk = true;
-                        clearInterval(appSet);
-                    } else {
-                        this.selectedValueVisible = true;
-                        clearInterval(appSet);
-                    }
-                    sessionStorage.setItem('walletActiveName', 'first');
-                    sessionStorage.setItem('consensusTabName', 'first');
-                }
-                else {
-                    if (this.javaNumber === 0 || this.javaNumber === 6 || this.javaNumber === 10) {
-                        let fileName = 'nuls';
-                        config.JavaFile(fileName);
-                    }else if(this.javaNumber === 15){
-                        this.$alert(this.$t('message.c137'), this.$t('message.c138'), {
-                            confirmButtonText: this.$t('message.confirmButtonText'),
-                            showClose:false,
-                            callback: action => {
-                                let fileName = 'stop';
-                                config.JavaFile(fileName);
-                                setTimeout(() => {
-                                    const ipc = require('electron').ipcRenderer;
-                                    ipc.send('window-close');
-                                }, 500);
-                            }
-                        });
-                        clearInterval(appSet);
-                    }
-                }
-            }, 3000);
-        },
-        methods: {
-            showLanguageList() {
-                this.showLanguageData = !this.showLanguageData;
-            },
-            selectedValue(languageName, languageKey) {
-                if (languageKey !== "cn") {
-                    languageKey = 'en'
-                }
-                this.languageValue = languageName;
-                this.$i18n.locale = languageKey;
-                this.loadingHome = false;
-                this.bottomOk = true;
-                localStorage.setItem("language", languageKey);
-                this.selectedValueVisible = false;
-            },
-            //获取版本信息
-            getBottromInfo() {
-                this.$fetch('/sys/version')
-                    .then((response) => {
-                        if (response.success) {
-                            //console.log(response);
-                            this.$store.commit("setVersionInfo", response.data);
-                        }
-                        sessionStorage.setItem("homeJava", "1")
-                    }).catch((reject) => {
-                    this.javaNumber++;
-                    console.log(reject);
-                    sessionStorage.setItem("homeJava", "0")
-                });
-            },
+  const ipc = require('electron').ipcRenderer
+
+  export default {
+    name: 'app',
+    data () {
+      return {
+        //全局加载
+        loadingHome: true,
+        bottomOk: false,
+        selectedValueVisible: false,
+        languageValue: 'English',
+        showLanguageData: false,
+        languageList: [
+          {languageName: 'English', languageKey: 'en'},
+          {languageName: '简体中文', languageKey: 'cn'},
+        ],
+        retryCount: 0,
+      }
+    },
+    components: {
+      Top,
+      Bottom,
+    },
+    created () {
+      let appSet = setInterval(() => {
+        this.getBottromInfo()
+        //判断是否连接到后台程序
+        if (sessionStorage.getItem('getVersionSuccess') === '1') {
+          //用户是否选择语言
+          if (localStorage.hasOwnProperty('language')) {
+            this.loadingHome = false
+            this.bottomOk = true
+            clearInterval(appSet)
+          } else {
+            this.selectedValueVisible = true
+            clearInterval(appSet)
+          }
+          sessionStorage.setItem('walletActiveName', 'first')
+          sessionStorage.setItem('consensusTabName', 'first')
         }
+        else {
+          if (this.retryCount === 0 || this.retryCount === 6 || this.retryCount === 10) {
+            let fileName = 'nuls'
+            ipc.send('CoreLauncher', 'nuls')
+          } else if (this.retryCount === 15) {
+            this.$alert(this.$t('message.c137'), this.$t('message.c138'), {
+              confirmButtonText: this.$t('message.confirmButtonText'),
+              showClose: false,
+              callback: action => {
+                ipc.send('CoreLauncher', 'stop')
+                setTimeout(() => {
+                  const ipc = require('electron').ipcRenderer
+                  ipc.send('window-close')
+                }, 500)
+              }
+            })
+            clearInterval(appSet)
+          }
+        }
+      }, 3000)
+    },
+    methods: {
+      showLanguageList () {
+        this.showLanguageData = !this.showLanguageData
+      },
+      selectedValue (languageName, languageKey) {
+        if (languageKey !== 'cn') {
+          languageKey = 'en'
+        }
+        this.languageValue = languageName
+        this.$i18n.locale = languageKey
+        this.loadingHome = false
+        this.bottomOk = true
+        localStorage.setItem('language', languageKey)
+        this.selectedValueVisible = false
+      },
+      //获取版本信息
+      getBottromInfo () {
+        this.$fetch('/sys/version')
+          .then((response) => {
+            if (response.success) {
+              this.$store.commit('setVersionInfo', response.data)
+            }
+            sessionStorage.setItem('getVersionSuccess', '1')
+          }).catch((reject) => {
+          this.retryCount++
+          console.log(reject)
+          sessionStorage.setItem('getVersionSuccess', '0')
+        })
+      },
     }
+  }
 </script>
 <style lang="less">
     .el-dialog__title {
