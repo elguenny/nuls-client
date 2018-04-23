@@ -41,9 +41,8 @@
 <script>
   import Top from './components/TopBar.vue'
   import Bottom from './components/BottomBar.vue'
-  import * as config from '@/config.js'
 
-  const ipc = require('electron').ipcRenderer
+  const ipc = require('electron').ipcRenderer;
 
   export default {
     name: 'app',
@@ -68,37 +67,35 @@
     },
     created () {
       let appSet = setInterval(() => {
-        this.getBottromInfo()
+        this.getBottromInfo();
         //判断是否连接到后台程序
         if (sessionStorage.getItem('getVersionSuccess') === '1') {
           //用户是否选择语言
           if (localStorage.hasOwnProperty('language')) {
-            this.loadingHome = false
-            this.bottomOk = true
+            this.loadingHome = false;
+            this.bottomOk = true;
             clearInterval(appSet)
           } else {
-            this.selectedValueVisible = true
+            this.selectedValueVisible = true;
             clearInterval(appSet)
           }
-          sessionStorage.setItem('walletActiveName', 'first')
+          sessionStorage.setItem('walletActiveName', 'first');
           sessionStorage.setItem('consensusTabName', 'first')
         }
         else {
           if (this.retryCount === 0 || this.retryCount === 6 || this.retryCount === 10) {
-            let fileName = 'nuls'
-            ipc.send('CoreLauncher', 'nuls')
+              ipc.send('CoreLauncher', 'nuls')
           } else if (this.retryCount === 15) {
             this.$alert(this.$t('message.c137'), this.$t('message.c138'), {
               confirmButtonText: this.$t('message.confirmButtonText'),
               showClose: false,
               callback: action => {
-                ipc.send('CoreLauncher', 'stop')
+                ipc.send('CoreLauncher', 'stop');
                 setTimeout(() => {
-                  const ipc = require('electron').ipcRenderer
                   ipc.send('window-close')
                 }, 500)
               }
-            })
+            });
             clearInterval(appSet)
           }
         }
@@ -112,11 +109,11 @@
         if (languageKey !== 'cn') {
           languageKey = 'en'
         }
-        this.languageValue = languageName
-        this.$i18n.locale = languageKey
-        this.loadingHome = false
-        this.bottomOk = true
-        localStorage.setItem('language', languageKey)
+        this.languageValue = languageName;
+        this.$i18n.locale = languageKey;
+        this.loadingHome = false;
+        this.bottomOk = true;
+        localStorage.setItem('language', languageKey);
         this.selectedValueVisible = false
       },
       //获取版本信息
@@ -128,8 +125,8 @@
             }
             sessionStorage.setItem('getVersionSuccess', '1')
           }).catch((reject) => {
-          this.retryCount++
-          console.log(reject)
+          this.retryCount++;
+          console.log(reject);
           sessionStorage.setItem('getVersionSuccess', '0')
         })
       },

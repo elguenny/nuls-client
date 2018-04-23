@@ -400,7 +400,7 @@
         }
         .wallet-hide {
             right: 7%;
-            top: 133px;
+            top: 120px;
             position: fixed;
             z-index: 800;
             .icon {

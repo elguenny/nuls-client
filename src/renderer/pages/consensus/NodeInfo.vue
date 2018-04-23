@@ -7,7 +7,7 @@
 				<label>{{$t('message.c16')}}</label><span>{{this.myNodeInfo.packingAddress}}</span>
 			</li>
 			<li>
-				<label>{{$t('message.state')}}</label><span>{{this.myNodeInfo.status}}</span>
+				<label>{{$t('message.state')}}</label><span> {{ $t('message.status'+this.myNodeInfo.status) }}</span>
 			</li>
 			<li>
 				<label>{{$t('message.c7')}}</label><span>{{this.myNodeInfo.reward*0.00000001 }} NULS</span>
@@ -31,7 +31,7 @@
 				<label>{{$t('message.c27')}}</label><span>{{this.myNodeInfo.introduction}}！</span>
 			</li>
 		</ul>
-		<el-button @click="closedNode" type="button" class="bottom-btn" v-show="closedNode=false">{{$t('message.c62')}}</el-button>
+		<el-button @click="closedNode" type="button" class="bottom-btn">{{$t('message.c62')}}</el-button>
 		<Password ref="password" @toSubmit="toSubmit"></Password>
 	</div>
 </template>
@@ -58,28 +58,12 @@
             getMyNodeInfo(url){
                 this.$fetch(url)
                     .then((response) => {
-                        console.log(response);
+                        //console.log(response);
                         if(response.success){
-                            response.data.statuss = response.data.status;
-                            response.data.status = this.switchStatus(response.data.status);
                             this.myNodeInfo = response.data;
 						}
                     });
 			},
-            //查询共识状态
-            switchStatus(status) {
-                switch (status) {
-                    case 0:
-                        return this.$t("message.c13");
-                        break;
-                    case 1:
-                        return this.$t("message.c14");
-                        break;
-                    case 2:
-                        return this.$t("message.c15");
-                        break;
-                }
-            },
 			//关闭我创建的节点信息
 			closedNode() {
                 this.$confirm(this.$t('message.c98')+this.myNodeInfo.agentName+this.$t('message.c99')+this.$t('message.miningFee'), this.$t('message.c86'), {

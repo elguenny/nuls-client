@@ -175,10 +175,9 @@
             },
             //关闭窗体
             toClose() {
-                let fileName = 'stop';
-                config.JavaFile(fileName);
+                let ipc = require('electron').ipcRenderer;
+                ipc.send('CoreLauncher', 'stop');
                 setTimeout(() => {
-                    let ipc = require('electron').ipcRenderer;
                     ipc.send('window-close');
                 }, 600);
             }

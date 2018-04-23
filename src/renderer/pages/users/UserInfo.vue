@@ -68,7 +68,7 @@
                 this.$fetch(url, params)
                     .then((response) => {
                         if (response.success) {
-                            console.log(response);
+                            //console.log(response);
                             this.totalAll = response.data.total;
                             if (response.data.list.length === 0) {
                                 localStorage.setItem('fastUser', '0');
@@ -122,6 +122,7 @@
                     let params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}';
                     this.outUserAddress('/wallet/remove/', params)
                 } else {
+                  localStorage.setItem("userPass",password);
                     this.$router.push({
                         name: '/newAccount',
                         params: {newOk: false, address: this.setAsAddress},

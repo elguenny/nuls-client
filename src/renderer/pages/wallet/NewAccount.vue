@@ -2,14 +2,15 @@
     <div class="new-account">
         <Back :backTitle="this.$t('message.accountManagement')" v-show="newOks"></Back>
         <div class="new-account-top">
-            <h1 v-show="newOk" style="text-align: center"> {{$t("message.newAccountTitle")}}</h1>
+            <h1 v-show="newOk" style="text-align: center"> {{$t('message.newAccountTitle')}}</h1>
             <h2>
                 {{$t('message.newAccountAddress')}}：{{ this.newAccountAddress }}
             </h2>
             <div class="new-account-key">
                 <h3 class="fl">
-                    {{$t("message.newAccountKey")}}：
-                    <input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly" style="margin-left: -5px">
+                    {{$t('message.newAccountKey')}}：
+                    <input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly"
+                           style="margin-left: -5px">
                 </h3>
                 <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
                 <i class="" @click="keyCode"></i>
@@ -18,254 +19,219 @@
         </div>
         <ul>
             <li @click="backupsKey">
-                <span>{{$t("message.newAccountBackupsKey")}}</span>
-                <label>{{$t("message.newAccountBackupsKeyInfo")}}</label>
+                <span>{{$t('message.newAccountBackupsKey')}}</span>
+                <label>{{$t('message.newAccountBackupsKeyInfo')}}</label>
             </li>
-           <!-- <li @click="backupsCode">
-                <span>{{$t("message.newAccountBackupsCode")}}</span>
-                <label>{{$t("message.newAccountBackupsCodeInfo")}}</label>
-            </li>-->
+            <!-- <li @click="backupsCode">
+                 <span>{{$t("message.newAccountBackupsCode")}}</span>
+                 <label>{{$t("message.newAccountBackupsCodeInfo")}}</label>
+             </li>-->
         </ul>
         <div class="cl new-bt">
-            <el-button type="primary" class="new-submit" @click="newSubmit()">{{$t("message.newAccountSubmit")}}
+            <el-button type="primary" class="new-submit" @click="newSubmit()">{{$t('message.newAccountSubmit')}}
             </el-button>
             <el-button type="primary" class="new-reset" @click="newReset()" v-show="newOk">
-                {{$t("message.newAccountReset")}}
+                {{$t('message.newAccountReset')}}
             </el-button>
         </div>
     </div>
 </template>
 
 <script>
-    import Back from '@/components/BackBar.vue';
-    import CodeBar from '@/components/CodeBar.vue'
-    import {jquery} from '@/assets/js/jquery.min.js'
-    import {jvectormap} from '@/assets/js/jquery.qrcode.min.js'
+  import Back from '@/components/BackBar.vue'
+  import CodeBar from '@/components/CodeBar.vue'
+  import { jquery } from '@/assets/js/jquery.min.js'
+  import { jvectormap } from '@/assets/js/jquery.qrcode.min.js'
 
-    export default {
-        data() {
-            return {
-                keyShow: false,
-                keyInfo: '',
-                newAccountAddress: this.$route.params.address === "" ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
-                codeShowOk: false,
-                newOk: this.$route.params.newOk,
-                newOks: this.$route.params.newOk ? false : true,
+  export default {
+    data () {
+      return {
+        keyShow: false,
+        keyInfo: '',
+        newAccountAddress: this.$route.params.address === '' ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
+        codeShowOk: false,
+        newOk: this.$route.params.newOk,
+        newOks: this.$route.params.newOk ? false : true,
+      }
+    },
+    components: {
+      Back,
+      CodeBar
+    },
+    mounted () {
+      let _this = this
+      let params = '{"address":"' + this.newAccountAddress + '","password":"' + localStorage.getItem('userPass') + '"}'
+      this.getPrikey('/account/prikey', params)
+    },
+    methods: {
+      //获取私钥
+      getPrikey (url, params) {
+        this.$post(url, params)
+          .then((response) => {
+            if (response.success) {
+              this.keyInfo = response.data
+              this.passwordVisible = false
+            } else {
+              this.passwordVisible = true
+              this.passwordForm.password = ''
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
             }
-        },
-        components: {
-            Back,
-            CodeBar
-        },
-        mounted() {
-            let _this = this;
-            let params = '{"address":"' + this.newAccountAddress + '","password":"' + localStorage.getItem("userPass") + '"}';
-            this.getPrikey('/account/prikey', params);
-        },
-        methods: {
-            //获取私钥
-            getPrikey(url,params) {
-                this.$post(url, params)
-                    .then((response) => {
-                        if (response.success) {
-                            this.keyInfo = response.data;
-                            this.passwordVisible = false
-                        } else {
-                            this.passwordVisible = true;
-                            this.passwordForm.password = '';
-                            this.$message({
-                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                            });
-                        }
-                    })
+          })
 
-            },
-            //二维码显示隐藏
-            keyCode() {
-                this.$refs.codeBar.codeMaker(this.keyInfo);
-                this.codeShowOk = !this.codeShowOk;
-            },
-            codeShowOks() {
-                this.codeShowOk = false;
-            },
-            /** Backups Key
-             * @method backupsKey
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            backupsKey() {
-                let path = require('path');
-                let _path = path.join(__dirname, '../../../../' + this.newAccountAddress + '_privateKey.txt');
-                //var _path ="D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.txt";
-                let fs = require('fs');
-                fs.readFile(_path, 'utf8', function (err, data) {
-                    if (err) return console.log(err);
-                });
+      },
+      //二维码显示隐藏
+      keyCode () {
+        this.$refs.codeBar.codeMaker(this.keyInfo)
+        this.codeShowOk = !this.codeShowOk
+      },
+      codeShowOks () {
+        this.codeShowOk = false
+      },
 
-                fs.writeFile(_path, this.keyInfo, function (err) {
-                    if (!err)
-                        console.log("写入成功！" + _path)
-                });
-                /*var downloadFileAddress = "D:/work/nuls-client/pubKey.txt";*/
-                const {dialog} = require('electron').remote;
-                const {ipcRenderer} = require('electron');
-                ipcRenderer.on('tips', (event, person) => {
-                });
-                dialog.showOpenDialog({
-                    defaultPath: '../Desktop',
-                    properties: [
-                        'openDirectory',
-                    ],
-                    filters: [
-                        {name: 'All', extensions: ['*']},
-                    ]
-                }, function (res) {
-                    if (res[0] !== "") {
-                        ipcRenderer.send('download', _path + "+" + res[0]);
-                        setTimeout(() => {
-                            fs.unlink(_path, function (err) {
-                                if (err) return console.log(err);
-                                console.log('文件删除成功');
-                            });
-                        }, 6000);
-                        alert(res);
-                    } else {
-                        alert(this.$t('message.c109'));
-                    }
-                })
-            },
-            /** Backups Code
-             * @method backupsCode
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            backupsCode() {
-                $('.qrcode').qrcode({
-                    render: "canvas",
-                    width: 256,
-                    height: 256,
-                    text: this.keyInfo,
-                    typeNumber: -1,
-                    correctLevel: 2,
-                    background: "#ffffff",
-                    foreground: "#000000"
-                });
-                this.exportCanvasAsPNG($(".qrcode").find("canvas")[0], this.newAccountAddress + "_privateKey.png");
-            },
-            /** Export Canvas As PNG
-             * @method exportCanvasAsPNG
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            exportCanvasAsPNG(canvas, fileName) {
-                const {dialog} = require('electron').remote;
-                const {ipcRenderer} = require('electron');
-                ipcRenderer.on('tips', (event, person) => {
-                });
-                dialog.showOpenDialog({
-                    defaultPath: '../Desktop',
-                    properties: [
-                        'openDirectory',
-                    ],
-                    filters: [
-                        {name: 'All', extensions: ['*']},
-                    ]
-                }, function (res) {
-                    if (res[0] !== "") {
-                        var MIME_TYPE = "image/png";
-                        var dlLink = document.createElement('a');
-                        dlLink.download = fileName;
-                        dlLink.href = canvas.toDataURL("image/png");
-                        //var fs = require('fs');
-                        //fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
-                        let path = require('path');
-                        let _path = path.join(__dirname, process.execPath.substr(0, process.execPath.length - 14) + this.newAccountAddress + '_privateKey.png');
-                        //var _path = "D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.png";
-                        ipcRenderer.send('download', _path + "+" + res[0]);
-                        dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
-                        document.body.appendChild(dlLink);
-                        dlLink.click();
-                        document.body.removeChild(dlLink);
-                        $('.qrcode').html("");
-                        alert(res);
-                    } else {
-                        alert(this.$t('message.c109'));
-                    }
-                })
-            },
+      /**
+       * 备份私钥
+       * Backups Key
+       * @method backupsKey
+       **/
+      backupsKey () {
+        let path = require('path')
+        let _path = path.join(__dirname, '../../../../' + this.newAccountAddress + '_privateKey.txt')
+        //var _path ="D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.txt";
+        let fs = require('fs')
+        fs.readFile(_path, 'utf8', function (err, data) {
+          if (err) return console.log(err)
+        })
 
-            /** Backup File
-             * @method backupFile
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            backupFile(downloadAddress) {
-                const {dialog} = require('electron').remote;
-                const {ipcRenderer} = require('electron');
-                ipcRenderer.on('tips', (event, person) => {
-                });
-                dialog.showOpenDialog({
-                    defaultPath: '../Desktop',
-                    properties: [
-                        'openDirectory',
-                    ],
-                    filters: [
-                        {name: 'All', extensions: ['*']},
-                    ]
-                }, function (res) {
-                    if (res[0] !== "") {
-                        ipcRenderer.send('download', downloadAddress + "+" + res[0]);
-                        /*var fs = require('fs');
-                        fs.unlink(downloadAddress, function (err) {
-                                 if (err) return console.log(err);
-                                 console.log('文件删除成功');
-                             });*/
-                        alert(res);
-                    } else {
-                        alert(this.$t('message.c109'));
-                    }
-                })
-            },
-            /** New Submit
-             * @method newSubmit
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            newSubmit() {
-                this.$confirm(this.$t('message.c110'), this.$t('message.c86'), {
-                    confirmButtonText: this.$t('message.c111'),
-                    cancelButtonText: this.$t('message.c112'),
-                }).then(() => {
-                    if (localStorage.getItem('fastUser') === "0") {
-                        this.$router.push({
-                            path: '/wallet'
-                        })
-                    } else {
-                        this.$router.push({
-                            path: '/wallet/users/userInfo'
-                        })
-                    }
-                });
+        fs.writeFile(_path, this.keyInfo, function (err) {
+          if (!err)
+            console.log('写入成功！' + _path)
+        })
+        //var downloadFileAddress = "D:/work/nuls-client/pubKey.txt";
+        const {dialog} = require('electron').remote
+        const {ipcRenderer} = require('electron')
+        ipcRenderer.on('tips', (event, person) => {
+        })
+        dialog.showOpenDialog({
+          defaultPath: '../Desktop',
+          properties: [
+            'openDirectory',
+          ],
+          filters: [
+            {name: 'All', extensions: ['*']},
+          ]
+        }, function (res) {
+          if (res[0] !== '') {
+            ipcRenderer.send('download', _path + '+' + res[0])
+            setTimeout(() => {
+              fs.unlink(_path, function (err) {
+                if (err) return console.log(err)
+                console.log('文件删除成功')
+              })
+            }, 6000)
+            alert(res)
+          } else {
+            alert(this.$t('message.c109'))
+          }
+        })
+      },
 
-            },
-            /** New Reset
-             * @method newReset
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            newReset() {
-                this.$router.push({
-                    path: '/wallet'
-                })
-            }
-        }
+      /**
+       * 备份二维码
+       * Backups Code
+       * @method backupsCode
+       **/
+      backupsCode () {
+        $('.qrcode').qrcode({
+          render: 'canvas',
+          width: 256,
+          height: 256,
+          text: this.keyInfo,
+          typeNumber: -1,
+          correctLevel: 2,
+          background: '#ffffff',
+          foreground: '#000000'
+        })
+        this.exportCanvasAsPNG($('.qrcode').find('canvas')[0], this.newAccountAddress + '_privateKey.png')
+      },
+
+      /**
+       * 二维码保存到本地
+       * Export Canvas As PNG
+       * @method exportCanvasAsPNG
+       **/
+      exportCanvasAsPNG (canvas, fileName) {
+        const {dialog} = require('electron').remote
+        const {ipcRenderer} = require('electron')
+        ipcRenderer.on('tips', (event, person) => {
+        })
+        dialog.showOpenDialog({
+          defaultPath: '../Desktop',
+          properties: [
+            'openDirectory',
+          ],
+          filters: [
+            {name: 'All', extensions: ['*']},
+          ]
+        }, function (res) {
+          if (res[0] !== '') {
+            var MIME_TYPE = 'image/png'
+            var dlLink = document.createElement('a')
+            dlLink.download = fileName
+            dlLink.href = canvas.toDataURL('image/png')
+            //var fs = require('fs');
+            //fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
+            let path = require('path')
+            let _path = path.join(__dirname, process.execPath.substr(0, process.execPath.length - 14) + this.newAccountAddress + '_privateKey.png')
+            //var _path = "D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.png";
+            ipcRenderer.send('download', _path + '+' + res[0])
+            dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':')
+            document.body.appendChild(dlLink)
+            dlLink.click()
+            document.body.removeChild(dlLink)
+            $('.qrcode').html('')
+            alert(res)
+          } else {
+            alert(this.$t('message.c109'))
+          }
+        })
+      },
+
+      /**
+       * 完成备份提示跳转
+       * New Submit
+       * @method newSubmit
+       **/
+      newSubmit () {
+        this.$confirm(this.$t('message.c110'), this.$t('message.c86'), {
+          confirmButtonText: this.$t('message.c111'),
+          cancelButtonText: this.$t('message.c112'),
+        }).then(() => {
+          if (localStorage.getItem('fastUser') === '0') {
+            this.$router.push({
+              path: '/wallet'
+            })
+          } else {
+            this.$router.push({
+              path: '/wallet/users/userInfo'
+            })
+          }
+        })
+
+      },
+      /**
+       * 不备份跳转
+       * New Reset
+       * @method newReset
+       **/
+      newReset () {
+        this.$router.push({
+          path: '/wallet'
+        })
+      }
     }
+  }
 </script>
 
 <style lang="less">
