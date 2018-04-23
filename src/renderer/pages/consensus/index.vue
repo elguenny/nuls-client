@@ -127,7 +127,7 @@
     export default {
         data() {
             return {
-                loading: true,
+                loading: false,
                 tabelShow: false,
                 accountAddressOk: true,
                 accountAddress: [],

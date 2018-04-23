@@ -300,15 +300,16 @@
                     }
                 }
                 .nav-all {
-                    .bar-bg {
-                        margin-top: 13px;
-                    }
+
                 }
                 .nav-all,
                 .nav-usable,
                 .nav-lock {
                     font-size: 12px;
                     line-height: 1.5rem;
+                    .bar-bg {
+                        margin-top: 13px;
+                    }
                     label {
                         margin-left: 16px;
                         max-width: 60px;

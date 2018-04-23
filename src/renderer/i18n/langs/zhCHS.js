@@ -48,9 +48,9 @@ const cn = {
         set: '设置',
         oldPassWord: '旧密码',
         setPassWord: '设置密码',
-        walletPassWord: '钱包密码（8-20位字符,需包含字母和数字）：',
+        walletPassWord: '钱包密码（8-20位字符,需包含字母和数字）',
         walletPassWord1:'8-20位字符,需包含字母和数字',
-        affirmWalletPassWord: '确认钱包密码：',
+        affirmWalletPassWord: '确认钱包密码',
         passWordHint: '密码提示(可选)',
         passWordInfo: '请认真保存当前钱包密码，若钱包密码丢失，很可能导致您的资产丢失！',
         passWordHintEmpty: '密码提示不能为空!',
@@ -239,7 +239,7 @@ const cn = {
         c881:'最新版本:V',
         c89:'版本更新',
         //editorPassword
-        c90:'新密码（8-16位字符，需包含大小写字母和数字）',
+        c90:'新密码（8-20位字符，需包含写字母和数字）',
         c91:'确认密码',
         c92:'请输入正确的旧密码',
         //userAddressList
