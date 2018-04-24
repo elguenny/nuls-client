@@ -15,8 +15,6 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow
-let folderpath;
-let downloadpath;
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
@@ -30,15 +28,15 @@ function createWindow () {
    */
   mainWindow = new BrowserWindow({
     height: 560,
-    width: 1800,
+    width: 800,
     useContentSize: true,
     webPreferences: {webSecurity: false},
     frame: false,
     //Set minimum width height.
     minWidth: 800,
     minHeight: 560,
-    /*maxWidth: 800,
-    maxHeight: 560,*/
+    maxWidth: 800,
+    maxHeight: 560,
   })
 
   /**
@@ -64,17 +62,17 @@ function createWindow () {
    *File download
    */
   ipcMain.on('download', (evt, args) => {
-    let arr = args.split("+");
-    downloadpath = arr[0];
-    folderpath = arr[1];
-    evt.sender.send('tips', downloadpath);
-    mainWindow.webContents.downloadURL(downloadpath);
-  });
+    let arr = args.split('+')
+    downloadpath = arr[0]
+    folderpath = arr[1]
+    evt.sender.send('tips', downloadpath)
+    mainWindow.webContents.downloadURL(downloadpath)
+  })
 
-  app.commandLine.appendSwitch('--disable-http-cache');
+  app.commandLine.appendSwitch('--disable-http-cache')
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
     // Set the save path, making Electron not to prompt a save dialog.
-    item.setSavePath(folderpath + `\\${item.getFilename()}`);
+    item.setSavePath(folderpath + `\\${item.getFilename()}`)
     item.on('updated', (event, state) => {
       if (state === 'interrupted') {
         console.log('Download is interrupted but can be resumed')
@@ -85,7 +83,7 @@ function createWindow () {
           console.log(`Received bytes: ${item.getReceivedBytes()}`)
         }
       }
-    });
+    })
     item.once('done', (event, state) => {
       if (state === 'completed') {
         console.log('Download successfully')
@@ -93,8 +91,7 @@ function createWindow () {
         console.log(`Download failed: ${state}`)
       }
     })
-  });
-
+  })
 
   mainWindow.loadURL(winURL)
 
@@ -115,7 +112,7 @@ function corePath (cmd) {
     paths.targetPath = path.resolve(process.resourcesPath, '../java/bin')
     paths.binPath = path.resolve(paths.targetPath, cmd + '.sh')
   } else if (platform === 'win32' || platform === 'win64') {
-     paths.targetPath = path.resolve(process.execPath, '../../../../java/bin')
+    paths.targetPath = path.resolve(process.execPath, '../../../../java/bin')
     //paths.targetPath = path.join(process.execPath, './../java/bin')
     paths.binPath = path.resolve(paths.targetPath, cmd + '.bat')
   }
@@ -155,7 +152,7 @@ ipcMain.on('CoreLauncher', function (event, arg) {
 
 /**
  * 只能开启一个electron 进程
- *Only one electron process can be opened
+ * Only one electron process can be opened
  * @type {boolean}
  */
 const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
@@ -164,8 +161,17 @@ const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
     mainWindow.focus()
   }
 })
+
 if (shouldQuit) {
   app.quit()
 }
+
+app.on('quit', (event,exitCode) => {
+  if (process.env.NODE_ENV === 'development') {
+    return
+  }
+  let cmdPath = corePath('stop')
+  launchCmd(cmdPath)
+})
 
 app.on('ready', createWindow)
