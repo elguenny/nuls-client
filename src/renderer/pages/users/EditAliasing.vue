@@ -27,94 +27,94 @@
 </template>
 
 <script>
-    import Back from '@/components/BackBar.vue';
-    import Password from '@/components/PasswordBar.vue';
+  import Back from '@/components/BackBar.vue'
+  import Password from '@/components/PasswordBar.vue'
 
-    export default {
-        data() {
-            var aliasing = (rule, value, callback) => {
-                if (this.usable > 1.01) {
-                    if (value === '') {
-                        callback(new Error(this.$t('message.c104')));
-                    } else if (value.length > 8) {
-                        callback(new Error(this.$t('message.c106')));
-                    } else {
-                        callback();
-                    }
-                } else {
-                    callback(new Error(this.$t('message.c107')));
-                }
-            };
-            return {
-                address: this.$route.params.address,
-                usable: 0,
-                aliasForm: {
-                    alias: '',
-                },
-                aliasRules: {
-                    alias: [
-                        {validator: aliasing, trigger: 'blur'}
-                    ]
-                },
-            }
-        },
-        components: {
-            Back,
-            Password,
-        },
-        mounted() {
-            let _this = this;
-            this.getBalanceAddress('/account/balance/' + this.address);
-        },
-        methods: {
-            //根据账户地址获取账户余额
-            getBalanceAddress(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        if (response.success) {
-                            this.usable = response.data.usable * 0.000000001;
-                        } else {
-                            this.usable = 0;
-                        }
-                    });
-            },
-            //修改别名
-            aliasingSubmit(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$refs.password.showPassword(true);
-                    }
-                })
-            },
-            //
-            toSubmit(password) {
-                if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
-                    var param = {"alias": this.aliasForm.alias, "address": this.address, "password": password};
-                    //console.log(param);
-                    this.$post('/account/alias/', param)
-                        .then((response) => {
-                            //console.log(response);
-                            if (response.success) {
-                                this.$message({
-                                    type: 'success', message: this.$t('message.passWordSuccess')
-                                });
-                                this.$router.push({
-                                    name: '/userInfo'
-                                })
-                            } else {
-                                this.$message({
-                                    type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                                });
-                            }
-                        })
-                }else {
-                    this.$message({
-                        message: this.$t('message.c133'),
-                    });
-                }
-            }
+  export default {
+    data () {
+      var aliasing = (rule, value, callback) => {
+        if (this.usable > 1.01) {
+          if (value === '') {
+            callback(new Error(this.$t('message.c104')))
+          } else if (value.length > 8) {
+            callback(new Error(this.$t('message.c106')))
+          } else {
+            callback()
+          }
+        } else {
+          callback(new Error(this.$t('message.c107')))
         }
+      }
+      return {
+        address: this.$route.params.address,
+        usable: 0,
+        aliasForm: {
+          alias: '',
+        },
+        aliasRules: {
+          alias: [
+            {validator: aliasing, trigger: 'blur'}
+          ]
+        },
+      }
+    },
+    components: {
+      Back,
+      Password,
+    },
+    mounted () {
+      let _this = this
+      this.getBalanceAddress('/account/balance/' + this.address)
+    },
+    methods: {
+      //根据账户地址获取账户余额
+      getBalanceAddress (url) {
+        this.$fetch(url)
+          .then((response) => {
+            if (response.success) {
+              this.usable = response.data.usable * 0.000000001
+            } else {
+              this.usable = 0
+            }
+          })
+      },
+      //修改别名
+      aliasingSubmit (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.$refs.password.showPassword(true)
+          }
+        })
+      },
+      //
+      toSubmit (password) {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
+          var param = {'alias': this.aliasForm.alias, 'address': this.address, 'password': password}
+          //console.log(param);
+          this.$post('/account/alias/', param)
+            .then((response) => {
+              //console.log(response);
+              if (response.success) {
+                this.$message({
+                  type: 'success', message: this.$t('message.passWordSuccess')
+                })
+                this.$router.push({
+                  name: '/userInfo'
+                })
+              } else {
+                this.$message({
+                  type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                })
+              }
+            })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'),
+          })
+        }
+      }
     }
+  }
 </script>
 <style lang="less">
     .edit-aliasing {

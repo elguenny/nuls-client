@@ -98,7 +98,7 @@
       }, 1000)
     },
     mounted () {
-      //10秒循环一次我的资产和全网共识
+      //5秒循环一次我的资产和全网共识
       setTimeout(() => {
         let map = $('#world-map-markers').vectorMap('get', 'mapObject')
         setInterval(() => {
@@ -108,7 +108,7 @@
           setTimeout(() => {
             map.addMarkers(this.ipObj)
           }, 1000)
-        }, 10000)
+        }, 5000)
       }, 1000)
 
     },

@@ -101,7 +101,10 @@
         //var _path ="D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.txt";
         let fs = require('fs')
         fs.readFile(_path, 'utf8', function (err, data) {
-          if (err) return console.log(err)
+          if (err){
+            console.log(err)
+            return err
+          }
         })
 
         fs.writeFile(_path, this.keyInfo, function (err) {

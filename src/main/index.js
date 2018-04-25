@@ -1,9 +1,11 @@
 import electron from 'electron'
 
-const {app, ipcMain} = require('electron')
-const process = require('process')
-const BrowserWindow = electron.BrowserWindow
-const Menu = electron.Menu
+const {dialog, ipcMain} = require('electron');
+const {download} = require('electron-download');
+const ipc = electron.ipcMain;
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+const Menu = electron.Menu;
 
 /**
  * 将“静态”路径设置为生产中的静态文件
@@ -15,6 +17,8 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow
+let folderpath;
+let downloadpath;
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
@@ -28,15 +32,15 @@ function createWindow () {
    */
   mainWindow = new BrowserWindow({
     height: 560,
-    width: 800,
+    width: 1800,
     useContentSize: true,
     webPreferences: {webSecurity: false},
     frame: false,
     //Set minimum width height.
     minWidth: 800,
     minHeight: 560,
-    maxWidth: 800,
-    maxHeight: 560,
+    /*maxWidth: 800,
+    maxHeight: 560,*/
   })
 
   /**

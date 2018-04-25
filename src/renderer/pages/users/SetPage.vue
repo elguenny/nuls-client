@@ -94,22 +94,31 @@
             },
             //修改密码
             toEditPassword() {
+              if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+                && sessionStorage.getItem('setNodeNumberOk') === 'true') {
                 //获取账户地址列表
                 this.$fetch("/account/list")
-                    .then((response) => {
-                        if (response.data.length != 0) {
-                            if (localStorage.getItem("newAccountAddress") == null) {
-                                localStorage.setItem("newAccountAddress", response.data[0].address)
-                            }
-                            this.$router.push({
-                                name: '/editorPassword',
-                            })
-                        } else {
-                            this.$router.push({
-                                name: '/setPassword',
-                            })
-                        }
-                    });
+                  .then((response) => {
+                    if (response.data.length !== 0) {
+                      if (localStorage.getItem("newAccountAddress") == null) {
+                        localStorage.setItem("newAccountAddress", response.data[0].address)
+                      }
+                      this.$router.push({
+                        name: '/editorPassword',
+                      })
+                    } else {
+                      this.$router.push({
+                        name: '/setPassword',
+                      })
+                    }
+                  });
+              } else {
+                this.$message({
+                  message: this.$t('message.c133'), duration: '800'
+                })
+              }
+
+
             },
             //版本更新
             versionUpdates() {

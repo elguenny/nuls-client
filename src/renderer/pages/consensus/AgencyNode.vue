@@ -89,6 +89,7 @@
 
         allConsensus: [],
         totalAll: 0,
+        pageNumber:1,
       }
     },
     components: {
@@ -97,17 +98,7 @@
     },
     mounted () {
       let _this = this
-      this.getAllConsensus('/consensus/agent/list/', {'pageSize': '6', 'pageNumber': '1'})
-      //判断用户选择的语言
-      let language = localStorage.getItem('language')
-      setInterval(() => {
-        if (language !== localStorage.getItem('language')) {
-          language = localStorage.getItem('language')
-          this.getAllConsensus('/consensus/agent/list/', {'pageSize': '6', 'pageNumber': '1'})
-        } else {
-          language = localStorage.getItem('language')
-        }
-      }, 1000)
+      this.getAllConsensus('/consensus/agent/list/', {'pageSize': '6', 'pageNumber': this.pageNumber})
     },
     methods: {
       //获取全部共识列表
@@ -135,6 +126,7 @@
       },
       //全部共识分页
       allConsensusSize (events) {
+        this.pageNumber = events;
         this.getAllConsensus('/consensus/agent/list/', {'pageNumber': events, 'pageSize': '6'})
       },
       showDataList () {

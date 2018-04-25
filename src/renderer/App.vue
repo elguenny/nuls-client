@@ -153,7 +153,6 @@
     .el-dialog__title {
         color: #0c1323;
     }
-
     .app {
         width: 250px;
         height: 25px;

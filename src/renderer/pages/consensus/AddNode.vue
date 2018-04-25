@@ -40,7 +40,8 @@
         <div class="add-node-bottom">
             <el-form ref="addNodeForm" :model="addNodeForm" :rules="addNodeRules" size="mini" label-position="left">
                 <el-form-item :label="$t('message.c51')+':'" class="pledge-money" prop="nodeNo">
-                    <el-input ref="input" v-model="addNodeForm.nodeNo" :placeholder=this.placeholder :maxlength="17"></el-input>
+                    <el-input ref="input" v-model="addNodeForm.nodeNo" :placeholder=this.placeholder
+                              :maxlength="17"></el-input>
                 </el-form-item>
                 <div class="procedure"><label>{{$t('message.c28')}}:</label><span>0.01 NULS</span></div>
                 <el-form-item size="large" class="submit">
@@ -141,31 +142,41 @@
       getBalanceAddress (url) {
         this.$fetch(url)
           .then((response) => {
+            console.log(response)
             if (response.success) {
-              this.placeholder = '（' + this.$t('message.currentBalance') + response.data.usable * 0.00000001 + 'NULS）'
-              this.usable = response.data.usable * 0.00000001
+              let leftShift = new BigNumber(0.00000001);
+              this.placeholder = '（' + this.$t('message.currentBalance') + parseFloat(leftShift.times(response.data.usable).toString()) + 'NULS）'
+              this.usable = parseFloat(leftShift.times(response.data.usable).toString())
             }
           })
       },
       //提交追加
       onSubmit (formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            this.$refs.password.showPassword(true)
-          } else {
-            return false
-          }
-        })
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              this.$refs.password.showPassword(true)
+            } else {
+              return false
+            }
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
       },
       //
       toSubmit (password) {
+        let rightShift = new BigNumber(100000000);
         let param = '{"address":"' + localStorage.getItem('newAccountAddress')
           + '","agentId":"' + this.agentId
-          + '","deposit":"' + this.addNodeForm.nodeNo * 100000000
+          + '","deposit":"' + parseFloat(rightShift.times(this.addNodeForm.nodeNo).toString())
           + '","password":"' + password + '"}'
+        //console.log(param);
         this.$post('/consensus/deposit/', param)
           .then((response) => {
-            //console.log(param);
             //console.log(response);
             if (response.success) {
               this.$message({

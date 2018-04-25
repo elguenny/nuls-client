@@ -68,6 +68,11 @@
                             this.netWorkInfo = response.data;
                             this.$store.commit("setNetWorkInfo", response.data);
                             let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
+                            if(wifi < 2 ){
+                              sessionStorage.setItem("setNodeNumberOk", "false");
+                            }else {
+                              sessionStorage.setItem("setNodeNumberOk", "true");
+                            }
                             this.connectNumber = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
                             if (wifi !== 0) {
                                 if (wifi < 15) {

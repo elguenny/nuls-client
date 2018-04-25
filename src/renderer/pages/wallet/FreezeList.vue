@@ -15,9 +15,7 @@
                 </el-table-column>
                 <el-table-column prop="lockTime" :label="$t('message.thawingTime')" min-width="100" align='center'>
                     <template slot-scope="scope">
-                        {{parseInt(scope.row.lockTime) > 1500000000 ? scope.row.lockTime :
-                        (parseInt(scope.row.lockTime) === 0 ? $t('message.consensusManagement'):
-                        $t('message.c139') + scope.row.lockTime)}}
+                        {{parseInt(scope.row.lockTime) > 1000000000000 ? scope.row.lockTimes : (parseInt(scope.row.lockTime) === 0 ? $t('message.consensusManagement'): $t('message.c139') + scope.row.lockTime)}}
                     </template>
                 </el-table-column>
             </el-table>
@@ -65,8 +63,10 @@
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].value = parseFloat(leftShift.times(response.data.list[i].value).toString())
                 response.data.list[i].createTime = moment(response.data.list[i].createTime).format('YYYY-MM-DD hh:mm:ss')
-                if (response.data.list[i].lockTime > 1500000000) {
-                  response.data.list[i].lockTime = moment(response.data.list[i].lockTime).format('YYYY-MM-DD hh:mm:ss')
+                response.data.list[i].lockTimes = response.data.list[i].lockTime
+                if (response.data.list[i].lockTime > 1000000000000) {
+                  console.log(response.data.list[i].lockTime > 1000000000000)
+                  response.data.list[i].lockTimes = moment(response.data.list[i].lockTime).format('YYYY-MM-DD hh:mm:ss')
                 }
               }
               this.freezeData = response.data.list

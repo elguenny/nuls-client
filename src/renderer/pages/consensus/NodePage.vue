@@ -40,7 +40,7 @@
                 <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
-                <span class="allUsable">{{$t('message.currentBalance')}}: {{ this.usable}} NULS</span>
+                <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable }} NULS</span>
                 <el-form-item :label="$t('message.c25')" class="number" prop="nodeNo">
                     <el-input ref="input" v-model="nodeForm.nodeNo" :maxlength="17"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
@@ -159,13 +159,14 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              this.usable = config.FloatMul(response.data.usable, 0.00000001)
+              let leftShift = new BigNumber(0.00000001)
+              this.usable = parseFloat(leftShift.times(response.data.usable).toString())
             }
           })
       },
       //选择全部金额
       allUsable (balance) {
-        if (balance === '0.00000000') {
+        if (balance === 0) {
           this.$message({
             message: this.$t('message.creditLow'),
             type: 'warning '
@@ -177,13 +178,20 @@
       },
       //提交委托
       onSubmit (formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            this.$refs.password.showPassword(true)
-          } else {
-            return false
-          }
-        })
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              this.$refs.password.showPassword(true)
+            } else {
+              return false
+            }
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
       },
       //
       toSubmit (password) {

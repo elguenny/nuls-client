@@ -29,8 +29,7 @@
                 <li><span>{{$t('message.transactionType')}}</span>
                         {{$t('message.type'+infoData.type)}}
                 </li>
-                <li><span>{{$t('message.transactionState')}}</span>{{infoData.status !== '1' ?
-                    $t('message.confirmed'):$t('message.confirming') }}
+                <li><span>{{$t('message.transactionState')}}</span>{{ $t('message.statusS'+infoData.status) }}
                 </li>
                 <li><span>{{$t('message.blockHeight')}}</span>{{infoData.blockHeight}}</li>
                 <li><span>{{$t('message.remarks')}}</span>{{infoData.remark}}</li>
@@ -93,8 +92,7 @@
       hashCopy (hash) {
         copy(hash)
         this.$message({
-          message: this.$t('message.c129'),
-          type: 'success'
+          message: this.$t('message.c129'), type: 'success', duration: '800'
         })
       },
     }

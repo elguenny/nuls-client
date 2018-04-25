@@ -97,7 +97,7 @@
                         </el-table-column>
                         <el-table-column :label="$t('message.state')" width="85" align='center'>
                             <template slot-scope="scope">
-                                <span>{{ scope.row.status !== '1' ? $t('message.confirmed'):$t('message.confirming') }}</span>
+                                <span>{{ $t('message.statusS'+scope.row.status) }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.time')" width="145" align='center'>
@@ -170,26 +170,30 @@
         })
       }
       /**
-       * 10秒查询交易列表
-       *10 second query trade list
+       * 5秒查询交易列表
+       * 5second query trade list
        */
       setInterval(() => {
-        if (this.types !== '') {
-          //console.log(this.types);
-          this.getAccountTxList('/tx/list/', {
-            'address': this.accountAddressValue,
-            'type': this.types,
-            'pageSize': 9,
-            'pageNumber': this.pages
-          })
-        } else {
-          this.getAccountTxList('/tx/list/', {
-            'address': this.accountAddressValue,
-            'pageSize': 9,
-            'pageNumber': this.pages
-          })
+        if(this.activeName === 'first'){
+          this.getAccountAssets('/account/assets/' + this.accountAddressValue)
+        }else {
+          if (this.types !== '') {
+            //console.log(this.types);
+            this.getAccountTxList('/tx/list/', {
+              'address': this.accountAddressValue,
+              'type': this.types,
+              'pageSize': 9,
+              'pageNumber': this.pages
+            })
+          } else {
+            this.getAccountTxList('/tx/list/', {
+              'address': this.accountAddressValue,
+              'pageSize': 9,
+              'pageNumber': this.pages
+            })
+          }
         }
-      }, 10000)
+      }, 5000)
     },
     methods: {
       /**
@@ -322,8 +326,7 @@
       accountCopy () {
         copy(this.accountAddressValue)
         this.$message({
-          message: this.$t('message.c129'),
-          type: 'success'
+          message: this.$t('message.c129'), type: 'success', duration: '800'
         })
       },
 
@@ -344,10 +347,17 @@
        *Account management jump
        */
       accountChoice () {
-        localStorage.setItem('toUserInfo', '1')
-        this.$router.push({
-          path: '/wallet/users/userInfo'
-        })
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          localStorage.setItem('toUserInfo', '1')
+          this.$router.push({
+            path: '/wallet/users/userInfo'
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
       },
 
       /**
@@ -395,14 +405,14 @@
        * @param address
        */
       toTransfer (address) {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight && sessionStorage.getItem("setNodeNumberOk") === "true") {
           this.$router.push({
             name: '/transfer',
             params: {address: address},
           })
         } else {
           this.$message({
-            message: this.$t('message.c133'),
+            message: this.$t('message.c133'), duration: '800'
           })
         }
       },

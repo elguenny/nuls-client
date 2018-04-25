@@ -57,15 +57,16 @@
                                 <li class="cb">
                                     <label class="fl">{{$t('message.c19')}}：</label>{{item.memberCount}}
                                 </li>
+                                <li>
+                                    <label class="fl">{{$t('message.c20')}}：</label>
+                                    {{ (item.totalDeposit).toFixed(2) }}
+                                </li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t('message.c18')}}:</label>
                                     <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'"
                                                  :widthData="item.creditRatio"></ProgressBar>
                                 </li>
-                                <li class="cb">
-                                    <label class="fl">{{$t('message.c20')}}：</label>
-                                    <ProgressBar colorData="#82BD39" :widthData="item.totalDeposit"></ProgressBar>
-                                </li>
+
                             </ul>
                             <div class="credit-valuesDiv" :id=index>
                                 <h2>
@@ -94,19 +95,19 @@
                             <ul>
                                 <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                                <li><label>{{$t('message.c25')}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
+                                <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit*0.00000001).toFixed(2) }} NULS</li>
                                 <li class="cb">
                                     <label class="fl">{{$t('message.c19')}}：</label>{{item.memberCount}}
+                                </li>
+                                <li class="cb">
+                                    <label class="fl">{{$t('message.c20')}}：</label>{{ (item.totalDeposit).toFixed(2) }}
                                 </li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t('message.c18')}}:</label>
                                     <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'"
                                                  :widthData="item.creditRatio"></ProgressBar>
                                 </li>
-                                <li class="cb">
-                                    <label class="fl">{{$t('message.c20')}}：</label>
-                                    <ProgressBar colorData="#82BD39" :widthData="item.totalDeposit"></ProgressBar>
-                                </li>
+
                             </ul>
                         </div>
                         <el-pagination layout="prev, pager, next" :page-size="3" :total=this.myTotalAll class="cb"
@@ -181,16 +182,31 @@
     },
     created () {
       this.getConsensus('/consensus')
-      if (localStorage.getItem('newAccountAddress') !== '') {
-        this.accountAddressValue = localStorage.getItem('newAccountAddress')
-        this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
-        this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
-          'pageSize': '3',
-          'pageNumber': '1'
-        })
-      }
       this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': '1'})
 
+      if (localStorage.getItem('newAccountAddress') !== '') {
+        this.accountAddressValue = localStorage.getItem('newAccountAddress')
+        this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
+          'pageSize': '3',
+          'pageNumber':'1'
+        })
+        /**
+         * 5秒查询列表
+         * 5second list
+         */
+        setInterval(() => {
+          this.getConsensus('/consensus')
+          this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
+          if(this.tabName === 'first'){
+            this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': this.allEvents})
+          }else {
+            this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
+              'pageSize': '3',
+              'pageNumber':this.myEvents
+            })
+          }
+        },5000)
+      }
     },
     methods: {
       //获取下拉选择地址
@@ -218,7 +234,7 @@
       getConsensusAddress (url) {
         this.$fetch(url)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.myInfoData = response.data
@@ -235,6 +251,7 @@
             //console.log(response);
             this.myTotalAll = 1
             if (response.success) {
+              let leftShift = new BigNumber(0.00000001);
               if (response.data.list.length !== 0) {
                 this.noDataOK = false
                 this.myConsensusSizeOK = true
@@ -254,11 +271,7 @@
                   response.data.list[i].creditRatio = '50%'
                 }
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
-                if (response.data.list[i].totalDeposit > 50000000000000) {
-                  response.data.list[i].totalDeposit = '100%'
-                } else {
-                  response.data.list[i].totalDeposit = (response.data.list[i].totalDeposit / 500000000000).toString() + '%'
-                }
+                response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
               this.loading = false
               this.tabelShow = true
@@ -281,6 +294,7 @@
           .then((response) => {
             if (response.success) {
               //console.log(response);
+              let leftShift = new BigNumber(0.00000001) ;
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].creditRatios = response.data.list[i].creditRatio
                 if (response.data.list[i].creditRatio !== 0) {
@@ -293,11 +307,7 @@
                   response.data.list[i].creditRatio = '50%'
                 }
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
-                if (response.data.list[i].totalDeposit > 50000000000000) {
-                  response.data.list[i].totalDeposit = '100%'
-                } else {
-                  response.data.list[i].totalDeposit = (response.data.list[i].totalDeposit / 500000000000).toString() + '%'
-                }
+                response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
               this.loading = false
               this.tabelShow = true

@@ -1,7 +1,7 @@
 <template>
     <div class="new-node">
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
-        <h2>{{$t("message.c21")}}</h2>
+        <h2>{{$t('message.c21')}}</h2>
         <div class="new-node-form">
             <el-form ref="newNodeForm" :model="newNodeForm" :rules="newNodeRules" size="mini" label-position="top">
                 <el-form-item :label="$t('message.c22')+':'">
@@ -27,7 +27,8 @@
 
                 </el-form-item>
                 <el-form-item size="large" class="submit">
-                    <el-button type="primary" @click="submitForm('newNodeForm')" id="newNode">{{$t("message.confirmButtonText")}}
+                    <el-button type="primary" @click="submitForm('newNodeForm')" id="newNode">
+                        {{$t('message.confirmButtonText')}}
                     </el-button>
                 </el-form-item>
             </el-form>
@@ -37,140 +38,155 @@
 </template>
 
 <script>
-    import Back from './../../components/BackBar.vue'
-    import AccountAddressBar from '@/components/AccountAddressBar.vue';
-    import Password from '@/components/PasswordBar.vue';
+  import Back from './../../components/BackBar.vue'
+  import AccountAddressBar from '@/components/AccountAddressBar.vue'
+  import Password from '@/components/PasswordBar.vue'
+  import { BigNumber } from 'bignumber.js'
 
-    export default {
-        data() {
-            let checkNodeNo = (rule, value, callback) => {
-                if (!value) {
-                    callback(new Error(this.$t('message.c31')));
-                }
-                setTimeout(() => {
-                    let re = /^\d+(?=\.{0,1}\d+$|$)/;
-                    let res = /^\d{1,8}(\.\d{1,8})?$/;
-                    if (!re.exec(value) || !res.exec(value)) {
-                        callback(new Error(this.$t('message.c32')));
-                    } else if (value > this.usable - 0.01 || value < 20000 ) {
-                        callback(new Error(this.$t('message.c541')));
-                    } else {
-                        callback();
-                    }
-                }, 100);
-            };
-            let checkCommissionRate = (rule, value, callback) => {
-                if (!value) {
-                    callback(new Error(this.$t('message.c35')));
-                }
-                let re = /^\d+(?=\.{0,1}\d+$|$)/;
-                let res = /^\d{1,2}(\.\d{1,2})?$/;
-                if (!re.exec(value) || !res.exec(value)) {
-                    callback(new Error(this.$t('message.c36')));
-                } else if (0 > value || value > 20) {
-                    callback(new Error(this.$t('message.c37')));
-                } else {
-                    callback();
-                }
-            };
-            return {
-                submitId:"newNode",
-                accountAddress: [],
-                usable: "0",
-                placeholder: "",
-                newNodeForm: {
-                    accountAddressValue: localStorage.getItem('newAccountAddress'),
-                    packingAddress: '',
-                    agentName: '',
-                    deposit: '',
-                    commissionRate: '',
-                    remark: '',
-                },
-                newNodeRules: {
-                    packingAddress: [
-                        {required: true, message: this.$t('message.c38'), trigger: 'blur'}
-                    ],
-                    agentName: [
-                        {required: true, message: this.$t('message.c39')},
-                        {max: 50, message: this.$t('message.c41'), trigger: 'blur'}
-                    ],
-                    deposit: [
-                        {validator: checkNodeNo, trigger: 'blur'},
-                    ],
-                    commissionRate: [
-                        {validator: checkCommissionRate, trigger: 'blur'}
-                    ],
-                    remark: [
-                        {required: true, message: this.$t('message.c40'), trigger: 'blur'}
-                    ],
-                },
-            }
-        },
-        components: {
-            Back,
-            AccountAddressBar,
-            Password,
-        },
-        mounted() {
-            let _this = this;
-            this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'));
-        },
-        methods: {
-            //获取下拉选择地址
-            chenckAccountAddress(chenckAddress) {
-                this.newNodeForm.accountAddressValue= chenckAddress;
-                this.getBalanceAddress('/account/balance/' + chenckAddress);
-                setTimeout(() => {
-                    if (this.newNodeForm.deposit !== '') {
-                        this.$refs.newNodeForm.validateField('deposit');
-                    }
-                }, 500);
-            },
-            //根据账户地址获取账户余额
-            getBalanceAddress(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        if (response.success) {
-                            this.usable = response.data.usable * 0.00000001;
-                            this.placeholder = this.$t('message.currentBalance') + " " + response.data.usable * 0.00000001;
-                        }
-                    });
-            },
-            //提交创建
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$refs.password.showPassword(true);
-                    }
-                    else {
-                        return false;
-                    }
-                });
-            },
-            //
-            toSubmit(password) {
-                let param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue + '","packingAddress":"' + this.newNodeForm.packingAddress + '","commissionRate":"' + this.newNodeForm.commissionRate + '","deposit":"' + this.newNodeForm.deposit * 100000000 + '","agentName":"' + this.newNodeForm.agentName + '","remark":"' + this.newNodeForm.remark + '","password":"' + password + '"}';
-                this.$post('/consensus/agent ', param)
-                    .then((response) => {
-                        console.log(param);
-                        console.log(response);
-                        if (response.success) {
-                            this.$message({
-                                type: 'success', message: this.$t('message.passWordSuccess')
-                            });
-                            this.$router.push({
-                                name: '/consensus',
-                                params: {"activeName": "first"},
-                            })
-                        } else {
-                            this.$message({
-                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                            });
-                        }
-                    })
-            },
+  export default {
+    data () {
+      let checkNodeNo = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('message.c31')))
         }
+        setTimeout(() => {
+          let re = /^\d+(?=\.{0,1}\d+$|$)/
+          let res = /^\d{1,8}(\.\d{1,8})?$/
+          if (!re.exec(value) || !res.exec(value)) {
+            callback(new Error(this.$t('message.c32')))
+          } else if (value > this.usable - 0.01 || value < 20000) {
+            callback(new Error(this.$t('message.c541')))
+          } else {
+            callback()
+          }
+        }, 100)
+      }
+      let checkCommissionRate = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('message.c35')))
+        }
+        let re = /^\d+(?=\.{0,1}\d+$|$)/
+        let res = /^\d{1,2}(\.\d{1,2})?$/
+        if (!re.exec(value) || !res.exec(value)) {
+          callback(new Error(this.$t('message.c36')))
+        } else if (0 > value || value > 20) {
+          callback(new Error(this.$t('message.c37')))
+        } else {
+          callback()
+        }
+      }
+      return {
+        submitId: 'newNode',
+        accountAddress: [],
+        usable: '0',
+        placeholder: '',
+        newNodeForm: {
+          accountAddressValue: localStorage.getItem('newAccountAddress'),
+          packingAddress: '',
+          agentName: '',
+          deposit: '',
+          commissionRate: '',
+          remark: '',
+        },
+        newNodeRules: {
+          packingAddress: [
+            {required: true, message: this.$t('message.c38'), trigger: 'blur'}
+          ],
+          agentName: [
+            {required: true, message: this.$t('message.c39')},
+            {max: 50, message: this.$t('message.c41'), trigger: 'blur'}
+          ],
+          deposit: [
+            {validator: checkNodeNo, trigger: 'blur'},
+          ],
+          commissionRate: [
+            {validator: checkCommissionRate, trigger: 'blur'}
+          ],
+          remark: [
+            {required: true, message: this.$t('message.c40'), trigger: 'blur'}
+          ],
+        },
+      }
+    },
+    components: {
+      Back,
+      AccountAddressBar,
+      Password,
+    },
+    mounted () {
+      let _this = this
+      this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'))
+    },
+    methods: {
+      //获取下拉选择地址
+      chenckAccountAddress (chenckAddress) {
+        this.newNodeForm.accountAddressValue = chenckAddress
+        this.getBalanceAddress('/account/balance/' + chenckAddress)
+        setTimeout(() => {
+          if (this.newNodeForm.deposit !== '') {
+            this.$refs.newNodeForm.validateField('deposit')
+          }
+        }, 500)
+      },
+      //根据账户地址获取账户余额
+      getBalanceAddress (url) {
+        this.$fetch(url)
+          .then((response) => {
+            if (response.success) {
+              this.usable = response.data.usable * 0.00000001
+              this.placeholder = this.$t('message.currentBalance') + ' ' + response.data.usable * 0.00000001
+            }
+          })
+      },
+      //提交创建
+      submitForm (formName) {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              this.$refs.password.showPassword(true)
+            }
+            else {
+              return false
+            }
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
+      },
+      //
+      toSubmit (password) {
+        let rightShift = new BigNumber(100000000)
+        let param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue
+          + '","packingAddress":"' + this.newNodeForm.packingAddress
+          + '","commissionRate":"' + this.newNodeForm.commissionRate
+          + '","deposit":"' + parseFloat(rightShift.times(this.newNodeForm.deposit).toString())
+          + '","agentName":"' + this.newNodeForm.agentName
+          + '","remark":"' + this.newNodeForm.remark
+          + '","password":"' + password + '"}'
+        //console.log(param)
+        this.$post('/consensus/agent ', param)
+          .then((response) => {
+            //console.log(response)
+            if (response.success) {
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              })
+              this.$router.push({
+                name: '/consensus',
+                params: {'activeName': 'first'},
+              })
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
+            }
+          })
+      },
     }
+  }
 </script>
 
 <style lang="less">
@@ -190,8 +206,8 @@
                 width: 396px;
                 right: 0;
                 margin-left: 0;
-                .sub-select-list{
-                    .sub-select-item{
+                .sub-select-list {
+                    .sub-select-item {
                         width: 396px;
                     }
                 }
