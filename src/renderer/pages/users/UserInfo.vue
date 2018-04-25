@@ -7,14 +7,14 @@
             <el-table :data="userData">
                 <el-table-column prop="address" :label="$t('message.tabName')" min-width="438" align='center'>
                 </el-table-column>
-                <!--<el-table-column :label="$t('message.tabAlias')" width="100" class="user-aliasing">
+                <el-table-column :label="$t('message.tabAlias')" width="100" class="user-aliasing">
                     <template slot-scope="scope">
                         <span>{{ scope.row.alias != null  ? scope.row.alias : "-" }}</span>
                         <i class="el-icon-edit cursor-p"
                            v-show="scope.row.alias != null  ? false : true"
                            @click="editAliasing(scope.row.address,scope.row.alias)"></i>
                     </template>
-                </el-table-column>-->
+                </el-table-column>
                 <el-table-column :label="$t('message.operation')" width="150" align='center'>
                     <template slot-scope="scope">
                         <el-button size="mini" type="text" @click="outUser(scope.row.address)">

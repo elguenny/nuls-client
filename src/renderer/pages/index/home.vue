@@ -2,45 +2,45 @@
     <div class="home">
         <div class="home-nav">
             <div class="home-nav-top">
-                <div class="nav-title">{{$t("message.fund")}}</div>
+                <div class="nav-title">{{$t('message.fund')}}</div>
                 <div class="nav-all">
-                    <label class="fl">{{$t("message.fundTotal")}}：</label>
-                    <ProgressBar :colorData=this.balanceData.balanceColor
+                    <label class="fl">{{$t('message.fundTotal')}}：</label>
+                    <ProgressBar colorData="#658EC7"
                                  :widthData=this.balanceData.balanceWidth></ProgressBar>
                     <label class="number">{{this.balanceData.balance}} NULS</label>
                 </div>
                 <div class="nav-lock cl">
-                    <label class="fl">{{$t("message.fundLock")}}：</label>
-                    <ProgressBar :colorData=this.balanceData.usableColor
+                    <label class="fl">{{$t('message.fundLock')}}：</label>
+                    <ProgressBar colorData="#f64b3e"
                                  :widthData=this.balanceData.lockedWidth></ProgressBar>
                     <label class="number">{{this.balanceData.locked}} NULS</label>
                 </div>
                 <div class="nav-usable cl">
-                    <label class="fl">{{$t("message.fundUsable")}}：</label>
-                    <ProgressBar :colorData=this.balanceData.lockedColor
+                    <label class="fl">{{$t('message.fundUsable')}}：</label>
+                    <ProgressBar colorData="#82bd39"
                                  :widthData=this.balanceData.usableWidth></ProgressBar>
                     <label class="number">{{this.balanceData.usable}} NULS</label>
                 </div>
             </div>
             <div class="home-nav-top">
-                <div class="nav-title">{{$t("message.consensus1")}}</div>
+                <div class="nav-title">{{$t('message.consensus1')}}</div>
                 <ul>
                     <li class="cl">
-                        <label class="fl">{{$t("message.annualYield")}}：</label>
+                        <label class="fl">{{$t('message.annualYield')}}：</label>
                         <span>{{this.allNodeList.nodeNumber}} {{$t('message.c30')}}</span>
                     </li>
                     <li>
-                        <label class="fl">{{$t("message.pledge")}}：</label>
+                        <label class="fl">{{$t('message.pledge')}}：</label>
                         <span class="number">{{this.allNodeList.entrust}} NULS</span>
                     </li>
                     <li class="cl">
-                        <label class="fl">{{$t("message.income")}}：</label>
+                        <label class="fl">{{$t('message.income')}}：</label>
                         <span class="number">{{this.allNodeList.income}} NULS</span>
                     </li>
                 </ul>
             </div>
         </div>
-        <div class="div-title">{{$t("message.applicationsNode")}}</div>
+        <div class="div-title">{{$t('message.applicationsNode')}}</div>
         <div class="cl home-info">
             <div class="home-info-consensus" v-loading.lock="loading">
                 <div id="world-map-markers" style="height: 18rem;">
@@ -51,213 +51,207 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import ProgressBar from '@/components/ProgressBar.vue';
-    import '@/assets/css/jquery-jvectormap.css';
-    import {jvectormap} from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min';
-    import {jvectormap1} from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js';
-    import * as config from '@/config.js';
+  import axios from 'axios'
+  import ProgressBar from '@/components/ProgressBar.vue'
+  import '@/assets/css/jquery-jvectormap.css'
+  import { jvectormap } from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
+  import { jvectormap1 } from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
+  import {BigNumber} from 'bignumber.js';
 
-    export default {
-        data() {
-            return {
-                //地图加载
-                loading: true,
-                //我的资产Info
-                balanceData: {
-                    balance: 0,
-                    balanceColor: '',
-                    balanceWidth: '',
-                    locked: 0,
-                    lockedColor: '',
-                    lockedWidth: '',
-                    usable: 0,
-                    usableColor: '',
-                    usableWidth: '',
-                },
-                //全网共识Info
-                allNodeList: {
-                    entrust: 0,
-                    income: 0,
-                    nodeNumber: 0,
-                },
-                //ipInfo
-                ipData: [],
-                //
-                mapObj: [],
-                //经纬度Info
-                ipObj: [],
-            };
+  export default {
+    data () {
+      return {
+        //地图加载
+        loading: true,
+        //我的资产Info
+        balanceData: {
+          balance: 0,
+          balanceWidth: '0',
+          locked: 0,
+          lockedWidth: '0',
+          usable: 0,
+          usableWidth: '0',
         },
-        components: {
-            ProgressBar,
+        //全网共识Info
+        allNodeList: {
+          entrust: 0,
+          income: 0,
+          nodeNumber: 0,
         },
-        created() {
-            this.getAccountAddress("/account/balances/");
-            this.getConsensus("/consensus");
-            this.getNetWork();
-            setTimeout(() => {
-                this.methodsMaps(this.ipObj);
-            }, 1000);
-        },
-        mounted(){
-            //10秒循环一次我的资产和全网共识
-            setTimeout(() => {
-                let map = $('#world-map-markers').vectorMap('get', 'mapObject');
-                const setIntervalData = setInterval(() => {
-                    this.getAccountAddress("/account/balances/");
-                    this.getConsensus("/consensus");
-                    this.getNetWork();
-                    setTimeout(() => {
-                        //console.log(this.ipObj);
-                        map.addMarkers(this.ipObj);
-                    }, 1000);
-                }, 10000);
-            }, 1000);
+        //ipInfo
+        ipData: [],
+        //
+        mapObj: [],
+        //经纬度Info
+        ipObj: [],
+      }
+    },
+    components: {
+      ProgressBar,
+    },
+    created () {
+      this.getAccountAddress('/account/balances/')
+      this.getConsensus('/consensus')
+      this.getNetWork()
+      setTimeout(() => {
+        this.methodsMaps(this.ipObj)
+      }, 1000)
+    },
+    mounted () {
+      //10秒循环一次我的资产和全网共识
+      setTimeout(() => {
+        let map = $('#world-map-markers').vectorMap('get', 'mapObject')
+        setInterval(() => {
+          this.getAccountAddress('/account/balances/')
+          this.getConsensus('/consensus')
+          this.getNetWork()
+          setTimeout(() => {
+            map.addMarkers(this.ipObj)
+          }, 1000)
+        }, 10000)
+      }, 1000)
 
-
-        },
-        methods: {
-            /**
-             * 根据账户地址获取总金、冻结、可用额
-             *Get the total amount, freezing and availability according to the account address.
-             * @param url
-             */
-            getAccountAddress(url) {
-                this.$fetch(url)
+    },
+    methods: {
+      /**
+       * 根据账户地址获取总金、冻结、可用额
+       *Get the total amount, freezing and availability according to the account address.
+       * @param url
+       */
+      getAccountAddress (url) {
+        this.$fetch(url)
+          .then((response) => {
+            //console.log(response)
+            if (response.success) {
+              this.balanceData = response.data
+              let leftShift = new BigNumber(0.00000001)
+              this.balanceData.balance = parseFloat(leftShift.times(this.balanceData.balance).toString())
+              this.balanceData.locked =  parseFloat(leftShift.times(this.balanceData.locked).toString())
+              this.balanceData.usable = parseFloat(leftShift.times(this.balanceData.usable).toString())
+              if (this.balanceData.balance !== 0) {
+                this.balanceData.balanceWidth = (this.balanceData.balance / this.balanceData.balance * 100).toFixed(2) + '%'
+                this.balanceData.lockedWidth = (this.balanceData.locked / this.balanceData.balance * 100).toFixed(2) + '%'
+                this.balanceData.usableWidth = (this.balanceData.usable / this.balanceData.balance * 100).toFixed(2) + '%'
+              }
+            }
+          })
+      },
+      /**
+       * 获取所有共识信息
+       * Get all the consensus information
+       * @param url
+       */
+      getConsensus (url) {
+        this.$fetch(url)
+          .then((response) => {
+            if (response.success) {
+              let leftShift = new BigNumber(0.00000001)
+              this.allNodeList.nodeNumber = response.data.agentCount
+              this.allNodeList.entrust =parseFloat(leftShift.times(response.data.totalDeposit).toString())
+              this.allNodeList.income =parseFloat(leftShift.times(response.data.rewardOfDay).toString())
+            }
+          })
+      },
+      /**
+       * getNetWork
+       * getNetWork
+       */
+      getNetWork () {
+        this.$fetch('/network/nodes')
+          .then((response) => {
+            if (response.success) {
+              //console.log(response);
+              this.ipData = response.data
+              if (this.ipData.length > 0) {
+                this.ipObj = []
+                for (let j = 0, len = this.ipData.length; j < len; j++) {
+                  axios.get('http://freegeoip.net/json/' + this.ipData[j])
                     .then((response) => {
-                        if (response.success) {
-                            //console.log(response);
-                            this.balanceData = response.data;
-                            this.balanceData.balance = config.FloatMul(this.balanceData.balance, 0.00000001);
-                            this.balanceData.locked = config.FloatMul(this.balanceData.locked, 0.00000001);
-                            this.balanceData.usable = config.FloatMul(this.balanceData.usable, 0.00000001);
-                            this.balanceData.balanceColor = "#658EC7";
-                            this.balanceData.lockedColor = "#82bd39";
-                            this.balanceData.usableColor = "#f64b3e";
-                            if ((this.balanceData.balance).toString() !== "0.00000000") {
-                                this.balanceData.balanceWidth = (this.balanceData.balance / this.balanceData.balance * 100).toFixed(2) + "%";
-                                this.balanceData.lockedWidth = (this.balanceData.locked / this.balanceData.balance * 100).toFixed(2) + "%";
-                                this.balanceData.usableWidth = (this.balanceData.usable / this.balanceData.balance * 100).toFixed(2) + "%";
-                            }
-                        }
-                    });
-            },
-            /**
-             * 获取所有共识信息
-             * Get all the consensus information
-             * @param url
-             */
-            getConsensus(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        if (response.success) {
-                            this.allNodeList.nodeNumber = response.data.agentCount;
-                            this.allNodeList.entrust = config.FloatMul(response.data.totalDeposit, 0.00000001);
-                            this.allNodeList.income = config.FloatMul(response.data.rewardOfDay, 0.00000001);
-                        }
+                      //console.log(response.data);
+                      let latLngs = [response.data.latitude, response.data.longitude]
+                      let names = response.data.region_code
+                      this.ipObj.push({'latLng': latLngs, 'name': names})
                     })
-            },
-            /**
-             * getNetWork
-             * getNetWork
-             */
-            getNetWork() {
-                this.$fetch('/network/nodes')
-                    .then((response) => {
-                        if (response.success) {
-                            //console.log(response);
-                            this.ipData = response.data;
-                            if (this.ipData.length > 0) {
-                                this.ipObj = [];
-                                for (let j = 0, len = this.ipData.length; j < len; j++) {
-                                    axios.get('http://freegeoip.net/json/' + this.ipData[j])
-                                        .then((response) => {
-                                            //console.log(response.data);
-                                            let latLngs = [response.data.latitude, response.data.longitude];
-                                            let names = response.data.region_code;
-                                            this.ipObj.push({"latLng": latLngs, "name": names});
-                                        })
-                                }
-                            } else {
-                                console.log("没有获取到ip")
-                            }
-                        }
-                    });
-            },
-            /**
-             * 根据坐标标注位置
-             * According to coordinate annotation position
-             * @param url
-             * @param data
-             * @returns {Promise}
-             */
-            methodsMaps(maps) {
-                $('#world-map-markers').vectorMap({
-                    map: 'world_mill_en',
-                    normalizeFunction: 'polynomial',
-                    hoverOpacity: 0.7,
-                    hoverColor: false,
-                    zoomOnScroll: false,
-                    zoomStep: 1,
-                    backgroundColor: 'transparent',
-                    regionStyle: {
-                        initial: {
-                            fill: 'none',
-                            "fill-opacity": 0.5,
-                            stroke: '#6da6f5',
-                            "stroke-width": 0.8,
-                            "stroke-opacity": 0.6
-                        },
-                        hover: {
-                            'fill-opacity': 0.7,
-                            cursor: 'pointer'
-                        },
-                        selected: {
-                            fill: 'yellow'
-                        },
-                        selectedHover: {}
-                    },
-                    markerStyle: {
-                        initial: {
-                            fill: '#00a65a',
-                            stroke: '#82bd39',
-                            r: 3,
-                        },
-                        hover: {
-                            r: 4,
-                            fill: '#dbf433',
-                            stroke: '#82bd39',
-                        }
-                    },
-                    markers: maps,
-                });
-                this.loading = false;
-            },
-            //新增地图标注
-            addJvpMarkers(maps) {
-                let map = $('#world-map-markers').vectorMap('get', 'mapObject');
-                map.addMarkers(maps);
-            },
-            //移除地图标注
-            removeJvpMarkers(maps) {
-                let map = $('#world-map-markers').vectorMap('get', 'mapObject');
-                map.removeMarkers(maps);
+                }
+              } else {
+                console.log('没有获取到ip')
+              }
             }
+          })
+      },
+      /**
+       * 根据坐标标注位置
+       * According to coordinate annotation position
+       * @param url
+       * @param data
+       * @returns {Promise}
+       */
+      methodsMaps (maps) {
+        $('#world-map-markers').vectorMap({
+          map: 'world_mill_en',
+          normalizeFunction: 'polynomial',
+          hoverOpacity: 0.7,
+          hoverColor: false,
+          zoomOnScroll: false,
+          zoomStep: 1,
+          backgroundColor: 'transparent',
+          regionStyle: {
+            initial: {
+              fill: 'none',
+              'fill-opacity': 0.5,
+              stroke: '#6da6f5',
+              'stroke-width': 0.8,
+              'stroke-opacity': 0.6
+            },
+            hover: {
+              'fill-opacity': 0.7,
+              cursor: 'pointer'
+            },
+            selected: {
+              fill: 'yellow'
+            },
+            selectedHover: {}
+          },
+          markerStyle: {
+            initial: {
+              fill: '#00a65a',
+              stroke: '#82bd39',
+              r: 3,
+            },
+            hover: {
+              r: 4,
+              fill: '#dbf433',
+              stroke: '#82bd39',
+            }
+          },
+          markers: maps,
+        })
+        this.loading = false
+      },
+      //新增地图标注
+      addJvpMarkers (maps) {
+        let map = $('#world-map-markers').vectorMap('get', 'mapObject')
+        map.addMarkers(maps)
+      },
+      //移除地图标注
+      removeJvpMarkers (maps) {
+        let map = $('#world-map-markers').vectorMap('get', 'mapObject')
+        map.removeMarkers(maps)
+      }
+    },
+    watch: {
+      ipObj: {
+        handler: function (val, oldVal) {
+          if (val !== oldVal) {
+            //console.log("旧数据=新数据");
+            //this.removeJvpMarkers(oldVal);
+            //this.addJvpMarkers(val);
+          }
         },
-        watch: {
-            ipObj: {
-                handler: function (val, oldVal) {
-                    if (val !== oldVal) {
-                        //console.log("旧数据=新数据");
-                        //this.removeJvpMarkers(oldVal);
-                        //this.addJvpMarkers(val);
-                    }
-                },
-                deep: true
-            }
-        }
+        deep: true
+      }
     }
+  }
 </script>
 <style lang="less">
     @import url("../../assets/css/style.less");
@@ -323,15 +317,15 @@
                         float: left;
                         text-align: right;
                         margin-left: 5px;
-                        min-width: 150px;
+                        min-width: 151px;
                     }
                 }
             }
             .home-nav-top:last-child {
-                margin-right: 0px;
+                margin-right: 0;
             }
             .home-info {
-                widow: 100%;
+                width: 100%;
                 height: 25rem;
                 margin-top: 0.5rem;
                 border: 1px solid #333333;

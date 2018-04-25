@@ -24,8 +24,8 @@ const en = {
         passWordTitle: 'Please input your password',
         confirmButtonText: 'Confirm ',
         cancelButtonText: 'Cancel',
-        passWordSuccess: 'Congratulations,your account has been created!',
-        passWordFailed: 'Sorry,we have failed to create your account!',
+        passWordSuccess: 'Congratulations, apply for success',
+        passWordFailed: 'Sorry, the application failed',
         passWordWasincorrect: 'Incorrect password！',
         enterCance: 'Cancel',
         //top nav
@@ -112,7 +112,7 @@ const en = {
         type:'Type',
         amount:'Amount change',
         freezeTime:'FreezeDate',
-        thawingTime:'ThawingDate',
+        thawingTime:'Thawing',
         //userInfo
         userInfoTitle:'Account Address',
         tabName:'Account',
@@ -197,7 +197,8 @@ const en = {
         c51:'Deposit',
         c52:'Please enter the entrustment depositamount！',
         c53:'Please enter the correct entrustment deposit amount for digital value',
-        c54:'The amount of the entrustment deposit should not be greater than the available balance',
+        c54:'Margin:no less than 20000, less than the available balance',
+        c541:'Margin:no less than 20000, less than the available balance',
         //allPledge
         c55:'Total amount of deposit',
         //myNode
@@ -292,6 +293,7 @@ const en = {
         c136:'The most eight bits before and after the decimal point',
         c137:'The core program failed to start. Please try again or contact developers.',
         c138:'Startup failure',
+        c139:'Height',
 		
         //Bottom info
         purseVersion: 'Wallet version',

@@ -2,21 +2,24 @@
     <nav class="nav-top">
         <div class="logo fl"><img class="logo-img" src="../assets/logo.png"/></div>
         <ul>
-            <li @click="to('home','0')" :class="[errorClass ,isActive===0 ? activeClass : '']"><i class="home_icon"></i><span>{{$t("message.home")}}</span>
+            <li @click="to('home','0')" :class="[errorClass ,isActive===0 ? activeClass : '']"><i class="home_icon"></i><span>{{$t('message.home')}}</span>
             </li>
             <li @click="to('wallet','1')" :class="[errorClass ,isActive===1 ? activeClass : '']"><i
-                    class="wallet_icon"></i> <span>{{$t("message.wallet")}}</span></li>
+                    class="wallet_icon"></i> <span>{{$t('message.wallet')}}</span></li>
             <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i
-                    class="consensus_icon"></i> <span>{{$t("message.consensus")}}</span></li>
+                    class="consensus_icon"></i> <span>{{$t('message.consensus')}}</span></li>
             <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i
-                    class="application_icon"></i> <span>{{$t("message.applications")}}</span></li>
+                    class="application_icon"></i> <span>{{$t('message.applications')}}</span></li>
             <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="more_icon"></i>
-                <span>{{$t("message.more")}}</span></li>
+                <span>{{$t('message.more')}}</span></li>
         </ul>
         <div class="top-icon fl">
-            <el-badge :value="0" class="news">
+            <el-badge class="news">
                 <i class="message_icon" @click="news"></i>
             </el-badge>
+            <!--<el-badge :value="0" class="news">
+                <i class="message_icon" @click="news"></i>
+            </el-badge>-->
             <div class="set"><i class="set_icon" @click="toSetUp"></i></div>
             <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem"
                       :widthData="widthData"></SelecBar>
@@ -26,7 +29,7 @@
             </div>
         </div>
         <div class="news-div" v-show="newsOk">
-            <h2>{{$t("message.news")}}</h2>
+            <h2>{{$t('message.news')}}</h2>
             <div class="news-div-info">
                 <div class="news-div-info-div cursor-p">
                     <h5>系统消息</h5>
@@ -39,153 +42,179 @@
 </template>
 
 <script>
-    import SelecBar from './SelecBar.vue';
-    import {jquery} from '@/assets/js/jquery.min.js';
-    import * as config from '@/config.js';
+  import SelecBar from './SelecBar.vue'
+  import { jquery } from '@/assets/js/jquery.min.js'
+  import * as config from '@/config.js'
 
-    export default {
-        data() {
-            return {
-                newsOk: false,
-                current: 0,
-                //languageItem
-                languageItem: [
-                    {
-                        key: "cn",
-                        value: "static/img/Language-zh.png"
-                    },
-                    {
-                        key: "en",
-                        value: "static/img/Language-en.png"
-                    }
-                ],
-                //select language initial info
-                projectName: {
-                    key: "en",
-                    value: "static/img/Language-en.png"
-                },
-                //select language initial width
-                widthData: "2rem",
-                errorClass: '',
-                activeClass: 'active',
-                isActive: 0,
-            }
+  export default {
+    data () {
+      return {
+        newsOk: false,
+        current: 0,
+        //languageItem
+        languageItem: [
+          {
+            key: 'cn',
+            value: 'static/img/Language-zh.png'
+          },
+          {
+            key: 'en',
+            value: 'static/img/Language-en.png'
+          }
+        ],
+        //select language initial info
+        projectName: {
+          key: 'en',
+          value: 'static/img/Language-en.png'
         },
-        components: {
-            SelecBar
-        },
-        computed: {},
-        created() {
-            this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en';
-            if (localStorage.getItem("language") === 'cn') {
-                this.projectName = {
-                    key: "cn",
-                    value: "static/img/Language-zh.png"
-                }
-            } else {
-                this.projectName = {
-                    key: "en",
-                    value: "static/img/Language-en.png"
-                }
-            }
-        },
-        methods: {
-            //语言切换
-            selectLanguage() {
-                this.$i18n.locale = this.projectName.key;
-                let param = '{"language":"' + this.projectName.key + '"}';
-                this.$post('/lang', param)
-                    .then((response) => {
-                        //console.log(response);
-                        if (response.success) {
-                            console.log('success')
-                        } else {
-                            console.log('err')
-                        }
-                    });
-            },
-            //菜单跳转
-            to(url, index) {
-                if (sessionStorage.getItem("userList") !== '1') {
-                    this.$message({
-                        type: 'info', message: this.$t('message.c131'), duration: '800'
-                    });
-                } else {
-                    if (url === "home") {
-                        this.isActive = 0;
-                        this.$router.push({
-                            path: '/*',
-                        })
-                    }
-                    if (url === "wallet") {
-                        this.isActive = 1;
-                        //获取账户地址列表
-                        if (this.$store.getters.getAddressList.length === 0) {
-                            this.$router.push({
-                                name: '/setPassword',
-                            })
-                        } else {
-                            this.$router.push({
-                                name: '/wallet',
-                                params: {language: index}
-                            })
-                        }
-                    }
-                    if (url === "consensus") {
-                        this.isActive = 2;
-                        this.$router.push({
-                            name: '/consensus',
-                            params: {activeName: "first"},
-                        })
-                    }
-                    if (url === "application") {
-                        this.isActive = 3;
-                        this.$message({
-                            type: 'info', message: this.$t('message.c65'), duration: '800'
-                        });
-                    }
-                    if (url === "more") {
-                        this.isActive = 4;
-                        this.$message({
-                            type: 'info', message: this.$t('message.c65'), duration: '800'
-                        });
-                    }
-                }
-            },
-            //消息方案
-            news() {
-                /*this.newsOk = !this.newsOk*/
-            },
-            //设置界面跳转
-            toSetUp() {
-                if (this.$store.getters.getAddressList.length === 0) {
-                    this.$router.push({
-                        name: '/setPassword',
-                    })
-                } else {
-                    this.$router.push({
-                        path: '/users/setPage'
-                    })
-                }
-            },
-            //窗体最小化
-            toMinus() {
-                let ipc = require('electron').ipcRenderer;
-                ipc.send('window-min');
-            },
-            //关闭窗体
-            toClose() {
-                let ipc = require('electron').ipcRenderer;
-                ipc.send('CoreLauncher', 'stop');
-                setTimeout(() => {
-                    ipc.send('window-close');
-                }, 600);
-            }
+        //select language initial width
+        widthData: '2rem',
+        errorClass: '',
+        activeClass: 'active',
+        isActive: 0,
+      }
+    },
+    components: {
+      SelecBar
+    },
+    computed: {},
+    mounted () {
+      this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en'
+      //判断是否有设置语言
+      if(localStorage.hasOwnProperty('language')){
+        if (localStorage.getItem('language') === 'cn') {
+          this.projectName = {
+            key: 'cn',
+            value: 'static/img/Language-zh.png'
+          }
+        } else {
+          this.projectName = {
+            key: 'en',
+            value: 'static/img/Language-en.png'
+          }
         }
+      }else {
+        const languageSet = setInterval(() => {
+          if(localStorage.hasOwnProperty('language')){
+            if (localStorage.getItem('language') === 'cn') {
+              this.projectName = {
+                key: 'cn',
+                value: 'static/img/Language-zh.png'
+              }
+            } else {
+              this.projectName = {
+                key: 'en',
+                value: 'static/img/Language-en.png'
+              }
+            }
+            clearInterval(languageSet)
+          }
+        },500)
+      }
+
+    },
+    methods: {
+      //语言切换
+      selectLanguage () {
+        this.$i18n.locale = this.projectName.key
+        let param =''
+        if(this.projectName.key !=='en'){
+         param ='zh-CHS'
+        }else {
+          param =this.projectName.key
+        }
+        this.$put('/sys/lang/'+param)
+          .then((response) => {
+            if (response.success) {
+              console.log('success')
+            } else {
+              console.log('err')
+            }
+          })
+      },
+      //菜单跳转
+      to (url, index) {
+        if (sessionStorage.getItem('userList') !== '1') {
+          this.$message({
+            type: 'info', message: this.$t('message.c131'), duration: '800'
+          })
+        } else {
+          if (url === 'home') {
+            this.isActive = 0
+            this.$router.push({
+              path: '/*',
+            })
+          }
+          if (url === 'wallet') {
+            this.isActive = 1
+            //获取账户地址列表
+            if (this.$store.getters.getAddressList.length === 0) {
+              this.$router.push({
+                name: '/setPassword',
+              })
+            } else {
+              this.$router.push({
+                name: '/wallet',
+                params: {language: index}
+              })
+            }
+          }
+          if (url === 'consensus') {
+            this.isActive = 2
+            this.$router.push({
+              name: '/consensus',
+              params: {activeName: 'first'},
+            })
+          }
+          if (url === 'application') {
+            this.isActive = 3
+            this.$message({
+              type: 'info', message: this.$t('message.c65'), duration: '800'
+            })
+          }
+          if (url === 'more') {
+            this.isActive = 4
+            this.$message({
+              type: 'info', message: this.$t('message.c65'), duration: '800'
+            })
+          }
+        }
+      },
+      //消息方案
+      news () {
+        /*this.newsOk = !this.newsOk*/
+      },
+      //设置界面跳转
+      toSetUp () {
+        if (this.$store.getters.getAddressList.length === 0) {
+          this.$router.push({
+            name: '/setPassword',
+          })
+        } else {
+          this.$router.push({
+            path: '/users/setPage'
+          })
+        }
+      },
+      //窗体最小化
+      toMinus () {
+        let ipc = require('electron').ipcRenderer
+        ipc.send('window-min')
+      },
+      //关闭窗体
+      toClose () {
+        let ipc = require('electron').ipcRenderer
+        ipc.send('CoreLauncher', 'stop')
+        setTimeout(() => {
+          ipc.send('window-close')
+        }, 600)
+      }
     }
+  }
 </script>
 <style lang="less">
     @import './../assets/css/style.less';
+
     .nav-top {
         width: 100%;
         height: 42px;

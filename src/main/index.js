@@ -115,8 +115,8 @@ function corePath (cmd) {
     paths.targetPath = path.resolve(process.resourcesPath, '../java/bin')
     paths.binPath = path.resolve(paths.targetPath, cmd + '.sh')
   } else if (platform === 'win32' || platform === 'win64') {
-     paths.targetPath = path.resolve(process.execPath, '../../../../java/bin')
-    //paths.targetPath = path.join(process.execPath, './../java/bin')
+     //paths.targetPath = path.resolve(process.execPath, '../../../../java/bin')
+    paths.targetPath = path.join(process.execPath, './../java/bin')
     paths.binPath = path.resolve(paths.targetPath, cmd + '.bat')
   }
   return paths

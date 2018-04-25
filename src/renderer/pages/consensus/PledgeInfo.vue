@@ -2,21 +2,22 @@
     <div class="pledge-info">
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{$t('message.c48')}}</h2>
-        <el-table :data="pledgeData" >
-            <el-table-column prop="agentName" :label="$t('message.c24')" width="120" align='center'>
+        <el-table :data="pledgeData">
+            <el-table-column prop="agentName" :label="$t('message.c24')" min-width="120" align='center'>
             </el-table-column>
             <el-table-column prop="amount" :label="$t('message.amount')" min-width="210" align='center'>
             </el-table-column>
-            <el-table-column prop="status" :label="$t('message.state')"  width="100" align='center'>
+            <el-table-column prop="status" :label="$t('message.state')" width="100" align='center'>
                 <template slot-scope="scope">
-                    {{$t('message.type'+scope.row.status)}}
+                    {{$t('message.status'+scope.row.status)}}
                 </template>
             </el-table-column>
-            <el-table-column prop="depositTime" :label="$t('message.c49')"  width="160" align='center'>
+            <el-table-column prop="depositTime" :label="$t('message.c49')" width="160" align='center'>
             </el-table-column>
-            <el-table-column :label="$t('message.operation')"   width="90" align='center'>
+            <el-table-column :label="$t('message.operation')" width="90" align='center'>
                 <template slot-scope="scope">
-                    <el-button @click="handleClick(scope.row)" type="text" size="small">{{$t('message.c50')}}</el-button>
+                    <el-button @click="handleClick(scope.row)" type="text" size="small">{{$t('message.c50')}}
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -26,54 +27,64 @@
 </template>
 
 <script>
-    import Back from './../../components/BackBar.vue'
-    import moment from 'moment';
-    export default {
-        data() {
-            return {
-                pledgeData: [],
-                total:0,
-            }
-        },
-        components: {
-            Back,
-        },
-        mounted() {
-            let _this = this;
-            if(localStorage.getItem("newAccountAddress") !== ''){
-                this.getConsensusDeposit("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'),{"pageSize": "8"});
-            }
+  import Back from './../../components/BackBar.vue'
+  import moment from 'moment'
+  import { BigNumber } from 'bignumber.js'
 
-        },
-        methods: {
-            //获取我的抵押总额明细列表
-            getConsensusDeposit(url,params) {
-                this.$fetch(url,params)
-                    .then((response) => {
-                        //console.log(response);
-                        if (response.success) {
-                            this.total = response.data.total;
-                            for (let i = 0; i < response.data.list.length; i++) {
-                                response.data.list[i].amount = (response.data.list[i].amount *0.00000001).toFixed(8);
-                                response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss');
-                            }
-                            this.pledgeData = response.data.list;
-                        }
-                    });
-            },
-            //分页功能
-            pledgeSize(events){
-                this.getConsensusDeposit("/consensus/deposit/address/" + localStorage.getItem('newAccountAddress'), {"pageNumber": events, "pageSize": "8"});
-            },
-            //查看节点详情
-            handleClick(row) {
-                this.$router.push({
-                    name: '/myNode',
-                    params: {agentAddress: row.agentAddress},
-                })
+  export default {
+    data () {
+      return {
+        pledgeData: [],
+        total: 0,
+      }
+    },
+    components: {
+      Back,
+    },
+    mounted () {
+      let _this = this
+      if (localStorage.getItem('newAccountAddress') !== '') {
+        this.getConsensusDeposit('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
+          'pageSize': '8',
+          'pageNumber': 1
+        })
+      }
+
+    },
+    methods: {
+      //获取我的抵押总额明细列表
+      getConsensusDeposit (url, params) {
+        this.$fetch(url, params)
+          .then((response) => {
+            //console.log(url + params)
+            //console.log(response)
+            if (response.success) {
+              let leftShift = new BigNumber(0.00000001)
+              this.total = response.data.total
+              for (let i = 0; i < response.data.list.length; i++) {
+                response.data.list[i].amount = parseFloat(leftShift.times(response.data.list[i].amount).toString())
+                response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss')
+              }
+              this.pledgeData = response.data.list
             }
-        }
+          })
+      },
+      //分页功能
+      pledgeSize (events) {
+        this.getConsensusDeposit('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
+          'pageNumber': events,
+          'pageSize': '8'
+        })
+      },
+      //查看节点详情
+      handleClick (row) {
+        this.$router.push({
+          name: '/myNode',
+          params: {agentAddress: row.agentAddress},
+        })
+      }
     }
+  }
 </script>
 
 <style lang="less">

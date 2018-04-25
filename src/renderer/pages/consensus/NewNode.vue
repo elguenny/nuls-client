@@ -52,8 +52,8 @@
                     let res = /^\d{1,8}(\.\d{1,8})?$/;
                     if (!re.exec(value) || !res.exec(value)) {
                         callback(new Error(this.$t('message.c32')));
-                    } else if (value > this.usable - 0.01 || value < 2000 ) {
-                        callback(new Error(this.$t('message.c54')));
+                    } else if (value > this.usable - 0.01 || value < 20000 ) {
+                        callback(new Error(this.$t('message.c541')));
                     } else {
                         callback();
                     }

@@ -35,7 +35,7 @@
                 <ul>
                     <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                     <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                    <li><label>{{$t('message.c25')}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
+                    <li><label>{{$t('message.c25')}}：</label>{{ item.owndeposit}} NULS</li>
                     <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                         <label class="fl cursor-p">{{$t('message.c18')}}:</label>
                         <ProgressBar colorData="#f64b3e" :widthData="item.creditRatio"></ProgressBar>
@@ -66,112 +66,115 @@
 </template>
 
 <script>
-    import Back from './../../components/BackBar.vue'
-    import ProgressBar from './../../components/ProgressBar.vue'
+  import Back from './../../components/BackBar.vue'
+  import ProgressBar from './../../components/ProgressBar.vue'
+  import { BigNumber } from 'bignumber.js'
 
-    export default {
-        data() {
-            return {
-                showData: false,
-                sortValue: this.$t('message.c46'),
-                sortConsensusList: [
-                    {sortName: this.$t('message.c46'), sortKey: ''},
-                    {sortName: this.$t('message.c17'), sortKey: 'commissionRate'},
-                    {sortName: this.$t('message.c25'), sortKey: 'owndeposit'},
-                    {sortName: this.$t('message.c18'), sortKey: 'creditRatio'}
-                ],
-                keyword: '',
-                selectKeyword: '',
-                creditValuesShow0: false,
-                creditValuesShow1: false,
-                creditValuesShow2: false,
+  export default {
+    data () {
+      return {
+        showData: false,
+        sortValue: this.$t('message.c46'),
+        sortConsensusList: [
+          {sortName: this.$t('message.c46'), sortKey: ''},
+          {sortName: this.$t('message.c17'), sortKey: 'commissionRate'},
+          {sortName: this.$t('message.c25'), sortKey: 'owndeposit'},
+          {sortName: this.$t('message.c18'), sortKey: 'creditRatio'}
+        ],
+        keyword: '',
+        selectKeyword: '',
+        creditValuesShow0: false,
+        creditValuesShow1: false,
+        creditValuesShow2: false,
 
-                allConsensus: [],
-                totalAll: 0,
-            }
-        },
-        components: {
-            Back,
-            ProgressBar,
-        },
-        mounted() {
-            let _this = this;
-            this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6", "pageNumber": "1"});
-            //判断用户选择的语言
-            let language = localStorage.getItem('language');
-            setInterval(() => {
-                if (language !== localStorage.getItem('language')) {
-                    language = localStorage.getItem('language');
-                    this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6", "pageNumber": "1"});
-                } else {
-                    language = localStorage.getItem('language');
-                }
-            }, 1000);
-        },
-        methods: {
-            //获取全部共识列表
-            getAllConsensus(url, params) {
-                this.$fetch(url, params)
-                    .then((response) => {
-                        //console.log(params);
-                        if (response.success) {
-                            for (let i = 0; i < response.data.list.length; i++) {
-                                response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + "..." + (response.data.list[i].agentAddress).substr(-6);
-                                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%';
-                                response.data.list[i].totalDeposit = ((response.data.list[i].totalDeposit / 50000000000000).toFixed()).toString() + '%';
-                            }
-                            this.totalAll = response.data.total;
-                            this.allConsensus = response.data.list;
-                        } else {
-                            this.totalAll = 0;
-                            this.allConsensus = [];
-                        }
-                    }).catch((reject) => {
-                    console.log("获取全部共识列表：" + reject);
-                });
-            },
-            //全部共识分页
-            allConsensusSize(events) {
-                this.getAllConsensus("/consensus/agent/list/", {"pageNumber": events, "pageSize": "6"});
-            },
-            showDataList() {
-                this.showData = !this.showData;
-            },
-            //搜索功能
-            searchConsensus() {
-                if (this.keyword !== '') {
-                    const params = {"keyword": this.keyword, "pageSize": "6", "pageNumber": "1"};
-                    this.getAllConsensus("/consensus/agent/list/", params);
-                } else {
-                    this.getAllConsensus("/consensus/agent/list/", {"pageSize": "6", "pageNumber": "1"});
-                }
-            },
-            //排序共识
-            sortConsensus(sortName,sortKey){
-                this.showData=false;
-                this.sortValue = sortName;
-                if (this.keyword!== '') {
-                    const params = {"keyword": this.keyword, "sortType": sortKey, "pageSize": "6", "pageNumber": "1"};
-                    this.getAllConsensus("/consensus/agent/list/", params);
-                } else {
-                    const params = {"sortType": sortKey, "pageSize": "6", "pageNumber": "1"};
-                    this.getAllConsensus("/consensus/agent/list/", params);
-                }
-
-            },
-            //显示隐藏信用值
-            toggleShow(e) {
-                this.creditValuesShow0 = !this.creditValuesShow0;
-            },
-            //查看节点详情
-            toNodePage(index) {
-                this.$router.push({
-                    name: '/nodePage',
-                    params: {address: index},
-                });
-            }
+        allConsensus: [],
+        totalAll: 0,
+      }
+    },
+    components: {
+      Back,
+      ProgressBar,
+    },
+    mounted () {
+      let _this = this
+      this.getAllConsensus('/consensus/agent/list/', {'pageSize': '6', 'pageNumber': '1'})
+      //判断用户选择的语言
+      let language = localStorage.getItem('language')
+      setInterval(() => {
+        if (language !== localStorage.getItem('language')) {
+          language = localStorage.getItem('language')
+          this.getAllConsensus('/consensus/agent/list/', {'pageSize': '6', 'pageNumber': '1'})
+        } else {
+          language = localStorage.getItem('language')
         }
+      }, 1000)
+    },
+    methods: {
+      //获取全部共识列表
+      getAllConsensus (url, params) {
+        this.$fetch(url, params)
+          .then((response) => {
+            //console.log(params);
+            if (response.success) {
+              let leftShift = new BigNumber(0.00000001)
+              for (let i = 0; i < response.data.list.length; i++) {
+                response.data.list[i].owndeposit = parseFloat(leftShift.times(response.data.list[i].owndeposit).toString())
+                response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
+                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+                response.data.list[i].totalDeposit = ((response.data.list[i].totalDeposit / 50000000000000).toFixed()).toString() + '%'
+              }
+              this.totalAll = response.data.total
+              this.allConsensus = response.data.list
+            } else {
+              this.totalAll = 0
+              this.allConsensus = []
+            }
+          }).catch((reject) => {
+          console.log('获取全部共识列表：' + reject)
+        })
+      },
+      //全部共识分页
+      allConsensusSize (events) {
+        this.getAllConsensus('/consensus/agent/list/', {'pageNumber': events, 'pageSize': '6'})
+      },
+      showDataList () {
+        this.showData = !this.showData
+      },
+      //搜索功能
+      searchConsensus () {
+        if (this.keyword !== '') {
+          const params = {'keyword': this.keyword, 'pageSize': '6', 'pageNumber': '1'}
+          this.getAllConsensus('/consensus/agent/list/', params)
+        } else {
+          this.getAllConsensus('/consensus/agent/list/', {'pageSize': '6', 'pageNumber': '1'})
+        }
+      },
+      //排序共识
+      sortConsensus (sortName, sortKey) {
+        this.showData = false
+        this.sortValue = sortName
+        if (this.keyword !== '') {
+          const params = {'keyword': this.keyword, 'sortType': sortKey, 'pageSize': '6', 'pageNumber': '1'}
+          this.getAllConsensus('/consensus/agent/list/', params)
+        } else {
+          const params = {'sortType': sortKey, 'pageSize': '6', 'pageNumber': '1'}
+          this.getAllConsensus('/consensus/agent/list/', params)
+        }
+
+      },
+      //显示隐藏信用值
+      toggleShow (e) {
+        this.creditValuesShow0 = !this.creditValuesShow0
+      },
+      //查看节点详情
+      toNodePage (index) {
+        this.$router.push({
+          name: '/nodePage',
+          params: {address: index},
+        })
+      }
     }
+  }
 </script>
 
 <style lang="less">
@@ -211,9 +214,9 @@
             .select-div {
                 margin-left: 3%;
                 width: 165px;
-                .sort-select{
+                .sort-select {
                     width: 135px;
-                    .sort-select-item{
+                    .sort-select-item {
                         width: 135px;
                     }
                 }

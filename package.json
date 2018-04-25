@@ -64,6 +64,7 @@
   },
   "dependencies": {
     "axios": "^0.16.1",
+    "bignumber.js": "^6.0.0",
     "clipboard": "^2.0.0",
     "copy-to-clipboard": "^3.0.8",
     "cropper": "^3.1.4",

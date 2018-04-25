@@ -3,16 +3,16 @@
         <Back :backTitle="backTitle"></Back>
         <h2>{{$t('message.c55')}}</h2>
         <el-table :data="pledgeData" :stripe="false">
-            <el-table-column prop="address" :label="$t('message.tabName')" min-width="50" align='center'>
+            <el-table-column prop="address" :label="$t('message.tabName')" min-width="120" align='center'>
             </el-table-column>
-            <el-table-column prop="amount" :label="$t('message.amount')" min-width="13" align='center'>
+            <el-table-column prop="amount" :label="$t('message.amount')" align='center'>
             </el-table-column>
-            <el-table-column prop="status" :label="$t('message.state')" min-width="12" align='center'>
+            <el-table-column prop="status" :label="$t('message.state')" min-width="35" align='center'>
                 <template slot-scope="scope">
                     {{$t('message.status'+scope.row.status)}}
                 </template>
             </el-table-column>
-            <el-table-column prop="depositTime" :label="$t('message.c49')" min-width="20" align='center'>
+            <el-table-column prop="depositTime" :label="$t('message.c49')" min-width="65" align='center'>
             </el-table-column>
         </el-table>
         <el-pagination layout="prev, pager, next" :total=this.total class="cb"
@@ -54,7 +54,7 @@
             if (response.success) {
               this.total = response.data.total
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].amount = response.data.list[i].amount * 0.00000001
+                response.data.list[i].amount = (response.data.list[i].amount * 0.00000001).toFixed(8)
                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss')
               }
               this.pledgeData = response.data.list

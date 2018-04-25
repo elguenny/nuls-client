@@ -21,7 +21,8 @@
                 </li>
                 <li>
                     <label>{{$t('message.c18')}}：</label>
-                    <ProgressBar colorData="#82bd39" :widthData="this.nodeData.creditRatio"></ProgressBar>
+                    <ProgressBar :colorData="this.nodeData.creditRatios < 0 ? '#f64b3e':'#82bd39'"
+                                 :widthData="this.nodeData.creditRatio"></ProgressBar>
                     <span>&nbsp;{{this.nodeData.creditRatios}}</span>
                 </li>
                 <li>
@@ -41,14 +42,14 @@
                 </el-form-item>
                 <span class="allUsable">{{$t('message.currentBalance')}}: {{ this.usable}} NULS</span>
                 <el-form-item :label="$t('message.c25')" class="number" prop="nodeNo">
-                    <el-input v-model="nodeForm.nodeNo" :maxlength="17"></el-input>
+                    <el-input ref="input" v-model="nodeForm.nodeNo" :maxlength="17"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
                 </el-form-item>
                 <div class="procedure"><label>{{$t('message.c28')}}</label><span>0.01 NULS</span></div>
                 <el-form-item size="large" class="submit">
                     <el-button type="primary" @click="onSubmit('nodeForm')" id="nodePage"
                                :disabled=this.btOk>
-                    {{$t('message.confirmButtonText')}}
+                        {{$t('message.confirmButtonText')}}
                     </el-button>
                 </el-form-item>
             </el-form>
@@ -58,154 +59,165 @@
 </template>
 
 <script>
-    import Back from '@/components/BackBar.vue';
-    import ProgressBar from '@/components/ProgressBar.vue';
-    import AccountAddressBar from '@/components/AccountAddressBar.vue';
-    import Password from '@/components/PasswordBar.vue';
-    import * as config from '@/config.js';
-    export default {
-        data() {
-            let checkNodeNo = (rule, value, callback) => {
-                if (!value) {
-                    callback(new Error(this.$t('message.c52')));
-                }
-                setTimeout(() => {
-                    let re = /^\d+(?=\.{0,1}\d+$|$)/;
-                    let res = /^\d{1,8}(\.\d{1,8})?$/;
-                    if (!re.exec(value) || !res.exec(value)) {
-                        callback(new Error(this.$t('message.c53')));
-                    } else if (value > this.usable - 0.01 || value < 2000 ) {
-                        callback(new Error(this.$t('message.c54')));
-                    } else {
-                        callback();
-                    }
-                }, 100);
-            };
-            return {
-                loading: true,
-                btOk:this.$store.getters.getNetWorkInfo.localBestHeight !== this.$store.getters.getNetWorkInfo.netBestHeight,
-                submitId:"nodePage",
-                address: this.$route.params.address,
-                agentId:'',
-                nodeData: [],
-                usable: 0,
-                nodeForm: {
-                    nodeNo: 0,
-                },
-                nodeRules: {
-                    nodeNo: [
-                        {validator: checkNodeNo, trigger: 'blur'}
-                    ],
-                }
-            }
-        },
-        components: {
-            Back,
-            ProgressBar,
-            AccountAddressBar,
-            Password,
-        },
-        created() {
-            this.getConsensusAddress("/consensus/agent/"+this.address);
-            this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'));
-        },
-        methods: {
-            //根据address获取共识节点列表信息
-            getConsensusAddress(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        if (response.success) {
-                            //console.log(response);
-                            response.data.creditRatios = response.data.creditRatio;
-                            if (response.data.creditRatio !== 0) {
-                                if (response.data.creditRatio > 0) {
-                                    response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%';
-                                } else {
-                                    response.data.creditRatio = (parseFloat(response.data.creditRatio) * 100).toFixed(6).substr(1,5)+'%';
-                                }
-                            } else {
-                                response.data.creditRatio = "50%";
-                            }
-                            response.data.agentAddresss = (response.data.agentAddress).substr(0,10)+"..."+(response.data.agentAddress).substr(-10);
-                            response.data.totalDeposits = (response.data.totalDeposit*0.00000001).toFixed(0) +"/500000";
-                            if(response.data.totalDeposit > 50000000000000){
-                                response.data.totalDeposit ='100%';
-                            }else {
-                                response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%';
-                            }
-                            //response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
-                            this.agentId = response.data.agentId;
-                            this.nodeData = response.data;
-                            this.loading =false;
-                        }
-                    });
-            },
-            //获取下拉选择地址
-            chenckAccountAddress(chenckAddress) {
-                //console.log(chenckAddress);
-                this.getBalanceAddress('/account/balance/' + chenckAddress);
-                this.$refs.nodeForm.validateField('nodeNo');
-            },
-            //根据账户地址获取账户余额
-            getBalanceAddress(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        if(response.success){
-                            this.usable = config.FloatMul(response.data.usable,0.00000001);
-                        }
-                    });
-            },
-            //选择全部金额
-            allUsable(balance) {
-                if(balance === "0.00000000"){
-                    this.$message({
-                        message: this.$t('message.creditLow'),
-                        type: 'warning '
-                    });
-                }else {
-                    console.log(balance);
-                    this.nodeForm.nodeNo =  config.FloatSub(balance,0.01)
-                }
-            },
-            //提交委托
-            onSubmit(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$refs.password.showPassword(true);
-                    } else {
-                        return false;
-                    }
-                });
-            },
-            //
-            toSubmit(password) {
-                let param = '{"address":"' + localStorage.getItem('newAccountAddress') + '","agentId":"' + this.agentId + '","deposit":"' + this.nodeForm.nodeNo * 100000000 + '","password":"' + password + '"}';
-                this.$post('/consensus/deposit/', param)
-                    .then((response) => {
-                        //console.log(param);
-                        if (response.success) {
-                            this.$message({
-                                message: this.$t('message.passWordSuccess'),
-                                type: 'success'
-                            });
-                            this.$router.push({
-                                name: '/consensus',
-                                params:{"activeName":"first"}
-                            });
-                            /*this.$router.push({
-                                name: '/myNode',
-                                params:{"agentAddress":this.nodeData.agentAddress}
-                            })*/
-                        } else {
-                            this.$message({
-                                message: this.$t('message.passWordFailed') + response.msg,
-                                type: 'warning',
-                            });
-                        }
-                    })
-            },
+  import Back from '@/components/BackBar.vue'
+  import ProgressBar from '@/components/ProgressBar.vue'
+  import AccountAddressBar from '@/components/AccountAddressBar.vue'
+  import Password from '@/components/PasswordBar.vue'
+  import * as config from '@/config.js'
+  import { BigNumber } from 'bignumber.js'
+
+  export default {
+    data () {
+      let checkNodeNo = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('message.c52')))
         }
+        setTimeout(() => {
+          let re = /^\d+(?=\.{0,1}\d+$|$)/
+          let res = /^\d{1,8}(\.\d{1,8})?$/
+          if (!re.exec(value) || !res.exec(value)) {
+            callback(new Error(this.$t('message.c53')))
+          } else if (value > this.usable - 0.01 || value < 2000) {
+            callback(new Error(this.$t('message.c54')))
+          } else {
+            callback()
+          }
+        }, 100)
+      }
+      return {
+        loading: true,
+        btOk: this.$store.getters.getNetWorkInfo.localBestHeight !== this.$store.getters.getNetWorkInfo.netBestHeight,
+        submitId: 'nodePage',
+        address: this.$route.params.address,
+        agentId: '',
+        nodeData: [],
+        usable: 0,
+        nodeForm: {
+          nodeNo: '',
+        },
+        nodeRules: {
+          nodeNo: [
+            {validator: checkNodeNo, trigger: 'blur'}
+          ],
+        }
+      }
+    },
+    components: {
+      Back,
+      ProgressBar,
+      AccountAddressBar,
+      Password,
+    },
+    created () {
+      this.getConsensusAddress('/consensus/agent/' + this.address)
+      this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'))
+    },
+    mounted () {
+      this.$refs['input'].focus()
+      this.$refs['input'].value = ''
+    },
+    methods: {
+
+      //根据address获取共识节点列表信息
+      getConsensusAddress (url) {
+        this.$fetch(url)
+          .then((response) => {
+            if (response.success) {
+              //console.log(response);
+              response.data.creditRatios = response.data.creditRatio
+              if (response.data.creditRatio !== 0) {
+                if (response.data.creditRatio > 0) {
+                  response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%'
+                } else {
+                  response.data.creditRatio = (parseFloat(response.data.creditRatio) * 100).toFixed(6).substr(1, 5) + '%'
+                }
+              } else {
+                response.data.creditRatio = '50%'
+              }
+              response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10)
+              response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000'
+              if (response.data.totalDeposit > 50000000000000) {
+                response.data.totalDeposit = '100%'
+              } else {
+                response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%'
+              }
+              //response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
+              this.agentId = response.data.agentId
+              this.nodeData = response.data
+              this.loading = false
+            }
+          })
+      },
+      //获取下拉选择地址
+      chenckAccountAddress (chenckAddress) {
+        //console.log(chenckAddress);
+        this.getBalanceAddress('/account/balance/' + chenckAddress)
+        this.$refs.nodeForm.validateField('nodeNo')
+      },
+      //根据账户地址获取账户余额
+      getBalanceAddress (url) {
+        this.$fetch(url)
+          .then((response) => {
+            if (response.success) {
+              this.usable = config.FloatMul(response.data.usable, 0.00000001)
+            }
+          })
+      },
+      //选择全部金额
+      allUsable (balance) {
+        if (balance === '0.00000000') {
+          this.$message({
+            message: this.$t('message.creditLow'),
+            type: 'warning '
+          })
+        } else {
+          //console.log(balance)
+          this.nodeForm.nodeNo = config.FloatSub(balance, 0.01)
+        }
+      },
+      //提交委托
+      onSubmit (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.$refs.password.showPassword(true)
+          } else {
+            return false
+          }
+        })
+      },
+      //
+      toSubmit (password) {
+        let rightShift = new BigNumber(100000000)
+        let param = '{"address":"' + localStorage.getItem('newAccountAddress')
+          + '","agentId":"' + this.agentId
+          + '","deposit":"' + parseFloat(rightShift.times(this.nodeForm.nodeNo).toString())
+          + '","password":"' + password + '"}'
+        //console.log(param)
+        this.$post('/consensus/deposit/', param)
+          .then((response) => {
+            if (response.success) {
+              this.$message({
+                message: this.$t('message.passWordSuccess'),
+                type: 'success'
+              })
+              this.$router.push({
+                name: '/consensus',
+                params: {'activeName': 'first'}
+              })
+              /*this.$router.push({
+                  name: '/myNode',
+                  params:{"agentAddress":this.nodeData.agentAddress}
+              })*/
+            } else {
+              this.$message({
+                message: this.$t('message.passWordFailed') + response.msg,
+                type: 'warning',
+              })
+            }
+          })
+      },
     }
+  }
 </script>
 
 <style lang="less">
@@ -253,18 +265,18 @@
         .node-page-bottom {
             width: 80%;
             height: 190px;
-            margin: 20px auto 0px;
+            margin: 20px auto 0;
             border: 1px solid #658ec7;
             background-color: #17202e;
             .account-address {
                 margin-bottom: 8px;
                 .el-form-item__label {
                     margin-top: 20px;
-                    margin-right: 0px;
+                    margin-right: 0;
                     text-align: right;
                     width: 67px;
                 }
-                .address-select{
+                .address-select {
                     right: 90px;
                     top: 20px;
                     margin-left: 90px;
@@ -283,7 +295,7 @@
             }
             .el-form-item {
                 width: 90%;
-                margin: 0px auto 10px;
+                margin: 0 auto 10px;
                 .el-form-item__label {
                     color: #C1C5C9;
                 }

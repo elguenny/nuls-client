@@ -39,8 +39,8 @@
             this.getNetWorkInfo('/network/info');
             //2秒获取一次区块高度 encapsulated https
             setInterval(() => {
-                this.getNetWorkInfo('/network/info');
-            }, 2000);
+            this.getNetWorkInfo('/network/info');
+          }, 2000);
 
         },
         methods: {

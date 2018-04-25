@@ -3,7 +3,7 @@
         <Back :backTitle="this.$t('message.transactionManagement')"></Back>
         <div class="deal-info-top">
             <div class="deal-left fl">
-                <div>{{$t("message.input")}}<span> {{(this.allInputs*0.00000001).toFixed(8)}} NULS</span></div>
+                <div>{{$t('message.input')}}<span> {{(this.allInputs*0.00000001).toFixed(8)}} NULS</span></div>
                 <ul>
                     <li v-for="inItem in inputs">
                         {{ inItem.address }}<span>{{(inItem.value*0.00000001).toFixed(8)}}</span>
@@ -11,7 +11,7 @@
                 </ul>
             </div>
             <div class="deal-right fr">
-                <div>{{$t("message.output")}}<span>{{(this.allOutputs*0.00000001).toFixed(8)}} NULS</span></div>
+                <div>{{$t('message.output')}}<span>{{(this.allOutputs*0.00000001).toFixed(8)}} NULS</span></div>
                 <ul>
                     <li v-for="outItem in outputs">
                         {{ outItem.address }}<span>{{(outItem.value*0.00000001).toFixed(8)}}</span>
@@ -20,15 +20,20 @@
             </div>
         </div>
         <div class="deal-case">
-            <h3>{{$t("message.overview")}}</h3>
+            <h3>{{$t('message.overview')}}</h3>
             <ul>
-                <li><span>{{$t("message.tradingTime")}}</span>{{this.times}}</li>
-                <li><span>{{$t("message.miningFee1")}}</span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
-                <li @click="hashCopy(infoData.hash)" class="cursor-p"><span>{{$t("message.autograph")}}</span>{{infoData.hash}}</li>
-                <li><span>{{$t("message.transactionType")}}</span>{{infoData.transferType == '1' ? $t('message.rollOut'): $t('message.rollIn')}}</li>
-                <li><span>{{$t("message.transactionState")}}</span>{{infoData.status == '1' ? $t('message.confirmed'):$t('message.confirming') }}</li>
-                <li><span>{{$t("message.blockHeight")}}</span>{{infoData.blockHeight}}</li>
-                <li><span>{{$t("message.remarks")}}</span>{{infoData.remark}}</li>
+                <li><span>{{$t('message.tradingTime')}}</span>{{this.times}}</li>
+                <li><span>{{$t('message.miningFee1')}}</span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
+                <li @click="hashCopy(infoData.hash)" class="cursor-p"><span>{{$t('message.autograph')}}</span>{{infoData.hash}}
+                </li>
+                <li><span>{{$t('message.transactionType')}}</span>
+                        {{$t('message.type'+infoData.type)}}
+                </li>
+                <li><span>{{$t('message.transactionState')}}</span>{{infoData.status !== '1' ?
+                    $t('message.confirmed'):$t('message.confirming') }}
+                </li>
+                <li><span>{{$t('message.blockHeight')}}</span>{{infoData.blockHeight}}</li>
+                <li><span>{{$t('message.remarks')}}</span>{{infoData.remark}}</li>
             </ul>
         </div>
 
@@ -36,63 +41,64 @@
 </template>
 
 <script>
-    import Back from '@/components/BackBar.vue';
-    import copy from 'copy-to-clipboard';
-    import moment from 'moment';
-    export default {
-        data() {
-            return {
-                hash: this.$route.params.hash,
-                infoData: [],
-                inputs: [],
-                allInputs: 0,
-                outputs: [],
-                allOutputs: 0,
-                times:'',
+  import Back from '@/components/BackBar.vue'
+  import copy from 'copy-to-clipboard'
+  import moment from 'moment'
 
+  export default {
+    data () {
+      return {
+        hash: this.$route.params.hash,
+        infoData: [],
+        inputs: [],
+        allInputs: 0,
+        outputs: [],
+        allOutputs: 0,
+        times: '',
+
+      }
+    },
+    components: {
+      Back,
+    },
+    mounted () {
+      let _this = this
+      this.getHashInfo('/tx/hash/' + this.hash)
+    },
+    methods: {
+      //根据hash获取交易信息
+      getHashInfo (url) {
+        this.$fetch(url)
+          .then((response) => {
+            //console.log(response);
+            this.infoData = response.data
+            this.times = moment(response.data.time).format('YYYY-MM-DD hh:mm:ss')
+            this.inputs = response.data.inputs
+            if (response.data.inputs.length > 0) {
+              for (let i = 0; i < response.data.inputs.length; i++) {
+                response.data.inputs[i].address = response.data.inputs[i].address.substr(0, 10) + '...' + response.data.inputs[i].address.substr(length - 10)
+                this.allInputs = this.allInputs + parseFloat(response.data.inputs[i].value)
+              }
             }
-        },
-        components: {
-            Back,
-        },
-        mounted() {
-            let _this = this;
-            this.getHashInfo('/tx/hash/' + this.hash);
-        },
-        methods: {
-            //根据hash获取交易信息
-            getHashInfo(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        //console.log(response);
-                        this.infoData = response.data;
-                        this.times =  moment(response.data.time).format('YYYY-MM-DD hh:mm:ss');
-                        this.inputs = response.data.inputs;
-                        if (response.data.inputs.length > 0) {
-                            for (let i = 0; i < response.data.inputs.length; i++) {
-                                response.data.inputs[i].address= response.data.inputs[i].address.substr(0, 10) + '...' +  response.data.inputs[i].address.substr(length - 10);
-                                this.allInputs = this.allInputs + parseFloat(response.data.inputs[i].value);
-                            }
-                        }
-                        this.outputs = response.data.outputs;
-                        if (response.data.outputs.length > 0) {
-                            for (let i = 0; i < response.data.outputs.length; i++) {
-                                response.data.outputs[i].address= response.data.outputs[i].address.substr(0, 10) + '...' +  response.data.outputs[i].address.substr(length - 10);
-                                this.allOutputs = this.allOutputs + parseFloat(response.data.outputs[i].value);
-                            }
-                        }
-                    })
-            },
-            //复制功能
-            hashCopy(hash) {
-                copy(hash);
-                this.$message({
-                    message: this.$t('message.c129'),
-                    type: 'success'
-                });
-            },
-        }
+            this.outputs = response.data.outputs
+            if (response.data.outputs.length > 0) {
+              for (let i = 0; i < response.data.outputs.length; i++) {
+                response.data.outputs[i].address = response.data.outputs[i].address.substr(0, 10) + '...' + response.data.outputs[i].address.substr(length - 10)
+                this.allOutputs = this.allOutputs + parseFloat(response.data.outputs[i].value)
+              }
+            }
+          })
+      },
+      //复制功能
+      hashCopy (hash) {
+        copy(hash)
+        this.$message({
+          message: this.$t('message.c129'),
+          type: 'success'
+        })
+      },
     }
+  }
 </script>
 
 <style lang="less">
@@ -102,7 +108,7 @@
         .deal-info-top {
             width: 86%;
             height: 6rem;
-            margin:1rem auto 0;
+            margin: 1rem auto 0;
             .deal-left, .deal-right {
                 width: 48.2%;
                 line-height: 30px;
@@ -121,7 +127,7 @@
                 ul {
                     height: 4rem;
                     width: 101%;
-                    overflow:scroll;
+                    overflow: scroll;
                     overflow-x: hidden;
                     li {
                         width: 100%;
@@ -134,29 +140,26 @@
                         }
                     }
                 }
-                ul::-webkit-scrollbar-track
-                {
-                    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+                ul::-webkit-scrollbar-track {
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
                     background-color: #0c1323;
                     border-radius: 10px;
                 }
 
-                ul::-webkit-scrollbar
-                {
+                ul::-webkit-scrollbar {
                     width: 3px;
                     background-color: #0c1323;
                 }
 
-                ul::-webkit-scrollbar-thumb
-                {
+                ul::-webkit-scrollbar-thumb {
                     border-radius: 10px;
-                    background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#222d3f), to(#82bd39), color-stop(.6,#222d3f))
+                    background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#222d3f), to(#82bd39), color-stop(.6, #222d3f))
                 }
             }
         }
         .deal-case {
             width: 86%;
-            margin:3px auto 0;
+            margin: 3px auto 0;
             h3 {
                 background-color: #222d3f;
                 line-height: 30px;

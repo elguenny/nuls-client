@@ -2,13 +2,13 @@
     <div class="wallet">
         <div class="search">
             <div class="account-top">
-                <label>{{$t("message.indexAccountAddress")}}</label>
+                <label>{{$t('message.indexAccountAddress')}}</label>
                 <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
             </div>
             <div class="wallet-i">
                 <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
                    @click="accountCopy"></i>
-                <i class="qr_icon cursor-p" @click="accountCode"></i>
+                <i class="qr_icon cursor-p" @click="accountCode" style="display: none"></i>
                 <i class="zhanghu_icon fr cursor-p" @click="accountChoice"></i>
             </div>
             <CodeBar v-show="codeShowOk" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
@@ -50,14 +50,14 @@
                         </el-table-column>
                         <el-table-column :label="$t('message.operation')" align='center'>
                             <template slot-scope="scope">
-                                <span class="cursor-p text-d" @click="toTransfer(accountAddressValue)">{{$t("message.transfer")}}</span>
+                                <span class="cursor-p text-d" @click="toTransfer(accountAddressValue)">{{$t('message.transfer')}}</span>
                             </template>
                         </el-table-column>
                     </el-table>
                     <!--<el-pagination layout="prev, pager, next":total="1000 "></el-pagination>-->
                 </el-tab-pane>
                 <el-tab-pane :label="$t('message.transactionRecord')" name="second">
-                    <el-table :data="dealList" @filter-change="changeType"  v-loading="loading">
+                    <el-table :data="dealList" @filter-change="changeType" v-loading="loading">
                         <el-table-column
                                 prop="type"
                                 :label="$t('message.transactionType')"
@@ -97,7 +97,7 @@
                         </el-table-column>
                         <el-table-column :label="$t('message.state')" width="85" align='center'>
                             <template slot-scope="scope">
-                                <span>{{ scope.row.status == '1' ? $t('message.confirmed'):$t('message.confirming') }}</span>
+                                <span>{{ scope.row.status !== '1' ? $t('message.confirmed'):$t('message.confirming') }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.time')" width="145" align='center'>
@@ -116,224 +116,298 @@
 </template>
 
 <script>
-    import CodeBar from '@/components/CodeBar.vue';
-    import AccountAddressBar from '@/components/AccountAddressBar.vue';
-    import copy from 'copy-to-clipboard';
-    import moment from 'moment';
-    import * as config from '@/config.js';
+  import CodeBar from '@/components/CodeBar.vue'
+  import AccountAddressBar from '@/components/AccountAddressBar.vue'
+  import copy from 'copy-to-clipboard'
+  import moment from 'moment'
+  import { BigNumber } from 'bignumber.js'
 
-    export default {
-        data() {
-            return {
-                loading: true,
-                walletHide: true,
-                keyShow: false,
-                codeShowOk: false,
-                locale: localStorage.getItem('language'),
-                accountAddress: [],
-                accountAddressValue: localStorage.getItem('newAccountAddress'),
-                accountData: [],
-                dealList: [],
-                activeName: sessionStorage.getItem('walletActiveName'),
-                tabName: 'first',
-                totalAll: 0,
-                pages:1,
-                types:''
+  export default {
+    data () {
+      return {
+        loading: true,
+        walletHide: true,
+        keyShow: false,
+        codeShowOk: false,
+        locale: localStorage.getItem('language'),
+        accountAddress: [],
+        accountAddressValue: localStorage.getItem('newAccountAddress'),
+        accountData: [],
+        dealList: [],
+        activeName: sessionStorage.getItem('walletActiveName'),
+        tabName: 'first',
+        totalAll: 0,
+        pages: 1,
+        types: ''
+      }
+    },
+    components: {
+      CodeBar,
+      AccountAddressBar,
+    },
+    created () {
+
+      /**
+       *  判断显示隐藏数字
+       *Judgment display hidden numbers
+       */
+      if (localStorage.getItem('keyShow') === 'true') {
+        this.keyShow = true
+      } else {
+        this.keyShow = false
+      }
+      this.getAccountAssets('/account/assets/' + this.accountAddressValue)
+
+      /**
+       * 切换交易记录tab
+       *Switching transaction record tab
+       */
+      if (this.activeName === 'second') {
+        this.getAccountTxList('/tx/list/', {
+          'address': this.accountAddressValue,
+          'pageSize': 9,
+          'pageNumber': 1
+        })
+      }
+      /**
+       * 10秒查询交易列表
+       *10 second query trade list
+       */
+      setInterval(() => {
+        if (this.types !== '') {
+          //console.log(this.types);
+          this.getAccountTxList('/tx/list/', {
+            'address': this.accountAddressValue,
+            'type': this.types,
+            'pageSize': 9,
+            'pageNumber': this.pages
+          })
+        } else {
+          this.getAccountTxList('/tx/list/', {
+            'address': this.accountAddressValue,
+            'pageSize': 9,
+            'pageNumber': this.pages
+          })
+        }
+      }, 10000)
+    },
+    methods: {
+      /**
+       * 根据账户地址获取资产列表
+       *Obtaining a list of assets based on the account address
+       * @param url
+       */
+      getAccountAssets (url) {
+        this.$fetch(url)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              let leftShift = new BigNumber(0.00000001)
+              for (let i = 0; i < response.data.length; i++) {
+                response.data[i].balance = parseFloat(leftShift.times(response.data[i].balance).toString())
+                response.data[i].locked = parseFloat(leftShift.times(response.data[i].locked).toString())
+                response.data[i].usable = parseFloat(leftShift.times(response.data[i].usable).toString())
+              }
+              this.accountData = response.data
             }
-        },
-        components: {
-            CodeBar,
-            AccountAddressBar,
-        },
-        created() {
-            //判断显示隐藏数字
-            if (localStorage.getItem("keyShow") === 'true') {
-                this.keyShow = true
+          })
+      },
+
+      /**
+       * 根据用户地址获取用户交易列表
+       *Obtaining a user's trade list based on the user address
+       * @param url
+       * @param param
+       */
+      getAccountTxList (url, param) {
+        this.$fetch(url, param)
+          .then((response) => {
+            //console.log(response)
+            if (response.data != null) {
+              this.totalAll = response.data.total
+              let leftShift = new BigNumber(0.00000001)
+              if (response.data.list.length > 0) {
+                this.dealList = response.data.list
+                //this.$store.commit("setAccountTxList",response.data.list);
+                for (let i = 0; i < response.data.list.length; i++) {
+                  let length = this.dealList[i].hash.length
+                  this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10)
+                  this.dealList[i].values = parseFloat(leftShift.times(response.data.list[i].value).toString())
+                  this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss')
+                }
+                this.loading = false
+              } else {
+                this.loading = false
+                this.dealList = []
+              }
             } else {
-                this.keyShow = false
+              this.loading = false
+              this.dealList = []
             }
-            this.getAccountAssets("/account/assets/" + this.accountAddressValue);
+          })
+      },
 
-            //切换交易记录tab
-            if (this.activeName === 'second') {
-                this.getAccountTxList('/tx/list/', {
-                    "address": this.accountAddressValue,
-                    "pageSize": 9,
-                    "pageNumber": 1
-                });
-            }
-            //10秒查询交易列表
-            const setListData = setInterval(() => {
-                if(this.types !==''){
-                    //console.log(this.types);
-                    this.getAccountTxList('/tx/list/', {
-                        "address": this.accountAddressValue,
-                        "type":this.types,
-                        "pageSize": 9,
-                        "pageNumber":this.pages
-                    });
-                }else {
-                    this.getAccountTxList('/tx/list/', {
-                        "address": this.accountAddressValue,
-                        "pageSize": 9,
-                        "pageNumber":this.pages
-                    });
-                }
-            },10000)
-        },
-        methods: {
-            //根据账户地址获取资产列表
-            getAccountAssets(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        //console.log(response);
-                        if (response.success) {
-                            for (let i = 0; i < response.data.length; i++) {
-                                response.data[i].balance = config.FloatMul(response.data[i].balance, 0.00000001);
-                                response.data[i].locked = config.FloatMul(response.data[i].locked, 0.00000001);
-                                response.data[i].usable = config.FloatMul(response.data[i].usable, 0.00000001);
-                            }
-                            this.accountData = response.data;
-                        }
-                    });
-            },
-            //根据用户地址获取用户交易列表
-            getAccountTxList(url, param) {
-                this.$fetch(url, param)
-                    .then((response) => {
-                        //console.log(response);
-                        if (response.data != null) {
-                            this.totalAll = response.data.total;
-                            if (response.data.list.length > 0) {
-                                this.dealList = response.data.list;
-                                //this.$store.commit("setAccountTxList",response.data.list);
-                                for (let i = 0; i < response.data.list.length; i++) {
-                                    let length = this.dealList[i].hash.length;
-                                    this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10);
-                                    this.dealList[i].values = config.FloatMul(response.data.list[i].value, 0.00000001);
-                                    this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss');
-                                }
-                                this.loading=false;
-                            } else {
-                                this.loading=false;
-                                this.dealList = [];
-                            }
-                        } else {
-                            this.loading=false;
-                            this.dealList = [];
-                        }
-                    });
-            },
-            //交易列表分页
-            txIdConsensusSize(events) {
-                this.pages = events;
-                this.getAccountTxList('/tx/list/', {
-                    "address": this.accountAddressValue,
-                    "pageSize": 9,
-                    "pageNumber": events
-                });
-            },
-            //获取下拉选择地址
-            chenckAccountAddress(chenckAddress) {
-                //console.log(chenckAddress)
-                this.accountAddressValue = chenckAddress;
-                if (this.activeName === "first") {
-                    this.getAccountAssets("/account/assets/" + chenckAddress);
-                } else {
-                    this.getAccountTxList('/tx/list/', {"address": chenckAddress, "pageSize": 9, "pageNumber": 1});
-                }
-            },
-            //选择交易类型查询
-            changeType(typeValue) {
-                this.types = typeValue.type[0];
-                this.getAccountTxList('/tx/list/', {
-                    "address": this.accountAddressValue,
-                    "type": typeValue.type[0],
-                    "pageSize": 9,
-                    "pageNumber": 1
-                });
-            },
-            //tab切换
-            handleClick(tab, event) {
-                this.tabName = tab.name;
-                if (tab.name !== "first") {
-                    this.activeName = "second";
-                    this.walletHide = false;
-                    let params = {
-                        "address": this.accountAddressValue,
-                        "pageSize": 9,
-                        "pageNumber": 1
-                    };
-                    this.getAccountTxList('/tx/list/', params);
-                } else {
-                    sessionStorage.setItem('walletActiveName', tab.name);
-                    this.walletHide = true;
-                    this.getAccountAssets("/account/assets/" + this.accountAddressValue);
-                }
-            },
-            //复制功能
-            accountCopy() {
-                copy(this.accountAddressValue);
-                this.$message({
-                    message: this.$t('message.c129'),
-                    type: 'success'
-                });
-            },
-            //二维码显示
-            accountCode() {
-                this.$refs.codeBar.codeMaker(localStorage.getItem('newAccountAddress'));
-                this.codeShowOk = !this.codeShowOk;
-            },
-            codeShowOks() {
-                this.codeShowOk = false;
-            },
-            //账户管理跳转
-            accountChoice() {
-                localStorage.setItem('toUserInfo', '1');
-                this.$router.push({
-                    path: '/wallet/users/userInfo'
-                })
-            },
-            //金额显示隐藏
-            toKeyShow() {
-                if (this.keyShow) {
-                    localStorage.setItem("keyShow", false);
-                    this.keyShow = false;
-                } else {
-                    localStorage.setItem("keyShow", true);
-                    this.keyShow = true;
-                }
-            },
-            //toTxid跳转
-            toTxid(txId) {
-                sessionStorage.setItem('walletActiveName', 'second');
-                this.$router.push({
-                    name: '/dealInfo',
-                    params: {hash: txId},
-                })
-            },
-            //toLocked 跳转冻结列表
-            toLocked(address) {
-                this.$router.push({
-                    name: '/freezeList',
-                    params: {address: address},
-                })
-            },
-            //跳转转账
-            toTransfer(address) {
-                if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
-                    this.$router.push({
-                        name: '/transfer',
-                        params: {address: address},
-                    })
-                } else {
-                    this.$message({
-                        message: this.$t('message.c133'),
-                    });
-                }
-            },
-        },
-    }
+      /**
+       * 交易列表分页
+       * Transaction list paging
+       * @param events
+       */
+      txIdConsensusSize (events) {
+        this.pages = events
+        this.getAccountTxList('/tx/list/', {
+          'address': this.accountAddressValue,
+          'pageSize': 9,
+          'pageNumber': events
+        })
+      },
+
+      /**
+       * 获取下拉选择地址
+       * Get the drop-down selection address
+       * @param chenckAddress
+       */
+      chenckAccountAddress (chenckAddress) {
+        //console.log(chenckAddress)
+        this.accountAddressValue = chenckAddress
+        if (this.activeName === 'first') {
+          this.getAccountAssets('/account/assets/' + chenckAddress)
+        } else {
+          this.getAccountTxList('/tx/list/', {'address': chenckAddress, 'pageSize': 9, 'pageNumber': 1})
+        }
+      },
+
+      /**
+       * 选择交易类型查询
+       * Select transaction type query
+       * @param typeValue
+       */
+      changeType (typeValue) {
+        this.types = typeValue.type[0]
+        this.getAccountTxList('/tx/list/', {
+          'address': this.accountAddressValue,
+          'type': typeValue.type[0],
+          'pageSize': 9,
+          'pageNumber': 1
+        })
+      },
+
+      /**
+       * tab切换
+       * tab
+       * @param tab
+       * @param event
+       */
+      handleClick (tab, event) {
+        this.tabName = tab.name
+        if (tab.name !== 'first') {
+          this.activeName = 'second'
+          this.walletHide = false
+          let params = {
+            'address': this.accountAddressValue,
+            'pageSize': 9,
+            'pageNumber': 1
+          }
+          this.getAccountTxList('/tx/list/', params)
+        } else {
+          sessionStorage.setItem('walletActiveName', tab.name)
+          this.walletHide = true
+          this.getAccountAssets('/account/assets/' + this.accountAddressValue)
+        }
+      },
+
+      /**
+       * 复制功能
+       * copy
+       */
+      accountCopy () {
+        copy(this.accountAddressValue)
+        this.$message({
+          message: this.$t('message.c129'),
+          type: 'success'
+        })
+      },
+
+      /**
+       * 二维码显示
+       * Two-dimensional code display
+       */
+      accountCode () {
+        this.$refs.codeBar.codeMaker(localStorage.getItem('newAccountAddress'))
+        this.codeShowOk = !this.codeShowOk
+      },
+      codeShowOks () {
+        this.codeShowOk = false
+      },
+
+      /**
+       * 账户管理跳转
+       *Account management jump
+       */
+      accountChoice () {
+        localStorage.setItem('toUserInfo', '1')
+        this.$router.push({
+          path: '/wallet/users/userInfo'
+        })
+      },
+
+      /**
+       * 金额显示隐藏
+       * Amount display concealment
+       */
+      toKeyShow () {
+        if (this.keyShow) {
+          localStorage.setItem('keyShow', false)
+          this.keyShow = false
+        } else {
+          localStorage.setItem('keyShow', true)
+          this.keyShow = true
+        }
+      },
+
+      /**
+       * toTxid跳转
+       * toTxid
+       * @param txId
+       */
+      toTxid (txId) {
+        sessionStorage.setItem('walletActiveName', 'second')
+        this.$router.push({
+          name: '/dealInfo',
+          params: {hash: txId},
+        })
+      },
+
+      /**
+       * 跳转冻结列表
+       * To locked list
+       * @param address
+       */
+      toLocked (address) {
+        this.$router.push({
+          name: '/freezeList',
+          params: {address: address},
+        })
+      },
+
+      /**
+       * 跳转转账
+       * To transfer
+       * @param address
+       */
+      toTransfer (address) {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
+          this.$router.push({
+            name: '/transfer',
+            params: {address: address},
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'),
+          })
+        }
+      },
+    },
+  }
 </script>
 
 <style lang="less">

@@ -11,10 +11,10 @@
                 <el-form-item :label="$t('message.c104')+'：'" class="label-aliasing" prop="alias"
                               style="margin-top: 30px">
                     <el-input v-model="aliasForm.alias" class="bt-aliasing"
-                              :placeholder="$t('message.c105')"></el-input>
+                              :placeholder="$t('message.c105')" :maxlength="8"></el-input>
                 </el-form-item>
                 <div class="div-text">
-                    <label>{{$t('message.miningFee1')}}:</label>0.01NULS
+                    <label>{{$t('message.miningFee1')}}:</label>1.01NULS
                 </div>
                 <el-form-item class="aliasing-submit">
                     <el-button type="primary" @click="aliasingSubmit('aliasForm')">{{$t('message.confirmButtonText')}}

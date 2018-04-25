@@ -5,10 +5,11 @@ import Vuex from 'vuex'
 import store from './vuex/store.js'
 import i18n from './i18n/i18n'
 import axios from 'axios'
-import { post, fetch } from './api/https'
+import {fetch,post,put} from './api/https'
 //定义全局变量
-Vue.prototype.$post = post
 Vue.prototype.$fetch = fetch
+Vue.prototype.$post = post
+Vue.prototype.$put = put
 
 Vue.use(Vuex)
 
