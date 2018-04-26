@@ -226,10 +226,10 @@
        * @param param
        */
       getAccountTxList (url, param) {
-        console.log(param)
+        //console.log(param)
         this.$fetch(url, param)
           .then((response) => {
-            console.log(response)
+            //console.log(response)
             if (response.data != null) {
               this.totalAll = response.data.total
               let leftShift = new BigNumber(0.00000001)

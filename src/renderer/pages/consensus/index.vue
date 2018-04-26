@@ -53,7 +53,7 @@
                             <ul>
                                 <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                                <li><label>{{$t('message.c25')}}：</label>{{ item.owndeposit*0.00000001 }} NULS</li>
+                                <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit).toFixed(2)}} NULS</li>
                                 <li class="cb">
                                     <label class="fl">{{$t('message.c19')}}：</label>{{item.memberCount}}
                                 </li>
@@ -314,6 +314,7 @@
                 }
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
+                response.data.list[i].owndeposit = parseFloat(leftShift.times(response.data.list[i].owndeposit).toString())
               }
               this.loading = false
               this.tabelShow = true

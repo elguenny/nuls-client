@@ -36,14 +36,14 @@
                     <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                     <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
                     <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit).toFixed(2)}} NULS</li>
+                    <li class="cb">
+                        <label class="fl">{{$t('message.c47')}}：</label>{{(item.totalDeposit).toFixed(2)}}
+                    </li>
                     <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                         <label class="fl cursor-p">{{$t('message.c18')}}:</label>
-                        <ProgressBar colorData="#f64b3e" :widthData="item.creditRatio"></ProgressBar>
+                        <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'" :widthData="item.creditRatio"></ProgressBar>
                     </li>
-                    <li class="cb">
-                        <label class="fl">{{$t('message.c47')}}：</label>
-                        <ProgressBar colorData="#58a5c9" :widthData="item.totalDeposit"></ProgressBar>
-                    </li>
+
                 </ul>
                 <div class="credit-valuesDiv" v-show="creditValuesShow0">
                     <h2>
@@ -112,7 +112,7 @@
                 response.data.list[i].owndeposit = parseFloat(leftShift.times(response.data.list[i].owndeposit).toString())
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
-                response.data.list[i].totalDeposit = ((response.data.list[i].totalDeposit / 50000000000000).toFixed()).toString() + '%'
+                response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
               this.totalAll = response.data.total
               this.allConsensus = response.data.list
