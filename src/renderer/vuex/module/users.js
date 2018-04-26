@@ -1,5 +1,7 @@
+const {app} = require('electron').remote
+
 const state = {
-    purseVersion: '1.0.0',
+    purseVersion: app.getVersion(),
     addressListItems: [],
     accountTxList:[],
 };
