@@ -1,11 +1,12 @@
 import electron from 'electron'
 
-const {dialog, ipcMain} = require('electron');
-const {download} = require('electron-download');
-const ipc = electron.ipcMain;
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-const Menu = electron.Menu;
+const {dialog, ipcMain} = require('electron')
+const {download} = require('electron-download')
+const ipc = electron.ipcMain
+const app = electron.app
+const BrowserWindow = electron.BrowserWindow
+const Menu = electron.Menu
+const platform = require('os').platform()
 
 /**
  * 将“静态”路径设置为生产中的静态文件
@@ -17,8 +18,8 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow
-let folderpath;
-let downloadpath;
+let folderpath
+let downloadpath
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
@@ -26,7 +27,10 @@ function createWindow () {
    *  隐藏electron 菜单
    *  Hide the menu of the electron form
    */
-  Menu.setApplicationMenu(null)
+  if (platform === 'win32' || platform === 'win64') {
+    Menu.setApplicationMenu(null)
+  }
+
   /**
    * Initial window options
    */
@@ -110,13 +114,12 @@ function createWindow () {
 function corePath (cmd) {
   const path = require('path')
   let paths = {binPath: '', targetPath: ''}
-  const platform = require('os').platform()
 
   if (platform === 'darwin') {
     paths.targetPath = path.resolve(process.resourcesPath, '../java/bin')
     paths.binPath = path.resolve(paths.targetPath, cmd + '.sh')
   } else if (platform === 'win32' || platform === 'win64') {
-     //paths.targetPath = path.resolve(process.execPath, '../../../../java/bin')
+    //paths.targetPath = path.resolve(process.execPath, '../../../../java/bin')
     paths.targetPath = path.join(process.execPath, './../java/bin')
     paths.binPath = path.resolve(paths.targetPath, cmd + '.bat')
   }
@@ -170,7 +173,7 @@ if (shouldQuit) {
   app.quit()
 }
 
-app.on('quit', (event,exitCode) => {
+app.on('quit', (event, exitCode) => {
   if (process.env.NODE_ENV === 'development') {
     return
   }
