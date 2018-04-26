@@ -63,7 +63,7 @@
       }
       let checkCommissionRate = (rule, value, callback) => {
         if (!value) {
-          callback(new Error(this.$t('message.c35')))
+          callback(new Error(this.$t('message.c37')))
         }
         let re = /^\d+(?=\.{0,1}\d+$|$)/
         let res = /^\d{1,3}(\.\d{1,2})?$/

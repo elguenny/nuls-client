@@ -66,6 +66,9 @@
               sessionStorage.setItem('userList', '1')
               this.rejectTime = 0
               this.netWorkInfo = response.data
+              if(this.netWorkInfo.localBestHeight === 0 || this.netWorkInfo.netBestHeight === 0){
+                sessionStorage.setItem('userList', '0')
+              }
               this.$store.commit('setNetWorkInfo', response.data)
               let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount
               if (wifi < 2) {

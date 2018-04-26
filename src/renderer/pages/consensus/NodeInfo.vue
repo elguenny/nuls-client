@@ -27,8 +27,8 @@
             <li>
                 <label>{{$t('message.c1')}}</label><span class="cursor-p text-d" @click="toallPledge">{{this.myNodeInfo.totalDeposit}}</span>
             </li>
-            <li class="overflow">
-                <label>{{$t('message.c27')}}</label><span>{{this.myNodeInfo.introduction}}！</span>
+            <li>
+                <label>{{$t('message.c27')}}</label><span class="overflow">{{this.myNodeInfo.introduction}}！</span>
             </li>
         </ul>
         <el-button @click="closedNode" type="button" class="bottom-btn">{{$t('message.c62')}}</el-button>

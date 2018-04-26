@@ -29,10 +29,10 @@
             </el-form>
             <el-dialog :visible.sync="dialogTableVisible" class="transfer-dialog">
                 <el-table :data="userAddressList" @row-dblclick="dbcheckedAddress">
-                    <el-table-column property="userAddress" :label="$t('message.tabName')" width="280"
+                    <el-table-column property="userAddress" :label="$t('message.tabName')" min-width="280"
                                      align='center'></el-table-column>
-                    <el-table-column property="userAlias" :label="$t('message.tabAlias')" width="70"
-                                     align='center'></el-table-column>
+                    <!--<el-table-column property="userAlias" :label="$t('message.tabAlias')" width="70"
+                                     align='center'></el-table-column>-->
                     <el-table-column property="userHelp" :label="$t('message.remarks')" width="110"
                                      align='center'></el-table-column>
                     <el-table-column :label="$t('message.operation')" width="100" align='center'>
