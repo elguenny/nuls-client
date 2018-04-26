@@ -72,10 +72,11 @@
               this.keyInfo = response.data
               this.passwordVisible = false
             } else {
-              this.passwordVisible = true
-              this.passwordForm.password = ''
               this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg, duration: '800'
+              })
+              this.$router.push({
+                path: '/wallet/users/userInfo'
               })
             }
           })

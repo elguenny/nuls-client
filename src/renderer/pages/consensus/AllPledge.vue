@@ -23,6 +23,7 @@
 <script>
   import Back from './../../components/BackBar.vue'
   import moment from 'moment'
+  import { BigNumber } from 'bignumber.js'
 
   export default {
     data () {
@@ -53,8 +54,9 @@
           .then((response) => {
             if (response.success) {
               this.total = response.data.total
+              let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].amount = (response.data.list[i].amount * 0.00000001).toFixed(8)
+                response.data.list[i].amount =  parseFloat(leftShift.times(response.data.list[i].amount).toString())
                 response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss')
               }
               this.pledgeData = response.data.list

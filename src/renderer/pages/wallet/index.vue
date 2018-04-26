@@ -138,7 +138,8 @@
         tabName: 'first',
         totalAll: 0,
         pages: 1,
-        types: ''
+        types: '',
+        walletSetInterval:null,
       }
     },
     components: {
@@ -146,7 +147,6 @@
       AccountAddressBar,
     },
     created () {
-
       /**
        *  判断显示隐藏数字
        *Judgment display hidden numbers
@@ -173,12 +173,11 @@
        * 5秒查询交易列表
        * 5second query trade list
        */
-      setInterval(() => {
+      this.walletSetInterval = setInterval(() => {
         if(this.activeName === 'first'){
           this.getAccountAssets('/account/assets/' + this.accountAddressValue)
         }else {
           if (this.types !== '') {
-            //console.log(this.types);
             this.getAccountTxList('/tx/list/', {
               'address': this.accountAddressValue,
               'type': this.types,
@@ -194,6 +193,9 @@
           }
         }
       }, 5000)
+    },
+    destroyed() {
+      clearInterval(this.walletSetInterval)
     },
     methods: {
       /**
@@ -224,9 +226,10 @@
        * @param param
        */
       getAccountTxList (url, param) {
+        console.log(param)
         this.$fetch(url, param)
           .then((response) => {
-            //console.log(response)
+            console.log(response)
             if (response.data != null) {
               this.totalAll = response.data.total
               let leftShift = new BigNumber(0.00000001)
@@ -536,6 +539,30 @@
     .el-table-filter {
         border: 1px solid #17202e;
         background-color: #17202e;
+        max-height: 310px;
+        overflow-y: auto;
+        ul{
+            min-width: 80px;
+            li{
+                font-size: 12px;
+            }
+        }
+
+        &::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+            background-color: #0c1323;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar {
+            width: 3px;
+            background-color: #0c1323;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #222d3f))
+        }
     }
 
     .el-select-dropdown__list {

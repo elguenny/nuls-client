@@ -56,7 +56,7 @@
   import '@/assets/css/jquery-jvectormap.css'
   import { jvectormap } from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
   import { jvectormap1 } from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
-  import {BigNumber} from 'bignumber.js';
+  import { BigNumber } from 'bignumber.js'
 
   export default {
     data () {
@@ -84,6 +84,7 @@
         mapObj: [],
         //经纬度Info
         ipObj: [],
+        homeSetInterval:null,
       }
     },
     components: {
@@ -101,7 +102,8 @@
       //5秒循环一次我的资产和全网共识
       setTimeout(() => {
         let map = $('#world-map-markers').vectorMap('get', 'mapObject')
-        setInterval(() => {
+        this.homeSetInterval = setInterval(() => {
+          //console.log(123456)
           this.getAccountAddress('/account/balances/')
           this.getConsensus('/consensus')
           this.getNetWork()
@@ -111,6 +113,10 @@
         }, 5000)
       }, 1000)
 
+    },
+    //离开当前页面后执行
+    destroyed() {
+      clearInterval(this.homeSetInterval)
     },
     methods: {
       /**
@@ -126,7 +132,7 @@
               this.balanceData = response.data
               let leftShift = new BigNumber(0.00000001)
               this.balanceData.balance = parseFloat(leftShift.times(this.balanceData.balance).toString())
-              this.balanceData.locked =  parseFloat(leftShift.times(this.balanceData.locked).toString())
+              this.balanceData.locked = parseFloat(leftShift.times(this.balanceData.locked).toString())
               this.balanceData.usable = parseFloat(leftShift.times(this.balanceData.usable).toString())
               if (this.balanceData.balance !== 0) {
                 this.balanceData.balanceWidth = (this.balanceData.balance / this.balanceData.balance * 100).toFixed(2) + '%'
@@ -147,8 +153,8 @@
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.allNodeList.nodeNumber = response.data.agentCount
-              this.allNodeList.entrust =parseFloat(leftShift.times(response.data.totalDeposit).toString())
-              this.allNodeList.income =parseFloat(leftShift.times(response.data.rewardOfDay).toString())
+              this.allNodeList.entrust = parseFloat(leftShift.times(response.data.totalDeposit).toString())
+              this.allNodeList.income = parseFloat(leftShift.times(response.data.rewardOfDay).toString())
             }
           })
       },

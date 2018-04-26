@@ -322,7 +322,7 @@
             .joinNo {
                 .el-input__inner {
                     background-color: #17202e;
-                    border: 1px solid #24426c;
+                    //border: 1px solid #24426c;
                 }
             }
             .out-name {
@@ -383,6 +383,7 @@
                     .el-form-item__label {
                         line-height: 0;
                         height: 20px;
+                        color: #FFFFFF;
                     }
                     .el-form-item__content {
                         line-height: 0;
@@ -392,10 +393,14 @@
                             }
                         }
                         .el-input__inner {
+                            border:1px solid #24426c;
                             color: #FFFFFF;
+                            &:hover{
+                                border-color: #658ec7;
+                            }
                         }
                         .el-form-item__error {
-                            padding-top: 0px;
+                            padding-top: 0;
                         }
                     }
                 }

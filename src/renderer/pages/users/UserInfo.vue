@@ -104,7 +104,7 @@
                             this.getUserList("/account/list");
                         } else {
                             this.$message({
-                                type: 'success', message: this.$t('message.passWordFailed') + response.msg
+                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
                             });
                         }
                     })

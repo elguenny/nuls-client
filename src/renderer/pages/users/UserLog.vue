@@ -3,6 +3,9 @@
 		<Back :backTitle="this.$t('message.setManagement')"></Back>
 		<h2>Log</h2>
 		<div class="users-log-info">
+			<p>This function is being prepareing, please wait.</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
 		</div>
 		<div class="users-log-bottom">
 			<!--<label>9856日志条目</label>-->

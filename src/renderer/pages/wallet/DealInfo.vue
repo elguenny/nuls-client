@@ -3,18 +3,18 @@
         <Back :backTitle="this.$t('message.transactionManagement')"></Back>
         <div class="deal-info-top">
             <div class="deal-left fl">
-                <div>{{$t('message.input')}}<span> {{(this.allInputs*0.00000001).toFixed(8)}} NULS</span></div>
+                <div>{{$t('message.input')}}<span> {{this.allInputs}} NULS</span></div>
                 <ul>
                     <li v-for="inItem in inputs">
-                        {{ inItem.address }}<span>{{(inItem.value*0.00000001).toFixed(8)}}</span>
+                        {{ inItem.address }}<span>{{inItem.value}}</span>
                     </li>
                 </ul>
             </div>
             <div class="deal-right fr">
-                <div>{{$t('message.output')}}<span>{{(this.allOutputs*0.00000001).toFixed(8)}} NULS</span></div>
+                <div>{{$t('message.output')}}<span>{{this.allOutputs}} NULS</span></div>
                 <ul>
                     <li v-for="outItem in outputs">
-                        {{ outItem.address }}<span>{{(outItem.value*0.00000001).toFixed(8)}}</span>
+                        {{ outItem.address }}<span>{{outItem.value}}</span>
                     </li>
                 </ul>
             </div>
@@ -27,7 +27,7 @@
                 <li @click="hashCopy(infoData.hash)" class="cursor-p"><span>{{$t('message.autograph')}}</span>{{infoData.hash}}
                 </li>
                 <li><span>{{$t('message.transactionType')}}</span>
-                        {{$t('message.type'+infoData.type)}}
+                    {{$t('message.type'+infoData.type)}}
                 </li>
                 <li><span>{{$t('message.transactionState')}}</span>{{ $t('message.statusS'+infoData.status) }}
                 </li>
@@ -43,6 +43,7 @@
   import Back from '@/components/BackBar.vue'
   import copy from 'copy-to-clipboard'
   import moment from 'moment'
+  import { BigNumber } from 'bignumber.js'
 
   export default {
     data () {
@@ -72,20 +73,24 @@
             //console.log(response);
             this.infoData = response.data
             this.times = moment(response.data.time).format('YYYY-MM-DD hh:mm:ss')
-            this.inputs = response.data.inputs
+            let leftShift = new BigNumber(0.00000001)
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {
                 response.data.inputs[i].address = response.data.inputs[i].address.substr(0, 10) + '...' + response.data.inputs[i].address.substr(length - 10)
-                this.allInputs = this.allInputs + parseFloat(response.data.inputs[i].value)
+                response.data.inputs[i].value = parseFloat(leftShift.times(response.data.inputs[i].value).toString())
+                this.allInputs = this.allInputs + response.data.inputs[i].value
               }
             }
-            this.outputs = response.data.outputs
+            this.inputs = response.data.inputs
+
             if (response.data.outputs.length > 0) {
               for (let i = 0; i < response.data.outputs.length; i++) {
                 response.data.outputs[i].address = response.data.outputs[i].address.substr(0, 10) + '...' + response.data.outputs[i].address.substr(length - 10)
+                response.data.outputs[i].value = parseFloat(leftShift.times(response.data.outputs[i].value).toString())
                 this.allOutputs = this.allOutputs + parseFloat(response.data.outputs[i].value)
               }
             }
+            this.outputs = response.data.outputs
           })
       },
       //复制功能

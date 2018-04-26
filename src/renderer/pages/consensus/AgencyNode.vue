@@ -35,7 +35,7 @@
                 <ul>
                     <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                     <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                    <li><label>{{$t('message.c25')}}：</label>{{ item.owndeposit}} NULS</li>
+                    <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit).toFixed(2)}} NULS</li>
                     <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                         <label class="fl cursor-p">{{$t('message.c18')}}:</label>
                         <ProgressBar colorData="#f64b3e" :widthData="item.creditRatio"></ProgressBar>

@@ -38,7 +38,8 @@
         address: this.$route.params.address,
         freezeData: [],
         totalAll: 0,
-        pageNumber: 1
+        pageNumber: 1,
+        freezeSetInterval:null,
       }
     },
     components: {
@@ -47,16 +48,19 @@
     mounted () {
       let _this = this
       this.getLocked('tx/locked/', {'address': this.address, 'pageSize': 10, 'pageNumber': 1})
-      setInterval(() => {
+      this.freezeSetInterval = setInterval(() => {
         this.getLocked('tx/locked/', {'address': this.address, 'pageSize': 10, 'pageNumber': this.pageNumber})
       }, 2000)
+    },
+    destroyed() {
+      clearInterval(this.freezeSetInterval)
     },
     methods: {
       //获取冻结列表
       getLocked (url, param) {
         this.$fetch(url, param)
           .then((response) => {
-            console.log(response)
+            //console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.totalAll = response.data.total

@@ -66,10 +66,10 @@
           callback(new Error(this.$t('message.c35')))
         }
         let re = /^\d+(?=\.{0,1}\d+$|$)/
-        let res = /^\d{1,2}(\.\d{1,2})?$/
+        let res = /^\d{1,3}(\.\d{1,2})?$/
         if (!re.exec(value) || !res.exec(value)) {
           callback(new Error(this.$t('message.c36')))
-        } else if (0 > value || value > 20) {
+        } else if (10 > value || value > 100) {
           callback(new Error(this.$t('message.c37')))
         } else {
           callback()

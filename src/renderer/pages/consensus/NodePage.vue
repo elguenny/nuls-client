@@ -14,7 +14,7 @@
                     <label>{{$t('message.c17')}}：</label>{{this.nodeData.commissionRate}}%
                 </li>
                 <li>
-                    <label>{{$t('message.c25')}}：</label>{{(this.nodeData.owndeposit*0.00000001).toFixed(8)}} NULS
+                    <label>{{$t('message.c25')}}：</label>{{this.nodeData.owndeposit}} NULS
                 </li>
                 <li>
                     <label>{{$t('message.c19')}}：</label>{{this.nodeData.memberCount}}
@@ -124,6 +124,8 @@
           .then((response) => {
             if (response.success) {
               //console.log(response);
+              let leftShift = new BigNumber(0.00000001)
+              response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
               response.data.creditRatios = response.data.creditRatio
               if (response.data.creditRatio !== 0) {
                 if (response.data.creditRatio > 0) {

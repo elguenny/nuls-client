@@ -169,6 +169,8 @@
         myEvents: 1,
         myTotalAll: 0,
 
+        consensusSetInterval:null,
+
       }
     },
     components: {
@@ -182,6 +184,7 @@
     },
     created () {
       this.getConsensus('/consensus')
+      this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
       this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': '1'})
 
       if (localStorage.getItem('newAccountAddress') !== '') {
@@ -194,7 +197,7 @@
          * 5秒查询列表
          * 5second list
          */
-        setInterval(() => {
+        this.consensusSetInterval = setInterval(() => {
           this.getConsensus('/consensus')
           this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
           if(this.tabName === 'first'){
@@ -205,14 +208,17 @@
               'pageNumber':this.myEvents
             })
           }
-        },5000)
+        },10000)
       }
+    },
+    destroyed() {
+      clearInterval(this.consensusSetInterval)
     },
     methods: {
       //获取下拉选择地址
       chenckAccountAddress (chenckAddress) {
         this.getConsensusAddress('/consensus/address/' + chenckAddress)
-        if (this.tabName === 'first') {
+        if (sessionStorage.getItem('consensusTabName') === 'first') {
           this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': '1'})
         } else {
           this.getMyConsensus('/consensus/agent/address/' + chenckAddress, {'pageSize': '3', 'pageNumber': '1'})
