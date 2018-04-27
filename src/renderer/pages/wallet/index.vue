@@ -240,7 +240,7 @@
                   let length = this.dealList[i].hash.length
                   this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10)
                   this.dealList[i].values = parseFloat(leftShift.times(response.data.list[i].value).toString())
-                  this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss')
+                  this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
                 }
                 this.loading = false
               } else {

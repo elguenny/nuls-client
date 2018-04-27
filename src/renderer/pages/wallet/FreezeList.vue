@@ -66,11 +66,11 @@
               this.totalAll = response.data.total
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].value = parseFloat(leftShift.times(response.data.list[i].value).toString())
-                response.data.list[i].createTime = moment(response.data.list[i].createTime).format('YYYY-MM-DD hh:mm:ss')
+                response.data.list[i].createTime = moment(response.data.list[i].createTime).format('YYYY-MM-DD HH:mm:ss')
                 response.data.list[i].lockTimes = response.data.list[i].lockTime
                 if (response.data.list[i].lockTime > 1000000000000) {
                   console.log(response.data.list[i].lockTime > 1000000000000)
-                  response.data.list[i].lockTimes = moment(response.data.list[i].lockTime).format('YYYY-MM-DD hh:mm:ss')
+                  response.data.list[i].lockTimes = moment(response.data.list[i].lockTime).format('YYYY-MM-DD HH:mm:ss')
                 }
               }
               this.freezeData = response.data.list

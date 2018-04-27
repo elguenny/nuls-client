@@ -72,7 +72,7 @@
           .then((response) => {
             //console.log(response);
             this.infoData = response.data
-            this.times = moment(response.data.time).format('YYYY-MM-DD hh:mm:ss')
+            this.times = moment(response.data.time).format('YYYY-MM-DD HH:mm:ss')
             let leftShift = new BigNumber(0.00000001)
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {

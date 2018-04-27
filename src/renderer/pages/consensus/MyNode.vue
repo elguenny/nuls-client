@@ -143,7 +143,7 @@
               this.total = response.data.total
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].amount = parseFloat(leftShift.times(response.data.list[i].amount).toString())
-                response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss')
+                response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD HH:mm:ss')
               }
               this.myMortgageData = response.data.list
               //console.log(this.myMortgageData);
