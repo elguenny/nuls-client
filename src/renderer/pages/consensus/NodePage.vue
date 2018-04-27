@@ -36,7 +36,7 @@
             </ul>
         </div>
         <div class="node-page-bottom">
-            <el-form ref="nodeForm" :model="nodeForm" :rules="nodeRules" size="mini" label-position="left">
+            <el-form ref="nodeForm" :model="nodeForm" :rules="nodeRules" size="mini" label-position="left" @submit.native.prevent>
                 <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
@@ -47,8 +47,7 @@
                 </el-form-item>
                 <div class="procedure"><label>{{$t('message.c28')}}</label><span>0.01 NULS</span></div>
                 <el-form-item size="large" class="submit">
-                    <el-button type="primary" @click="onSubmit('nodeForm')" id="nodePage"
-                               :disabled=this.btOk>
+                    <el-button type="primary" @click="onSubmit('nodeForm')" id="nodePage" :disabled=this.btOk>
                         {{$t('message.confirmButtonText')}}
                     </el-button>
                 </el-form-item>
@@ -117,9 +116,9 @@
     mounted () {
       this.$refs['input'].focus()
       this.$refs['input'].value = ''
+      sessionStorage.setItem('passwordOk','0')
     },
     methods: {
-
       //根据address获取共识节点列表信息
       getConsensusAddress (url) {
         this.$fetch(url)

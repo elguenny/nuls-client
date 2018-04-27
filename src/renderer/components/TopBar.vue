@@ -8,9 +8,9 @@
                     class="wallet_icon"></i> <span>{{$t('message.wallet')}}</span></li>
             <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i
                     class="consensus_icon"></i> <span>{{$t('message.consensus')}}</span></li>
-            <li @click="to('application','3')" :class="[errorClass ,isActive===3 ? activeClass : '']"><i
+            <li @click="to('application','3')"><i
                     class="application_icon"></i> <span>{{$t('message.applications')}}</span></li>
-            <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="more_icon"></i>
+            <li @click="to('more','4')" ><i class="more_icon"></i>
                 <span>{{$t('message.more')}}</span></li>
         </ul>
         <div class="top-icon fl">
@@ -167,13 +167,13 @@
             })
           }
           if (url === 'application') {
-            this.isActive = 3
+            //this.isActive = 3
             this.$message({
               type: 'info', message: this.$t('message.c65'), duration: '800'
             })
           }
           if (url === 'more') {
-            this.isActive = 4
+            //this.isActive = 4
             this.$message({
               type: 'info', message: this.$t('message.c65'), duration: '800'
             })
@@ -186,6 +186,7 @@
       },
       //设置界面跳转
       toSetUp () {
+        this.isActive = 9
         if (this.$store.getters.getAddressList.length === 0) {
           this.$router.push({
             name: '/setPassword',

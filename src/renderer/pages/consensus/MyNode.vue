@@ -82,10 +82,12 @@
         agentAddressInfo: [],
         myMortgageData: [],
         total: 0,
+        pageNumber:'1',
         outInfo: {
           address: '',
           txHash: '',
-        }
+        },
+        myNodeSetInterval:null,
       }
     },
     components: {
@@ -99,8 +101,20 @@
       this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
         'agentAddress': this.agentAddress,
         'pageSize': '3',
-        'pageNumber': '1'
+        'pageNumber': this.pageNumber
       })
+
+      this.myNodeSetInterval = setInterval(() => {
+        this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress)
+        this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
+          'agentAddress': this.agentAddress,
+          'pageSize': '3',
+          'pageNumber': this.pageNumber
+        })
+      },5000)
+    },
+    destroyed() {
+      clearInterval(this.myNodeSetInterval)
     },
     methods: {
       //根据agentAddress获取共识节点列表信息
@@ -152,6 +166,7 @@
       },
       //分页功能
       myMortgageSize (events) {
+        this.pageNumber = events;
         this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
           'agentAddress': this.agentAddress,
           'pageSize': '3',

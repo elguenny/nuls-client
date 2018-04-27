@@ -38,7 +38,7 @@
             </ul>
         </div>
         <div class="add-node-bottom">
-            <el-form ref="addNodeForm" :model="addNodeForm" :rules="addNodeRules" size="mini" label-position="left">
+            <el-form ref="addNodeForm" :model="addNodeForm" :rules="addNodeRules" size="mini" label-position="left" @submit.native.prevent>
                 <el-form-item :label="$t('message.c51')+':'" class="pledge-money" prop="nodeNo">
                     <el-input ref="input" v-model="addNodeForm.nodeNo" :placeholder=this.placeholder
                               :maxlength="17"></el-input>

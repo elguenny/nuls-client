@@ -107,10 +107,12 @@
           this.getAccountAddress('/account/balances/')
           this.getConsensus('/consensus')
           this.getNetWork()
+          //console.log(this.ipObj)
           setTimeout(() => {
+            map.clearSelectedMarkers()
             map.addMarkers(this.ipObj)
           }, 1000)
-        }, 5000)
+        }, 9000)
       }, 1000)
 
     },
@@ -235,16 +237,6 @@
         })
         this.loading = false
       },
-      //新增地图标注
-      addJvpMarkers (maps) {
-        let map = $('#world-map-markers').vectorMap('get', 'mapObject')
-        map.addMarkers(maps)
-      },
-      //移除地图标注
-      removeJvpMarkers (maps) {
-        let map = $('#world-map-markers').vectorMap('get', 'mapObject')
-        map.removeMarkers(maps)
-      }
     },
     watch: {
       ipObj: {
