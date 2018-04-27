@@ -184,7 +184,9 @@
     },
     created () {
       this.getConsensus('/consensus')
-      this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
+      if (localStorage.getItem('newAccountAddress') !== '') {
+        this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
+      }
       this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': '1'})
 
       if (localStorage.getItem('newAccountAddress') !== '') {

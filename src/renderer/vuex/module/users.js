@@ -1,5 +1,5 @@
 const state = {
-    purseVersion: '1.0.0',
+    purseVersion: '0.9.0',
     addressListItems: [],
     accountTxList:[],
 };

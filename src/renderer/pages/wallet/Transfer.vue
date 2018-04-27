@@ -148,6 +148,18 @@
       let _this = this
       this.openDB()
       this.getBalanceAddress('/account/balance/' + this.transferForm.address)
+      //Enter key
+      document.onkeydown=function(e){
+
+        let key=window.event.keyCode;
+        if(key === 13){
+          console.log("回车设计")
+          document.getElementById('transferSubmit').click();
+          /*if(){
+
+          }*/
+        }
+      }
     },
     methods: {
       /**
@@ -158,7 +170,7 @@
       getBalanceAddress (url) {
         this.$fetch(url)
           .then((response) => {
-            console.log(response)
+            //console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.usable = parseFloat(leftShift.times(response.data.usable).toString())
@@ -193,6 +205,8 @@
           });
         } else {
           this.transferForm.joinNo = config.FloatSub(balance, 0.01)
+          this.$refs.transferForm.validateField('joinAddress')
+          this.$refs.transferForm.validateField('joinNo')
         }
       },
 

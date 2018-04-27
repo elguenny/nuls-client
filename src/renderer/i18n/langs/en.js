@@ -302,9 +302,9 @@ const en = {
     c139: 'Height',
 
     //Bottom info
-    purseVersion: 'Wallet version',
-    coreVersion: 'Core version',
-    toUpdate: 'Latest version',
+    purseVersion: 'Wallet',
+    coreVersion: 'Core',
+    toUpdate: 'Latest',
     blockState: 'Block',
     local: 'Local height',
     backward: 'Behind',

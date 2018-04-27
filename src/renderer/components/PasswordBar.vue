@@ -47,7 +47,7 @@
                 if(key === 13){
                     return false;
                     //alert("回车设计");
-                    /*if(document.getElementById("passwords")){
+                    if(document.getElementById("passwords")){
                         document.getElementById("passwords").focus();
                     }
                     //console.log(passwordShow);
@@ -58,7 +58,7 @@
                        if(clickId !=="null" &&  document.getElementById(clickId)){
                            document.getElementById(clickId).click();
                        }
-                    }*/
+                    }
                 }
             }
         },
