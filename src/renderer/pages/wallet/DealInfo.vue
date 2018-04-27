@@ -78,7 +78,7 @@
               for (let i = 0; i < response.data.inputs.length; i++) {
                 response.data.inputs[i].address = response.data.inputs[i].address.substr(0, 10) + '...' + response.data.inputs[i].address.substr(length - 10)
                 response.data.inputs[i].value = parseFloat(leftShift.times(response.data.inputs[i].value).toString())
-                this.allInputs = this.allInputs + response.data.inputs[i].value
+                this.allInputs = BigNumber(this.allInputs).plus(response.data.inputs[i].value).toString()
               }
             }
             this.inputs = response.data.inputs
@@ -87,7 +87,7 @@
               for (let i = 0; i < response.data.outputs.length; i++) {
                 response.data.outputs[i].address = response.data.outputs[i].address.substr(0, 10) + '...' + response.data.outputs[i].address.substr(length - 10)
                 response.data.outputs[i].value = parseFloat(leftShift.times(response.data.outputs[i].value).toString())
-                this.allOutputs = this.allOutputs + parseFloat(response.data.outputs[i].value)
+                this.allOutputs = BigNumber(this.allOutputs).plus(response.data.outputs[i].value).toString()
               }
             }
             this.outputs = response.data.outputs
