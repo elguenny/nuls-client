@@ -18,18 +18,11 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow
-let folderpath
-let downloadpath
+let folderPath
+let downloadPath
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
-  /**
-   *  隐藏electron 菜单
-   *  Hide the menu of the electron form
-   */
-  if (platform === 'win32' || platform === 'win64') {
-    Menu.setApplicationMenu(null)
-  }
 
   /**
    * Initial window options
@@ -38,7 +31,7 @@ function createWindow () {
     height: 560,
     width: 800,
     useContentSize: true,
-    webPreferences: {webSecurity: false},
+    webPreferences: {webSecurity: process.env.NODE_ENV !== 'development'},
     frame: false,
     //Set minimum width height.
     minWidth: 800,
@@ -71,16 +64,16 @@ function createWindow () {
    */
   ipcMain.on('download', (evt, args) => {
     let arr = args.split('+')
-    downloadpath = arr[0]
-    folderpath = arr[1]
-    evt.sender.send('tips', downloadpath)
-    mainWindow.webContents.downloadURL(downloadpath)
+    downloadPath = arr[0]
+    folderPath = arr[1]
+    evt.sender.send('tips', downloadPath)
+    mainWindow.webContents.downloadURL(downloadPath)
   })
 
   app.commandLine.appendSwitch('--disable-http-cache')
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
     // Set the save path, making Electron not to prompt a save dialog.
-    item.setSavePath(folderpath + `\\${item.getFilename()}`)
+    item.setSavePath(folderPath + `\\${item.getFilename()}`)
     item.on('updated', (event, state) => {
       if (state === 'interrupted') {
         console.log('Download is interrupted but can be resumed')
@@ -103,6 +96,35 @@ function createWindow () {
 
   mainWindow.loadURL(winURL)
 
+  /**
+   *  隐藏electron 菜单
+   *  Hide the menu of the electron form
+   */
+  if (platform === 'darwin') {
+    var template = [{
+      label: 'Application',
+      submenu: [
+        {label: 'About Nuls Wallet', selector: 'orderFrontStandardAboutPanel:'},
+        {type: 'separator'},
+        {label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit() }}
+      ]
+    }, {
+      label: 'Edit',
+      submenu: [
+        {label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:'},
+        {label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:'},
+        {type: 'separator'},
+        {label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:'},
+        {label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:'},
+        {label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:'},
+        {label: 'Select All', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:'}
+      ]
+    }
+    ]
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+  } else {
+    Menu.setApplicationMenu(null)
+  }
 }
 
 /**
@@ -119,7 +141,6 @@ function corePath (cmd) {
     paths.targetPath = path.resolve(process.resourcesPath, '../java/bin')
     paths.binPath = path.resolve(paths.targetPath, cmd + '.sh')
   } else if (platform === 'win32' || platform === 'win64') {
-    //paths.targetPath = path.resolve(process.execPath, '../../../../java/bin')
     paths.targetPath = path.join(process.execPath, './../java/bin')
     paths.binPath = path.resolve(paths.targetPath, cmd + '.bat')
   }
