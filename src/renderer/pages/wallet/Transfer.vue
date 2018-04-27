@@ -8,7 +8,7 @@
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
                 <el-form-item :label="$t('message.destinationAddress')+'：'" class="join-address" prop="joinAddress">
-                    <el-input type="text" v-model.trim="transferForm.joinAddress"></el-input>
+                    <el-input type="text" v-model.trim="transferForm.joinAddress" ref="joinAddress"></el-input>
                     <i class="cursor-p" @click="toUsersAddressList"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')+'：'" class="join-nos" prop="joinNo">
@@ -107,7 +107,6 @@
           } else {
             callback()
           }
-
         }, 100)
 
       }
@@ -148,18 +147,6 @@
       let _this = this
       this.openDB()
       this.getBalanceAddress('/account/balance/' + this.transferForm.address)
-      //Enter key
-      document.onkeydown=function(e){
-
-        let key=window.event.keyCode;
-        if(key === 13){
-          console.log("回车设计")
-          document.getElementById('transferSubmit').click();
-          /*if(){
-
-          }*/
-        }
-      }
     },
     methods: {
       /**

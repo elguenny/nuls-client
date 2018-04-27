@@ -72,8 +72,10 @@
           let res = /^\d{1,8}(\.\d{1,8})?$/
           if (!re.exec(value) || !res.exec(value)) {
             callback(new Error(this.$t('message.c53')))
-          } else if (value > this.usable - 0.01 || value < 2000) {
+          } else if (value < 2000) {
             callback(new Error(this.$t('message.c54')))
+          }else if (value > this.usable - 0.01) {
+            callback(new Error(this.$t('message.c542')))
           } else {
             callback()
           }
@@ -142,7 +144,7 @@
       getBalanceAddress (url) {
         this.$fetch(url)
           .then((response) => {
-            console.log(response)
+            //console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
               this.placeholder = '（' + this.$t('message.currentBalance') + parseFloat(leftShift.times(response.data.usable).toString()) + 'NULS）'

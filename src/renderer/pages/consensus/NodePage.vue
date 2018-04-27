@@ -77,8 +77,10 @@
           let res = /^\d{1,8}(\.\d{1,8})?$/
           if (!re.exec(value) || !res.exec(value)) {
             callback(new Error(this.$t('message.c53')))
-          } else if (value > this.usable - 0.01 || value < 2000) {
+          } else if ( value < 2000) {
             callback(new Error(this.$t('message.c54')))
+          } else if (value > this.usable - 0.01) {
+            callback(new Error(this.$t('message.c542')))
           } else {
             callback()
           }
@@ -176,6 +178,7 @@
         } else {
           //console.log(balance)
           this.nodeForm.nodeNo = config.FloatSub(balance, 0.01)
+          this.$refs.nodeForm.validateField('nodeNo')
         }
       },
       //提交委托

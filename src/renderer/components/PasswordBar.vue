@@ -42,7 +42,7 @@
                 passwordShow = this.$store.getters.getPasswordShow;
             },500);
             //let clickId = this.submitId;
-            document.onkeydown=function(e){
+            /*document.onkeydown=function(e){
                 let key=window.event.keyCode;
                 if(key === 13){
                     return false;
@@ -60,7 +60,7 @@
                        }
                     }
                 }
-            }
+            }*/
         },
         methods: {
             //密码框显示执行事件

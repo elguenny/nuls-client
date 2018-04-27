@@ -202,8 +202,11 @@ const en = {
     c51: 'Deposit',
     c52: 'Please enter the entrustment depositamount！',
     c53: 'Please enter the correct entrustment deposit amount for digital value',
-    c54: 'No less than 2000, less than the balance',
-    c541: 'No less than 20000, less than the balance',
+    c54: 'No less than 2000',
+    c542: 'Less than the balance',
+    c541: 'No less than 20000',
+    c543: 'less than the balance',
+
     //allPledge
     c55: 'Total amount of deposit',
     //myNode
