@@ -100,8 +100,6 @@
         let keyInfo = this.keyInfo
         const {dialog} = require('electron').remote
         dialog.showSaveDialog({
-          title: '保存文件路径：',
-          defaultPath: 'D:/',
           properties: [
             'openFile',
           ],
