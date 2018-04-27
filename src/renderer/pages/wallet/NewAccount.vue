@@ -97,47 +97,26 @@
        * @method backupsKey
        **/
       backupsKey () {
-        let path = require('path')
-        let _path = path.join(__dirname, '../../../../' + this.newAccountAddress + '_privateKey.txt')
-        //var _path ="D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.txt";
-        let fs = require('fs')
-        fs.readFile(_path, 'utf8', function (err, data) {
-          if (err){
-            console.log(err)
-            return err
-          }
-        })
-
-        fs.writeFile(_path, this.keyInfo, function (err) {
-          if (!err)
-            console.log('写入成功！' + _path)
-        })
-        //var downloadFileAddress = "D:/work/nuls-client/pubKey.txt";
+        let keyInfo = this.keyInfo
         const {dialog} = require('electron').remote
-        const {ipcRenderer} = require('electron')
-        ipcRenderer.on('tips', (event, person) => {
-        })
-        dialog.showOpenDialog({
-          defaultPath: '../Desktop',
+        dialog.showSaveDialog({
+          title: '保存文件路径：',
+          defaultPath: 'D:/',
           properties: [
-            'openDirectory',
+            'openFile',
           ],
           filters: [
-            {name: 'All', extensions: ['*']},
+            {name: 'All Files', extensions: ['*']},
           ]
         }, function (res) {
-          if (res[0] !== '') {
-            ipcRenderer.send('download', _path + '+' + res[0])
-            setTimeout(() => {
-              fs.unlink(_path, function (err) {
-                if (err) return console.log(err)
-                console.log('文件删除成功')
-              })
-            }, 6000)
-            alert(res)
-          } else {
-            alert(this.$t('message.c109'))
-          }
+          let path = require('path')
+          let _path = path.join(res + '.txt')
+          let fs = require('fs')
+          fs.writeFile(_path, keyInfo, function (err) {
+            if (!err) {
+              alert(res + '.txt')
+            }
+          })
         })
       },
 

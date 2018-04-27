@@ -51,7 +51,7 @@
                 <span class="cursor-p set-page-div-span" @click="toEditPassword ">{{$t('message.c80')}}</span>
             </div>
             <div class="set-page-div">
-                <label>{{$t('message.c81')}}：V1.0.0</label>
+                <label>{{$t('message.c81')}}：V{{this.$store.getters.getPurseVersiont}}</label>
                 <span class="cursor-p set-page-div-span" @click="versionUpdates">{{$t('message.c82')}}</span>
             </div>
         </div>
