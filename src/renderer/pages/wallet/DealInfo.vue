@@ -31,7 +31,7 @@
                 </li>
                 <li><span>{{$t('message.transactionState')}}</span>{{ $t('message.statusS'+infoData.status) }}
                 </li>
-                <li><span>{{$t('message.blockHeight')}}</span>{{infoData.blockHeight}}</li>
+                <li><span>{{$t('message.blockHeight')}}</span>{{infoData.blockHeight < 0 ? "- -":infoData.blockHeight }}</li>
                 <li><span>{{$t('message.remarks')}}</span>{{infoData.remark}}</li>
             </ul>
         </div>
@@ -136,7 +136,7 @@
                         width: 100%;
                         text-align: left;
                         padding-left: 5px;
-                        font-size: 9px;
+                        font-size: 10px;
                         span {
                             float: right;
                             padding-right: 5px;
