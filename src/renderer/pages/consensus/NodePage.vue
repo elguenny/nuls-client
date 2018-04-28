@@ -124,19 +124,11 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              //console.log(response);
+              console.log(response);
               let leftShift = new BigNumber(0.00000001)
               response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
               response.data.creditRatios = response.data.creditRatio
-              if (response.data.creditRatio !== 0) {
-                if (response.data.creditRatio > 0) {
-                  response.data.creditRatio = ((((response.data.creditRatio + 1) / 2)) * 100).toFixed() + '%'
-                } else {
-                  response.data.creditRatio = (parseFloat(response.data.creditRatio) * 100).toFixed(6).substr(1, 5) + '%'
-                }
-              } else {
-                response.data.creditRatio = '50%'
-              }
+              response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
               response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10)
               response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000'
               if (response.data.totalDeposit > 50000000000000) {

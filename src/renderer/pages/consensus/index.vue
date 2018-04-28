@@ -269,15 +269,7 @@
               }
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].creditRatios = response.data.list[i].creditRatio
-                if (response.data.list[i].creditRatio !== 0) {
-                  if (response.data.list[i].creditRatio > 0) {
-                    response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%'
-                  } else {
-                    response.data.list[i].creditRatio = (parseFloat(response.data.list[i].creditRatio) * 100).toFixed(6).substr(1, 5) + '%'
-                  }
-                } else {
-                  response.data.list[i].creditRatio = '50%'
-                }
+                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
@@ -305,15 +297,7 @@
               let leftShift = new BigNumber(0.00000001) ;
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].creditRatios = response.data.list[i].creditRatio
-                if (response.data.list[i].creditRatio !== 0) {
-                  if (response.data.list[i].creditRatio > 0) {
-                    response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%'
-                  } else {
-                    response.data.list[i].creditRatio = (parseFloat(response.data.list[i].creditRatio) * 100).toFixed(5).substr(1, 5) + '%'
-                  }
-                } else {
-                  response.data.list[i].creditRatio = '50%'
-                }
+                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
                 response.data.list[i].owndeposit = parseFloat(leftShift.times(response.data.list[i].owndeposit).toString())

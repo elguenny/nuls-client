@@ -3,7 +3,7 @@
         <Back :backTitle="this.$t('message.accountManagement')"></Back>
         <div class="edit-info">
             <h2>{{$t('message.c100')}}</h2>
-            <el-form :model="aliasForm" :rules="aliasRules" ref="aliasForm">
+            <el-form :model="aliasForm" :rules="aliasRules" ref="aliasForm"  @submit.native.prevent>
                 <div class="div-text" style="text-align: center">
                     <label>{{$t('message.c102')}}:</label>{{this.address}}
                 </div>
@@ -17,12 +17,12 @@
                     <label>{{$t('message.miningFee1')}}:</label>1.01NULS
                 </div>
                 <el-form-item class="aliasing-submit">
-                    <el-button type="primary" @click="aliasingSubmit('aliasForm')">{{$t('message.confirmButtonText')}}
+                    <el-button type="primary" @click="aliasingSubmit('aliasForm')" id="aliasAliasing">{{$t('message.confirmButtonText')}}
                     </el-button>
                 </el-form-item>
             </el-form>
         </div>
-        <Password ref="password" @toSubmit="toSubmit"></Password>
+        <Password ref="password" @toSubmit="toSubmit" :submitId="submitId"></Password>
     </div>
 </template>
 
@@ -46,6 +46,7 @@
         }
       }
       return {
+        submitId: 'aliasAliasing',
         address: this.$route.params.address,
         usable: 0,
         aliasForm: {
