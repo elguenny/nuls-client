@@ -89,6 +89,7 @@
             this.submitId = 'null'
           } else {
             console.log('error submit!!')
+            this.$refs[formName].resetFields()
             return false
           }
         })

@@ -124,7 +124,7 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              console.log(response);
+              //console.log(response);
               let leftShift = new BigNumber(0.00000001)
               response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
               response.data.creditRatios = response.data.creditRatio

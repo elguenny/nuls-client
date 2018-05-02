@@ -101,7 +101,7 @@ function createWindow () {
    *  Hide the menu of the electron form
    */
   if (platform === 'darwin') {
-    var template = [{
+    let template = [{
       label: 'Application',
       submenu: [
         {label: 'About Nuls Wallet', selector: 'orderFrontStandardAboutPanel:'},
