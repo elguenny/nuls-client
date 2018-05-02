@@ -201,6 +201,7 @@
                     background-color: #17202e;
                     border: 1px solid #658ec7;
                     padding: 0 2px;
+                    color: #FFFFFF;
                 }
                 .el-select-dropdown__list {
                     width: 165px;

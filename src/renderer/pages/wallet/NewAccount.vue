@@ -101,20 +101,22 @@
         const {dialog} = require('electron').remote
         dialog.showSaveDialog({
           properties: [
-            'openFile',
-          ],
-          filters: [
-            {name: 'All Files', extensions: ['*']},
-          ]
+             'openFile',
+           ],
+           filters: [
+             {name: 'All Files', extensions: ['*'],}
+           ]
         }, function (res) {
           let path = require('path')
-          let _path = path.join(res + '.txt')
-          let fs = require('fs')
-          fs.writeFile(_path, keyInfo, function (err) {
-            if (!err) {
-              alert(res + '.txt')
-            }
-          })
+          if(res){
+            let _path = path.join(res + '.txt')
+            let fs = require('fs')
+            fs.writeFile(_path, keyInfo, function (err) {
+              if (!err) {
+                alert(res + '.txt')
+              }
+            })
+          }
         })
       },
 
