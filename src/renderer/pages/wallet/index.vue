@@ -230,22 +230,32 @@
         this.$fetch(url, param)
           .then((response) => {
             //console.log(response)
+            //判断是否查询到数据
             if (response.data != null) {
               this.totalAll = response.data.total
-              let leftShift = new BigNumber(0.00000001)
-              if (response.data.list.length > 0) {
-                this.dealList = response.data.list
-                //this.$store.commit("setAccountTxList",response.data.list);
-                for (let i = 0; i < response.data.list.length; i++) {
-                  let length = this.dealList[i].hash.length
-                  this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10)
-                  this.dealList[i].values = parseFloat(leftShift.times(response.data.list[i].value).toString())
-                  this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
+              //判断最大页数>=当前选择的最大页数
+              if(response.data.pages >= this.pages){
+                let leftShift = new BigNumber(0.00000001)
+                if (response.data.list.length > 0) {
+                  this.dealList = response.data.list
+                  //this.$store.commit("setAccountTxList",response.data.list);
+                  for (let i = 0; i < response.data.list.length; i++) {
+                    let length = this.dealList[i].hash.length
+                    this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10)
+                    this.dealList[i].values = parseFloat(leftShift.times(response.data.list[i].value).toString())
+                    this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
+                  }
+                  this.loading = false
+                } else {
+                  this.loading = false
+                  this.dealList = []
                 }
-                this.loading = false
-              } else {
-                this.loading = false
-                this.dealList = []
+              }else {
+                this.getAccountTxList('/tx/list/', {
+                  'address': this.accountAddressValue,
+                  'pageSize': 9,
+                  'pageNumber': response.data.pages
+                })
               }
             } else {
               this.loading = false

@@ -102,6 +102,10 @@
         form {
             width: 60%;
             margin: auto;
+            .el-form-item__label{
+                line-height: 10px;
+                color: #FFFFFF;
+            }
         }
         .el-textarea__inner {
             background-color: #17202e;
