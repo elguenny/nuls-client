@@ -143,6 +143,7 @@ const en = {
     c3: 'Profile',
     c4: 'My agent',
     c5: 'Create',
+    c5_1: 'Check',
     c6: 'Balance',
     c7: 'Income',
     c8: 'Agent',
@@ -303,6 +304,12 @@ const en = {
     c137: 'The core program failed to start. Please try again or contact developers.',
     c138: 'Startup failure',
     c139: 'Height',
+    c140: 'Choice language',
+    c141: 'Minimize',
+    c142: 'Close',
+    c143: 'Copy',
+    c144: 'display/hide',
+    c145:'Click Copy txid',
 
     //Bottom info
     purseVersion: 'Wallet',

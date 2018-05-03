@@ -9,6 +9,7 @@
             <ul>
                 <li class="li-bg overflow">
                     <label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddresss}}
+                    <span v-show="toCheckOk" @click="toCheck" class="cursor-p text-d">{{$t('message.c5_1')}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c17')}}：</label>{{this.agentAddressInfo.commissionRate}}%
@@ -88,6 +89,7 @@
           txHash: '',
         },
         myNodeSetInterval:null,
+        toCheckOk:false,
       }
     },
     components: {
@@ -124,6 +126,7 @@
             //console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
+              this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress")
               response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
               response.data.creditRatios = response.data.creditRatio
               response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
@@ -163,6 +166,12 @@
           'agentAddress': this.agentAddress,
           'pageSize': '3',
           'pageNumber': events
+        })
+      },
+      //查看节点
+      toCheck () {
+        this.$router.push({
+          name: '/nodeInfo'
         })
       },
       //全部退出

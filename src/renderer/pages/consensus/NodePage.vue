@@ -9,6 +9,7 @@
             <ul>
                 <li class="li-bg overflow">
                     <label>{{$t('message.c16')}}：</label>{{this.nodeData.agentAddresss}}
+                    <span v-show="toCheckOk" @click="toCheck" class="cursor-p text-d">{{$t('message.c5_1')}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c17')}}：</label>{{this.nodeData.commissionRate}}%
@@ -78,7 +79,7 @@
             callback(new Error(this.$t('message.c53')))
           } else if ( value < 2000) {
             callback(new Error(this.$t('message.c54')))
-          } else if (value > this.usable - 0.01) {
+          } else if (value > config.FloatSub(this.usable,0.01)) {
             callback(new Error(this.$t('message.c542')))
           } else {
             callback()
@@ -100,7 +101,8 @@
           nodeNo: [
             {validator: checkNodeNo, trigger: 'blur'}
           ],
-        }
+        },
+        toCheckOk:false,
       }
     },
     components: {
@@ -126,6 +128,7 @@
             if (response.success) {
               //console.log(response);
               let leftShift = new BigNumber(0.00000001)
+              this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress")
               response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
               response.data.creditRatios = response.data.creditRatio
               response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
@@ -171,6 +174,12 @@
           this.nodeForm.nodeNo = config.FloatSub(balance, 0.01)
           this.$refs.nodeForm.validateField('nodeNo')
         }
+      },
+      //查看节点
+      toCheck () {
+        this.$router.push({
+          name: '/nodeInfo'
+        })
       },
       //提交委托
       onSubmit (formName) {

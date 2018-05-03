@@ -15,17 +15,17 @@
         </ul>
         <div class="top-icon fl">
             <el-badge class="news">
-                <i class="message_icon" @click="news"></i>
+                <i class="message_icon" @click="news" :title="$t('message.news')"></i>
             </el-badge>
             <!--<el-badge :value="0" class="news">
                 <i class="message_icon" @click="news"></i>
             </el-badge>-->
-            <div class="set"><i class="set_icon" @click="toSetUp"></i></div>
+            <div class="set"><i class="set_icon" @click="toSetUp" :title="$t('message.set')"></i></div>
             <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem"
                       :widthData="widthData"></SelecBar>
             <div class="minusClose">
-                <i class="el-icon-minus minus-close fl" @click="toMinus"></i>
-                <i class="el-icon-close minus-close fl " @click="toClose"></i>
+                <i class="el-icon-minus minus-close fl" @click="toMinus" :title="$t('message.c141')"></i>
+                <i class="el-icon-close minus-close fl " @click="toClose" :title="$t('message.c142')"></i>
             </div>
         </div>
         <div class="news-div" v-show="newsOk">

@@ -6,7 +6,7 @@
         </div>
         <div class="consensus-index-title">
             <label>{{$t('message.c1')}}{{$t('message.c1_1')}}：</label>
-            {{this.allTotalDeposit}} NULS，
+            {{this.allTotalDeposit.toString()}} NULS，
             <label>{{$t('message.c2')}}：</label>{{this.allAgentCount}}
         </div>
         <div class="consensus-center">
@@ -19,8 +19,9 @@
                 </li>
                 <li>
                     <label>{{$t('message.c4')}}：</label>{{this.myInfoData.agentCount}} {{$t('message.c30')}}
-                    <span v-show="this.myInfoData.agentCount > 0 ? false:true ">(<span
-                            @click="toNewNode" class="span">{{$t('message.c5')}}</span>)</span>
+                    <span v-if="this.myInfoData.agentCount > 0">(<span
+                            @click="toCheck" class="span">{{$t('message.c5_1')}}</span>)</span>
+                    <span v-else>(<span @click="toNewNode" class="span">{{$t('message.c5')}}</span>)</span>
                 </li>
                 <li>
                     <label>{{$t('message.c8')}}：</label>{{this.myInfoData.joinAgentCount}} {{$t('message.c30')}}
@@ -29,12 +30,12 @@
                         class="span">{{$t('message.c9')}}</span>)
                 </li>
                 <li>
-                    <label>{{$t('message.c6')}}：</label>{{this.myInfoData.usableBalance}} NULS
+                    <label>{{$t('message.c6')}}：</label>{{this.myInfoData.usableBalance.toString()}} NULS
                 </li>
                 <li>
                     <label>{{$t('message.c10')}}：</label>
                     <span @click="toPledgeInfo" class="span">
-                    {{this.myInfoData.totalDeposit}} NULS
+                    {{this.myInfoData.totalDeposit.toString()}} NULS
                     </span>
                 </li>
 
@@ -95,7 +96,9 @@
                             <ul>
                                 <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                                <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit*0.00000001).toFixed(2) }} NULS</li>
+                                <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit*0.00000001).toFixed(2) }}
+                                    NULS
+                                </li>
                                 <li class="cb">
                                     <label class="fl">{{$t('message.c19')}}：</label>{{item.memberCount}}
                                 </li>
@@ -154,7 +157,7 @@
           reward: 0,
           joinAgentCount: 0,
           usableBalance: 0,
-          rewardOfDay:0,
+          rewardOfDay: 0,
         },
 
         creditColor: '#6e84f7',
@@ -169,7 +172,7 @@
         myEvents: 1,
         myTotalAll: 0,
 
-        consensusSetInterval:null,
+        consensusSetInterval: null,
 
       }
     },
@@ -193,7 +196,7 @@
         this.accountAddressValue = localStorage.getItem('newAccountAddress')
         this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
           'pageSize': '3',
-          'pageNumber':'1'
+          'pageNumber': '1'
         })
         /**
          * 5秒查询列表
@@ -202,18 +205,18 @@
         this.consensusSetInterval = setInterval(() => {
           this.getConsensus('/consensus')
           this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
-          if(this.tabName === 'first'){
+          if (this.tabName === 'first') {
             this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': this.allEvents})
-          }else {
+          } else {
             this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
               'pageSize': '3',
-              'pageNumber':this.myEvents
+              'pageNumber': this.myEvents
             })
           }
-        },10000)
+        }, 10000)
       }
     },
-    destroyed() {
+    destroyed () {
       clearInterval(this.consensusSetInterval)
     },
     methods: {
@@ -259,7 +262,7 @@
             //console.log(response);
             this.myTotalAll = 1
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
+              let leftShift = new BigNumber(0.00000001)
               if (response.data.list.length !== 0) {
                 this.noDataOK = false
                 this.myConsensusSizeOK = true
@@ -294,7 +297,7 @@
           .then((response) => {
             if (response.success) {
               //console.log(response);
-              let leftShift = new BigNumber(0.00000001) ;
+              let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].creditRatios = response.data.list[i].creditRatio
                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
@@ -351,16 +354,16 @@
       },
       //我的节点跳转
       toMyNode (address) {
-        if (address === localStorage.getItem('newAccountAddress')) {
-          this.$router.push({
-            name: '/nodeInfo'
-          })
-        } else {
-          this.$router.push({
-            name: '/myNode',
-            params: {'agentAddress': address}
-          })
-        }
+        this.$router.push({
+          name: '/myNode',
+          params: {'agentAddress': address}
+        })
+      },
+      //查看节点
+      toCheck () {
+        this.$router.push({
+          name: '/nodeInfo'
+        })
       },
       //显示隐藏信用系数规则
       toggleShow (index) {

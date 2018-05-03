@@ -9,7 +9,7 @@
                 </el-table-column>
                 <el-table-column :label="$t('message.tabAlias')" width="100" class="user-aliasing">
                     <template slot-scope="scope">
-                        <span>{{ scope.row.alias != null  ? scope.row.alias : "-" }}</span>
+                        <span>{{ scope.row.alias != null  ? scope.row.alias : '-' }}</span>
                         <i class="el-icon-edit cursor-p"
                            v-show="scope.row.alias != null  ? false : true"
                            @click="editAliasing(scope.row.address,scope.row.alias)"></i>
@@ -36,117 +36,126 @@
 </template>
 
 <script>
-    import Back from '@/components/BackBar.vue';
-    import Password from '@/components/PasswordBar.vue';
+  import Back from '@/components/BackBar.vue'
+  import Password from '@/components/PasswordBar.vue'
 
-    export default {
-        data() {
-            return {
-                outOrBackup: 0,
-                backUrl: '/wallet',
-                setAsAddress: '',
-                userData: [],
-                totalAll: 0,
+  export default {
+    data () {
+      return {
+        outOrBackup: 0,
+        backUrl: '/wallet',
+        setAsAddress: '',
+        userData: [],
+        totalAll: 0,
+      }
+    },
+    components: {
+      Back,
+      Password,
+    },
+    mounted () {
+      let _this = this
+      this.getUserList('/account/list', {'pageSize': 8, 'pageNumber': 1})
+    },
+    methods: {
+      back () {
+        this.$router.push({
+          name: '/wallete',
+        })
+      },
+      //获取所有账户列表
+      getAllUserList (url) {
+        this.$fetch(url)
+          .then((response) => {
+            if (response.success) {
+              this.$store.commit('setAddressList', response.data.list)
             }
-        },
-        components: {
-            Back,
-            Password,
-        },
-        mounted() {
-            let _this = this;
-            this.getUserList("/account/list", {"pageSize": 8, "pageNumber": 1});
-        },
-        methods: {
-            back() {
-                this.$router.push({
-                    name: '/wallete',
-                })
-            },
-            //获取账户列表
-            getUserList(url, params) {
-                this.$fetch(url, params)
-                    .then((response) => {
-                        if (response.success) {
-                            //console.log(response);
-                            this.totalAll = response.data.total;
-                            if (response.data.list.length === 0) {
-                                localStorage.setItem('fastUser', '0');
-                                localStorage.setItem("userPass", "");
-                                localStorage.setItem("newAccountAddress", "");
-                                localStorage.setItem("toUserInfo", "0");
-                            } else {
-                                localStorage.setItem('fastUser', '1');
-                                localStorage.setItem("newAccountAddress", response.data.list[0].address);
-                            }
-                            this.$store.commit("setAddressList", response.data.list);
-                            this.userData = response.data.list;
-                        }
-                    });
-            },
-            userListSize(events) {
-                this.getUserList("/account/list", {"pageSize": 8, "pageNumber": events});
-            },
-            //点击根据地址移除账户事件
-            outUser(address) {
-                this.setAsAddress = address;
-                this.outOrBackup = 1;
-                this.$refs.password.showPassword(true);
-            },
-            //移除账户
-            outUserAddress(url, params) {
-                this.$post(url, params)
-                    .then((response) => {
-                        if (response.success) {
-                            this.$message({
-                                type: 'success', message: this.$t('message.passWordSuccess')
-                            });
-                            this.getUserList("/account/list");
-                        } else {
-                            this.$message({
-                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                            });
-                        }
-                    })
-            },
-            //备份账户
-            backupUser(address) {
-                this.setAsAddress = address;
-                this.outOrBackup = 2;
-                this.$refs.password.showPassword(true);
-
-            },
-            //输入密码提交
-            toSubmit(password) {
-                if (this.outOrBackup === 1) {
-                    let params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}';
-                    this.outUserAddress('/wallet/remove/', params)
-                } else {
-                  localStorage.setItem("userPass",password);
-                    this.$router.push({
-                        name: '/newAccount',
-                        params: {newOk: false, address: this.setAsAddress},
-                    })
-                }
-
-            },
-            //修改别名
-            editAliasing(Address) {
-                this.$router.push({
-                    name: '/editAliasing',
-                    params: {address: Address},
-                })
-            },
-            //新增账户
-            toNewAccount() {
-                localStorage.setItem('toUserInfo', "0");
-                this.$router.push({
-                    path: '/firstInto/firstInfo'
-                })
+          })
+      },
+      //获取账户列表
+      getUserList (url, params) {
+        this.$fetch(url, params)
+          .then((response) => {
+            if (response.success) {
+              //console.log(response);
+              this.totalAll = response.data.total
+              if (response.data.list.length === 0) {
+                localStorage.setItem('fastUser', '0')
+                localStorage.setItem('userPass', '')
+                localStorage.setItem('newAccountAddress', '')
+                localStorage.setItem('toUserInfo', '0')
+              } else {
+                localStorage.setItem('fastUser', '1')
+                localStorage.setItem('newAccountAddress', response.data.list[0].address)
+              }
+              this.getAllUserList('/account/list')
+              this.userData = response.data.list
             }
+          })
+      },
+      userListSize (events) {
+        this.getUserList('/account/list', {'pageSize': 8, 'pageNumber': events})
+      },
+      //点击根据地址移除账户事件
+      outUser (address) {
+        this.setAsAddress = address
+        this.outOrBackup = 1
+        this.$refs.password.showPassword(true)
+      },
+      //移除账户
+      outUserAddress (url, params) {
+        this.$post(url, params)
+          .then((response) => {
+            if (response.success) {
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              })
+              this.getUserList('/account/list', {'pageSize': 8, 'pageNumber': 1})
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
+            }
+          })
+      },
+      //备份账户
+      backupUser (address) {
+        this.setAsAddress = address
+        this.outOrBackup = 2
+        this.$refs.password.showPassword(true)
 
+      },
+      //输入密码提交
+      toSubmit (password) {
+        if (this.outOrBackup === 1) {
+          let params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}'
+          this.outUserAddress('/wallet/remove/', params)
+        } else {
+          localStorage.setItem('userPass', password)
+          this.$router.push({
+            name: '/newAccount',
+            params: {newOk: false, address: this.setAsAddress},
+          })
         }
+
+      },
+      //修改别名
+      editAliasing (Address) {
+        this.$router.push({
+          name: '/editAliasing',
+          params: {address: Address},
+        })
+      },
+      //新增账户
+      toNewAccount () {
+        localStorage.setItem('toUserInfo', '0')
+        this.$router.push({
+          path: '/firstInto/firstInfo'
+        })
+      }
+
     }
+  }
 </script>
 <style lang="less">
     @import url("../../assets/css/style.less");
@@ -171,7 +180,6 @@
                 text-align: center;
                 line-height: 3rem;
             }
-
         }
         .el-table th {
             background-color: #17202e;

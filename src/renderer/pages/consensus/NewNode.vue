@@ -41,6 +41,7 @@
   import Back from './../../components/BackBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
+  import * as config from '@/config.js'
   import { BigNumber } from 'bignumber.js'
 
   export default {
@@ -56,7 +57,7 @@
             callback(new Error(this.$t('message.c32')))
           } else if (value < 20000) {
             callback(new Error(this.$t('message.c541')))
-          }else if (value > this.usable - 0.01 ) {
+          }else if (value > config.FloatSub(this.usable,0.01) ) {
             callback(new Error(this.$t('message.c543')))
           } else {
             callback()

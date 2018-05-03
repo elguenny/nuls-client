@@ -7,15 +7,15 @@
             </div>
             <div class="wallet-i">
                 <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
-                   @click="accountCopy"></i>
+                   @click="accountCopy" :title="$t('message.c143')"></i>
                 <i class="qr_icon cursor-p" @click="accountCode" style="display: none"></i>
-                <i class="zhanghu_icon fr cursor-p" @click="accountChoice"></i>
+                <i class="zhanghu_icon fr cursor-p" @click="accountChoice" :title="$t('message.accountManagement')"></i>
             </div>
             <CodeBar v-show="codeShowOk" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
         </div>
         <div class="wallet-hide" v-show="walletHide">
             <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="toKeyShow"
-               class="cursor-p"></i>
+               class="cursor-p" :title="$t('message.c144')"></i>
         </div>
         <div class="wallet-tab cl">
             <el-tabs v-model="activeName" @tab-click="handleClick" @dblclick="tab-clicks">
@@ -29,21 +29,21 @@
                         <el-table-column :label="$t('message.indexSum')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.balance
+                                       :value=scope.row.balance.toString()
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexUsable')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.usable
+                                       :value=scope.row.usable.toString()
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexLock')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.locked
+                                       :value=scope.row.locked.toString()
                                        readonly="readonly" class="cursor-p text-d"
                                        @click="toLocked(accountAddressValue)">
                             </template>

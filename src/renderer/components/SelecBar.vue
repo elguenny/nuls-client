@@ -2,7 +2,7 @@
     <!--select-->
     <div class="base-select fl" @click="showDataList">
         <div class="sub-selected-value">
-            <img :src="selectedValue.value" class="language-img">
+            <img :src="selectedValue.value" class="language-img" :title="$t('message.c140')">
             <ul class="ul" v-bind:style="{width: widthData}" v-if="showData">
                 <li v-for="(item, index) in dataList" @click.stop="select(item, index)">
                     <img :src="item.value" class="language-img">

@@ -24,7 +24,7 @@
             <ul>
                 <li><span>{{$t('message.tradingTime')}}</span>{{this.times}}</li>
                 <li><span>{{$t('message.miningFee1')}}</span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
-                <li @click="hashCopy(infoData.hash)" class="cursor-p"><span>{{$t('message.autograph')}}</span>{{infoData.hash}}
+                <li @click="hashCopy(infoData.hash)" class="cursor-p" :title="$t('message.c145')"><span>{{$t('message.autograph')}}</span>{{infoData.hash}}
                 </li>
                 <li><span>{{$t('message.transactionType')}}</span>
                     {{$t('message.type'+infoData.type)}}

@@ -13,7 +13,7 @@
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')+'：'" class="join-nos" prop="joinNo">
                     <span class="allUsable">{{$t('message.currentBalance')}}: {{usable}} NULS</span>
-                    <el-input type="text" v-model.number="transferForm.joinNo" :maxlength="17"></el-input>
+                    <el-input type="text" v-model="transferForm.joinNo" :maxlength="17"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
@@ -98,7 +98,7 @@
           let res = /^\d{1,8}(\.\d{1,8})?$/
           if (!re.exec(value)) {
             callback(new Error(this.$t('message.transferNO1')))
-          } else if (value > this.usable - 0.01) {
+          } else if (value > config.FloatSub(this.usable,0.01)) {
             callback(new Error(this.$t('message.transferNO2')))
           } else if (value < 0.01) {
             callback(new Error(this.$t('message.transferNO3')))

@@ -9,6 +9,7 @@
             <ul>
                 <li class="li-bg overflow">
                     <label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddresss}}
+                    <span v-show="toCheckOk" @click="toCheck" class="cursor-p text-d">{{$t('message.c5_1')}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c17')}}：</label>{{this.agentAddressInfo.commissionRate}}%
@@ -59,6 +60,7 @@
   import Back from './../../components/BackBar.vue'
   import ProgressBar from './../../components/ProgressBar.vue'
   import Password from '@/components/PasswordBar.vue'
+  import * as config from '@/config.js'
   import { BigNumber } from 'bignumber.js'
 
   export default {
@@ -74,7 +76,7 @@
             callback(new Error(this.$t('message.c53')))
           } else if (value < 2000) {
             callback(new Error(this.$t('message.c54')))
-          }else if (value > this.usable - 0.01) {
+          }else if (value > config.FloatSub(this.usable,0.01)) {
             callback(new Error(this.$t('message.c542')))
           } else {
             callback()
@@ -96,7 +98,7 @@
         },
         usable: 0,
         placeholder: '',
-
+        toCheckOk:false,
       }
     },
     components: {
@@ -118,6 +120,7 @@
           .then((response) => {
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
+              this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress")
               response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
               response.data.creditRatios = response.data.creditRatio
               response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
@@ -143,6 +146,12 @@
               this.usable = parseFloat(leftShift.times(response.data.usable).toString())
             }
           })
+      },
+      //查看节点
+      toCheck () {
+        this.$router.push({
+          name: '/nodeInfo'
+        })
       },
       //提交追加
       onSubmit (formName) {

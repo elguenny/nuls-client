@@ -151,3 +151,6 @@ fabric.properties
 
 build
 java
+zhihu/
+yarn.lock
+.project

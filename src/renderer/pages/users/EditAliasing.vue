@@ -29,6 +29,7 @@
 <script>
   import Back from '@/components/BackBar.vue'
   import Password from '@/components/PasswordBar.vue'
+  import { BigNumber } from 'bignumber.js'
 
   export default {
     data () {
@@ -73,7 +74,9 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              this.usable = response.data.usable * 0.000000001
+              let leftShift = new BigNumber(0.00000001)
+              this.usable = parseFloat(leftShift.times(response.data.usable).toString())
+              //this.usable = response.data.usable * 0.000000001
             } else {
               this.usable = 0
             }
@@ -145,6 +148,7 @@
             }
             .bt-aliasing .el-input__inner {
                 border: 1px solid #24426c;
+                color: #FFFFFF;
             }
             .el-input__inner:hover {
                 border: 1px solid #658ec7;

@@ -41,7 +41,8 @@
                     </li>
                     <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                         <label class="fl cursor-p">{{$t('message.c18')}}:</label>
-                        <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'" :widthData="item.creditRatio"></ProgressBar>
+                        <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'"
+                                     :widthData="item.creditRatio"></ProgressBar>
                     </li>
 
                 </ul>
@@ -75,6 +76,7 @@
       return {
         showData: false,
         sortValue: this.$t('message.c46'),
+        sortKey: '',
         sortConsensusList: [
           {sortName: this.$t('message.c46'), sortKey: ''},
           {sortName: this.$t('message.c17'), sortKey: 'commissionRate'},
@@ -89,7 +91,7 @@
 
         allConsensus: [],
         totalAll: 0,
-        pageNumber:1,
+        pageNumber: 1,
       }
     },
     components: {
@@ -105,23 +107,14 @@
       getAllConsensus (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            console.log(params);
-            console.log(response);
+            //console.log(params)
+            //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].creditRatios = response.data.list[i].creditRatio
                 response.data.list[i].owndeposit = parseFloat(leftShift.times(response.data.list[i].owndeposit).toString())
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
-                /*if (response.data.list[i].creditRatio !== 0) {
-                  if (response.data.list[i].creditRatio > 0) {
-                    response.data.list[i].creditRatio = ((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed() + '%'
-                  } else {
-                    response.data.list[i].creditRatio = (parseFloat(response.data.list[i].creditRatio) * 100).toFixed(6).substr(1, 5) + '%'
-                  }
-                } else {
-                  response.data.list[i].creditRatio = '50%'
-                }*/
                 response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
@@ -131,14 +124,22 @@
               this.totalAll = 0
               this.allConsensus = []
             }
-          }).catch((reject) => {
-          console.log('获取全部共识列表：' + reject)
-        })
+          })
       },
       //全部共识分页
       allConsensusSize (events) {
-        this.pageNumber = events;
-        this.getAllConsensus('/consensus/agent/list/', {'pageNumber': events, 'pageSize': '6'})
+        this.pageNumber = events
+        let params = ''
+        if (this.keyword !== '') {
+          params = {'keyword': this.keyword, 'pageSize': '6', 'pageNumber': events}
+        } else if (this.sortValue !== '请选择排序方式') {
+          params = {'sortType': this.sortKey, 'pageSize': '6', 'pageNumber': events}
+        } else if (this.keyword !== '' && this.sortValue !== '请选择排序方式') {
+          params = {'keyword': this.keyword, 'sortType': this.sortKey, 'pageSize': '6', 'pageNumber': events}
+        } else {
+          params = {'pageSize': '6', 'pageNumber': events}
+        }
+        this.getAllConsensus('/consensus/agent/list/', params)
       },
       showDataList () {
         this.showData = !this.showData
@@ -156,6 +157,7 @@
       sortConsensus (sortName, sortKey) {
         this.showData = false
         this.sortValue = sortName
+        this.sortKey = sortKey
         if (this.keyword !== '') {
           const params = {'keyword': this.keyword, 'sortType': sortKey, 'pageSize': '6', 'pageNumber': '1'}
           this.getAllConsensus('/consensus/agent/list/', params)

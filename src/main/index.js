@@ -29,15 +29,15 @@ function createWindow () {
    */
   mainWindow = new BrowserWindow({
     height: 560,
-    width: 1800,
+    width: 800,
     useContentSize: true,
     webPreferences: {webSecurity: process.env.NODE_ENV !== 'development'},
     frame: false,
     //Set minimum width height.
     minWidth: 800,
     minHeight: 560,
-    /*maxWidth: 800,
-    maxHeight: 560,*/
+    maxWidth: 800,
+    maxHeight: 560,
   })
 
   /**
@@ -176,7 +176,7 @@ ipcMain.on('CoreLauncher', function (event, arg) {
   }*/
   let cmdPath = corePath(arg)
   launchCmd(cmdPath)
-})
+});
 
 /**
  * 只能开启一个electron 进程
@@ -188,11 +188,15 @@ const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
     if (mainWindow.isMinimized()) mainWindow.restore()
     mainWindow.focus()
   }
-})
+});
 
 if (shouldQuit) {
   app.quit()
 }
+
+/*if(handleSquirrelEvent()){
+  return
+}*/
 
 app.on('quit', (event, exitCode) => {
   if (process.env.NODE_ENV === 'development') {
