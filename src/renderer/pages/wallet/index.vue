@@ -90,9 +90,14 @@
 								</span>
                             </template>
                         </el-table-column>
+                        <el-table-column :label="$t('message.time')" width="145" align='center'>
+                            <template slot-scope="scope">
+                                <span>{{scope.row.times}}</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column :label="$t('message.assetChange')" width="138" align='center'>
                             <template slot-scope="scope">
-                                <span>{{ scope.row.values }}</span>
+                                <span :class="scope.row.values > 0 ? 'add':'minus'">{{ scope.row.values }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.state')" width="85" align='center'>
@@ -100,11 +105,7 @@
                                 <span>{{ $t('message.statusS'+scope.row.status) }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.time')" width="145" align='center'>
-                            <template slot-scope="scope">
-                                <span>{{scope.row.times}}</span>
-                            </template>
-                        </el-table-column>
+
                     </el-table>
                     <el-pagination layout="prev, pager, next" :page-size="9" :total=this.totalAll class="cb"
                                    v-show="totalAllOk = this.totalAll>8 ?true:false"
@@ -139,7 +140,7 @@
         totalAll: 0,
         pages: 1,
         types: '',
-        walletSetInterval:null,
+        walletSetInterval: null,
       }
     },
     components: {
@@ -174,9 +175,9 @@
        * 5second query trade list
        */
       this.walletSetInterval = setInterval(() => {
-        if(this.activeName === 'first'){
+        if (this.activeName === 'first') {
           this.getAccountAssets('/account/assets/' + this.accountAddressValue)
-        }else {
+        } else {
           if (this.types !== '') {
             this.getAccountTxList('/tx/list/', {
               'address': this.accountAddressValue,
@@ -194,7 +195,7 @@
         }
       }, 5000)
     },
-    destroyed() {
+    destroyed () {
       clearInterval(this.walletSetInterval)
     },
     methods: {
@@ -210,9 +211,10 @@
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.length; i++) {
-                response.data[i].balance = parseFloat(leftShift.times(response.data[i].balance).toString())
-                response.data[i].locked = parseFloat(leftShift.times(response.data[i].locked).toString())
-                response.data[i].usable = parseFloat(leftShift.times(response.data[i].usable).toString())
+                //console.log(leftShift.times(response.data[i].balance).toFixed(8))
+                response.data[i].balance = leftShift.times(response.data[i].balance).toFixed(8)
+                response.data[i].locked = leftShift.times(response.data[i].locked).toFixed(8)
+                response.data[i].usable = leftShift.times(response.data[i].usable).toFixed(8)
               }
               this.accountData = response.data
             }
@@ -234,7 +236,7 @@
             if (response.data != null) {
               this.totalAll = response.data.total
               //判断最大页数>=当前选择的最大页数
-              if(response.data.pages >= this.pages){
+              if (response.data.pages >= this.pages) {
                 let leftShift = new BigNumber(0.00000001)
                 if (response.data.list.length > 0) {
                   this.dealList = response.data.list
@@ -250,7 +252,7 @@
                   this.loading = false
                   this.dealList = []
                 }
-              }else {
+              } else {
                 this.getAccountTxList('/tx/list/', {
                   'address': this.accountAddressValue,
                   'pageSize': 9,
@@ -289,6 +291,8 @@
         if (this.activeName === 'first') {
           this.getAccountAssets('/account/assets/' + chenckAddress)
         } else {
+          this.totalAll = 0
+          this.types = ''
           this.getAccountTxList('/tx/list/', {'address': chenckAddress, 'pageSize': 9, 'pageNumber': 1})
         }
       },
@@ -299,6 +303,17 @@
        * @param typeValue
        */
       changeType (typeValue) {
+        let liValue = 0
+        if (typeValue.type[0]) {
+          liValue = typeValue.type[0]
+        }
+        let list2 = document.getElementsByClassName('el-table-filter__list')[0]//用class获取元素
+        let li = list2.getElementsByTagName('li')
+        for (let i = 0; i < li.length; i++) {
+          li[i].className = 'el-table-filter__list-item'
+        }
+        li[liValue].className = 'el-table-filter__list-item is-active'
+
         this.types = typeValue.type[0]
         this.getAccountTxList('/tx/list/', {
           'address': this.accountAddressValue,
@@ -418,7 +433,7 @@
        * @param address
        */
       toTransfer (address) {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight && sessionStorage.getItem("setNodeNumberOk") === "true") {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$router.push({
             name: '/transfer',
             params: {address: address},
@@ -551,10 +566,20 @@
         background-color: #17202e;
         max-height: 310px;
         overflow-y: auto;
-        ul{
+        ul {
             min-width: 80px;
-            li{
+            li {
                 font-size: 12px;
+                text-align: center;
+                &.el-table-filter__list-item {
+                    line-height: 32px;
+                    &.is-active {
+                        background-color: #658ec7;
+                    }
+                }
+                &:hover {
+                    background-color: #222d3f;
+                }
             }
         }
 
@@ -571,7 +596,7 @@
 
         &::-webkit-scrollbar-thumb {
             border-radius: 10px;
-            background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #222d3f))
+            background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #FFFFFF))
         }
     }
 

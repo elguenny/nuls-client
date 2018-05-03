@@ -34,7 +34,7 @@
   export default {
     data () {
       var aliasing = (rule, value, callback) => {
-        if (this.usable > 1.01) {
+        if (this.usable >= 1.01) {
           if (value === '') {
             callback(new Error(this.$t('message.c104')))
           } else if (value.length > 8) {

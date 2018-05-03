@@ -250,7 +250,7 @@
               let leftShift = new BigNumber(0.00000001)
               this.myInfoData = response.data
               this.myInfoData.reward = parseFloat(leftShift.times(response.data.reward).toString())
-              this.myInfoData.usableBalance = parseFloat(leftShift.times(response.data.usableBalance).toString())
+              this.myInfoData.usableBalance = leftShift.times(response.data.usableBalance).toFixed(8)
               this.myInfoData.totalDeposit = parseFloat(leftShift.times(response.data.totalDeposit).toString())
             }
           })

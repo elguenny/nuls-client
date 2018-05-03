@@ -37,7 +37,8 @@
             </ul>
         </div>
         <div class="node-page-bottom">
-            <el-form ref="nodeForm" :model="nodeForm" :rules="nodeRules" size="mini" label-position="left" @submit.native.prevent>
+            <el-form ref="nodeForm" :model="nodeForm" :rules="nodeRules" size="mini" label-position="left"
+                     @submit.native.prevent>
                 <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
@@ -77,9 +78,9 @@
           let res = /^\d{1,8}(\.\d{1,8})?$/
           if (!re.exec(value) || !res.exec(value)) {
             callback(new Error(this.$t('message.c53')))
-          } else if ( value < 2000) {
+          } else if (value < 2000) {
             callback(new Error(this.$t('message.c54')))
-          } else if (value > config.FloatSub(this.usable,0.01)) {
+          } else if (value > config.FloatSub(this.usable, 0.01)) {
             callback(new Error(this.$t('message.c542')))
           } else {
             callback()
@@ -102,7 +103,7 @@
             {validator: checkNodeNo, trigger: 'blur'}
           ],
         },
-        toCheckOk:false,
+        toCheckOk: false,
       }
     },
     components: {
@@ -118,7 +119,7 @@
     mounted () {
       this.$refs['input'].focus()
       this.$refs['input'].value = ''
-      sessionStorage.setItem('passwordOk','0')
+      sessionStorage.setItem('passwordOk', '0')
     },
     methods: {
       //根据address获取共识节点列表信息
@@ -128,7 +129,7 @@
             if (response.success) {
               //console.log(response);
               let leftShift = new BigNumber(0.00000001)
-              this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress")
+              this.toCheckOk = response.data.agentAddress === localStorage.getItem('newAccountAddress')
               response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
               response.data.creditRatios = response.data.creditRatio
               response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
@@ -293,6 +294,26 @@
                     right: 90px;
                     top: 20px;
                     margin-left: 90px;
+                    .sub-select-list {
+                        max-height: 170px;
+                        overflow-y: auto;
+                        &::-webkit-scrollbar-track {
+                            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+                            background-color: #0c1323;
+                            border-radius: 10px;
+                        }
+
+                        &::-webkit-scrollbar {
+                            width: 3px;
+                            background-color: #0c1323;
+                        }
+
+                        &::-webkit-scrollbar-thumb {
+                            border-radius: 10px;
+                            background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #FFFFFF))
+                        }
+
+                    }
                 }
             }
             .number {
