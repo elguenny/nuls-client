@@ -53,9 +53,10 @@
 <script>
   import axios from 'axios'
   import ProgressBar from '@/components/ProgressBar.vue'
-  import '@/assets/css/jquery-jvectormap.css'
-  import { jvectormap } from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
-  import { jvectormap1 } from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
+  import '@/assets/css/jquery-jvectormap-2.0.3.css'
+  import { jquery } from '@/assets/js/jquery.min.js'
+  import { jvectormap } from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min.js'
+  import { world_mill } from '@/assets/js/jvectormap/jquery-jvectormap-world-mill.js'
   import { BigNumber } from 'bignumber.js'
 
   export default {
@@ -84,7 +85,8 @@
         mapObj: [],
         //经纬度Info
         ipObj: [],
-        homeSetInterval:null,
+        homeSetInterval: null,
+        homeSetIntervals: null,
       }
     },
     components: {
@@ -100,25 +102,24 @@
     },
     mounted () {
       //5秒循环一次我的资产和全网共识
-      setTimeout(() => {
-        let map = $('#world-map-markers').vectorMap('get', 'mapObject')
-        this.homeSetInterval = setInterval(() => {
-          //console.log(123456)
-          this.getAccountAddress('/account/balances/')
-          this.getConsensus('/consensus')
-          this.getNetWork()
-          //console.log(this.ipObj)
-          setTimeout(() => {
-            map.clearSelectedMarkers()
-            map.addMarkers(this.ipObj)
-          }, 1000)
-        }, 9000)
-      }, 1000)
+      let map = $('#world-map-markers').vectorMap('get', 'mapObject')
+      this.homeSetInterval = setInterval(() => {
+        this.getAccountAddress('/account/balances/')
+        this.getConsensus('/consensus')
+      }, 8000)
 
+      this.homeSetIntervals = setInterval(() => {
+        this.getNetWork()
+        setTimeout(() => {
+          map.clearSelectedMarkers()
+          map.addMarkers(this.ipObj)
+        }, 1000)
+      }, 15000)
     },
     //离开当前页面后执行
-    destroyed() {
+    destroyed () {
       clearInterval(this.homeSetInterval)
+      clearInterval(this.homeSetIntervals)
     },
     methods: {
       /**
@@ -197,12 +198,12 @@
        */
       methodsMaps (maps) {
         $('#world-map-markers').vectorMap({
-          map: 'world_mill_en',
+          map: 'world_mill',
           normalizeFunction: 'polynomial',
           hoverOpacity: 0.7,
-          hoverColor: false,
-          zoomOnScroll: false,
-          zoomStep: 1,
+          zoomButtons:false,
+          zoomOnScroll:false,
+          zoomMax:4,
           backgroundColor: 'transparent',
           regionStyle: {
             initial: {
