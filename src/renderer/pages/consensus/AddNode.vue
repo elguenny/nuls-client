@@ -72,11 +72,13 @@
         setTimeout(() => {
           let re = /^\d+(?=\.{0,1}\d+$|$)/
           let res = /^\d{1,8}(\.\d{1,8})?$/
+          let values = new BigNumber(value)
+          let nu = new BigNumber(this.usable)
           if (!re.exec(value) || !res.exec(value)) {
             callback(new Error(this.$t('message.c53')))
           } else if (value < 2000) {
             callback(new Error(this.$t('message.c54')))
-          }else if (value > config.FloatSub(this.usable,0.01)) {
+          }else if (values.comparedTo(nu.minus(0.01)) === 1) {
             callback(new Error(this.$t('message.c542')))
           } else {
             callback()

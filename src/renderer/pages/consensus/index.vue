@@ -3,6 +3,8 @@
         <div class="account-top" v-show="tabelShow">
             <label v-show="accountAddressOk">{{$t('message.indexAccountAddress')}}</label>
             <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
+            <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
+               @click="accountCopy" :title="$t('message.c143')"></i>
         </div>
         <div class="consensus-index-title">
             <label>{{$t('message.c1')}}{{$t('message.c1_1')}}：</label>
@@ -130,6 +132,7 @@
   import ProgressBar from '@/components/ProgressBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import { BigNumber } from 'bignumber.js'
+  import copy from 'copy-to-clipboard'
 
   export default {
     data () {
@@ -138,7 +141,7 @@
         tabelShow: false,
         accountAddressOk: true,
         accountAddress: [],
-        accountAddressValue: '',
+        accountAddressValue: localStorage.getItem('newAccountAddress'),
         activeName: sessionStorage.getItem('consensusTabName'),
         tabName: 'first',
 
@@ -222,12 +225,23 @@
     methods: {
       //获取下拉选择地址
       chenckAccountAddress (chenckAddress) {
+        this.accountAddressValue = chenckAddress
         this.getConsensusAddress('/consensus/address/' + chenckAddress)
         if (sessionStorage.getItem('consensusTabName') === 'first') {
           this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': '1'})
         } else {
           this.getMyConsensus('/consensus/agent/address/' + chenckAddress, {'pageSize': '3', 'pageNumber': '1'})
         }
+      },
+      /**
+       * 复制功能
+       * copy
+       */
+      accountCopy () {
+        copy(this.accountAddressValue)
+        this.$message({
+          message: this.$t('message.c129'), type: 'success', duration: '800'
+        })
       },
       //获取共识信息
       getConsensus (url) {
@@ -401,6 +415,19 @@
     @import url("../../assets/css/style");
 
     .consensus-index {
+        .account-top {
+            .copy_icon {
+                position: absolute;
+                top: 75px;
+                right: 120px;
+                width: 30px;
+                height: 20px;
+                display: block;
+                float: left;
+                background-size: @bg-size;
+                background: @bg-image -198px -46px;
+            }
+        }
         .consensus-index-title {
             width: 640px;
             margin: auto;

@@ -104,19 +104,26 @@
       },
       //移除账户
       outUserAddress (url, params) {
-        this.$post(url, params)
-          .then((response) => {
-            if (response.success) {
-              this.$message({
-                type: 'success', message: this.$t('message.passWordSuccess')
-              })
-              this.getUserList('/account/list', {'pageSize': 8, 'pageNumber': 1})
-            } else {
-              this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-              })
-            }
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          this.$post(url, params)
+            .then((response) => {
+              if (response.success) {
+                this.$message({
+                  type: 'success', message: this.$t('message.passWordSuccess')
+                })
+                this.getUserList('/account/list', {'pageSize': 8, 'pageNumber': 1})
+              } else {
+                this.$message({
+                  type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                })
+              }
+            })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
           })
+        }
       },
       //备份账户
       backupUser (address) {
@@ -141,19 +148,32 @@
       },
       //修改别名
       editAliasing (Address) {
-        this.$router.push({
-          name: '/editAliasing',
-          params: {address: Address},
-        })
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          this.$router.push({
+            name: '/editAliasing',
+            params: {address: Address},
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
       },
       //新增账户
       toNewAccount () {
-        localStorage.setItem('toUserInfo', '0')
-        this.$router.push({
-          path: '/firstInto/firstInfo'
-        })
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          localStorage.setItem('toUserInfo', '0')
+          this.$router.push({
+            path: '/firstInto/firstInfo'
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
       }
-
     }
   }
 </script>

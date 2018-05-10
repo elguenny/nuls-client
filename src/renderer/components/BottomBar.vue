@@ -8,7 +8,7 @@
         </el-col>
         <el-col :span="14" class='footer-right'>
             {{$t('message.blockState')}}：{{$t('message.local')}} {{ netWorkInfo.localBestHeight }}<span
-                v-show="timeOffsetOk">（ {{$t('message.backward')}} {{ netWorkInfo.timeOffset }} ）</span> /
+                v-show="timeOffsetOk"><!--（ {{$t('message.backward')}} {{ netWorkInfo.timeOffset }} ）--></span> /
             {{$t('message.theMain')}} {{netWorkInfo.netBestHeight}}
             <i :class="iconWifi" :title="connectNumber"></i>
         </el-col>

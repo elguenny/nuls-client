@@ -6,6 +6,8 @@
             <el-form :model="transferForm" :rules="rules" ref="transferForm">
                 <el-form-item :label="$t('message.sourceAddress')+'：'" class="out-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
+                    <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
+                       @click="accountCopy" :title="$t('message.c143')"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.destinationAddress')+'：'" class="join-address" prop="joinAddress">
                     <el-input type="text" v-model.trim="transferForm.joinAddress" ref="joinAddress"></el-input>
@@ -51,6 +53,7 @@
   import Back from '@/components/BackBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
+  import copy from 'copy-to-clipboard'
   import * as config from '@/config.js'
   import { BigNumber } from 'bignumber.js'
 
@@ -96,9 +99,11 @@
           //console.log(value);
           let re = /(^\+?|^\d?)\d*\.?\d+$/
           let res = /^\d{1,8}(\.\d{1,8})?$/
+          let values = new BigNumber(value)
+          let nu = new BigNumber(this.usable)
           if (!re.exec(value)) {
             callback(new Error(this.$t('message.transferNO1')))
-          } else if (value > config.FloatSub(this.usable,0.01)) {
+          } else if (values.comparedTo(nu.minus(0.01)) === 1) {
             callback(new Error(this.$t('message.transferNO2')))
           } else if (value < 0.01) {
             callback(new Error(this.$t('message.transferNO3')))
@@ -111,6 +116,7 @@
 
       }
       return {
+        accountAddressValue: localStorage.getItem('newAccountAddress'),
         submitId: 'transferSubmit',
         usable: 0,
         accountAddress: [],
@@ -173,6 +179,7 @@
        */
       chenckAccountAddress (chenckAddress) {
         this.address = chenckAddress
+        this.accountAddressValue = chenckAddress
         localStorage.setItem('newAccountAddress', this.address)
         this.getBalanceAddress('/account/balance/' + chenckAddress)
         this.$refs.transferForm.validateField('joinAddress')
@@ -180,16 +187,27 @@
       },
 
       /**
+       * 复制功能
+       * copy
+       */
+      accountCopy () {
+        copy(this.accountAddressValue)
+        this.$message({
+          message: this.$t('message.c129'), type: 'success', duration: '800'
+        })
+      },
+
+      /**
        * 选择全部金额
        * Choose the total amount
        * @param balance
        */
-      allUsable(balance) {
+      allUsable (balance) {
         if (balance === 0) {
           this.$message({
             message: this.$t('message.creditLow'),
             type: 'warning '
-          });
+          })
         } else {
           this.transferForm.joinNo = config.FloatSub(balance, 0.01)
           this.$refs.transferForm.validateField('joinAddress')
@@ -346,6 +364,17 @@
                         width: 553px;
                     }
                 }
+                .copy_icon {
+                    position: absolute;
+                    top: 23px;
+                    right: -33px;
+                    width: 30px;
+                    height: 20px;
+                    display: block;
+                    float: left;
+                    background-size: @bg-size;
+                    background: @bg-image -198px -46px;
+                }
             }
             .join-address {
                 i {
@@ -394,9 +423,9 @@
                             }
                         }
                         .el-input__inner {
-                            border:1px solid #24426c;
+                            border: 1px solid #24426c;
                             color: #FFFFFF;
-                            &:hover{
+                            &:hover {
                                 border-color: #658ec7;
                             }
                         }

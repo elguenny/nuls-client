@@ -230,8 +230,8 @@ const en = {
     c70: 'Consensus',
     c71: 'Ledger',
     c72: 'Network',
-    c73: 'Logs',
-    c74: 'View logs',
+    c73: 'Backups',
+    c74: 'Account backups',
     c75: 'Language',
     c76: 'Please choose',
     c77: 'Contacts',
@@ -312,6 +312,7 @@ const en = {
     c145:'Click Copy txid',
 
     //Bottom info
+    refresh:'Refresh',
     purseVersion: 'Wallet',
     coreVersion: 'Core',
     toUpdate: 'Latest',

@@ -305,7 +305,32 @@
       changeType (typeValue) {
         let liValue = 0
         if (typeValue.type[0]) {
-          liValue = typeValue.type[0]
+          switch (parseInt(typeValue.type[0])) {
+            case 11:
+              liValue = '6';
+              break;
+            case 90:
+              liValue = '7';
+              break;
+            case 91:
+              liValue = '8';
+              break;
+            case 92:
+              liValue = '9';
+              break;
+            case 93:
+              liValue = '10';
+              break;
+            case 94:
+              liValue = '11';
+              break;
+            case 95:
+              liValue = '12';
+              break;
+            default:
+              liValue = typeValue.type[0];
+          }
+
         }
         let list2 = document.getElementsByClassName('el-table-filter__list')[0]//用class获取元素
         let li = list2.getElementsByTagName('li')

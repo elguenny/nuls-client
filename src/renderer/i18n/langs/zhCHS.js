@@ -160,8 +160,8 @@ const cn = {
 
     statusundefined: '',
     status0: '未参共识',
-    status1: '等待共识',
-    status2: '正在共识',
+    status1: '待共识',
+    status2: '共识中',
 
     c16: '节点来源',
     c17: '佣金比例',
@@ -230,8 +230,8 @@ const cn = {
     c70: '共识',
     c71: '账本',
     c72: '网络',
-    c73: '日志',
-    c74: '查看日志',
+    c73: '备份',
+    c74: '账户备份',
     c75: '语言选择',
     c76: '请选择',
     c77: '通讯录管理',
@@ -309,6 +309,7 @@ const cn = {
     c144: '显示/隐藏',
     c145:'点击复制txid',
 
+    refresh:'刷新',
     //bottomInfo
     purseVersion: '钱包版本',
     coreVersion: '核心版本',

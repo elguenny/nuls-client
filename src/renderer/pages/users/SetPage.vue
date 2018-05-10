@@ -32,7 +32,7 @@
             </el-collapse>
             <div class="set-page-div">
                 <label>{{$t('message.c73')}}：</label>
-                <span class="cursor-p set-page-div-span" @click="toViewLog">{{$t('message.c74')}}</span>
+                <span class="cursor-p set-page-div-span" @click="toBackups">{{$t('message.c74')}}</span>
             </div>
             <!--<div class="set-page-div">
                 <label>{{$t('message.c75')}}：</label>
@@ -59,88 +59,86 @@
 </template>
 
 <script>
-    import {ipcRenderer} from "electron";
+  import { ipcRenderer } from 'electron'
 
-    export default {
-        data() {
-            return {
-                value0: false,
-                value1: false,
-                value2: true,
-                value3: false,
-                value4: true,
-                value5: false,
-                options: [{
-                    value: 'zh',
-                    label: this.$t('message.c83')
-                }, {
-                    value: 'en',
-                    label: this.$t('message.c84')
-                }],
-            }
-        },
-        methods: {
-            //查看日志
-            toViewLog() {
+  export default {
+    data () {
+      return {
+        value0: false,
+        value1: false,
+        value2: true,
+        value3: false,
+        value4: true,
+        value5: false,
+        options: [{
+          value: 'zh',
+          label: this.$t('message.c83')
+        }, {
+          value: 'en',
+          label: this.$t('message.c84')
+        }],
+      }
+    },
+    methods: {
+      //查看日志
+      toBackups () {
+        this.$router.push({
+          path: '/wallet/users/userInfo'
+        })
+      },
+      //通讯录管理
+      toUserAddressList () {
+        this.$router.push({
+          path: '/users/userAddressList'
+        })
+      },
+      //修改密码
+      toEditPassword () {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          //获取账户地址列表
+          this.$fetch('/account/list')
+            .then((response) => {
+              if (response.data.length !== 0) {
+                if (localStorage.getItem('newAccountAddress') == null) {
+                  localStorage.setItem('newAccountAddress', response.data[0].address)
+                }
                 this.$router.push({
-                    path: '/users/userLog'
+                  name: '/editorPassword',
                 })
-            },
-            //通讯录管理
-            toUserAddressList() {
-                this.$router.push({
-                    path: '/users/userAddressList'
-                })
-            },
-            //修改密码
-            toEditPassword() {
-              if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
-                && sessionStorage.getItem('setNodeNumberOk') === 'true') {
-                //获取账户地址列表
-                this.$fetch("/account/list")
-                  .then((response) => {
-                    if (response.data.length !== 0) {
-                      if (localStorage.getItem("newAccountAddress") == null) {
-                        localStorage.setItem("newAccountAddress", response.data[0].address)
-                      }
-                      this.$router.push({
-                        name: '/editorPassword',
-                      })
-                    } else {
-                      this.$router.push({
-                        name: '/setPassword',
-                      })
-                    }
-                  });
               } else {
-                this.$message({
-                  message: this.$t('message.c133'), duration: '800'
+                this.$router.push({
+                  name: '/setPassword',
                 })
               }
-
-
-            },
-            //版本更新
-            versionUpdates() {
-                this.$confirm(
-                    this.$t('message.c88') + this.$store.getters.getVersionInfo.myVersion + " , " +
-                    this.$t('message.c881') + "1.0.0", this.$t('message.c89'),
-                   /* this.$t('message.c881') + this.$store.getters.getVersionInfo.newestVersion, this.$t('message.c89'),*/
-                    {
-                        confirmButtonText: this.$t('message.confirmButtonText'),
-                        cancelButtonText: this.$t('message.cancelButtonText'),
-                    }).then(() => {
-
-
-                }).catch(() => {
-                    /*this.$message({
-                        type: 'info',
-                        message: this.$t('message.passWordFailed'),
-                    });*/
-                });
-            },
+            })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
         }
+
+      },
+      //版本更新
+      versionUpdates () {
+        this.$confirm(
+          this.$t('message.c88') + this.$store.getters.getVersionInfo.myVersion + ' , ' +
+          this.$t('message.c881') + '1.0.0', this.$t('message.c89'),
+          /* this.$t('message.c881') + this.$store.getters.getVersionInfo.newestVersion, this.$t('message.c89'),*/
+          {
+            confirmButtonText: this.$t('message.confirmButtonText'),
+            cancelButtonText: this.$t('message.cancelButtonText'),
+          }).then(() => {
+
+        }).catch(() => {
+          /*this.$message({
+              type: 'info',
+              message: this.$t('message.passWordFailed'),
+          });*/
+        })
+      },
     }
+  }
 </script>
 
 <style lang="less">

@@ -10,13 +10,17 @@
                     class="consensus_icon"></i> <span>{{$t('message.consensus')}}</span></li>
             <li @click="to('application','3')"><i
                     class="application_icon"></i> <span>{{$t('message.applications')}}</span></li>
-            <li @click="to('more','4')" ><i class="more_icon"></i>
+            <li @click="to('more','4')"><i class="more_icon"></i>
                 <span>{{$t('message.more')}}</span></li>
         </ul>
         <div class="top-icon fl">
-            <el-badge class="news">
+            <div class="refresh">
+                <i v-show="showTime" class="refresh_icon" @click="toRefresh" :title="$t('message.refresh')"></i>
+                <span v-show="!showTime" class="refresh_count">{{count}}s</span>
+            </div>
+            <!--<el-badge class="news">
                 <i class="message_icon" @click="news" :title="$t('message.news')"></i>
-            </el-badge>
+            </el-badge>-->
             <!--<el-badge :value="0" class="news">
                 <i class="message_icon" @click="news"></i>
             </el-badge>-->
@@ -55,23 +59,27 @@
         languageItem: [
           {
             key: 'cn',
-            value: 'static/img/Language-zh.png'
+            value: '中文'
           },
           {
             key: 'en',
-            value: 'static/img/Language-en.png'
+            value: 'English'
           }
         ],
         //select language initial info
         projectName: {
           key: 'en',
-          value: 'static/img/Language-en.png'
+          value: 'English'
         },
         //select language initial width
         widthData: '2rem',
         errorClass: '',
         activeClass: 'active',
         isActive: 0,
+
+        showTime: true,
+        count: '',
+        timer: null,
       }
     },
     components: {
@@ -81,35 +89,35 @@
     mounted () {
       this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en'
       //判断是否有设置语言
-      if(localStorage.hasOwnProperty('language')){
+      if (localStorage.hasOwnProperty('language')) {
         if (localStorage.getItem('language') === 'cn') {
           this.projectName = {
             key: 'cn',
-            value: 'static/img/Language-zh.png'
+            value: '中文'
           }
         } else {
           this.projectName = {
             key: 'en',
-            value: 'static/img/Language-en.png'
+            value: 'English'
           }
         }
-      }else {
+      } else {
         const languageSet = setInterval(() => {
-          if(localStorage.hasOwnProperty('language')){
+          if (localStorage.hasOwnProperty('language')) {
             if (localStorage.getItem('language') === 'cn') {
               this.projectName = {
                 key: 'cn',
-                value: 'static/img/Language-zh.png'
+                value: '中文'
               }
             } else {
               this.projectName = {
                 key: 'en',
-                value: 'static/img/Language-en.png'
+                value: 'English'
               }
             }
             clearInterval(languageSet)
           }
-        },500)
+        }, 500)
       }
 
     },
@@ -117,13 +125,13 @@
       //语言切换
       selectLanguage () {
         this.$i18n.locale = this.projectName.key
-        let param =''
-        if(this.projectName.key !=='en'){
-         param ='zh-CHS'
-        }else {
-          param =this.projectName.key
+        let param = ''
+        if (this.projectName.key !== 'en') {
+          param = 'zh-CHS'
+        } else {
+          param = this.projectName.key
         }
-        this.$put('/sys/lang/'+param)
+        this.$put('/sys/lang/' + param)
           .then((response) => {
             if (response.success) {
               console.log('success')
@@ -180,6 +188,30 @@
           }
         }
       },
+      //刷新
+      toRefresh () {
+        let url = this.$route.fullPath
+        this.$router.push({
+          name: '/empty',
+          params: {url:url},
+        })
+
+        const TIME_COUNT = 20
+        if (!this.timer) {
+          this.count = TIME_COUNT
+          this.showTime = false
+          this.timer = setInterval(() => {
+            if (this.count > 0 && this.count <= TIME_COUNT) {
+              this.count--
+            } else {
+              this.showTime = true
+              clearInterval(this.timer)
+              this.timer = null
+            }
+          }, 1000)
+        }
+
+      },
       //消息方案
       news () {
         /*this.newsOk = !this.newsOk*/
@@ -215,7 +247,6 @@
 </script>
 <style lang="less">
     @import './../assets/css/style.less';
-
     .nav-top {
         width: 100%;
         height: 42px;
@@ -286,12 +317,33 @@
             }
         }
         .top-icon {
-            width: 185px;
+            width: 165px;
             margin-top: 0.2rem;
             float: right;
             -webkit-app-region: no-drag;
             i:hover {
                 cursor: pointer;
+            }
+            .refresh_count{
+                width: 30px;
+                height: 20px;
+                position: absolute;
+                top: -2px;
+                font-size: 12px;
+            }
+            .refresh {
+                width: 16px;
+                height: 16px;
+                float: left;
+                padding-top: 10px;
+                .refresh_icon {
+                    width: 35px;
+                    height: 40px;
+                    position: absolute;
+                    margin-left: 0;
+                    background-size: 16px 16px;
+                    background: url("./../assets/images/shuaxin_icon.png") no-repeat;
+                }
             }
             .news {
                 width: 35px;
