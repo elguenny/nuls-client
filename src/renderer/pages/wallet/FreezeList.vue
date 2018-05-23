@@ -4,9 +4,9 @@
         <div class="freeze-list-tabs">
             <h2>{{$t('message.freezeList')}}</h2>
             <el-table :data="freezeData">
-                <el-table-column prop="status" :label="$t('message.type')" min-width="60" align='center'>
+                <el-table-column prop="txType" :label="$t('message.type')" min-width="60" align='center'>
                     <template slot-scope="scope">
-                        {{$t('message.type'+scope.row.type)}}
+                        {{$t('message.type'+scope.row.txType)}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="value" :label="$t('message.amount')" width="150" align='right'>
@@ -47,9 +47,9 @@
     },
     mounted () {
       let _this = this
-      this.getLocked('tx/locked/', {'address': this.address, 'pageSize': 10, 'pageNumber': 1})
+      this.getLocked('/accountledger/utxo/lock/'+this.address, {'pageSize': 10, 'pageNumber': 1})
       this.freezeSetInterval = setInterval(() => {
-        this.getLocked('tx/locked/', {'address': this.address, 'pageSize': 10, 'pageNumber': this.pageNumber})
+        this.getLocked('/accountledger/utxo/lock/'+this.address, {'pageSize': 10, 'pageNumber': this.pageNumber})
       }, 2000)
     },
     destroyed() {
@@ -60,7 +60,7 @@
       getLocked (url, param) {
         this.$fetch(url, param)
           .then((response) => {
-            //console.log(response)
+            console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.totalAll = response.data.total
@@ -82,11 +82,7 @@
       //交易列表分页
       freezeSize (events) {
         this.pageNumber = events
-        this.getLocked('tx/locked/', {
-          'address': this.address,
-          'pageSize': 10,
-          'pageNumber': events
-        })
+        this.getLocked('/accountledger/utxo/lock/'+this.address, {'pageSize': 10, 'pageNumber': events})
       },
     }
   }

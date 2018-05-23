@@ -142,58 +142,101 @@
       },
       //菜单跳转
       to (url, index) {
-        if (sessionStorage.getItem('userList') !== '1') {
-          this.$message({
-            type: 'info', message: this.$t('message.c131'), duration: '800'
+
+        if (url === 'home') {
+          this.isActive = 0
+          this.$router.push({
+            path: '/*',
           })
-        } else {
-          if (url === 'home') {
-            this.isActive = 0
+        }
+        if (url === 'wallet') {
+          this.isActive = 1
+          //获取账户地址列表
+          if (this.$store.getters.getAddressList.length === 0) {
             this.$router.push({
-              path: '/*',
+              name: '/setPassword',
             })
-          }
-          if (url === 'wallet') {
-            this.isActive = 1
-            //获取账户地址列表
-            if (this.$store.getters.getAddressList.length === 0) {
-              this.$router.push({
-                name: '/setPassword',
-              })
-            } else {
-              this.$router.push({
-                name: '/wallet',
-                params: {language: index}
-              })
-            }
-          }
-          if (url === 'consensus') {
-            this.isActive = 2
+          } else {
             this.$router.push({
-              name: '/consensus',
-              params: {activeName: 'first'},
-            })
-          }
-          if (url === 'application') {
-            //this.isActive = 3
-            this.$message({
-              type: 'info', message: this.$t('message.c65'), duration: '800'
-            })
-          }
-          if (url === 'more') {
-            //this.isActive = 4
-            this.$message({
-              type: 'info', message: this.$t('message.c65'), duration: '800'
+              name: '/wallet',
+              params: {language: index}
             })
           }
         }
+        if (url === 'consensus') {
+          this.isActive = 2
+          this.$router.push({
+            name: '/consensus',
+            params: {activeName: 'first'},
+          })
+        }
+        if (url === 'application') {
+          //this.isActive = 3
+          this.$message({
+            type: 'info', message: this.$t('message.c65'), duration: '800'
+          })
+        }
+        if (url === 'more') {
+          //this.isActive = 4
+          this.$message({
+            type: 'info', message: this.$t('message.c65'), duration: '800'
+          })
+        }
+
       },
+      /* to (url, index) {
+         if (sessionStorage.getItem('userList') !== '1') {
+           this.$message({
+             type: 'info', message: this.$t('message.c131'), duration: '800'
+           })
+         } else {
+           if (url === 'home') {
+             this.isActive = 0
+             this.$router.push({
+               path: '/!*',
+             })
+           }
+           if (url === 'wallet') {
+             this.isActive = 1
+             //获取账户地址列表
+             if (this.$store.getters.getAddressList.length === 0) {
+               this.$router.push({
+                 name: '/setPassword',
+               })
+             } else {
+               this.$router.push({
+                 name: '/wallet',
+                 params: {language: index}
+               })
+             }
+           }
+           if (url === 'consensus') {
+             this.isActive = 2
+             this.$router.push({
+               name: '/consensus',
+               params: {activeName: 'first'},
+             })
+           }
+           if (url === 'application') {
+             //this.isActive = 3
+             this.$message({
+               type: 'info', message: this.$t('message.c65'), duration: '800'
+             })
+           }
+           if (url === 'more') {
+             //this.isActive = 4
+             this.$message({
+               type: 'info', message: this.$t('message.c65'), duration: '800'
+             })
+           }
+         }
+       },*/
       //刷新
       toRefresh () {
         let url = this.$route.fullPath
         this.$router.push({
           name: '/empty',
-          params: {url:url},
+          params: {url: url},
         })
 
         const TIME_COUNT = 20
@@ -247,6 +290,7 @@
 </script>
 <style lang="less">
     @import './../assets/css/style.less';
+
     .nav-top {
         width: 100%;
         height: 42px;
@@ -324,21 +368,21 @@
             i:hover {
                 cursor: pointer;
             }
-            .refresh_count{
+            .refresh_count {
                 width: 30px;
                 height: 20px;
                 position: absolute;
-                top: -2px;
+                top: 0px;
                 font-size: 12px;
             }
             .refresh {
                 width: 16px;
                 height: 16px;
                 float: left;
-                padding-top: 10px;
+                padding-top: 12px;
                 .refresh_icon {
-                    width: 35px;
-                    height: 40px;
+                    width: 20px;
+                    height: 20px;
                     position: absolute;
                     margin-left: 0;
                     background-size: 16px 16px;

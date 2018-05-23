@@ -174,7 +174,6 @@
       /**
        * 获取下拉选择地址
        *Get the drop-down selection address
-
        * @param chenckAddress
        */
       chenckAccountAddress (chenckAddress) {
@@ -299,11 +298,13 @@
         let rightShift = new BigNumber(100000000)
         let param = '{"address":"' + this.address
           + '","toAddress":"' + this.transferForm.joinAddress
-          + '","amount":"' + rightShift.times(this.transferForm.joinNo)
-          + '","password":"' + password
+          + '","amount":' + rightShift.times(this.transferForm.joinNo)
+          + ',"password":"' + password
           + '","remark":"' + this.transferForm.remark + '"}'
-        this.$post('/wallet/transfer/', param)
+        this.$post('/accountledger/transfer', param)
           .then((response) => {
+            console.log("param="+param)
+            console.log(response)
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),

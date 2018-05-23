@@ -93,11 +93,11 @@
       //
       toSubmit (password) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
-          var param = {'alias': this.aliasForm.alias, 'address': this.address, 'password': password}
-          //console.log(param);
-          this.$post('/account/alias/', param)
+          var param = {'alias': this.aliasForm.alias, 'password': password}
+          console.log(param);
+          this.$post('/account/alias/'+this.address,param)
             .then((response) => {
-              //console.log(response);
+              console.log(response);
               if (response.success) {
                 this.$message({
                   type: 'success', message: this.$t('message.passWordSuccess')

@@ -5,14 +5,14 @@
         <el-table :data="pledgeData" :stripe="false">
             <el-table-column prop="address" :label="$t('message.tabName')" min-width="120" align='center'>
             </el-table-column>
-            <el-table-column prop="amount" :label="$t('message.amount')" align='center'>
+            <el-table-column prop="deposit" :label="$t('message.amount')" align='center'>
             </el-table-column>
             <el-table-column prop="status" :label="$t('message.state')" min-width="35" align='center'>
                 <template slot-scope="scope">
                     {{$t('message.status'+scope.row.status)}}
                 </template>
             </el-table-column>
-            <el-table-column prop="depositTime" :label="$t('message.c49')" min-width="65" align='center'>
+            <el-table-column prop="time" :label="$t('message.c49')" min-width="65" align='center'>
             </el-table-column>
         </el-table>
         <el-pagination layout="prev, pager, next" :total=this.total class="cb"
@@ -29,6 +29,7 @@
     data () {
       return {
         backTitle: this.$route.params.agentName,
+        txHash: this.$route.params.txHash,
         pledgeData: [],
         total: 0,
       }
@@ -38,7 +39,7 @@
     },
     mounted () {
       let _this = this
-      this.getConsensusDeposit('/consensus/deposit/agent/' + localStorage.getItem('newAccountAddress'), {
+      this.getConsensusDeposit('/consensus/deposit/agent/' + this.txHash, {
         'pageSize': '10',
         'pageNumber': '1'
       })
@@ -52,12 +53,13 @@
       getConsensusDeposit (url, params) {
         this.$fetch(url, params)
           .then((response) => {
+            console.log(response)
             if (response.success) {
               this.total = response.data.total
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].amount =  parseFloat(leftShift.times(response.data.list[i].amount).toString())
-                response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD hh:mm:ss')
+                response.data.list[i].deposit =  parseFloat(leftShift.times(response.data.list[i].deposit).toString())
+                response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss')
               }
               this.pledgeData = response.data.list
             }
@@ -70,7 +72,7 @@
        * @param events
        */
       pledgeSize (events) {
-        this.getConsensusDeposit('/consensus/deposit/agent/' + localStorage.getItem('newAccountAddress'), {
+        this.getConsensusDeposit('/consensus/deposit/agent/' + this.txHash, {
           'pageNumber': events,
           'pageSize': '10'
         })

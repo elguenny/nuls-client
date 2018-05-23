@@ -59,7 +59,7 @@
                 <el-tab-pane :label="$t('message.transactionRecord')" name="second">
                     <el-table :data="dealList" @filter-change="changeType" v-loading="loading">
                         <el-table-column
-                                prop="type"
+                                prop="txType"
                                 :label="$t('message.transactionType')"
                                 width="110"
                                 align="center"
@@ -80,24 +80,24 @@
                                 ]"
                                 :filter-multiple=false>
                             <template slot-scope="scope">
-                                {{$t('message.type'+scope.row.type)}}
+                                {{$t('message.type'+scope.row.txType)}}
                             </template>
                         </el-table-column>
                         <el-table-column label="txid" min-width="195" align='center'>
                             <template slot-scope="scope">
-								<span @click="toTxid(scope.row.hash)" class="cursor-p text-d overflow">
+								<span @click="toTxid(scope.row.txHash)" class="cursor-p text-d overflow">
 									{{ scope.row.hashs }}
 								</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.time')" width="145" align='center'>
                             <template slot-scope="scope">
-                                <span>{{scope.row.times}}</span>
+                                <span>{{scope.row.time}}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.assetChange')" width="138" align='center'>
                             <template slot-scope="scope">
-                                <span :class="scope.row.values > 0 ? 'add':'minus'">{{ scope.row.values }}</span>
+                                <span :class="scope.row.info > 0 ? 'add':'minus'">{{ scope.row.info }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.state')" width="85" align='center'>
@@ -164,14 +164,13 @@
        *Switching transaction record tab
        */
       if (this.activeName === 'second') {
-        this.getAccountTxList('/tx/list/', {
-          'address': this.accountAddressValue,
+        this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
           'pageSize': 9,
           'pageNumber': 1
         })
       }
       /**
-       * 5秒查询交易列表
+       * 查询交易列表
        * 5second query trade list
        */
       this.walletSetInterval = setInterval(() => {
@@ -179,21 +178,19 @@
           this.getAccountAssets('/account/assets/' + this.accountAddressValue)
         } else {
           if (this.types !== '') {
-            this.getAccountTxList('/tx/list/', {
-              'address': this.accountAddressValue,
+            this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
               'type': this.types,
               'pageSize': 9,
               'pageNumber': this.pages
             })
           } else {
-            this.getAccountTxList('/tx/list/', {
-              'address': this.accountAddressValue,
+            this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
               'pageSize': 9,
               'pageNumber': this.pages
             })
           }
         }
-      }, 5000)
+      }, 5000000)
     },
     destroyed () {
       clearInterval(this.walletSetInterval)
@@ -207,14 +204,14 @@
       getAccountAssets (url) {
         this.$fetch(url)
           .then((response) => {
-            //console.log(response);
+            ///console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.length; i++) {
                 //console.log(leftShift.times(response.data[i].balance).toFixed(8))
-                response.data[i].balance = leftShift.times(response.data[i].balance).toFixed(8)
-                response.data[i].locked = leftShift.times(response.data[i].locked).toFixed(8)
-                response.data[i].usable = leftShift.times(response.data[i].usable).toFixed(8)
+                response.data[i].balance = leftShift.times(response.data[i].balance)
+                response.data[i].locked = leftShift.times(response.data[i].locked)
+                response.data[i].usable = leftShift.times(response.data[i].usable)
               }
               this.accountData = response.data
             }
@@ -231,34 +228,28 @@
         //console.log(param)
         this.$fetch(url, param)
           .then((response) => {
-            //console.log(response)
+            console.log(url)
+            console.log(param)
+            console.log(response)
             //判断是否查询到数据
             if (response.data != null) {
               this.totalAll = response.data.total
               //判断最大页数>=当前选择的最大页数
-              if (response.data.pages >= this.pages) {
-                let leftShift = new BigNumber(0.00000001)
-                if (response.data.list.length > 0) {
-                  this.dealList = response.data.list
-                  //this.$store.commit("setAccountTxList",response.data.list);
-                  for (let i = 0; i < response.data.list.length; i++) {
-                    let length = this.dealList[i].hash.length
-                    this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10)
-                    this.dealList[i].values = parseFloat(leftShift.times(response.data.list[i].value).toString())
-                    this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
-                  }
-                  this.loading = false
-                } else {
-                  this.loading = false
-                  this.dealList = []
+
+              if (response.data.list.length > 0) {
+                //this.$store.commit("setAccountTxList",response.data.list);
+                for (let i = 0; i < response.data.list.length; i++) {
+                  let length = response.data.list[i].txHash.length
+                  response.data.list[i].hashs = response.data.list[i].txHash.substr(0, 10) + '...' + response.data.list[i].txHash.substr(length - 10)
+                  response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
                 }
+                this.dealList = response.data.list
+                this.loading = false
               } else {
-                this.getAccountTxList('/tx/list/', {
-                  'address': this.accountAddressValue,
-                  'pageSize': 9,
-                  'pageNumber': response.data.pages
-                })
+                this.loading = false
+                this.dealList = []
               }
+
             } else {
               this.loading = false
               this.dealList = []
@@ -273,11 +264,19 @@
        */
       txIdConsensusSize (events) {
         this.pages = events
-        this.getAccountTxList('/tx/list/', {
-          'address': this.accountAddressValue,
-          'pageSize': 9,
-          'pageNumber': events
-        })
+        if (this.types !== '') {
+          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+            'type': this.types,
+            'pageSize': 9,
+            'pageNumber': this.pages
+          })
+        } else {
+          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+            'pageSize': 9,
+            'pageNumber': this.pages
+          })
+        }
+
       },
 
       /**
@@ -293,7 +292,7 @@
         } else {
           this.totalAll = 0
           this.types = ''
-          this.getAccountTxList('/tx/list/', {'address': chenckAddress, 'pageSize': 9, 'pageNumber': 1})
+          this.getAccountTxList('/accountledger/tx/list/' + chenckAddress, {'pageSize': 9, 'pageNumber': 1})
         }
       },
 
@@ -307,28 +306,28 @@
         if (typeValue.type[0]) {
           switch (parseInt(typeValue.type[0])) {
             case 11:
-              liValue = '6';
-              break;
+              liValue = '6'
+              break
             case 90:
-              liValue = '7';
-              break;
+              liValue = '7'
+              break
             case 91:
-              liValue = '8';
-              break;
+              liValue = '8'
+              break
             case 92:
-              liValue = '9';
-              break;
+              liValue = '9'
+              break
             case 93:
-              liValue = '10';
-              break;
+              liValue = '10'
+              break
             case 94:
-              liValue = '11';
-              break;
+              liValue = '11'
+              break
             case 95:
-              liValue = '12';
-              break;
+              liValue = '12'
+              break
             default:
-              liValue = typeValue.type[0];
+              liValue = typeValue.type[0]
           }
 
         }
@@ -340,8 +339,7 @@
         li[liValue].className = 'el-table-filter__list-item is-active'
 
         this.types = typeValue.type[0]
-        this.getAccountTxList('/tx/list/', {
-          'address': this.accountAddressValue,
+        this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
           'type': typeValue.type[0],
           'pageSize': 9,
           'pageNumber': 1
@@ -360,11 +358,10 @@
           this.activeName = 'second'
           this.walletHide = false
           let params = {
-            'address': this.accountAddressValue,
             'pageSize': 9,
             'pageNumber': 1
           }
-          this.getAccountTxList('/tx/list/', params)
+          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, params)
         } else {
           sessionStorage.setItem('walletActiveName', tab.name)
           this.walletHide = true
@@ -400,7 +397,10 @@
        *Account management jump
        */
       accountChoice () {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+        this.$router.push({
+          path: '/wallet/users/userInfo'
+        })
+        /*if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           localStorage.setItem('toUserInfo', '1')
           this.$router.push({
@@ -410,7 +410,7 @@
           this.$message({
             message: this.$t('message.c133'), duration: '800'
           })
-        }
+        }*/
       },
 
       /**

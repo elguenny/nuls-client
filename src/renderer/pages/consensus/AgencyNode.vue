@@ -35,7 +35,7 @@
                 <ul>
                     <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                     <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                    <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit).toFixed(2)}} NULS</li>
+                    <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit).toFixed(2)}} NULS</li>
                     <li class="cb">
                         <label class="fl">{{$t('message.c47')}}：</label>{{(item.totalDeposit).toFixed(2)}}
                     </li>
@@ -107,15 +107,15 @@
       getAllConsensus (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(params)
-            //console.log(response);
+            console.log(params)
+            console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].creditRatios = response.data.list[i].creditRatio
-                response.data.list[i].owndeposit = parseFloat(leftShift.times(response.data.list[i].owndeposit).toString())
+                response.data.list[i].creditVals = response.data.list[i].creditVal
+                response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString())
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
-                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+                response.data.list[i].creditVal = (((((response.data.list[i].creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
               this.totalAll = response.data.total

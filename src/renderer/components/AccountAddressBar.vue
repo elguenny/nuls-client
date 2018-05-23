@@ -43,7 +43,7 @@
        * vuex in no data
        */
       if (this.$store.getters.getAddressList.length === 0) {
-        this.getAccountList('/account/list')
+        this.getAccountList('/account')
       }
     },
     methods: {

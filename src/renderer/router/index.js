@@ -152,7 +152,7 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/consensus/NodeInfo.vue'], resolve)
     },
     {
-      path: '/consensus/nodeInfo/allPledge :agentName',
+      path: '/consensus/nodeInfo/allPledge :agentName/:txHash',
       name: '/allPledge',
       component: resolve => require(['@/pages/consensus/AllPledge.vue'], resolve)
     },

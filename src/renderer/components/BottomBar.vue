@@ -17,7 +17,6 @@
 
 <script>
   import * as config from '@/config.js'
-  import { ipcRenderer } from 'electron'
 
   export default {
     data () {
@@ -37,7 +36,7 @@
       let _this = this
 
       this.getNetWorkInfo('/network/info')
-      //2秒获取一次区块高度 encapsulated https
+      //5秒获取一次区块高度 encapsulated https
       setInterval(() => {
         this.getNetWorkInfo('/network/info')
       }, 5000)
@@ -46,21 +45,20 @@
     methods: {
       //更新版本 Update version
       updateVersionUrl () {
-        alert('开始更新....')
-        //ipcRenderer.send("checkForUpdate");
+        console.log("开始更新了")
       },
       //获取节点高度 Get node height
       getNetWorkInfo (url) {
         this.$fetch(url)
           .then((response) => {
-            //console.log(response);
+            //console.log(response)
             if (response.success) {
               if (this.rejectTime > 1) {
                 this.rejectTime = this.rejectTime - 1
               }
               //调用用户地址列表没有就调用一下获取用户方法
               if (this.$store.getters.getAddressList.length === 0) {
-                this.getAccountList('/account/list')
+                this.getAccountList('/account')
               }
               sessionStorage.setItem('javaFile', '1')
               sessionStorage.setItem('userList', '1')
@@ -99,6 +97,7 @@
       getAccountList (url) {
         this.$fetch(url)
           .then((response) => {
+            //console.log(response);
             if (response.success) {
               if (response.data.list.length > 0) {
                 this.$store.commit('setAddressList', response.data.list)
@@ -124,7 +123,6 @@
 </script>
 <style lang="less">
     @import './../assets/css/style.less';
-
     footer {
         width: 100%;
         height: 2rem;

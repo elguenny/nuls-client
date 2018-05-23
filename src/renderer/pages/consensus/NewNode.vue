@@ -185,10 +185,10 @@
           + '","agentName":"' + this.newNodeForm.agentName
           + '","remark":"' + this.newNodeForm.remark
           + '","password":"' + password + '"}'
-        //console.log(param)
+        console.log(param)
         this.$post('/consensus/agent ', param)
           .then((response) => {
-            //console.log(response)
+            console.log(response)
             if (response.success) {
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')

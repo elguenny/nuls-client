@@ -15,7 +15,7 @@
                     <label>{{$t('message.c17')}}：</label>{{this.agentAddressInfo.commissionRate}}%
                 </li>
                 <li>
-                    <label>{{$t('message.c25')}}：</label>{{this.agentAddressInfo.owndeposit}}
+                    <label>{{$t('message.c25')}}：</label>{{this.agentAddressInfo.deposit}}
                     NULS
                 </li>
                 <li>
@@ -24,9 +24,9 @@
                 <li>
                     <label>{{$t('message.c18')}}：</label>
                     <ProgressBar
-                            :colorData="this.agentAddressInfo.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                            :widthData="this.agentAddressInfo.creditRatio"></ProgressBar>
-                    <span>&nbsp;{{this.agentAddressInfo.creditRatios}}</span>
+                            :colorData="this.agentAddressInfo.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                            :widthData="this.agentAddressInfo.creditVal"></ProgressBar>
+                    <span>&nbsp;{{this.agentAddressInfo.creditVals}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c47')}}：</label>
@@ -44,14 +44,14 @@
                 <span class="text-d cursor-p fr" @click="addNode">{{$t('message.c57')}}</span>
             </div>
             <el-table :data="myMortgageData">
-                <el-table-column prop="amount" :label="$t('message.c51')" min-width="100" align='center'>
+                <el-table-column prop="deposit" :label="$t('message.c51')" min-width="100" align='center'>
                 </el-table-column>
                 <el-table-column :label="$t('message.state')" width="70" align='center'>
                     <template slot-scope="scope">
                         {{$t('message.status'+scope.row.status)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="depositTime" :label="$t('message.c49')" min-width="85" align='center'>
+                <el-table-column prop="time" :label="$t('message.c49')" min-width="85" align='center'>
                 </el-table-column>
                 <el-table-column :label="$t('message.operation')" align='center'>
                     <template slot-scope="scope">
@@ -123,13 +123,15 @@
       getAgentAddressInfo (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(response)
+            console.log(url)
+            console.log(params)
+            console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress")
-              response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
-              response.data.creditRatios = response.data.creditRatio
-              response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
+              response.data.creditVals = response.data.creditVal
+              response.data.creditVal = (((((response.data.creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
               response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10)
               response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000'
               if (response.data.totalDeposit > 50000000000000) {
@@ -146,13 +148,14 @@
         this.$fetch(url, params)
           .then((response) => {
             if (response.success) {
+              //console.log(url);
               //console.log(params);
               //console.log(response);
               let leftShift = new BigNumber(0.00000001)
               this.total = response.data.total
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].amount = parseFloat(leftShift.times(response.data.list[i].amount).toString())
-                response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD HH:mm:ss')
+                response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString())
+                response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
               }
               this.myMortgageData = response.data.list
               //console.log(this.myMortgageData);

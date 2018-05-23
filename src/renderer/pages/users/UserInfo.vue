@@ -55,7 +55,7 @@
     },
     mounted () {
       let _this = this
-      this.getUserList('/account/list', {'pageSize': 8, 'pageNumber': 1})
+      this.getUserList('/account', {'pageSize': 8, 'pageNumber': 1})
     },
     methods: {
       back () {
@@ -94,7 +94,7 @@
           })
       },
       userListSize (events) {
-        this.getUserList('/account/list', {'pageSize': 8, 'pageNumber': events})
+        this.getUserList('/account', {'pageSize': 8, 'pageNumber': events})
       },
       //点击根据地址移除账户事件
       outUser (address) {
@@ -105,14 +105,15 @@
       //移除账户
       outUserAddress (url, params) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
-          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+        ) {
           this.$post(url, params)
             .then((response) => {
+              //console.log("params="+params)
               if (response.success) {
                 this.$message({
                   type: 'success', message: this.$t('message.passWordSuccess')
                 })
-                this.getUserList('/account/list', {'pageSize': 8, 'pageNumber': 1})
+                this.getUserList('/account', {'pageSize': 8, 'pageNumber': 1})
               } else {
                 this.$message({
                   type: 'warning', message: this.$t('message.passWordFailed') + response.msg
@@ -135,9 +136,11 @@
       //输入密码提交
       toSubmit (password) {
         if (this.outOrBackup === 1) {
-          let params = '{"address":"' + this.setAsAddress + '","password":"' + password + '"}'
-          this.outUserAddress('/wallet/remove/', params)
+          //console.log(this.outOrBackup);
+          let params = '{"password":"' + password + '"}'
+          this.outUserAddress('/account/remove/'+this.setAsAddress, params)
         } else {
+          //console.log("outOrBackup="+this.outOrBackup);
           localStorage.setItem('userPass', password)
           this.$router.push({
             name: '/newAccount',
@@ -162,7 +165,10 @@
       },
       //新增账户
       toNewAccount () {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+        this.$router.push({
+          path: '/firstInto/firstInfo'
+        })
+        /*if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           localStorage.setItem('toUserInfo', '0')
           this.$router.push({
@@ -172,7 +178,7 @@
           this.$message({
             message: this.$t('message.c133'), duration: '800'
           })
-        }
+        }*/
       }
     }
   }

@@ -56,7 +56,7 @@
                             <ul>
                                 <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                                <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit).toFixed(2)}} NULS</li>
+                                <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit).toFixed(2)}} NULS</li>
                                 <li class="cb">
                                     <label class="fl">{{$t('message.c19')}}：</label>{{item.memberCount}}
                                 </li>
@@ -66,23 +66,10 @@
                                 </li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t('message.c18')}}:</label>
-                                    <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                                                 :widthData="item.creditRatio"></ProgressBar>
+                                    <ProgressBar :colorData="item.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                                                 :widthData="item.creditVal"></ProgressBar>
                                 </li>
-
                             </ul>
-                            <div class="credit-valuesDiv" :id=index>
-                                <h2>
-                                    <label class="fl">能力系数&nbsp;</label>
-                                    <ProgressBar colorData="#82BD39" widthData="50%"></ProgressBar>
-                                </h2>
-                                <p class="cb">根据近100轮出块数量计算</p>
-                                <h4>
-                                    <label class="fl">责任系数&nbsp;</label>
-                                    <ProgressBar colorData="#82BD39" widthData="80%"></ProgressBar>
-                                </h4>
-                                <p class="cb">根据近100轮违规情况和出块正确性计算</p>
-                            </div>
                         </div>
                         <el-pagination layout="prev, pager, next" :page-size="3" :total=this.totalAll class="cb"
                                        v-show="totalAllOk = this.totalAll>3 ?true:false"
@@ -206,7 +193,7 @@
          * 5second list
          */
         this.consensusSetInterval = setInterval(() => {
-          this.getConsensus('/consensus')
+          //this.getConsensus('/consensus')
           this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
           if (this.tabName === 'first') {
             this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': this.allEvents})
@@ -216,7 +203,7 @@
               'pageNumber': this.myEvents
             })
           }
-        }, 10000)
+        }, 5000)
       }
     },
     destroyed () {
@@ -273,7 +260,9 @@
       getMyConsensus (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(response);
+            //console.log(url)
+            //console.log(params)
+            //console.log(response)
             this.myTotalAll = 1
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
@@ -310,14 +299,15 @@
         this.$fetch(url, params)
           .then((response) => {
             if (response.success) {
-              //console.log(response);
+              console.log(response);
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].creditRatios = response.data.list[i].creditRatio
-                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+                //console.log(response.data.list[i].creditRatio)
+                response.data.list[i].creditVals = response.data.list[i].creditVal
+                response.data.list[i].creditVal = (((((response.data.list[i].creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
-                response.data.list[i].owndeposit = parseFloat(leftShift.times(response.data.list[i].owndeposit).toString())
+                response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString())
               }
               this.loading = false
               this.tabelShow = true

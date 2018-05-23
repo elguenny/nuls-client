@@ -3,16 +3,16 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{$t('message.c48')}}</h2>
         <el-table :data="pledgeData">
-            <el-table-column prop="agentName" :label="$t('message.c24')" min-width="120" align='center'>
+            <el-table-column prop="address" :label="$t('message.c24')" min-width="120" align='center'>
             </el-table-column>
-            <el-table-column prop="amount" :label="$t('message.amount')" min-width="210" align='center'>
+            <el-table-column prop="deposit" :label="$t('message.amount')" min-width="210" align='center'>
             </el-table-column>
             <el-table-column prop="status" :label="$t('message.state')" width="100" align='center'>
                 <template slot-scope="scope">
                     {{$t('message.status'+scope.row.status)}}
                 </template>
             </el-table-column>
-            <el-table-column prop="depositTime" :label="$t('message.c49')" width="160" align='center'>
+            <el-table-column prop="time" :label="$t('message.c49')" width="160" align='center'>
             </el-table-column>
             <el-table-column :label="$t('message.operation')" width="90" align='center'>
                 <template slot-scope="scope">
@@ -56,14 +56,15 @@
       getConsensusDeposit (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(url + params)
-            //console.log(response)
+            console.log(url)
+            console.log(params)
+            console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.total = response.data.total
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].amount = parseFloat(leftShift.times(response.data.list[i].amount).toString())
-                response.data.list[i].depositTime = moment(response.data.list[i].depositTime).format('YYYY-MM-DD HH:mm:ss')
+                response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString())
+                response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
               }
               this.pledgeData = response.data.list
             }
@@ -80,7 +81,7 @@
       handleClick (row) {
         this.$router.push({
           name: '/myNode',
-          params: {agentAddress: row.agentAddress},
+          params: {agentAddress: row.address},
         })
       }
     }

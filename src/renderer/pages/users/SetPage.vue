@@ -3,8 +3,8 @@
         <h2>{{$t('message.c66')}}</h2>
         <div class="set-page-info">
             <el-switch v-model="value0" :width="30" active-color="#658ec7" inactive-color="#0b1422"
-                       :inactive-text="$t('message.c67')"></el-switch>
-            <el-collapse>
+                       :inactive-text="$t('message.c67')" v-show="false"></el-switch>
+            <el-collapse v-show="false">
                 <el-collapse-item>
                     <template slot="title">
                         <el-switch v-model="value1" :width="30" active-color="#658ec7" inactive-color="#0b1422"
@@ -55,12 +55,30 @@
                 <span class="cursor-p set-page-div-span" @click="versionUpdates">{{$t('message.c82')}}</span>
             </div>
         </div>
+        <el-dialog title="版本更新检查"
+                   :visible.sync="outerVisible"
+                   :close-on-click-modal="false"
+                   :close-on-press-escape="false"
+                   custom-class="version-dialog"
+                   :show-close="this.type !== 3"
+                   top = "30vh"
+                   :center="true">
+            <div class="progress-info">
+                <h2>{{this.tips}}</h2>
+                <div class="progress" v-show="this.type === 3 ">
+                    <el-progress :percentage=this.downloadPercent ></el-progress>
+                    <p>下载完成以后，程序会自动重启！</p>
+                </div>
+            </div>
+           <div slot="footer" class="dialog-footer"  v-show="this.type === 3 ">
+                <el-button type="primary" @click="outerVisible = false">后台运行</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
   import { ipcRenderer } from 'electron'
-
   export default {
     data () {
       return {
@@ -77,7 +95,27 @@
           value: 'en',
           label: this.$t('message.c84')
         }],
+        outerVisible: false,
+        type:0,
+        tips: '',
+        downloadPercent:0,
       }
+    },
+    beforeCreate () {
+      ipcRenderer.on('message', (event, text) => {
+        this.type = text.type
+        this.tips = text.info
+      })
+      ipcRenderer.on('downloadProgress', (event, progressObj) => {
+        console.log("")
+        this.downloadPercent = progressObj.percent || 0
+      })
+      ipcRenderer.on('isUpdateNow', () => {
+        ipcRenderer.send('isUpdateNow')
+      })
+    },
+    destroyed () {
+
     },
     methods: {
       //查看日志
@@ -94,10 +132,9 @@
       },
       //修改密码
       toEditPassword () {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
-          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
           //获取账户地址列表
-          this.$fetch('/account/list')
+          this.$fetch('/account')
             .then((response) => {
               if (response.data.length !== 0) {
                 if (localStorage.getItem('newAccountAddress') == null) {
@@ -121,21 +158,13 @@
       },
       //版本更新
       versionUpdates () {
-        this.$confirm(
-          this.$t('message.c88') + this.$store.getters.getVersionInfo.myVersion + ' , ' +
-          this.$t('message.c881') + '1.0.0', this.$t('message.c89'),
-          /* this.$t('message.c881') + this.$store.getters.getVersionInfo.newestVersion, this.$t('message.c89'),*/
-          {
-            confirmButtonText: this.$t('message.confirmButtonText'),
-            cancelButtonText: this.$t('message.cancelButtonText'),
-          }).then(() => {
-
-        }).catch(() => {
-          /*this.$message({
-              type: 'info',
-              message: this.$t('message.passWordFailed'),
-          });*/
-        })
+        this.outerVisible = true
+        ipcRenderer.send('checkForUpdate')
+        setTimeout(() => {
+          if(this.type !==3){
+            this.outerVisible = false
+          }
+        }, 5000)
       },
     }
   }
@@ -248,6 +277,39 @@
         }
         .el-select-dropdown__list {
             width: 310px;
+        }
+        .version-dialog{
+            width: 70%;
+            .el-dialog__header{
+                padding: 20px 0 0 0;
+                .el-dialog__title{
+                    color: #FFFFFF;
+                    font-size: 16px;
+                }
+            }
+            .el-dialog__body{
+                .progress-info{
+                    h2{
+                        font-size: 14px;
+                        line-height: 32px;
+                        text-align: center;
+                    }
+                    .progress{
+                        width: 60%;
+                        margin:0 0 0 23%;
+                        height: 80px;
+                        p{
+                            font-size: 12px;
+                            color: #c1c5c9;
+                            line-height: 32px;
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+            .el-dialog__footer{
+                padding: 0 0 20px;
+            }
         }
     }
 </style>

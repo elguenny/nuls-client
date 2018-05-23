@@ -159,7 +159,7 @@ const cn = {
     statusS1: '已确认',
 
     statusundefined: '',
-    status0: '未参共识',
+    status0: '共识中',
     status1: '待共识',
     status2: '共识中',
 

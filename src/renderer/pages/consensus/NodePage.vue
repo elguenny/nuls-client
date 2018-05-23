@@ -15,16 +15,16 @@
                     <label>{{$t('message.c17')}}：</label>{{this.nodeData.commissionRate}}%
                 </li>
                 <li>
-                    <label>{{$t('message.c25')}}：</label>{{this.nodeData.owndeposit}} NULS
+                    <label>{{$t('message.c25')}}：</label>{{this.nodeData.deposit}} NULS
                 </li>
                 <li>
                     <label>{{$t('message.c19')}}：</label>{{this.nodeData.memberCount}}
                 </li>
                 <li>
                     <label>{{$t('message.c18')}}：</label>
-                    <ProgressBar :colorData="this.nodeData.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                                 :widthData="this.nodeData.creditRatio"></ProgressBar>
-                    <span>&nbsp;{{this.nodeData.creditRatios}}</span>
+                    <ProgressBar :colorData="this.nodeData.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                                 :widthData="this.nodeData.creditVal"></ProgressBar>
+                    <span>&nbsp;{{this.nodeData.creditVals}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c64')}}：</label>
@@ -129,12 +129,12 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              //console.log(response);
+              console.log(response);
               let leftShift = new BigNumber(0.00000001)
               this.toCheckOk = response.data.agentAddress === localStorage.getItem('newAccountAddress')
-              response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
-              response.data.creditRatios = response.data.creditRatio
-              response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
+              response.data.creditVals = response.data.creditVal
+              response.data.creditVal = (((((response.data.creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
               response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10)
               response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000'
               if (response.data.totalDeposit > 50000000000000) {
@@ -143,7 +143,7 @@
                 response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%'
               }
               //response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
-              this.agentId = response.data.agentId
+              this.agentId = response.data.txHash
               this.nodeData = response.data
               this.loading = false
             }
@@ -205,12 +205,13 @@
       toSubmit (password) {
         let rightShift = new BigNumber(100000000)
         let param = '{"address":"' + localStorage.getItem('newAccountAddress')
-          + '","agentId":"' + this.agentId
+          + '","agentHash":"' + this.agentId
           + '","deposit":"' + parseFloat(rightShift.times(this.nodeForm.nodeNo).toString())
           + '","password":"' + password + '"}'
-        //console.log(param)
+        console.log(param)
         this.$post('/consensus/deposit/', param)
           .then((response) => {
+            console.log(response)
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),
