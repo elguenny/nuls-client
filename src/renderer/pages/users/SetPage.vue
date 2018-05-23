@@ -61,16 +61,16 @@
                    :close-on-press-escape="false"
                    custom-class="version-dialog"
                    :show-close="this.type !== 3"
-                   top = "30vh"
+                   top="30vh"
                    :center="true">
             <div class="progress-info">
                 <h2>{{this.tips}}</h2>
                 <div class="progress" v-show="this.type === 3 ">
-                    <el-progress :percentage=this.downloadPercent ></el-progress>
+                    <el-progress :percentage=this.downloadPercent></el-progress>
                     <p>下载完成以后，程序会自动重启！</p>
                 </div>
             </div>
-           <div slot="footer" class="dialog-footer"  v-show="this.type === 3 ">
+            <div slot="footer" class="dialog-footer" v-show="this.type === 3 ">
                 <el-button type="primary" @click="outerVisible = false">后台运行</el-button>
             </div>
         </el-dialog>
@@ -79,6 +79,7 @@
 
 <script>
   import { ipcRenderer } from 'electron'
+
   export default {
     data () {
       return {
@@ -96,9 +97,9 @@
           label: this.$t('message.c84')
         }],
         outerVisible: false,
-        type:0,
+        type: 0,
         tips: '',
-        downloadPercent:0,
+        downloadPercent: 0,
       }
     },
     beforeCreate () {
@@ -107,9 +108,9 @@
         this.tips = text.info
       })
       ipcRenderer.on('downloadProgress', (event, progressObj) => {
-        console.log("")
         this.downloadPercent = progressObj.percent || 0
       })
+
       ipcRenderer.on('isUpdateNow', () => {
         ipcRenderer.send('isUpdateNow')
       })
@@ -161,10 +162,10 @@
         this.outerVisible = true
         ipcRenderer.send('checkForUpdate')
         setTimeout(() => {
-          if(this.type !==3){
+          if (this.type !== 3) {
             this.outerVisible = false
           }
-        }, 5000)
+        }, 3000)
       },
     }
   }
@@ -278,27 +279,27 @@
         .el-select-dropdown__list {
             width: 310px;
         }
-        .version-dialog{
+        .version-dialog {
             width: 70%;
-            .el-dialog__header{
+            .el-dialog__header {
                 padding: 20px 0 0 0;
-                .el-dialog__title{
+                .el-dialog__title {
                     color: #FFFFFF;
                     font-size: 16px;
                 }
             }
-            .el-dialog__body{
-                .progress-info{
-                    h2{
+            .el-dialog__body {
+                .progress-info {
+                    h2 {
                         font-size: 14px;
                         line-height: 32px;
                         text-align: center;
                     }
-                    .progress{
+                    .progress {
                         width: 60%;
-                        margin:0 0 0 23%;
+                        margin: 0 0 0 23%;
                         height: 80px;
-                        p{
+                        p {
                             font-size: 12px;
                             color: #c1c5c9;
                             line-height: 32px;
@@ -307,7 +308,7 @@
                     }
                 }
             }
-            .el-dialog__footer{
+            .el-dialog__footer {
                 padding: 0 0 20px;
             }
         }

@@ -179,7 +179,7 @@ ipcMain.on('CoreLauncher', function (event, arg) {
   }*/
   let cmdPath = corePath(arg)
   launchCmd(cmdPath)
-});
+})
 
 /**
  * 只能开启一个electron 进程
@@ -191,7 +191,7 @@ const shouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
     if (mainWindow.isMinimized()) mainWindow.restore()
     mainWindow.focus()
   }
-});
+})
 
 if (shouldQuit) {
   app.quit()
@@ -213,17 +213,81 @@ app.on('ready', createWindow)
 
 // 注意这个autoUpdater不是electron中的autoUpdater
 import { autoUpdater } from 'electron-updater'
+
+const uploadUrl = 'http://io.2jz.info/download/'
+
+// 检测更新，在你想要检查更新的时候执行，renderer事件触发后的操作自行编写
+function updateHandle () {
+  let message = {
+    /*error: '检查更新出错',
+    checking: '正在检查更新……',
+    updateAva: '检测到新版本，正在下载……',
+    updateNotAva: '现在使用的就是最新版本，不用更新',*/
+    error: {type:1,info:'检查更新出错'},
+    //error: '检查更新出错',
+    checking: {type:2,info:'正在检查更新……'},
+    //checking: '正在检查更新……',
+    updateAva: {type:3,info:'检测到新版本，正在下载……'},
+    //updateAva: '检测到新版本，正在下载……',
+    updateNotAva: {type:3,info:'现在使用的就是最新版本，不用更新'},
+    //updateNotAva: '现在使用的就是最新版本，不用更新',
+  }
+  const os = require('os')
+
+  autoUpdater.setFeedURL(uploadUrl)
+  autoUpdater.on('error', function (error) {
+    sendUpdateMessage(message.error)
+  })
+  autoUpdater.on('checking-for-update', function () {
+    sendUpdateMessage(message.checking)
+  })
+  autoUpdater.on('update-available', function (info) {
+    sendUpdateMessage(message.updateAva)
+  })
+  autoUpdater.on('update-not-available', function (info) {
+    sendUpdateMessage(message.updateNotAva)
+  })
+
+  // 更新下载进度事件
+  autoUpdater.on('download-progress', function (progressObj) {
+    mainWindow.webContents.send('downloadProgress', progressObj)
+  })
+  autoUpdater.on('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) {
+
+    ipcMain.on('isUpdateNow', (e, arg) => {
+      console.log(arguments)
+      console.log('开始更新')
+      //some code here to handle event
+      autoUpdater.quitAndInstall()
+    })
+
+    mainWindow.webContents.send('isUpdateNow')
+  })
+
+  ipcMain.on('checkForUpdate', () => {
+    //执行自动更新检查
+    autoUpdater.checkForUpdates()
+  })
+}
+
+// 通过main进程发送事件给renderer进程，提示更新信息
+function sendUpdateMessage (text) {
+  mainWindow.webContents.send('message', text)
+}
+
+/*// 注意这个autoUpdater不是electron中的autoUpdater
+import { autoUpdater } from 'electron-updater'
 const uploadUrl = 'http://io.2jz.info/download/'
 // 检测更新，在你想要检查更新的时候执行，renderer事件触发后的操作自行编写
 function updateHandle () {
   let message = {
-    error: {value:1,info:'检查更新出错'},
+    error: {type:1,info:'检查更新出错'},
     //error: '检查更新出错',
-    checking: {value:2,info:'正在检查更新……'},
+    checking: {type:2,info:'正在检查更新……'},
     //checking: '正在检查更新……',
-    updateAva: {value:3,info:'检测到新版本，正在下载……'},
+    updateAva: {type:3,info:'检测到新版本，正在下载……'},
     //updateAva: '检测到新版本，正在下载……',
-    updateNotAva: {value:3,info:'现在使用的就是最新版本，不用更新'},
+    updateNotAva: {type:3,info:'现在使用的就是最新版本，不用更新'},
     //updateNotAva: '现在使用的就是最新版本，不用更新',
   }
   const os = require('os')
@@ -253,12 +317,12 @@ function updateHandle () {
     mainWindow.webContents.send('downloadProgress', progressObj)
   })
   autoUpdater.on('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) {
-    /*console.log("event=="+event)
+    /!*console.log("event=="+event)
     console.log("releaseNotes=="+releaseNotes)
     console.log("releaseName="+releaseName)
     console.log("releaseDate="+releaseDate)
     console.log("updateUrl="+updateUrl)
-    console.log("quitAndUpdate="+quitAndUpdate)*/
+    console.log("quitAndUpdate="+quitAndUpdate)*!/
     ipcMain.on('isUpdateNow', (e, arg) => {
       console.log('开始更新')
       //some code here to handle event
@@ -274,4 +338,4 @@ function updateHandle () {
 // 通过main进程发送事件给renderer进程，提示更新信息
 function sendUpdateMessage (text) {
   mainWindow.webContents.send('message', text)
-}
+}*/
