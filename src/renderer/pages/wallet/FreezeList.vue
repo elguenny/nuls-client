@@ -15,7 +15,7 @@
                 </el-table-column>
                 <el-table-column prop="lockTime" :label="$t('message.thawingTime')" min-width="100" align='center'>
                     <template slot-scope="scope">
-                        {{parseInt(scope.row.lockTime) > 1000000000000 ? scope.row.lockTimes : (parseInt(scope.row.lockTime) === 0 ? $t('message.consensusManagement'): $t('message.c139') + scope.row.lockTime)}}
+                        {{parseInt(scope.row.lockTime) > 1000000000000 ? scope.row.lockTimes : (parseInt(scope.row.lockTime) === -1 ? $t('message.c158'): $t('message.c139') + scope.row.lockTime)}}
                     </template>
                 </el-table-column>
             </el-table>

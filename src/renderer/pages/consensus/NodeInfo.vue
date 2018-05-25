@@ -9,9 +9,9 @@
             <li>
                 <label>{{$t('message.state')}}</label><span> {{ $t('message.status'+this.myNodeInfo.status) }}</span>
             </li>
-            <li>
+           <!-- <li>
                 <label>{{$t('message.c7')}}</label><span>{{this.myNodeInfo.reward }} NULS</span>
-            </li>
+            </li>-->
             <li>
                 <label>{{$t('message.c25')}}</label><span>{{this.myNodeInfo.deposit}}</span>
             </li>
@@ -44,6 +44,7 @@
   export default {
     data () {
       return {
+        txHash: this.$route.params.txHash,
         myNodeInfo: [],
       }
     },
@@ -53,7 +54,7 @@
     },
     mounted () {
       let _this = this
-      this.getMyNodeInfo('/consensus/agent/' + localStorage.getItem('newAccountAddress'))
+      this.getMyNodeInfo('/consensus/agent/' + this.txHash)
     },
     methods: {
       //获取我创建的节点信息

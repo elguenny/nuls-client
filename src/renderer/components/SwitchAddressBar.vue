@@ -1,13 +1,11 @@
 <template>
     <!--账户地址下拉框 address select -->
-    <div class="address-select" @click="showDataList"  >
-   <!-- <div class="address-select">
-        {{this.accountAddressValue}}-->
+    <div class="address-select1" @click="showDataList">
         <div class="sub-selected-value">
             {{accountAddressValue}}
-            <div class="sub-select-list" v-if="showData" >
+            <div class="sub-select-list" v-if="showData">
                 <div class="sub-select-item" v-for="item in getAddressList"
-                     @click.stop="accountAddressChecked(item.address)">
+                     @click.stop="accountAddressChecked(item.address,item.encrypted)">
                     {{item.address}}
                 </div>
             </div>
@@ -71,8 +69,10 @@
       getAccountList (url) {
         this.$fetch(url)
           .then((response) => {
+            console.log(response)
             if (response.success) {
               localStorage.setItem('newAccountAddress', response.data[0].address)
+              localStorage.setItem('encrypted', response.data.list[0].encrypted)
               this.$store.commit('setAddressList', response.data.list)
             } else {
               this.$store.commit('setAddressList', '')
@@ -88,29 +88,31 @@
        *Select account address
        * @param accountAddress
        */
-      accountAddressChecked (accountAddress) {
+      accountAddressChecked (accountAddress,encrypted) {
         this.showData = false
         this.accountAddressValue = accountAddress
         this.$emit('chenckAccountAddress', accountAddress)
         localStorage.setItem('newAccountAddress', accountAddress)
+        localStorage.setItem('encrypted', encrypted)
         //console.log(accountAddress);
       }
     },
   }
 </script>
 <style lang="less">
-    .address-select {
+    .address-select1 {
         position: relative;
         float: left;
         border: 1px solid #658ec7;
         height: 24px;
-        width: 410px;
+        width: 340px;
         color: #FFFFFF;
         right: 0;
         top: -1px;
         font-size: 14px;
         line-height: 24px;
-        padding: 0 0 0 2px;
+        padding: 0 0 0 5px;
+        cursor: pointer;
         i {
             position: absolute;
             top: 3px;
@@ -140,7 +142,7 @@
                 overflow-x: auto;
                 transition: transform .3s;
                 .sub-select-item {
-                    width: 410px;
+                    width: 340px;
                     height: 26px;
                     line-height: 26px;
                     position: relative;

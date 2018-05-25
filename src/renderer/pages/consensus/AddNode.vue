@@ -3,7 +3,7 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{this.agentAddressInfo.agentName}}</h2>
         <div class="div-icon1 node-page-top">
-            <p class="subscript">
+            <p class="subscript" :class="this.agentAddressInfo.status === 0  ? 'stay' : ''">
                 {{ $t('message.status'+this.agentAddressInfo.status) }}
             </p>
             <ul>
@@ -118,6 +118,7 @@
     methods: {
       //根据agentAddress获取共识节点信息
       getAgentAddressInfo (url) {
+        //console.log(url)
         this.$fetch(url)
           .then((response) => {
             console.log(response)
@@ -163,7 +164,17 @@
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$refs[formName].validate((valid) => {
             if (valid) {
-              this.$refs.password.showPassword(true)
+              if (localStorage.getItem('encrypted') === 'true') {
+                this.$refs.password.showPassword(true)
+              } else {
+                this.$confirm('此账户没有设置密码，确定加入节点么？', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消'
+                }).then(() => {
+                  this.toSubmit('')
+                }).catch(() => {
+                })
+              }
             } else {
               return false
             }
@@ -192,7 +203,7 @@
               })
               this.$router.push({
                 name: '/myNode',
-                params: {'agentAddress': this.agentAddress},
+                params: {'agentAddress': this.agentAddress,'agentHash': this.agentId}
               })
             } else {
               this.$message({

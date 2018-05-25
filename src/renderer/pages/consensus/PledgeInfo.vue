@@ -3,7 +3,7 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{$t('message.c48')}}</h2>
         <el-table :data="pledgeData">
-            <el-table-column prop="address" :label="$t('message.c24')" min-width="120" align='center'>
+            <el-table-column prop="agentName" :label="$t('message.c24')" min-width="120" align='center'>
             </el-table-column>
             <el-table-column prop="deposit" :label="$t('message.amount')" min-width="210" align='center'>
             </el-table-column>
@@ -56,8 +56,8 @@
       getConsensusDeposit (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            console.log(url)
-            console.log(params)
+            //console.log(url)
+            //console.log(params)
             console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
@@ -81,7 +81,8 @@
       handleClick (row) {
         this.$router.push({
           name: '/myNode',
-          params: {agentAddress: row.address},
+          params: {agentAddress: row.agentHash,agentHash:row.txHash},
+          //params: {'agentAddress': this.agentAddress,'agentHash': this.agentId}
         })
       }
     }

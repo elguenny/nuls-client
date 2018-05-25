@@ -31,6 +31,11 @@
                 </el-collapse-item>
             </el-collapse>
             <div class="set-page-div">
+                <label>切换账户：</label>
+                <SwitchAddressBar @chenckAccountAddress="chenckAccountAddress"></SwitchAddressBar>
+            </div>
+
+            <div class="set-page-div">
                 <label>{{$t('message.c73')}}：</label>
                 <span class="cursor-p set-page-div-span" @click="toBackups">{{$t('message.c74')}}</span>
             </div>
@@ -55,7 +60,7 @@
                 <span class="cursor-p set-page-div-span" @click="versionUpdates">{{$t('message.c82')}}</span>
             </div>
         </div>
-        <el-dialog title="版本更新检查"
+        <el-dialog :title="$t('message.c151')"
                    :visible.sync="outerVisible"
                    :close-on-click-modal="false"
                    :close-on-press-escape="false"
@@ -66,12 +71,12 @@
             <div class="progress-info">
                 <h2>{{this.tips}}</h2>
                 <div class="progress" v-show="this.type === 3 ">
-                    <el-progress :percentage=this.downloadPercent></el-progress>
-                    <p>下载完成以后，程序会自动重启！</p>
+                    <el-progress :percentage=this.downloadPercent v-show="false"></el-progress>
+                    <p>{{$t('message.c152')}}</p>
                 </div>
             </div>
             <div slot="footer" class="dialog-footer" v-show="this.type === 3 ">
-                <el-button type="primary" @click="outerVisible = false">后台运行</el-button>
+                <el-button type="primary" @click="outerVisible = false">{{$t('message.c153')}}</el-button>
             </div>
         </el-dialog>
     </div>
@@ -79,7 +84,7 @@
 
 <script>
   import { ipcRenderer } from 'electron'
-
+  import SwitchAddressBar from '@/components/SwitchAddressBar.vue'
   export default {
     data () {
       return {
@@ -102,13 +107,25 @@
         downloadPercent: 0,
       }
     },
+    components: {
+      SwitchAddressBar,
+    },
     beforeCreate () {
       ipcRenderer.on('message', (event, text) => {
         this.type = text.type
-        this.tips = text.info
+        if(this.type===2){
+          this.tips = this.$t('message.c155')
+        }else if(this.type===3){
+          this.tips = this.$t('message.c156')
+        }else if(this.type===4){
+          this.tips = this.$t('message.c157')
+        }else{
+          this.tips = this.$t('message.c154')
+        }
       })
       ipcRenderer.on('downloadProgress', (event, progressObj) => {
         this.downloadPercent = progressObj.percent || 0
+        alert("downloadPercent="+this.downloadPercent)
       })
 
       ipcRenderer.on('isUpdateNow', () => {
@@ -119,6 +136,10 @@
 
     },
     methods: {
+      //获取下拉选择地址
+      chenckAccountAddress (chenckAddress) {
+        localStorage.setItem('newAccountAddress', chenckAddress)
+      },
       //查看日志
       toBackups () {
         this.$router.push({
@@ -143,10 +164,12 @@
                 }
                 this.$router.push({
                   name: '/editorPassword',
+                  params: {address: localStorage.getItem('newAccountAddress'),backInfo:'设置'},
                 })
               } else {
                 this.$router.push({
                   name: '/setPassword',
+                  params: {address: localStorage.getItem('newAccountAddress'),backInfo:'设置'},
                 })
               }
             })
@@ -173,7 +196,7 @@
 
 <style lang="less">
     .set-page {
-        width: 320px;
+        width: 340px;
         margin: auto;
         h2 {
             margin-top: 30px;
@@ -192,7 +215,7 @@
                 }
                 .set-page-div-span {
                     display: block;
-                    width: 311px;
+                    width: 346px;
                     border: 1px solid #24426c;
                     text-align: center;
                 }
@@ -296,8 +319,8 @@
                         text-align: center;
                     }
                     .progress {
-                        width: 60%;
-                        margin: 0 0 0 23%;
+                        width: 75%;
+                        margin: 0 0 0 13%;
                         height: 80px;
                         p {
                             font-size: 12px;

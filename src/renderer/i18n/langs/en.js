@@ -283,15 +283,15 @@ const en = {
     typeundefined:'',
     type1: 'Reward',
     type2: 'Transfer',
-    type3: 'Lock',
+   /* type3: 'Lock',
     type4: 'Unlock',
-    type5: 'Change',
-    type11: 'Aliased',
+    type5: 'Change',*/
+    type51: 'Aliased',
     type90: 'Register',
     type91: 'Join',
     type92: 'Out',
-    type93: 'Yellow',
-    type94: 'Red',
+   /* type93: 'Yellow',
+    type94: 'Red',*/
     type95: 'Delete',
 
     c129: 'Copy success',
@@ -310,6 +310,21 @@ const en = {
     c143: 'Copy',
     c144: 'display/hide',
     c145:'Click Copy txid',
+
+    c146:'KeyStore format import',
+    c147:'Keystore files can only be uploaded, and not more than 2M',
+    c148:'Please select the keyStore file',
+    c149:'Uploading can only be keystore file',
+    c150:'The size of the uploaded image can not be more than 2MB',
+    c151:'Version update check',
+    c152:'After the download is completed, the program will restart automatically',
+    c153:'Backstage',
+    c154:'Check update error',
+    c155:'Checking updatesing',
+    c156:'A new version is detected and is being downloading',
+    c157:'The latest version is in use, not to be updated',
+    c158:'Consensus locking',
+    c159:'This account not password',
 
     //Bottom info
     refresh:'Refresh',

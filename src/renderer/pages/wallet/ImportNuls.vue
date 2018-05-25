@@ -1,16 +1,16 @@
 <template>
     <div class="import-nuls">
         <Back :backTitle="this.$t('message.inportAccount')"></Back>
-        <h2>KeyStore格式导入</h2>
+        <h2>{{$t("message.c146")}}</h2>
         <el-upload
                 class="avatar-uploader"
-                action="http://192.168.1.223:8001/posts/"
+                action="http://192.168.1.201:8001/posts/"
                 :show-file-list="true"
                 :limit="1"
                 :before-upload="beforeAvatarUpload">
             <img v-if="imageUrl" :src="imageUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            <div slot="tip" class="el-upload__tip">只能上传keystore文件，且不超过500kb</div>
+            <div slot="tip" class="el-upload__tip">{{$t("message.c147")}}</div>
         </el-upload>
         <el-button type="primary" @click="keyStoreSubmit" id="importKeystore">
             {{$t('message.confirmButtonText')}}
@@ -67,7 +67,7 @@
         if (this.keyStorePath !== '') {
           this.$refs.password.showPassword(true)
         } else {
-          this.$message.error('请选择keyStore文件！')
+          this.$message.error('message.passWordFailed')
         }
       },
 
@@ -84,8 +84,8 @@
 
       //导入keyStore import keyStore
       postKeyStore (url, params) {
-        console.log('url=' + url)
-        console.log('params=' + params)
+        //console.log('url=' + url)
+        //console.log('params=' + params)
         this.$post(url, params)
           .then((response) => {
             console.log(response)
@@ -159,9 +159,6 @@
                 height: 178px;
                 display: block;
             }
-        }
-        .el-button--primary {
-            margin-top: 2rem;
         }
 
     }

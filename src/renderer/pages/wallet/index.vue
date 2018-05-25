@@ -2,7 +2,7 @@
     <div class="wallet">
         <div class="search">
             <div class="account-top">
-                <label>{{$t('message.indexAccountAddress')}}</label>
+                <label>{{$t('message.indexAccountAddress')}}：</label>
                 <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
             </div>
             <div class="wallet-i">
@@ -67,15 +67,15 @@
                                 :filters="[
                                     {text: this.$t('message.type1'), value: '1'},
                                     {text: this.$t('message.type2'), value: '2'},
-                                    {text: this.$t('message.type3'), value: '3'},
+                                    /*{text: this.$t('message.type3'), value: '3'},
                                     {text: this.$t('message.type4'), value: '4'},
-                                    {text: this.$t('message.type5'), value: '5'},
-                                    {text: this.$t('message.type11'), value: '11'},
+                                    {text: this.$t('message.type5'), value: '5'},*/
+                                    {text: this.$t('message.type51'), value: '51'},
                                     {text: this.$t('message.type90'), value: '90'},
                                     {text: this.$t('message.type91'), value: '91'},
                                     {text: this.$t('message.type92'), value: '92'},
-                                    {text: this.$t('message.type93'), value: '93'},
-                                    {text: this.$t('message.type94'), value: '94'},
+                                   /* {text: this.$t('message.type93'), value: '93'},
+                                    {text: this.$t('message.type94'), value: '94'},*/
                                     {text: this.$t('message.type95'), value: '95'},
                                 ]"
                                 :filter-multiple=false>
@@ -305,26 +305,26 @@
         let liValue = 0
         if (typeValue.type[0]) {
           switch (parseInt(typeValue.type[0])) {
-            case 11:
-              liValue = '6'
+            case 51:
+              liValue = '3'
               break
             case 90:
-              liValue = '7'
+              liValue = '4'
               break
             case 91:
-              liValue = '8'
+              liValue = '5'
               break
             case 92:
-              liValue = '9'
+              liValue = '6'
               break
-            case 93:
+            /*case 93:
               liValue = '10'
               break
             case 94:
               liValue = '11'
-              break
+              break*/
             case 95:
-              liValue = '12'
+              liValue = '7'
               break
             default:
               liValue = typeValue.type[0]
@@ -483,10 +483,13 @@
             margin: 0;
             float: left;
             width: 485px;
-            .address-select {
-                width: 403px;
-                .sub-select-item {
-                    width: 403px;
+            .address-select{
+                .sub-selected-value{
+                    .sub-select-list{
+                        .sub-select-item{
+                            width: 410px;
+                        }
+                    }
                 }
             }
             .el-input__suffix {

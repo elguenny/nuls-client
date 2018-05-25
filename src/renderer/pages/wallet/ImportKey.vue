@@ -12,13 +12,13 @@
                 </el-button>
             </el-form-item>
         </el-form>
-        <Password ref="password" @toSubmit="toSubmit" :submitId="submitId"></Password>
+        <PasswordTow ref="passTwo" @toSubmit="toSubmit"></PasswordTow>
     </div>
 </template>
 
 <script>
   import Back from '@/components/BackBar.vue'
-  import Password from '@/components/PasswordBar.vue'
+  import PasswordTow from '@/components/PasswordTwoBar.vue'
 
   export default {
     data () {
@@ -36,14 +36,14 @@
     },
     components: {
       Back,
-      Password,
+      PasswordTow,
     },
     methods: {
       //提交导入明文私钥
       keySubmit (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$refs.password.showPassword(true)
+            this.$refs.passTwo.showPasswordTwo(true)
           } else {
             console.log('error submit!!')
             return false
@@ -52,8 +52,13 @@
       },
       //
       toSubmit (password) {
-        let param = '{"priKey":"' + this.keyData.keyInfo + '","password":"' + password + '"}'
-        this.$post('/account/import/pri', param)
+        let params = ''
+        if(password === ''){
+          params = '{"priKey":"' + this.keyData.keyInfo + '","password":""}'
+        }else{
+          params = '{"priKey":"' + this.keyData.keyInfo + '","password":"' + password + '"}'
+        }
+        this.$post('/account/import/pri', params)
           .then((response) => {
             if (response.success) {
               localStorage.setItem('newAccountAddress', response.data)
@@ -117,9 +122,6 @@
         }
         .el-form-item__content {
             text-align: center;
-            button {
-                width: 30%;
-            }
         }
         .el-form-item.is-required .el-form-item__label:before {
             font-size: 0;

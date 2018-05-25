@@ -1,6 +1,6 @@
 {
   "name": "NulsWallet",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "author": "Nuls team",
   "description": "Nuls Wallet corss platform app",
   "license": "MIT",
@@ -73,6 +73,7 @@
     "clipboard": "^2.0.0",
     "copy-to-clipboard": "^3.0.8",
     "cropper": "^3.1.4",
+    "crypto": "^1.0.1",
     "electron-updater": "^2.21.10",
     "element-ui": "^2.1.0",
     "fbjs": "^0.8.16",

@@ -12,16 +12,19 @@
                         <span>{{ scope.row.alias != null  ? scope.row.alias : '-' }}</span>
                         <i class="el-icon-edit cursor-p"
                            v-show="scope.row.alias != null  ? false : true"
-                           @click="editAliasing(scope.row.address,scope.row.alias)"></i>
+                           @click="editAliasing(scope.row.address,scope.row.encrypted)"></i>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('message.operation')" width="150" align='center'>
                     <template slot-scope="scope">
-                        <el-button size="mini" type="text" @click="outUser(scope.row.address)">
+                        <el-button size="mini" type="text" @click="outUser(scope.row.address,scope.row.encrypted)">
                             {{$t('message.tabRemove')}}
                         </el-button>
-                        <el-button size="mini" type="text" @click="backupUser(scope.row.address)">
+                        <el-button size="mini" type="text" @click="backupUser(scope.row.address,scope.row.encrypted)">
                             {{$t('message.tabBackups')}}
+                        </el-button>
+                        <el-button size="mini" type="text" @click="toPassword(scope.row.address,scope.row.encrypted)">
+                            {{scope.row.encrypted ? "修改密码":"设置密码"}}
                         </el-button>
                     </template>
                 </el-table-column>
@@ -77,7 +80,7 @@
         this.$fetch(url, params)
           .then((response) => {
             if (response.success) {
-              //console.log(response);
+              console.log(response)
               this.totalAll = response.data.total
               if (response.data.list.length === 0) {
                 localStorage.setItem('fastUser', '0')
@@ -87,8 +90,9 @@
               } else {
                 localStorage.setItem('fastUser', '1')
                 localStorage.setItem('newAccountAddress', response.data.list[0].address)
+                localStorage.setItem('encrypted', response.data.list[0].encrypted)
               }
-              this.getAllUserList('/account/list')
+              this.getAllUserList('/account')
               this.userData = response.data.list
             }
           })
@@ -97,10 +101,23 @@
         this.getUserList('/account', {'pageSize': 8, 'pageNumber': events})
       },
       //点击根据地址移除账户事件
-      outUser (address) {
-        this.setAsAddress = address
-        this.outOrBackup = 1
-        this.$refs.password.showPassword(true)
+      outUser (address, encrypted) {
+        if (encrypted) {
+          this.setAsAddress = address
+          this.outOrBackup = 1
+          this.$refs.password.showPassword(true)
+        } else {
+          this.$confirm('此账户没有设置密码，确定移除？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+          }).then(() => {
+            let params = '{"password":""}'
+            this.outUserAddress('/account/remove/' + address, params)
+          }).catch(() => {
+
+          })
+        }
+
       },
       //移除账户
       outUserAddress (url, params) {
@@ -127,10 +144,39 @@
         }
       },
       //备份账户
-      backupUser (address) {
-        this.setAsAddress = address
-        this.outOrBackup = 2
-        this.$refs.password.showPassword(true)
+      backupUser (address, encrypted) {
+        if (encrypted) {
+          this.setAsAddress = address
+          this.outOrBackup = 2
+          this.$refs.password.showPassword(true)
+        } else {
+          this.$confirm('此账户没有设置密码，确定备份？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+          }).then(() => {
+            localStorage.setItem('userPass', '')
+            this.$router.push({
+              name: '/newAccount',
+              params: {newOk: false, address: this.setAsAddress},
+            })
+          }).catch(() => {
+
+          })
+        }
+      },
+      //修改or设置密码
+      toPassword (address, encrypted) {
+        if(encrypted){
+          this.$router.push({
+            name: '/editorPassword',
+            params: {address: address,backInfo:'账户管理'},
+          })
+        }else{
+          this.$router.push({
+            name: '/setPassword',
+            params: {address:address,backInfo:'账户管理'},
+          })
+        }
 
       },
       //输入密码提交
@@ -138,7 +184,7 @@
         if (this.outOrBackup === 1) {
           //console.log(this.outOrBackup);
           let params = '{"password":"' + password + '"}'
-          this.outUserAddress('/account/remove/'+this.setAsAddress, params)
+          this.outUserAddress('/account/remove/' + this.setAsAddress, params)
         } else {
           //console.log("outOrBackup="+this.outOrBackup);
           localStorage.setItem('userPass', password)
@@ -150,12 +196,12 @@
 
       },
       //修改别名
-      editAliasing (Address) {
+      editAliasing (Address, encrypted) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$router.push({
             name: '/editAliasing',
-            params: {address: Address},
+            params: {address: Address, encrypted: encrypted},
           })
         } else {
           this.$message({

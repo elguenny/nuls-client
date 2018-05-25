@@ -3,7 +3,7 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{this.agentAddressInfo.agentName}}</h2>
         <div class="div-icon1 node-page-top">
-            <p class="subscript" :class="this.agentAddressInfo.status === 1  ? 'stay' : ''">
+            <p class="subscript" :class="this.agentAddressInfo.status === 0  ? 'stay' : ''">
                 {{ $t('message.status'+this.agentAddressInfo.status) }}
             </p>
             <ul>
@@ -80,6 +80,7 @@
       return {
         address: '',
         agentAddress: this.$route.params.agentAddress,
+        agentHash: this.$route.params.agentHash,
         agentAddressInfo: [],
         myMortgageData: [],
         total: 0,
@@ -101,7 +102,7 @@
       let _this = this
       this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress)
       this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
-        'agentAddress': this.agentAddress,
+        'agentHash': this.agentHash,
         'pageSize': '3',
         'pageNumber': this.pageNumber
       })
@@ -109,7 +110,7 @@
       this.myNodeSetInterval = setInterval(() => {
         this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress)
         this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
-          'agentAddress': this.agentAddress,
+          'agentHash': this.agentHash,
           'pageSize': '3',
           'pageNumber': this.pageNumber
         })
@@ -123,9 +124,8 @@
       getAgentAddressInfo (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            console.log(url)
-            console.log(params)
-            console.log(response)
+            //console.log(params)
+            //console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress")
@@ -186,7 +186,7 @@
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
           this.$router.push({
             name: '/addNode',
-            params: {agentAddress: this.agentAddressInfo.agentAddress, agentId: this.agentAddressInfo.agentId},
+            params: {agentAddress: this.agentAddress, agentId: this.agentAddressInfo.agentHash},
           })
         } else {
           this.$message({
@@ -196,7 +196,7 @@
       },
       //退出共识
       outNode (row) {
-        this.$confirm(this.$t('message.c60') + row.agentName + '？( ' + this.$t('message.c51') + row.amount + ' NULS)', this.$t('message.c61'), {
+        this.$confirm(this.$t('message.c60') + row.agentName + '？( ' + this.$t('message.c51') + row.deposit + ' NULS)', this.$t('message.c61'), {
           confirmButtonText: this.$t('message.confirmButtonText'),
           cancelButtonText: this.$t('message.cancelButtonText'),
         }).then(() => {
@@ -222,9 +222,9 @@
                 message: this.$t('message.passWordSuccess')
               })
               this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
-                'agentAddress': this.agentAddress,
+                'agentHash': this.agentHash,
                 'pageSize': '3',
-                'pageNumber': '1'
+                'pageNumber': this.pageNumber
               })
             } else {
               this.$message({

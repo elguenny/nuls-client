@@ -23,12 +23,11 @@
                     </div>
                     <i class="el-icon-arrow-up" :class="showData ? 'i_reverse':''"></i>
                 </div>
-
             </div>
         </div>
         <div class="agency-node-bottom">
-            <div class="div-icon cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentAddress)">
-                <p class="subscript" :class="item.status === 1  ? 'stay' : ''">
+            <div class="div-icon cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentHash)">
+                <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
                     {{ $t('message.status'+item.status) }}
                 </p>
                 <h3>{{item.agentName}}</h3>
@@ -41,10 +40,9 @@
                     </li>
                     <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                         <label class="fl cursor-p">{{$t('message.c18')}}:</label>
-                        <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                                     :widthData="item.creditRatio"></ProgressBar>
+                        <ProgressBar :colorData="item.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                                     :widthData="item.creditVal"></ProgressBar>
                     </li>
-
                 </ul>
                 <div class="credit-valuesDiv" v-show="creditValuesShow0">
                     <h2>
@@ -80,8 +78,8 @@
         sortConsensusList: [
           {sortName: this.$t('message.c46'), sortKey: ''},
           {sortName: this.$t('message.c17'), sortKey: 'commissionRate'},
-          {sortName: this.$t('message.c25'), sortKey: 'owndeposit'},
-          {sortName: this.$t('message.c18'), sortKey: 'creditRatio'}
+          {sortName: this.$t('message.c25'), sortKey: 'deposit'},
+          {sortName: this.$t('message.c18'), sortKey: 'creditVal'}
         ],
         keyword: '',
         selectKeyword: '',
@@ -107,7 +105,7 @@
       getAllConsensus (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            console.log(params)
+            //console.log(params)
             console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)

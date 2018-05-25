@@ -219,18 +219,10 @@ const uploadUrl = 'http://io.2jz.info/download/'
 // 检测更新，在你想要检查更新的时候执行，renderer事件触发后的操作自行编写
 function updateHandle () {
   let message = {
-    /*error: '检查更新出错',
-    checking: '正在检查更新……',
-    updateAva: '检测到新版本，正在下载……',
-    updateNotAva: '现在使用的就是最新版本，不用更新',*/
-    error: {type:1,info:'检查更新出错'},
-    //error: '检查更新出错',
-    checking: {type:2,info:'正在检查更新……'},
-    //checking: '正在检查更新……',
-    updateAva: {type:3,info:'检测到新版本，正在下载……'},
-    //updateAva: '检测到新版本，正在下载……',
-    updateNotAva: {type:3,info:'现在使用的就是最新版本，不用更新'},
-    //updateNotAva: '现在使用的就是最新版本，不用更新',
+    error: {type:1},
+    checking: {type:2},
+    updateAva: {type:3},
+    updateNotAva: {type:4},
   }
   const os = require('os')
 

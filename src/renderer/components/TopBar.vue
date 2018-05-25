@@ -154,7 +154,7 @@
           //获取账户地址列表
           if (this.$store.getters.getAddressList.length === 0) {
             this.$router.push({
-              name: '/setPassword',
+              path: '/firstInto/firstInfo'
             })
           } else {
             this.$router.push({

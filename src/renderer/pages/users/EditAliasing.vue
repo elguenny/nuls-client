@@ -3,7 +3,7 @@
         <Back :backTitle="this.$t('message.accountManagement')"></Back>
         <div class="edit-info">
             <h2>{{$t('message.c100')}}</h2>
-            <el-form :model="aliasForm" :rules="aliasRules" ref="aliasForm"  @submit.native.prevent>
+            <el-form :model="aliasForm" :rules="aliasRules" ref="aliasForm" @submit.native.prevent>
                 <div class="div-text" style="text-align: center">
                     <label>{{$t('message.c102')}}:</label>{{this.address}}
                 </div>
@@ -17,7 +17,8 @@
                     <label>{{$t('message.miningFee1')}}:</label>1.01NULS
                 </div>
                 <el-form-item class="aliasing-submit">
-                    <el-button type="primary" @click="aliasingSubmit('aliasForm')" id="aliasAliasing">{{$t('message.confirmButtonText')}}
+                    <el-button type="primary" @click="aliasingSubmit('aliasForm')" id="aliasAliasing">
+                        {{$t('message.confirmButtonText')}}
                     </el-button>
                 </el-form-item>
             </el-form>
@@ -33,7 +34,7 @@
 
   export default {
     data () {
-      var aliasing = (rule, value, callback) => {
+      let aliasing = (rule, value, callback) => {
         if (this.usable >= 1.01) {
           if (value === '') {
             callback(new Error(this.$t('message.c104')))
@@ -49,6 +50,7 @@
       return {
         submitId: 'aliasAliasing',
         address: this.$route.params.address,
+        encrypted: this.$route.params.encrypted,
         usable: 0,
         aliasForm: {
           alias: '',
@@ -86,37 +88,53 @@
       aliasingSubmit (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$refs.password.showPassword(true)
+            if (this.encrypted) {
+              this.$refs.password.showPassword(true)
+            } else {
+              this.$confirm('此账户没有设置密码，确定设置别名？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+              }).then(() => {
+                let param = {'alias': this.aliasForm.alias, 'password': ''}
+                this.aliasing('/account/alias/' + this.address,param)
+              }).catch(() => {
+
+              })
+            }
+
           }
         })
       },
       //
       toSubmit (password) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
-          var param = {'alias': this.aliasForm.alias, 'password': password}
-          console.log(param);
-          this.$post('/account/alias/'+this.address,param)
-            .then((response) => {
-              console.log(response);
-              if (response.success) {
-                this.$message({
-                  type: 'success', message: this.$t('message.passWordSuccess')
-                })
-                this.$router.push({
-                  name: '/userInfo'
-                })
-              } else {
-                this.$message({
-                  type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                })
-              }
-            })
+          let param = {'alias': this.aliasForm.alias, 'password': password}
+          this.aliasing('/account/alias/' + this.address,param)
         } else {
           this.$message({
             message: this.$t('message.c133'),
           })
         }
+      },
+      aliasing (url, param) {
+        this.$post(url, param)
+          .then((response) => {
+            //console.log(response)
+            if (response.success) {
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              })
+              this.$router.push({
+                name: '/userInfo'
+              })
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
+            }
+          })
       }
+
     }
   }
 </script>

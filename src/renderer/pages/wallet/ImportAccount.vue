@@ -10,7 +10,7 @@
 				<span>{{$t("message.code")}}</span>
 			</li>-->
 			<li @click="importNuls">
-				<span>KeyStore格式导入</span>
+				<span>{{$t("message.c146")}}</span>
 			</li>
 		</ul>
 	</div>

@@ -1,7 +1,7 @@
 <template>
     <div class="consensus-index" v-loading="loading">
         <div class="account-top" v-show="tabelShow">
-            <label v-show="accountAddressOk">{{$t('message.indexAccountAddress')}}</label>
+            <label v-show="accountAddressOk">{{$t('message.indexAccountAddress')}}：</label>
             <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
             <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
                @click="accountCopy" :title="$t('message.c143')"></i>
@@ -48,8 +48,8 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane :label="$t('message.c11')" name="first">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in allConsensus"
-                             @click="toNodePage(item.agentAddress)">
-                            <p class="subscript" :class="item.status === 1  ? 'stay' : ''">
+                             @click="toNodePage(item.txHash)">
+                            <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
                                 {{ $t('message.status'+item.status) }}
                             </p>
                             <h3 class="overflow">{{item.agentName}}</h3>
@@ -77,15 +77,15 @@
                     </el-tab-pane>
                     <el-tab-pane :label="$t('message.c12')" name="second">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
-                             @click="toMyNode(item.agentAddress,index)">
-                            <p class="subscript" :class="item.status === 1  ? 'stay' : ''">
+                             @click="toMyNode(item.txHash,item.agentHash)">
+                            <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
                                 {{ $t('message.status'+item.status) }}
                             </p>
                             <h3 class="overflow">{{item.agentName}}</h3>
                             <ul>
                                 <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                                <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit*0.00000001).toFixed(2) }}
+                                <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit*0.00000001).toFixed(2) }}
                                     NULS
                                 </li>
                                 <li class="cb">
@@ -96,8 +96,8 @@
                                 </li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t('message.c18')}}:</label>
-                                    <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                                                 :widthData="item.creditRatio"></ProgressBar>
+                                    <ProgressBar :colorData="item.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                                                 :widthData="item.creditVal"></ProgressBar>
                                 </li>
 
                             </ul>
@@ -246,7 +246,7 @@
       getConsensusAddress (url) {
         this.$fetch(url)
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.myInfoData = response.data
@@ -262,7 +262,7 @@
           .then((response) => {
             //console.log(url)
             //console.log(params)
-            //console.log(response)
+            console.log(response)
             this.myTotalAll = 1
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
@@ -274,8 +274,8 @@
                 this.myConsensusSizeOK = false
               }
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].creditRatios = response.data.list[i].creditRatio
-                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+                response.data.list[i].creditVals = response.data.list[i].creditVal
+                response.data.list[i].creditVal = (((((response.data.list[i].creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
@@ -299,7 +299,7 @@
         this.$fetch(url, params)
           .then((response) => {
             if (response.success) {
-              console.log(response);
+              //console.log(response);
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
                 //console.log(response.data.list[i].creditRatio)
@@ -357,16 +357,17 @@
         })
       },
       //我的节点跳转
-      toMyNode (address) {
+      toMyNode (address,hash) {
         this.$router.push({
           name: '/myNode',
-          params: {'agentAddress': address}
+          params: {'agentAddress': address,'agentHash': hash}
         })
       },
       //查看节点
       toCheck () {
         this.$router.push({
-          name: '/nodeInfo'
+          name: '/nodeInfo',
+          params:{"txHash":this.myInfoData.agentHash}
         })
       },
       //显示隐藏信用系数规则

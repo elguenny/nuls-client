@@ -282,7 +282,18 @@
       transferSubmit (fromName) {
         this.$refs[fromName].validate((valid) => {
           if (valid) {
-            this.$refs.password.showPassword(true)
+            if(localStorage.getItem('encrypted')==="true"){
+              this.$refs.password.showPassword(true)
+            }else{
+              this.$confirm('此账户没有设置密码，确定转账？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+              }).then(() => {
+                this.toSubmit('')
+              }).catch(() => {
+
+              })
+            }
           } else {
             return false
           }
@@ -303,8 +314,8 @@
           + '","remark":"' + this.transferForm.remark + '"}'
         this.$post('/accountledger/transfer', param)
           .then((response) => {
-            console.log("param="+param)
-            console.log(response)
+            //console.log("param="+param)
+            //console.log(response)
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),

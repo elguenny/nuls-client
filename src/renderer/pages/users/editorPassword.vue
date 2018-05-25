@@ -1,7 +1,7 @@
 <template>
     <div class="set-password">
-        <Back :backTitle="this.$t('message.setManagement')"></Back>
-        <h2>{{$t("message.c80")}}</h2>
+        <Back :backTitle="this.backInfo"></Back>
+        <h2>{{this.address +" : "+$t("message.c80")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
             <el-form-item :label="$t('message.oldPassWord')+'：'" prop="oldPass">
                 <el-input type="password" v-model="passForm.oldPass" :maxlength=20></el-input>
@@ -59,6 +59,8 @@
         }
       }
       return {
+        address: this.$route.params.address,
+        backInfo: this.$route.params.backInfo,
         passForm: {
           oldPass: '',
           pass: '',
@@ -102,7 +104,7 @@
           if (valid) {
             let param = '{"password":"' + this.passForm.oldPass + '","newPassword":"' + this.passForm.pass + '"}'
             //console.log(param);
-            this.$put('/account/password/' + localStorage.getItem('newAccountAddress'), param)
+            this.$put('/account/password/' + this.address, param)
               .then((response) => {
                 console.log(response)
                 if (response.success) {

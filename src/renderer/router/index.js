@@ -26,13 +26,13 @@ const router = new VueRouter({
     },
     {
       //设置钱包密码
-      path: '/users/setPassword',
+      path: '/users/setPassword :address/:backInfo',
       name: '/setPassword',
       component: resolve => require(['@/pages/users/SetPassword.vue'], resolve),
     },
     {
       //修改钱包密码
-      path: '/users/editorPassword',
+      path: '/users/editorPassword :address/:backInfo',
       name: '/editorPassword',
       component: resolve => require(['@/pages/users/EditorPassword.vue'], resolve),
     },
@@ -98,7 +98,7 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/users/UserInfo.vue'], resolve)
     },
     {
-      path: '/wallet/users/editAliasing :address',
+      path: '/wallet/users/editAliasing :address/:encrypted',
       name: '/editAliasing',
       component: resolve => require(['@/pages/users/EditAliasing.vue'], resolve)
     },
@@ -120,7 +120,7 @@ const router = new VueRouter({
 
     },
     {
-      path: '/consensus/myNode :agentAddress',
+      path: '/consensus/myNode :agentAddress/:agentHash',
       name: '/myNode',
       component: resolve => require(['@/pages/consensus/MyNode.vue'], resolve)
 
@@ -147,7 +147,7 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/consensus/AgencyNode.vue'], resolve)
     },
     {
-      path: '/consensus/nodeInfo',
+      path: '/consensus/nodeInfo :nodeInfo',
       name: '/nodeInfo',
       component: resolve => require(['@/pages/consensus/NodeInfo.vue'], resolve)
     },

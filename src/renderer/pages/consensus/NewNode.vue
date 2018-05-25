@@ -60,7 +60,7 @@
             callback(new Error(this.$t('message.c32')))
           } else if (value < 20000) {
             callback(new Error(this.$t('message.c541')))
-          }else if (value > config.FloatSub(this.usable,0.01) ) {
+          } else if (value > config.FloatSub(this.usable, 0.01)) {
             callback(new Error(this.$t('message.c543')))
           } else {
             callback()
@@ -128,7 +128,7 @@
       //获取下拉选择地址
       chenckAccountAddress (chenckAddress) {
         this.newNodeForm.accountAddressValue = chenckAddress
-        this.copyValue=chenckAddress
+        this.copyValue = chenckAddress
         this.getBalanceAddress('/account/balance/' + chenckAddress)
         setTimeout(() => {
           if (this.newNodeForm.deposit !== '') {
@@ -141,7 +141,7 @@
        * 复制功能
        * copy
        */
-      accountCopy (){
+      accountCopy () {
         copy(this.copyValue)
         this.$message({
           message: this.$t('message.c129'), type: 'success', duration: '800'
@@ -163,7 +163,17 @@
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$refs[formName].validate((valid) => {
             if (valid) {
-              this.$refs.password.showPassword(true)
+              if (localStorage.getItem('encrypted') === 'true') {
+                this.$refs.password.showPassword(true)
+              } else {
+                this.$confirm('共识账户没有设置密码，确定创建节点么？', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消'
+                }).then(() => {
+                  this.toSubmit('')
+                }).catch(() => {
+                })
+              }
             }
             else {
               return false

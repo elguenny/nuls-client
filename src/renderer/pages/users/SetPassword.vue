@@ -1,6 +1,7 @@
 <template>
     <div class="set-password">
-        <h2>{{$t("message.setPassWord")}}</h2>
+        <Back :backTitle="this.backInfo"></Back>
+        <h2>{{this.address +" : "+$t("message.setPassWord")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
             <el-form-item :label="$t('message.walletPassWord')" prop="pass">
                 <el-input type="password" v-model="passForm.pass" :maxlength=20></el-input>
@@ -10,84 +11,102 @@
             </el-form-item>
             <div class="set-pass-title">{{$t('message.passWordInfo')}}</div>
             <el-form-item>
-                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit" id="setPass">{{$t('message.passWordAffirm')}}</el-button>
+                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit" id="setPass">
+                    {{$t('message.passWordAffirm')}}
+                </el-button>
             </el-form-item>
         </el-form>
     </div>
 
 </template>
 <script>
-    export default {
-        data() {
-            let validatePass = (rule, value, callback) => {
-                let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
-                if (value === '') {
-                    callback(new Error(this.$t('message.walletPassWord1')));
-                } else if (!patrn.exec(value)) {
-                    callback(new Error(this.$t('message.walletPassWord1')));
-                } else {
-                    if (this.passForm.checkPass !== '') {
-                        this.$refs.passForm.validateField('checkPass');
-                    }
-                    callback();
-                }
-            };
-            let validatePass2 = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error(this.$t('message.affirmWalletPassWordEmpty')));
-                } else if (value !== this.passForm.pass) {
-                    callback(new Error(this.$t('message.passWordAtypism')));
-                } else {
-                    callback();
-                }
-            };
-            return {
-                passForm: {
-                    pass: '',
-                    checkPass: '',
-                },
-                rulesPass: {
-                    pass: [
-                        {validator: validatePass, trigger: 'blur'}
-                    ],
-                    checkPass: [
-                        {validator: validatePass2, trigger: 'blur'}
-                    ]
-                }
-            };
-        },
-        created() {
-            document.onkeydown=function(e){
-                let key=window.event.keyCode;
-                if(key === 13){
-                    document.getElementById('setPass').click();
-                }
-            }
-        },
-        methods: {
-            /** Set the password for the user
-             * @method submitForm
-             * @param {string} user password
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$router.push({
-                            path: '/firstInto/firstInfo'
-                        })
-                    } else {
-                        /*this.$message({
-                            type: 'success', message:this.$t('message.passWordFailed')
-                        });*/
-                        return false;
-                    }
-                });
-            },
+  import Back from '@/components/BackBar.vue'
+
+  export default {
+    data () {
+      let validatePass = (rule, value, callback) => {
+        let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/
+        if (value === '') {
+          callback(new Error(this.$t('message.walletPassWord1')))
+        } else if (!patrn.exec(value)) {
+          callback(new Error(this.$t('message.walletPassWord1')))
+        } else {
+          if (this.passForm.checkPass !== '') {
+            this.$refs.passForm.validateField('checkPass')
+          }
+          callback()
         }
+      }
+      let validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t('message.affirmWalletPassWordEmpty')))
+        } else if (value !== this.passForm.pass) {
+          callback(new Error(this.$t('message.passWordAtypism')))
+        } else {
+          callback()
+        }
+      }
+      return {
+        address: this.$route.params.address,
+        backInfo: this.$route.params.backInfo,
+        passForm: {
+          pass: '',
+          checkPass: '',
+        },
+        rulesPass: {
+          pass: [
+            {validator: validatePass, trigger: 'blur'}
+          ],
+          checkPass: [
+            {validator: validatePass2, trigger: 'blur'}
+          ]
+        }
+      }
+    },
+    components: {
+      Back,
+    },
+    created () {
+      document.onkeydown = function (e) {
+        let key = window.event.keyCode
+        if (key === 13) {
+          document.getElementById('setPass').click()
+        }
+      }
+    },
+    methods: {
+      /** Set the password for the user
+       **/
+      submitForm (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.setPassword('/account/password/'+this.address,{"password": this.passForm.pass})
+          } else {
+            return false
+          }
+        })
+      },
+      setPassword (url,params) {
+        this.$post(url, params)
+          .then((response) => {
+            //console.log(response)
+            if (response.success) {
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              })
+              this.$router.push({
+                path: '/wallet/users/userInfo'
+              })
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
+            }
+            this.passwordVisible = false
+          })
+      },
     }
+  }
 </script>
 <style lang="less">
     @import url("../../assets/css/style");
@@ -111,7 +130,7 @@
                 line-height: 15px;
                 padding-bottom: 30px;
             }
-            .set-pass-title{
+            .set-pass-title {
                 font-size: 12px;
             }
             .set-pass-submit {

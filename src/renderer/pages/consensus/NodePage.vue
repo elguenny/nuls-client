@@ -3,13 +3,13 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{this.nodeData.agentName}}</h2>
         <div class="div-icon1 node-page-top" v-loading="loading">
-            <p class="subscript" :class="this.nodeData.status === 1  ? 'stay' : ''">
+            <p class="subscript" :class="this.nodeData.status === 0  ? 'stay' : ''">
                 {{ $t('message.status'+this.nodeData.status) }}
             </p>
             <ul>
                 <li class="li-bg overflow">
                     <label>{{$t('message.c16')}}：</label>{{this.nodeData.agentAddresss}}
-                    <span v-show="toCheckOk" @click="toCheck" class="cursor-p text-d">{{$t('message.c5_1')}}</span>
+                    <span v-show="toCheckOk" @click="toCheck()" class="cursor-p text-d">{{$t('message.c5_1')}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c17')}}：</label>{{this.nodeData.commissionRate}}%
@@ -129,7 +129,7 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              console.log(response);
+              //console.log(response);
               let leftShift = new BigNumber(0.00000001)
               this.toCheckOk = response.data.agentAddress === localStorage.getItem('newAccountAddress')
               response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
@@ -181,7 +181,8 @@
       //查看节点
       toCheck () {
         this.$router.push({
-          name: '/nodeInfo'
+          name: '/nodeInfo',
+          params:{"txHash":this.agentId}
         })
       },
       //提交委托
@@ -190,7 +191,17 @@
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$refs[formName].validate((valid) => {
             if (valid) {
-              this.$refs.password.showPassword(true)
+              if (localStorage.getItem('encrypted') === 'true') {
+                this.$refs.password.showPassword(true)
+              } else {
+                this.$confirm('此账户没有设置密码，确定加入节点么？', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消'
+                }).then(() => {
+                  this.toSubmit('')
+                }).catch(() => {
+                })
+              }
             } else {
               return false
             }
@@ -227,7 +238,7 @@
               })*/
             } else {
               this.$message({
-                message: this.$t('message.passWordFailed') + response.msg,
+                message: this.$t('message.passWordFailed') + response.message,
                 type: 'warning',
               })
             }

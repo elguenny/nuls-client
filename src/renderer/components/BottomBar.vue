@@ -56,10 +56,9 @@
               if (this.rejectTime > 1) {
                 this.rejectTime = this.rejectTime - 1
               }
-              //调用用户地址列表没有就调用一下获取用户方法
-              if (this.$store.getters.getAddressList.length === 0) {
-                this.getAccountList('/account')
-              }
+              //调用查询账户列表
+              this.getAccountList('/account')
+
               sessionStorage.setItem('javaFile', '1')
               sessionStorage.setItem('userList', '1')
               this.rejectTime = 0
@@ -101,7 +100,9 @@
             if (response.success) {
               if (response.data.list.length > 0) {
                 this.$store.commit('setAddressList', response.data.list)
-                localStorage.setItem('newAccountAddress', response.data.list[0].address)
+                if( localStorage.getItem('newAccountAddress')===''){
+                  localStorage.setItem('newAccountAddress', response.data.list[0].address)
+                }
                 localStorage.setItem('fastUser', '1')
               } else {
                 this.$store.commit('setAddressList', '')
