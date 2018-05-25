@@ -91,9 +91,9 @@
             if (this.encrypted) {
               this.$refs.password.showPassword(true)
             } else {
-              this.$confirm('此账户没有设置密码，确定设置别名？', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消'
+              this.$confirm(this.$t('message.c164'), '', {
+                confirmButtonText: this.$t('message.confirmButtonText'),
+                cancelButtonText: this.$t('message.cancelButtonText')
               }).then(() => {
                 let param = {'alias': this.aliasForm.alias, 'password': ''}
                 this.aliasing('/account/alias/' + this.address,param)

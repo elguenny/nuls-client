@@ -22,7 +22,7 @@
                 <span>{{$t('message.newAccountBackupsKey')}}</span>
                 <label>{{$t('message.newAccountBackupsKeyInfo')}}</label>
             </li>
-            <li @click="backupsKeyStore">
+            <li @click="backupsKeyStore" v-show="false">
                 <span>点击备份KeyStore</span>
                 <label>{{$t('message.newAccountBackupsKeyInfo')}}</label>
             </li>
@@ -353,8 +353,8 @@
                 height: 11rem;
                 float: left;
                 margin-right: 5%;
-                //margin-left: 4%;
-                margin-left: 8%;
+                //margin-left: 8%;
+                margin-left: 33%;
                 border: 1px solid #658cc5;
                 background-color: #181f2f;
                 text-align: center;

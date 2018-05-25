@@ -30,7 +30,7 @@
                     </ul>
                 </el-collapse-item>
             </el-collapse>
-            <div class="set-page-div">
+            <div class="set-page-div"  v-show="false">
                 <label>切换账户：</label>
                 <SwitchAddressBar @chenckAccountAddress="chenckAccountAddress"></SwitchAddressBar>
             </div>
@@ -39,14 +39,6 @@
                 <label>{{$t('message.c73')}}：</label>
                 <span class="cursor-p set-page-div-span" @click="toBackups">{{$t('message.c74')}}</span>
             </div>
-            <!--<div class="set-page-div">
-                <label>{{$t('message.c75')}}：</label>
-                <el-select v-model="value" :placeholder="$t('message.c76')" :change="selectLanguage(value)">
-                    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"
-                               change="selectLanguage('item.value')">
-                    </el-option>
-                </el-select>
-            </div>-->
             <div class="set-page-div">
                 <label>{{$t('message.c77')}}：</label>
                 <span class="cursor-p set-page-div-span" @click="toUserAddressList">{{$t('message.c78')}}</span>

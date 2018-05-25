@@ -167,9 +167,9 @@
               if (localStorage.getItem('encrypted') === 'true') {
                 this.$refs.password.showPassword(true)
               } else {
-                this.$confirm('此账户没有设置密码，确定加入节点么？', '提示', {
-                  confirmButtonText: '确定',
-                  cancelButtonText: '取消'
+                this.$confirm(this.$t('message.c165'), '', {
+                  confirmButtonText: this.$t('message.confirmButtonText'),
+                  cancelButtonText: this.$t('message.cancelButtonText')
                 }).then(() => {
                   this.toSubmit('')
                 }).catch(() => {

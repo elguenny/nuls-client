@@ -325,6 +325,12 @@ const en = {
     c157:'The latest version is in use, not to be updated',
     c158:'Consensus locking',
     c159:'This account not password',
+    c160:'Edit password',
+    c161:'Set password',
+    c162:'The password is not set in this account and is determined to be removed',
+    c163:'This account does not set a password to determine the backup',
+    c164:'The password is not set in this account, and the alias is set',
+    c165:'There is no password in this account. Do you want to join the node?',
 
     //Bottom info
     refresh:'Refresh',

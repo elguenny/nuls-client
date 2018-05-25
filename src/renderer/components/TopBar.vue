@@ -184,53 +184,6 @@
         }
 
       },
-      /* to (url, index) {
-         if (sessionStorage.getItem('userList') !== '1') {
-           this.$message({
-             type: 'info', message: this.$t('message.c131'), duration: '800'
-           })
-         } else {
-           if (url === 'home') {
-             this.isActive = 0
-             this.$router.push({
-               path: '/!*',
-             })
-           }
-           if (url === 'wallet') {
-             this.isActive = 1
-             //获取账户地址列表
-             if (this.$store.getters.getAddressList.length === 0) {
-               this.$router.push({
-                 name: '/setPassword',
-               })
-             } else {
-               this.$router.push({
-                 name: '/wallet',
-                 params: {language: index}
-               })
-             }
-           }
-           if (url === 'consensus') {
-             this.isActive = 2
-             this.$router.push({
-               name: '/consensus',
-               params: {activeName: 'first'},
-             })
-           }
-           if (url === 'application') {
-             //this.isActive = 3
-             this.$message({
-               type: 'info', message: this.$t('message.c65'), duration: '800'
-             })
-           }
-           if (url === 'more') {
-             //this.isActive = 4
-             this.$message({
-               type: 'info', message: this.$t('message.c65'), duration: '800'
-             })
-           }
-         }
-       },*/
       //刷新
       toRefresh () {
         let url = this.$route.fullPath
@@ -264,7 +217,7 @@
         this.isActive = 9
         if (this.$store.getters.getAddressList.length === 0) {
           this.$router.push({
-            name: '/setPassword',
+            path: '/firstInto/firstInfo'
           })
         } else {
           this.$router.push({

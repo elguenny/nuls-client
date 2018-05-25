@@ -5,7 +5,7 @@
             <h2>{{$t('message.userInfoTitle')}}</h2>
             <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"></el-button>
             <el-table :data="userData">
-                <el-table-column prop="address" :label="$t('message.tabName')" min-width="438" align='center'>
+                <el-table-column prop="address" :label="$t('message.tabName')" width="350" align='center'>
                 </el-table-column>
                 <el-table-column :label="$t('message.tabAlias')" width="100" class="user-aliasing">
                     <template slot-scope="scope">
@@ -15,7 +15,7 @@
                            @click="editAliasing(scope.row.address,scope.row.encrypted)"></i>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.operation')" width="150" align='center'>
+                <el-table-column :label="$t('message.operation')" min-width="150" align='center'>
                     <template slot-scope="scope">
                         <el-button size="mini" type="text" @click="outUser(scope.row.address,scope.row.encrypted)">
                             {{$t('message.tabRemove')}}
@@ -24,7 +24,7 @@
                             {{$t('message.tabBackups')}}
                         </el-button>
                         <el-button size="mini" type="text" @click="toPassword(scope.row.address,scope.row.encrypted)">
-                            {{scope.row.encrypted ? "修改密码":"设置密码"}}
+                            {{scope.row.encrypted ? $t('message.c160'):$t('message.c161')}}
                         </el-button>
                     </template>
                 </el-table-column>
@@ -107,9 +107,9 @@
           this.outOrBackup = 1
           this.$refs.password.showPassword(true)
         } else {
-          this.$confirm('此账户没有设置密码，确定移除？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消'
+          this.$confirm(this.$t('message.c162'), '', {
+            confirmButtonText: this.$t('message.confirmButtonText'),
+            cancelButtonText: this.$t('message.cancelButtonText')
           }).then(() => {
             let params = '{"password":""}'
             this.outUserAddress('/account/remove/' + address, params)
@@ -150,9 +150,9 @@
           this.outOrBackup = 2
           this.$refs.password.showPassword(true)
         } else {
-          this.$confirm('此账户没有设置密码，确定备份？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消'
+          this.$confirm(this.$t('message.c163'), '', {
+            confirmButtonText: this.$t('message.confirmButtonText'),
+            cancelButtonText: this.$t('message.cancelButtonText')
           }).then(() => {
             localStorage.setItem('userPass', '')
             this.$router.push({
@@ -169,12 +169,12 @@
         if(encrypted){
           this.$router.push({
             name: '/editorPassword',
-            params: {address: address,backInfo:'账户管理'},
+            params: {address: address,backInfo:this.$t('message.accountManagement')},
           })
         }else{
           this.$router.push({
             name: '/setPassword',
-            params: {address:address,backInfo:'账户管理'},
+            params: {address:address,backInfo:this.$t('message.accountManagement')},
           })
         }
 
@@ -211,10 +211,7 @@
       },
       //新增账户
       toNewAccount () {
-        this.$router.push({
-          path: '/firstInto/firstInfo'
-        })
-        /*if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           localStorage.setItem('toUserInfo', '0')
           this.$router.push({
@@ -224,7 +221,7 @@
           this.$message({
             message: this.$t('message.c133'), duration: '800'
           })
-        }*/
+        }
       }
     }
   }

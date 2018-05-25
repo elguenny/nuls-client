@@ -9,7 +9,7 @@
 			<!--<li @click="importCode">
 				<span>{{$t("message.code")}}</span>
 			</li>-->
-			<li @click="importNuls">
+			<li @click="importNuls" v-show="false">
 				<span>{{$t("message.c146")}}</span>
 			</li>
 		</ul>
@@ -68,7 +68,7 @@
 				height: 11rem;
 				float: left;
 				margin-right: 40px;
-				margin-left: 80px;
+				margin-left: 235px;
 				border: 1px solid #1e314d;
 				background-color: #181f2f;
 				text-align: center;
