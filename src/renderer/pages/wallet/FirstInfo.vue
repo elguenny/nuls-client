@@ -40,7 +40,9 @@
     created () {
       document.onkeydown = function (e) {
         let key = window.event.keyCode
-        console.log(this.passwordVisible)
+        if (key === 13) {
+          document.getElementById('setPassTwo').click()
+        }
       }
     },
     methods: {
@@ -69,6 +71,9 @@
               localStorage.setItem('newAccountAddress', response.data[0])
               localStorage.setItem('userPass', md5(this.passwordValue+'nuls'))
               this.getAccountList('/account')
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              })
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.msg

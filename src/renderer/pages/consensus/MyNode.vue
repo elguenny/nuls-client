@@ -150,7 +150,7 @@
             if (response.success) {
               //console.log(url);
               //console.log(params);
-              //console.log(response);
+              console.log(response);
               let leftShift = new BigNumber(0.00000001)
               this.total = response.data.total
               for (let i = 0; i < response.data.list.length; i++) {
@@ -200,9 +200,14 @@
           confirmButtonText: this.$t('message.confirmButtonText'),
           cancelButtonText: this.$t('message.cancelButtonText'),
         }).then(() => {
-          this.$refs.password.showPassword(true)
           this.outInfo.address = row.address
           this.outInfo.txHash = row.txHash
+
+          if(localStorage.getItem('encrypted')==="true"){
+            this.$refs.password.showPassword(true)
+          }else{
+            this.toSubmit ('')
+          }
         }).catch(() => {
           this.$message({
             type: 'info',

@@ -228,14 +228,11 @@
         //console.log(param)
         this.$fetch(url, param)
           .then((response) => {
-            console.log(url)
-            console.log(param)
-            console.log(response)
+            //console.log(response)
             //判断是否查询到数据
             if (response.data != null) {
               this.totalAll = response.data.total
               //判断最大页数>=当前选择的最大页数
-
               if (response.data.list.length > 0) {
                 //this.$store.commit("setAccountTxList",response.data.list);
                 for (let i = 0; i < response.data.list.length; i++) {

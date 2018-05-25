@@ -45,7 +45,7 @@
             </div>
             <div class="set-page-div">
                 <label>{{$t('message.c79')}}：</label>
-                <span class="cursor-p set-page-div-span" @click="toEditPassword ">{{$t('message.c80')}}</span>
+                <span class="cursor-p set-page-div-span" @click="toEditPassword "> {{this.encrypted ? $t('message.c160'):$t('message.c161')}}</span>
             </div>
             <div class="set-page-div">
                 <label>{{$t('message.c81')}}：V{{this.$store.getters.getPurseVersiont}}</label>
@@ -97,6 +97,7 @@
         type: 0,
         tips: '',
         downloadPercent: 0,
+        encrypted:false,
       }
     },
     components: {
@@ -119,10 +120,18 @@
         this.downloadPercent = progressObj.percent || 0
         alert("downloadPercent="+this.downloadPercent)
       })
-
       ipcRenderer.on('isUpdateNow', () => {
         ipcRenderer.send('isUpdateNow')
       })
+    },
+    created () {
+      if(localStorage.getItem('encrypted') ==="true"){
+        this.encrypted = true
+        console.log("encrypted="+this.encrypted)
+      }else{
+        this.encrypted = false
+        console.log("encrypted===="+this.encrypted)
+      }
     },
     destroyed () {
 
@@ -147,24 +156,17 @@
       //修改密码
       toEditPassword () {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
-          //获取账户地址列表
-          this.$fetch('/account')
-            .then((response) => {
-              if (response.data.length !== 0) {
-                if (localStorage.getItem('newAccountAddress') == null) {
-                  localStorage.setItem('newAccountAddress', response.data[0].address)
-                }
-                this.$router.push({
-                  name: '/editorPassword',
-                  params: {address: localStorage.getItem('newAccountAddress'),backInfo:'设置'},
-                })
-              } else {
-                this.$router.push({
-                  name: '/setPassword',
-                  params: {address: localStorage.getItem('newAccountAddress'),backInfo:'设置'},
-                })
-              }
+          if(this.encrypted){
+            this.$router.push({
+              name: '/editorPassword',
+              params: {address: localStorage.getItem('newAccountAddress'),backInfo:this.$t('message.setManagement')},
             })
+          }else{
+            this.$router.push({
+              name: '/setPassword',
+              params: {address: localStorage.getItem('newAccountAddress'),backInfo:this.$t('message.setManagement')},
+            })
+          }
         } else {
           this.$message({
             message: this.$t('message.c133'), duration: '800'

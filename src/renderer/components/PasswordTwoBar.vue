@@ -4,14 +4,14 @@
         <h2>{{$t('message.setPassWord')}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
             <el-form-item :label="$t('message.walletPassWord')" prop="pass" style="margin-bottom: 5px">
-                <el-input type="password" v-model="passForm.pass" :maxlength=20></el-input>
+                <el-input type="password" v-model="passForm.pass" :maxlength=20 :placeholder="this.$t('message.walletPassWord1')"></el-input>
             </el-form-item>
             <el-form-item :label="$t('message.affirmWalletPassWord')" prop="checkPass" style="margin-bottom: 5px">
-                <el-input type="password" v-model="passForm.checkPass" :maxlength=20></el-input>
+                <el-input type="password" v-model="passForm.checkPass" :maxlength=20 :placeholder="this.$t('message.affirmWalletPassWordEmpty')"></el-input>
             </el-form-item>
             <div class="set-pass-title">{{$t('message.passWordInfo')}}</div>
             <el-form-item>
-                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit" id="setPass">
+                <el-button type="primary" @click="submitForm('passForm')" class="set-pass-submit" id="setPassTwo">
                     {{$t('message.passWordAffirm')}}
                 </el-button>
                <div class="new-no-pass" @click="noPassword">

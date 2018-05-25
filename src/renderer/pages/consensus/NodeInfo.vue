@@ -61,7 +61,7 @@
       getMyNodeInfo (url) {
         this.$fetch(url)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               //response.data.reward = parseFloat(leftShift.times(response.data.reward).toString())
@@ -77,7 +77,11 @@
           confirmButtonText: this.$t('message.confirmButtonText'),
           cancelButtonText: this.$t('message.cancelButtonText'),
         }).then(() => {
-          this.$refs.password.showPassword(true)
+          if(localStorage.getItem('encrypted')==="true"){
+            this.$refs.password.showPassword(true)
+          }else{
+            this.toSubmit ('')
+          }
         }).catch(() => {
           this.$message({
             type: 'waring',

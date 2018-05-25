@@ -246,7 +246,7 @@
       getConsensusAddress (url) {
         this.$fetch(url)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.myInfoData = response.data

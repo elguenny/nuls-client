@@ -51,7 +51,7 @@ const en = {
     set: 'Set',
     oldPassWord: 'Current password',
     setPassWord: 'New password',
-    walletPassWord: '8-20 characters, letters and numbers',
+    walletPassWord: 'Account password',
     walletPassWord1: '8-20 characters, letters and numbers',
     affirmWalletPassWord: 'Confirm password',
     passWordHint: 'Password hint',

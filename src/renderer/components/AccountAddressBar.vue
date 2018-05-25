@@ -7,7 +7,7 @@
             {{accountAddressValue}}
             <div class="sub-select-list" v-if="showData" >
                 <div class="sub-select-item" v-for="item in getAddressList"
-                     @click.stop="accountAddressChecked(item.address)">
+                     @click.stop="accountAddressChecked(item.address,item.encrypted)">
                     {{item.address}}
                 </div>
             </div>
@@ -88,11 +88,12 @@
        *Select account address
        * @param accountAddress
        */
-      accountAddressChecked (accountAddress) {
+      accountAddressChecked (accountAddress,encrypted) {
         this.showData = false
         this.accountAddressValue = accountAddress
         this.$emit('chenckAccountAddress', accountAddress)
         localStorage.setItem('newAccountAddress', accountAddress)
+        localStorage.setItem('encrypted', encrypted)
         //console.log(accountAddress);
       }
     },

@@ -27,14 +27,10 @@
   export default {
     data () {
       let validateOldPass = (rule, value, callback) => {
-        if (value !== localStorage.getItem('userPass')) {
-          callback(new Error(this.$t('message.c92')))
-        } else {
-          if (this.passForm.checkPass !== '') {
-            this.$refs.passForm.validateField('checkPass')
-          }
-          callback()
-        }
+      if (this.passForm.checkPass !== '') {
+        this.$refs.passForm.validateField('checkPass')
+      }
+      callback()
       }
       let validatePass = (rule, value, callback) => {
         let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/
