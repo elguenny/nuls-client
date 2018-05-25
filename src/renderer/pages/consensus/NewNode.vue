@@ -4,7 +4,7 @@
         <h2>{{$t('message.c21')}}</h2>
         <div class="new-node-form">
             <el-form ref="newNodeForm" :model="newNodeForm" :rules="newNodeRules" size="mini" label-position="top">
-                <el-form-item :label="$t('message.c22')+':'">
+                <el-form-item :label="$t('message.c22')+':'" class="a-new">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                     <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="copyValue"
                        @click="accountCopy" :title="$t('message.c143')"></i>
@@ -15,11 +15,11 @@
                 <el-form-item :label="$t('message.c24')+':'" prop="agentName">
                     <el-input v-model.trim="newNodeForm.agentName" :maxlength="25"></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('message.c25')+'（NULS）:'" class="form-left" prop="deposit">
+                <el-form-item :label="$t('message.c25')+'（NULS）:'" class="form-left a-new" prop="deposit">
                     <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder
                               :maxlength="17"></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('message.c26')+'（%）:'" class="form-left" prop="commissionRate">
+                <el-form-item :label="$t('message.c26')+'（%）:'" class="form-left a-new" prop="commissionRate">
                     <el-input v-model.number="newNodeForm.commissionRate" :maxlength="5"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c27')+':'" class="cb" prop="remark">
@@ -166,9 +166,9 @@
               if (localStorage.getItem('encrypted') === 'true') {
                 this.$refs.password.showPassword(true)
               } else {
-                this.$confirm('共识账户没有设置密码，确定创建节点么？', '提示', {
-                  confirmButtonText: '确定',
-                  cancelButtonText: '取消'
+                this.$confirm(this.$t('message.c166'), '', {
+                  confirmButtonText: this.$t('message.confirmButtonText'),
+                  cancelButtonText: this.$t('message.cancelButtonText'),
                 }).then(() => {
                   this.toSubmit('')
                 }).catch(() => {
@@ -293,6 +293,11 @@
             }
             .el-form-item--mini {
                 margin-bottom: 15px;
+            }
+            .a-new{
+                label{
+                    margin-left: 4px;
+                }
             }
             input::-webkit-input-placeholder {
                 color: #6d6e6f;
