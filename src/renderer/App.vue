@@ -136,6 +136,7 @@
       getBottromInfo () {
         this.$fetch('/sys/version')
           .then((response) => {
+            console.log(response)
             if (response.success) {
               this.$store.commit('setVersionInfo', response.data)
             }

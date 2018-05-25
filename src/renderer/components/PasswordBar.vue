@@ -66,12 +66,12 @@
       //密码框显示执行事件
       passwordShow () {
         this.$store.commit('setPasswordShow', true);
-        this.$refs['passwordForm'].resetFields();
+        //this.$refs['passwordForm'].resetFields();
         //document.getElementById("passwords").focus();
       },
       passwordClose () {
         this.$store.commit('setPasswordShow', false)
-        this.$refs['passwordForm'].resetFields()
+        //this.$refs['passwordForm'].resetFields()
       },
       //
       showPassword (boolean) {
@@ -84,7 +84,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.$emit('toSubmit', this.passwordForm.password)
-            this.$refs[formName].resetFields()
+            //this.$refs[formName].resetFields()
             this.passwordVisible = false
             this.submitId = 'null'
           } else {

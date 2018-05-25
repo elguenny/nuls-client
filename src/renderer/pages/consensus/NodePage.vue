@@ -3,27 +3,28 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{this.nodeData.agentName}}</h2>
         <div class="div-icon1 node-page-top" v-loading="loading">
-            <p class="subscript" :class="this.nodeData.status === 1  ? 'stay' : ''">
+            <p class="subscript" :class="this.nodeData.status === 0  ? 'stay' : ''">
                 {{ $t('message.status'+this.nodeData.status) }}
             </p>
             <ul>
                 <li class="li-bg overflow">
                     <label>{{$t('message.c16')}}：</label>{{this.nodeData.agentAddresss}}
+                    <span v-show="toCheckOk" @click="toCheck()" class="cursor-p text-d">{{$t('message.c5_1')}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c17')}}：</label>{{this.nodeData.commissionRate}}%
                 </li>
                 <li>
-                    <label>{{$t('message.c25')}}：</label>{{this.nodeData.owndeposit}} NULS
+                    <label>{{$t('message.c25')}}：</label>{{this.nodeData.deposit}} NULS
                 </li>
                 <li>
                     <label>{{$t('message.c19')}}：</label>{{this.nodeData.memberCount}}
                 </li>
                 <li>
                     <label>{{$t('message.c18')}}：</label>
-                    <ProgressBar :colorData="this.nodeData.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                                 :widthData="this.nodeData.creditRatio"></ProgressBar>
-                    <span>&nbsp;{{this.nodeData.creditRatios}}</span>
+                    <ProgressBar :colorData="this.nodeData.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                                 :widthData="this.nodeData.creditVal"></ProgressBar>
+                    <span>&nbsp;{{this.nodeData.creditVals}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c64')}}：</label>
@@ -36,7 +37,8 @@
             </ul>
         </div>
         <div class="node-page-bottom">
-            <el-form ref="nodeForm" :model="nodeForm" :rules="nodeRules" size="mini" label-position="left" @submit.native.prevent>
+            <el-form ref="nodeForm" :model="nodeForm" :rules="nodeRules" size="mini" label-position="left"
+                     @submit.native.prevent>
                 <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
@@ -74,11 +76,13 @@
         setTimeout(() => {
           let re = /^\d+(?=\.{0,1}\d+$|$)/
           let res = /^\d{1,8}(\.\d{1,8})?$/
+          let values = new BigNumber(value)
+          let nu = new BigNumber(this.usable)
           if (!re.exec(value) || !res.exec(value)) {
             callback(new Error(this.$t('message.c53')))
-          } else if ( value < 2000) {
+          } else if (value < 2000) {
             callback(new Error(this.$t('message.c54')))
-          } else if (value > this.usable - 0.01) {
+          } else if (values.comparedTo(nu.minus(0.01)) === 1) {
             callback(new Error(this.$t('message.c542')))
           } else {
             callback()
@@ -100,7 +104,8 @@
           nodeNo: [
             {validator: checkNodeNo, trigger: 'blur'}
           ],
-        }
+        },
+        toCheckOk: false,
       }
     },
     components: {
@@ -116,7 +121,7 @@
     mounted () {
       this.$refs['input'].focus()
       this.$refs['input'].value = ''
-      sessionStorage.setItem('passwordOk','0')
+      sessionStorage.setItem('passwordOk', '0')
     },
     methods: {
       //根据address获取共识节点列表信息
@@ -126,9 +131,10 @@
             if (response.success) {
               //console.log(response);
               let leftShift = new BigNumber(0.00000001)
-              response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
-              response.data.creditRatios = response.data.creditRatio
-              response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+              this.toCheckOk = response.data.agentAddress === localStorage.getItem('newAccountAddress')
+              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
+              response.data.creditVals = response.data.creditVal
+              response.data.creditVal = (((((response.data.creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
               response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10)
               response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000'
               if (response.data.totalDeposit > 50000000000000) {
@@ -137,7 +143,7 @@
                 response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%'
               }
               //response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
-              this.agentId = response.data.agentId
+              this.agentId = response.data.txHash
               this.nodeData = response.data
               this.loading = false
             }
@@ -172,13 +178,30 @@
           this.$refs.nodeForm.validateField('nodeNo')
         }
       },
+      //查看节点
+      toCheck () {
+        this.$router.push({
+          name: '/nodeInfo',
+          params:{"txHash":this.agentId}
+        })
+      },
       //提交委托
       onSubmit (formName) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$refs[formName].validate((valid) => {
             if (valid) {
-              this.$refs.password.showPassword(true)
+              if (localStorage.getItem('encrypted') === 'true') {
+                this.$refs.password.showPassword(true)
+              } else {
+                this.$confirm(this.$t('message.c165'), '', {
+                  confirmButtonText: this.$t('message.confirmButtonText'),
+                  cancelButtonText: this.$t('message.cancelButtonText')
+                }).then(() => {
+                  this.toSubmit('')
+                }).catch(() => {
+                })
+              }
             } else {
               return false
             }
@@ -193,12 +216,13 @@
       toSubmit (password) {
         let rightShift = new BigNumber(100000000)
         let param = '{"address":"' + localStorage.getItem('newAccountAddress')
-          + '","agentId":"' + this.agentId
+          + '","agentHash":"' + this.agentId
           + '","deposit":"' + parseFloat(rightShift.times(this.nodeForm.nodeNo).toString())
           + '","password":"' + password + '"}'
-        //console.log(param)
+        console.log(param)
         this.$post('/consensus/deposit/', param)
           .then((response) => {
+            console.log(response)
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),
@@ -284,6 +308,26 @@
                     right: 90px;
                     top: 20px;
                     margin-left: 90px;
+                    .sub-select-list {
+                        max-height: 170px;
+                        overflow-y: auto;
+                        &::-webkit-scrollbar-track {
+                            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+                            background-color: #0c1323;
+                            border-radius: 10px;
+                        }
+
+                        &::-webkit-scrollbar {
+                            width: 3px;
+                            background-color: #0c1323;
+                        }
+
+                        &::-webkit-scrollbar-thumb {
+                            border-radius: 10px;
+                            background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #FFFFFF))
+                        }
+
+                    }
                 }
             }
             .number {

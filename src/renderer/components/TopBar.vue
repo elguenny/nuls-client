@@ -10,22 +10,26 @@
                     class="consensus_icon"></i> <span>{{$t('message.consensus')}}</span></li>
             <li @click="to('application','3')"><i
                     class="application_icon"></i> <span>{{$t('message.applications')}}</span></li>
-            <li @click="to('more','4')" ><i class="more_icon"></i>
+            <li @click="to('more','4')"><i class="more_icon"></i>
                 <span>{{$t('message.more')}}</span></li>
         </ul>
         <div class="top-icon fl">
-            <el-badge class="news">
-                <i class="message_icon" @click="news"></i>
-            </el-badge>
+            <div class="refresh">
+                <i v-show="showTime" class="refresh_icon" @click="toRefresh" :title="$t('message.refresh')"></i>
+                <span v-show="!showTime" class="refresh_count">{{count}}s</span>
+            </div>
+            <!--<el-badge class="news">
+                <i class="message_icon" @click="news" :title="$t('message.news')"></i>
+            </el-badge>-->
             <!--<el-badge :value="0" class="news">
                 <i class="message_icon" @click="news"></i>
             </el-badge>-->
-            <div class="set"><i class="set_icon" @click="toSetUp"></i></div>
+            <div class="set"><i class="set_icon" @click="toSetUp" :title="$t('message.set')"></i></div>
             <SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem"
                       :widthData="widthData"></SelecBar>
             <div class="minusClose">
-                <i class="el-icon-minus minus-close fl" @click="toMinus"></i>
-                <i class="el-icon-close minus-close fl " @click="toClose"></i>
+                <i class="el-icon-minus minus-close fl" @click="toMinus" :title="$t('message.c141')"></i>
+                <i class="el-icon-close minus-close fl " @click="toClose" :title="$t('message.c142')"></i>
             </div>
         </div>
         <div class="news-div" v-show="newsOk">
@@ -55,23 +59,27 @@
         languageItem: [
           {
             key: 'cn',
-            value: 'static/img/Language-zh.png'
+            value: '中文'
           },
           {
             key: 'en',
-            value: 'static/img/Language-en.png'
+            value: 'English'
           }
         ],
         //select language initial info
         projectName: {
           key: 'en',
-          value: 'static/img/Language-en.png'
+          value: 'English'
         },
         //select language initial width
         widthData: '2rem',
         errorClass: '',
         activeClass: 'active',
         isActive: 0,
+
+        showTime: true,
+        count: '',
+        timer: null,
       }
     },
     components: {
@@ -81,35 +89,35 @@
     mounted () {
       this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en'
       //判断是否有设置语言
-      if(localStorage.hasOwnProperty('language')){
+      if (localStorage.hasOwnProperty('language')) {
         if (localStorage.getItem('language') === 'cn') {
           this.projectName = {
             key: 'cn',
-            value: 'static/img/Language-zh.png'
+            value: '中文'
           }
         } else {
           this.projectName = {
             key: 'en',
-            value: 'static/img/Language-en.png'
+            value: 'English'
           }
         }
-      }else {
+      } else {
         const languageSet = setInterval(() => {
-          if(localStorage.hasOwnProperty('language')){
+          if (localStorage.hasOwnProperty('language')) {
             if (localStorage.getItem('language') === 'cn') {
               this.projectName = {
                 key: 'cn',
-                value: 'static/img/Language-zh.png'
+                value: '中文'
               }
             } else {
               this.projectName = {
                 key: 'en',
-                value: 'static/img/Language-en.png'
+                value: 'English'
               }
             }
             clearInterval(languageSet)
           }
-        },500)
+        }, 500)
       }
 
     },
@@ -117,13 +125,13 @@
       //语言切换
       selectLanguage () {
         this.$i18n.locale = this.projectName.key
-        let param =''
-        if(this.projectName.key !=='en'){
-         param ='zh-CHS'
-        }else {
-          param =this.projectName.key
+        let param = ''
+        if (this.projectName.key !== 'en') {
+          param = 'zh-CHS'
+        } else {
+          param = this.projectName.key
         }
-        this.$put('/sys/lang/'+param)
+        this.$put('/sys/lang/' + param)
           .then((response) => {
             if (response.success) {
               console.log('success')
@@ -134,51 +142,71 @@
       },
       //菜单跳转
       to (url, index) {
-        if (sessionStorage.getItem('userList') !== '1') {
-          this.$message({
-            type: 'info', message: this.$t('message.c131'), duration: '800'
+
+        if (url === 'home') {
+          this.isActive = 0
+          this.$router.push({
+            path: '/*',
           })
-        } else {
-          if (url === 'home') {
-            this.isActive = 0
+        }
+        if (url === 'wallet') {
+          this.isActive = 1
+          //获取账户地址列表
+          if (this.$store.getters.getAddressList.length === 0) {
             this.$router.push({
-              path: '/*',
+              path: '/firstInto/firstInfo'
             })
-          }
-          if (url === 'wallet') {
-            this.isActive = 1
-            //获取账户地址列表
-            if (this.$store.getters.getAddressList.length === 0) {
-              this.$router.push({
-                name: '/setPassword',
-              })
-            } else {
-              this.$router.push({
-                name: '/wallet',
-                params: {language: index}
-              })
-            }
-          }
-          if (url === 'consensus') {
-            this.isActive = 2
+          } else {
             this.$router.push({
-              name: '/consensus',
-              params: {activeName: 'first'},
-            })
-          }
-          if (url === 'application') {
-            //this.isActive = 3
-            this.$message({
-              type: 'info', message: this.$t('message.c65'), duration: '800'
-            })
-          }
-          if (url === 'more') {
-            //this.isActive = 4
-            this.$message({
-              type: 'info', message: this.$t('message.c65'), duration: '800'
+              name: '/wallet',
+              params: {language: index}
             })
           }
         }
+        if (url === 'consensus') {
+          this.isActive = 2
+          this.$router.push({
+            name: '/consensus',
+            params: {activeName: 'first'},
+          })
+        }
+        if (url === 'application') {
+          //this.isActive = 3
+          this.$message({
+            type: 'info', message: this.$t('message.c65'), duration: '800'
+          })
+        }
+        if (url === 'more') {
+          //this.isActive = 4
+          this.$message({
+            type: 'info', message: this.$t('message.c65'), duration: '800'
+          })
+        }
+
+      },
+      //刷新
+      toRefresh () {
+        let url = this.$route.fullPath
+        this.$router.push({
+          name: '/empty',
+          params: {url: url},
+        })
+
+        const TIME_COUNT = 20
+        if (!this.timer) {
+          this.count = TIME_COUNT
+          this.showTime = false
+          this.timer = setInterval(() => {
+            if (this.count > 0 && this.count <= TIME_COUNT) {
+              this.count--
+            } else {
+              this.showTime = true
+              clearInterval(this.timer)
+              this.timer = null
+            }
+          }, 1000)
+        }
+
       },
       //消息方案
       news () {
@@ -189,7 +217,7 @@
         this.isActive = 9
         if (this.$store.getters.getAddressList.length === 0) {
           this.$router.push({
-            name: '/setPassword',
+            path: '/firstInto/firstInfo'
           })
         } else {
           this.$router.push({
@@ -286,12 +314,33 @@
             }
         }
         .top-icon {
-            width: 185px;
+            width: 165px;
             margin-top: 0.2rem;
             float: right;
             -webkit-app-region: no-drag;
             i:hover {
                 cursor: pointer;
+            }
+            .refresh_count {
+                width: 30px;
+                height: 20px;
+                position: absolute;
+                top: 0px;
+                font-size: 12px;
+            }
+            .refresh {
+                width: 16px;
+                height: 16px;
+                float: left;
+                padding-top: 12px;
+                .refresh_icon {
+                    width: 20px;
+                    height: 20px;
+                    position: absolute;
+                    margin-left: 0;
+                    background-size: 16px 16px;
+                    background: url("./../assets/images/shuaxin_icon.png") no-repeat;
+                }
             }
             .news {
                 width: 35px;

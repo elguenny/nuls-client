@@ -1,7 +1,7 @@
 {
   "name": "NulsWallet",
-  "version": "0.9.1",
-  "author": "Nuls",
+  "version": "0.9.3",
+  "author": "Nuls team",
   "description": "Nuls Wallet corss platform app",
   "license": "MIT",
   "main": "./dist/electron/main.js",
@@ -25,14 +25,18 @@
     "directories": {
       "output": "build"
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "extraFiles": [
+      "java/**/*"
+    ],
     "publish": [
       {
         "provider": "generic",
-        "url": "file://192.168.1.201/share/nuls/release/"
+        "url": "http://io.2jz.info/download/"
       }
-    ],
-    "extraFiles": [
-      "java/**/*"
     ],
     "files": [
       "dist/electron/**/*"
@@ -63,12 +67,14 @@
     }
   },
   "dependencies": {
+    "argparse": "^1.0.10",
     "axios": "^0.16.1",
     "bignumber.js": "^6.0.0",
     "clipboard": "^2.0.0",
     "copy-to-clipboard": "^3.0.8",
     "cropper": "^3.1.4",
-    "electron-updater": "^2.21.4",
+    "crypto": "^1.0.1",
+    "electron-updater": "^2.21.10",
     "element-ui": "^2.1.0",
     "fbjs": "^0.8.16",
     "jquery": "^3.3.1",

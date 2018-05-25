@@ -22,6 +22,10 @@
                 <span>{{$t('message.newAccountBackupsKey')}}</span>
                 <label>{{$t('message.newAccountBackupsKeyInfo')}}</label>
             </li>
+            <li @click="backupsKeyStore" v-show="false">
+                <span>点击备份KeyStore</span>
+                <label>{{$t('message.newAccountBackupsKeyInfo')}}</label>
+            </li>
             <!-- <li @click="backupsCode">
                  <span>{{$t("message.newAccountBackupsCode")}}</span>
                  <label>{{$t("message.newAccountBackupsCodeInfo")}}</label>
@@ -40,14 +44,13 @@
 <script>
   import Back from '@/components/BackBar.vue'
   import CodeBar from '@/components/CodeBar.vue'
-  import { jquery } from '@/assets/js/jquery.min.js'
-  import { jvectormap } from '@/assets/js/jquery.qrcode.min.js'
 
   export default {
     data () {
       return {
         keyShow: false,
         keyInfo: '',
+        keyStoreInfo:[],
         newAccountAddress: this.$route.params.address === '' ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
         codeShowOk: false,
         newOk: this.$route.params.newOk,
@@ -60,8 +63,9 @@
     },
     mounted () {
       let _this = this
-      let params = '{"address":"' + this.newAccountAddress + '","password":"' + localStorage.getItem('userPass') + '"}'
-      this.getPrikey('/account/prikey', params)
+      let params = '{"password":"' + localStorage.getItem('userPass') + '"}'
+      this.getPrikey('/account/prikey/'+ this.newAccountAddress, params)
+      this.getKeyStore('/account/export/'+ this.newAccountAddress, params)
     },
     methods: {
       //获取私钥
@@ -71,6 +75,23 @@
             if (response.success) {
               this.keyInfo = response.data
               this.passwordVisible = false
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg, duration: '800'
+              })
+              this.$router.push({
+                path: '/wallet/users/userInfo'
+              })
+            }
+          })
+      },
+      //获取 keyStore
+      getKeyStore (url, params) {
+        this.$post(url, params)
+          .then((response) => {
+            console.log(response)
+            if (response.success) {
+              this.keyStoreInfo = response.data
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.msg, duration: '800'
@@ -101,21 +122,55 @@
         const {dialog} = require('electron').remote
         dialog.showSaveDialog({
           properties: [
+             'openFile',
+           ],
+           filters: [
+             {name: 'All Files', extensions: ['*'],}
+           ]
+        }, function (res) {
+          let path = require('path')
+          if(res){
+            let _path = path.join(res + '.txt')
+            let fs = require('fs')
+            fs.writeFile(_path, keyInfo, function (err) {
+              if (!err) {
+                alert(res + '.txt')
+              }
+            })
+          }
+        })
+      },
+
+      //备份KeyStore  backups KeyStore
+      backupsKeyStore(){
+        let keyStoreInfo = "{'address':'"+this.keyStoreInfo.address+
+          "','alias':'"+this.keyStoreInfo.alias+
+          "','encryptedPrivateKey':'"+this.keyStoreInfo.encryptedPrivateKey+
+          "','pubKey':'"+this.keyStoreInfo.pubKey+
+          "'}"
+        console.log("backupsKeyStore="+keyStoreInfo)
+        const {dialog} = require('electron').remote
+        dialog.showSaveDialog({
+          properties: [
             'openFile',
           ],
           filters: [
-            {name: 'All Files', extensions: ['*']},
+            {name: 'All Files', extensions: ['*'],}
           ]
         }, function (res) {
           let path = require('path')
-          let _path = path.join(res + '.txt')
-          let fs = require('fs')
-          fs.writeFile(_path, keyInfo, function (err) {
-            if (!err) {
-              alert(res + '.txt')
-            }
-          })
+          if (res) {
+            let _path = path.join(res + '.keystore')
+            let fs = require('fs')
+            fs.writeFile(_path, keyStoreInfo, function (err) {
+              if (!err) {
+                alert(res + '.keystore')
+              }
+            })
+          }
         })
+
+
       },
 
       /**
@@ -290,17 +345,16 @@
             }
         }
         ul {
-            width: 65%;
+            width: 90%;
             height: 50%;
             margin: 20px auto 0;
-
             li {
-                width: 42%;
+                width: 32%;
                 height: 11rem;
                 float: left;
-                margin-right: 3%;
-                //margin-left: 4%;
-                margin-left: 29%;
+                margin-right: 5%;
+                //margin-left: 8%;
+                margin-left: 33%;
                 border: 1px solid #658cc5;
                 background-color: #181f2f;
                 text-align: center;

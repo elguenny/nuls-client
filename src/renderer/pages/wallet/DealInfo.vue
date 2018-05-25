@@ -3,18 +3,18 @@
         <Back :backTitle="this.$t('message.transactionManagement')"></Back>
         <div class="deal-info-top">
             <div class="deal-left fl">
-                <div>{{$t('message.input')}}<span> {{this.allInputs}} NULS</span></div>
+                <div>{{$t('message.input')}}<span> {{this.allInputs.toString()}} NULS</span></div>
                 <ul>
                     <li v-for="inItem in inputs">
-                        {{ inItem.address }}<span>{{inItem.value}}</span>
+                        {{ inItem.address }}<span>{{inItem.value.toString()}}</span>
                     </li>
                 </ul>
             </div>
             <div class="deal-right fr">
-                <div>{{$t('message.output')}}<span>{{this.allOutputs}} NULS</span></div>
+                <div>{{$t('message.output')}}<span>{{this.allOutputs.toString()}} NULS</span></div>
                 <ul>
                     <li v-for="outItem in outputs">
-                        {{ outItem.address }}<span>{{outItem.value}}</span>
+                        {{ outItem.address }}<span>{{outItem.value.toString()}}</span>
                     </li>
                 </ul>
             </div>
@@ -24,7 +24,7 @@
             <ul>
                 <li><span>{{$t('message.tradingTime')}}</span>{{this.times}}</li>
                 <li><span>{{$t('message.miningFee1')}}</span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
-                <li @click="hashCopy(infoData.hash)" class="cursor-p"><span>{{$t('message.autograph')}}</span>{{infoData.hash}}
+                <li @click="hashCopy(infoData.hash)" class="cursor-p" :title="$t('message.c145')"><span>{{$t('message.autograph')}}</span>{{infoData.hash}}
                 </li>
                 <li><span>{{$t('message.transactionType')}}</span>
                     {{$t('message.type'+infoData.type)}}
@@ -77,7 +77,7 @@
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {
                 response.data.inputs[i].address = response.data.inputs[i].address.substr(0, 10) + '...' + response.data.inputs[i].address.substr(length - 10)
-                response.data.inputs[i].value = parseFloat(leftShift.times(response.data.inputs[i].value).toString())
+                response.data.inputs[i].value =leftShift.times(response.data.inputs[i].value).toFixed(8)
                 this.allInputs = BigNumber(this.allInputs).plus(response.data.inputs[i].value).toString()
               }
             }
@@ -86,7 +86,7 @@
             if (response.data.outputs.length > 0) {
               for (let i = 0; i < response.data.outputs.length; i++) {
                 response.data.outputs[i].address = response.data.outputs[i].address.substr(0, 10) + '...' + response.data.outputs[i].address.substr(length - 10)
-                response.data.outputs[i].value = parseFloat(leftShift.times(response.data.outputs[i].value).toString())
+                response.data.outputs[i].value = leftShift.times(response.data.outputs[i].value).toFixed(8)
                 this.allOutputs = BigNumber(this.allOutputs).plus(response.data.outputs[i].value).toString()
               }
             }
@@ -156,7 +156,7 @@
 
                 ul::-webkit-scrollbar-thumb {
                     border-radius: 10px;
-                    background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#222d3f), to(#82bd39), color-stop(.6, #222d3f))
+                    background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #FFFFFF))
                 }
             }
         }

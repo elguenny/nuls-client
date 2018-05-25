@@ -6,6 +6,8 @@
             <el-form :model="transferForm" :rules="rules" ref="transferForm">
                 <el-form-item :label="$t('message.sourceAddress')+'：'" class="out-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
+                    <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
+                       @click="accountCopy" :title="$t('message.c143')"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.destinationAddress')+'：'" class="join-address" prop="joinAddress">
                     <el-input type="text" v-model.trim="transferForm.joinAddress" ref="joinAddress"></el-input>
@@ -13,7 +15,7 @@
                 </el-form-item>
                 <el-form-item :label="$t('message.transferAmount')+'：'" class="join-nos" prop="joinNo">
                     <span class="allUsable">{{$t('message.currentBalance')}}: {{usable}} NULS</span>
-                    <el-input type="text" v-model.number="transferForm.joinNo" :maxlength="17"></el-input>
+                    <el-input type="text" v-model="transferForm.joinNo" :maxlength="17"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
@@ -51,6 +53,7 @@
   import Back from '@/components/BackBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
+  import copy from 'copy-to-clipboard'
   import * as config from '@/config.js'
   import { BigNumber } from 'bignumber.js'
 
@@ -96,9 +99,11 @@
           //console.log(value);
           let re = /(^\+?|^\d?)\d*\.?\d+$/
           let res = /^\d{1,8}(\.\d{1,8})?$/
+          let values = new BigNumber(value)
+          let nu = new BigNumber(this.usable)
           if (!re.exec(value)) {
             callback(new Error(this.$t('message.transferNO1')))
-          } else if (value > this.usable - 0.01) {
+          } else if (values.comparedTo(nu.minus(0.01)) === 1) {
             callback(new Error(this.$t('message.transferNO2')))
           } else if (value < 0.01) {
             callback(new Error(this.$t('message.transferNO3')))
@@ -111,6 +116,7 @@
 
       }
       return {
+        accountAddressValue: localStorage.getItem('newAccountAddress'),
         submitId: 'transferSubmit',
         usable: 0,
         accountAddress: [],
@@ -168,11 +174,11 @@
       /**
        * 获取下拉选择地址
        *Get the drop-down selection address
-
        * @param chenckAddress
        */
       chenckAccountAddress (chenckAddress) {
         this.address = chenckAddress
+        this.accountAddressValue = chenckAddress
         localStorage.setItem('newAccountAddress', this.address)
         this.getBalanceAddress('/account/balance/' + chenckAddress)
         this.$refs.transferForm.validateField('joinAddress')
@@ -180,16 +186,27 @@
       },
 
       /**
+       * 复制功能
+       * copy
+       */
+      accountCopy () {
+        copy(this.accountAddressValue)
+        this.$message({
+          message: this.$t('message.c129'), type: 'success', duration: '800'
+        })
+      },
+
+      /**
        * 选择全部金额
        * Choose the total amount
        * @param balance
        */
-      allUsable(balance) {
+      allUsable (balance) {
         if (balance === 0) {
           this.$message({
             message: this.$t('message.creditLow'),
             type: 'warning '
-          });
+          })
         } else {
           this.transferForm.joinNo = config.FloatSub(balance, 0.01)
           this.$refs.transferForm.validateField('joinAddress')
@@ -265,7 +282,18 @@
       transferSubmit (fromName) {
         this.$refs[fromName].validate((valid) => {
           if (valid) {
-            this.$refs.password.showPassword(true)
+            if(localStorage.getItem('encrypted')==="true"){
+              this.$refs.password.showPassword(true)
+            }else{
+              this.$confirm('此账户没有设置密码，确定转账？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+              }).then(() => {
+                this.toSubmit('')
+              }).catch(() => {
+
+              })
+            }
           } else {
             return false
           }
@@ -281,11 +309,13 @@
         let rightShift = new BigNumber(100000000)
         let param = '{"address":"' + this.address
           + '","toAddress":"' + this.transferForm.joinAddress
-          + '","amount":"' + rightShift.times(this.transferForm.joinNo)
-          + '","password":"' + password
+          + '","amount":' + rightShift.times(this.transferForm.joinNo)
+          + ',"password":"' + password
           + '","remark":"' + this.transferForm.remark + '"}'
-        this.$post('/wallet/transfer/', param)
+        this.$post('/accountledger/transfer', param)
           .then((response) => {
+            //console.log("param="+param)
+            //console.log(response)
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),
@@ -346,6 +376,17 @@
                         width: 553px;
                     }
                 }
+                .copy_icon {
+                    position: absolute;
+                    top: 23px;
+                    right: -33px;
+                    width: 30px;
+                    height: 20px;
+                    display: block;
+                    float: left;
+                    background-size: @bg-size;
+                    background: @bg-image -198px -46px;
+                }
             }
             .join-address {
                 i {
@@ -394,9 +435,9 @@
                             }
                         }
                         .el-input__inner {
-                            border:1px solid #24426c;
+                            border: 1px solid #24426c;
                             color: #FFFFFF;
-                            &:hover{
+                            &:hover {
                                 border-color: #658ec7;
                             }
                         }

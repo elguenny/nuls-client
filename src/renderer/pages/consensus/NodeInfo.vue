@@ -9,17 +9,17 @@
             <li>
                 <label>{{$t('message.state')}}</label><span> {{ $t('message.status'+this.myNodeInfo.status) }}</span>
             </li>
-            <li>
+           <!-- <li>
                 <label>{{$t('message.c7')}}</label><span>{{this.myNodeInfo.reward }} NULS</span>
-            </li>
+            </li>-->
             <li>
-                <label>{{$t('message.c25')}}</label><span>{{this.myNodeInfo.owndeposit}}</span>
+                <label>{{$t('message.c25')}}</label><span>{{this.myNodeInfo.deposit}}</span>
             </li>
             <li>
                 <label>{{$t('message.c17')}}</label><span>{{this.myNodeInfo.commissionRate}} %</span>
             </li>
             <li>
-                <label>{{$t('message.c18')}}</label><span>{{this.myNodeInfo.creditRatio}}</span>
+                <label>{{$t('message.c18')}}</label><span>{{this.myNodeInfo.creditVal}}</span>
             </li>
             <li>
                 <label>{{$t('message.c19')}}</label><span>{{this.myNodeInfo.memberCount}}</span>
@@ -28,7 +28,7 @@
                 <label>{{$t('message.c1')}}</label><span class="cursor-p text-d" @click="toallPledge">{{this.myNodeInfo.totalDeposit}}</span>
             </li>
             <li>
-                <label>{{$t('message.c27')}}</label><span class="overflow">{{this.myNodeInfo.introduction}}！</span>
+                <label>{{$t('message.c27')}}</label><span class="overflow">{{this.myNodeInfo.introduction}}</span>
             </li>
         </ul>
         <el-button @click="closedNode" type="button" class="bottom-btn">{{$t('message.c62')}}</el-button>
@@ -44,6 +44,7 @@
   export default {
     data () {
       return {
+        txHash: this.$route.params.txHash,
         myNodeInfo: [],
       }
     },
@@ -53,7 +54,7 @@
     },
     mounted () {
       let _this = this
-      this.getMyNodeInfo('/consensus/agent/' + localStorage.getItem('newAccountAddress'))
+      this.getMyNodeInfo('/consensus/agent/' + this.txHash)
     },
     methods: {
       //获取我创建的节点信息
@@ -63,8 +64,8 @@
             //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
-              response.data.reward = parseFloat(leftShift.times(response.data.reward).toString())
-              response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
+              //response.data.reward = parseFloat(leftShift.times(response.data.reward).toString())
+              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
               response.data.totalDeposit = parseFloat(leftShift.times(response.data.totalDeposit).toString())
               this.myNodeInfo = response.data
             }
@@ -76,7 +77,11 @@
           confirmButtonText: this.$t('message.confirmButtonText'),
           cancelButtonText: this.$t('message.cancelButtonText'),
         }).then(() => {
-          this.$refs.password.showPassword(true)
+          if(localStorage.getItem('encrypted')==="true"){
+            this.$refs.password.showPassword(true)
+          }else{
+            this.toSubmit ('')
+          }
         }).catch(() => {
           this.$message({
             type: 'waring',
@@ -112,7 +117,7 @@
       toallPledge () {
         this.$router.push({
           name: '/allPledge',
-          params: {'agentName': this.myNodeInfo.agentName}
+          params: {'agentName': this.myNodeInfo.agentName,'txHash':this.myNodeInfo.txHash}
         })
       }
     }

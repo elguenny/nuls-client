@@ -23,8 +23,6 @@ Vue.config.productionTip = false
 /**
  *  创建实例
  */
-
-// sessionStorage.setItem('homeJava', "0")
 new Vue({
   el: '#app',
   router,

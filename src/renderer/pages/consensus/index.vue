@@ -1,12 +1,14 @@
 <template>
     <div class="consensus-index" v-loading="loading">
         <div class="account-top" v-show="tabelShow">
-            <label v-show="accountAddressOk">{{$t('message.indexAccountAddress')}}</label>
+            <label v-show="accountAddressOk">{{$t('message.indexAccountAddress')}}：</label>
             <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
+            <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
+               @click="accountCopy" :title="$t('message.c143')"></i>
         </div>
         <div class="consensus-index-title">
             <label>{{$t('message.c1')}}{{$t('message.c1_1')}}：</label>
-            {{this.allTotalDeposit}} NULS，
+            {{this.allTotalDeposit.toString()}} NULS，
             <label>{{$t('message.c2')}}：</label>{{this.allAgentCount}}
         </div>
         <div class="consensus-center">
@@ -19,8 +21,9 @@
                 </li>
                 <li>
                     <label>{{$t('message.c4')}}：</label>{{this.myInfoData.agentCount}} {{$t('message.c30')}}
-                    <span v-show="this.myInfoData.agentCount > 0 ? false:true ">(<span
-                            @click="toNewNode" class="span">{{$t('message.c5')}}</span>)</span>
+                    <span v-if="this.myInfoData.agentCount > 0">(<span
+                            @click="toCheck" class="span">{{$t('message.c5_1')}}</span>)</span>
+                    <span v-else>(<span @click="toNewNode" class="span">{{$t('message.c5')}}</span>)</span>
                 </li>
                 <li>
                     <label>{{$t('message.c8')}}：</label>{{this.myInfoData.joinAgentCount}} {{$t('message.c30')}}
@@ -29,12 +32,12 @@
                         class="span">{{$t('message.c9')}}</span>)
                 </li>
                 <li>
-                    <label>{{$t('message.c6')}}：</label>{{this.myInfoData.usableBalance}} NULS
+                    <label>{{$t('message.c6')}}：</label>{{this.myInfoData.usableBalance.toString()}} NULS
                 </li>
                 <li>
                     <label>{{$t('message.c10')}}：</label>
                     <span @click="toPledgeInfo" class="span">
-                    {{this.myInfoData.totalDeposit}} NULS
+                    {{this.myInfoData.totalDeposit.toString()}} NULS
                     </span>
                 </li>
 
@@ -45,15 +48,15 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane :label="$t('message.c11')" name="first">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in allConsensus"
-                             @click="toNodePage(item.agentAddress)">
-                            <p class="subscript" :class="item.status === 1  ? 'stay' : ''">
+                             @click="toNodePage(item.txHash)">
+                            <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
                                 {{ $t('message.status'+item.status) }}
                             </p>
                             <h3 class="overflow">{{item.agentName}}</h3>
                             <ul>
                                 <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                                <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit).toFixed(2)}} NULS</li>
+                                <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit).toFixed(2)}} NULS</li>
                                 <li class="cb">
                                     <label class="fl">{{$t('message.c19')}}：</label>{{item.memberCount}}
                                 </li>
@@ -63,23 +66,10 @@
                                 </li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t('message.c18')}}:</label>
-                                    <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                                                 :widthData="item.creditRatio"></ProgressBar>
+                                    <ProgressBar :colorData="item.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                                                 :widthData="item.creditVal"></ProgressBar>
                                 </li>
-
                             </ul>
-                            <div class="credit-valuesDiv" :id=index>
-                                <h2>
-                                    <label class="fl">能力系数&nbsp;</label>
-                                    <ProgressBar colorData="#82BD39" widthData="50%"></ProgressBar>
-                                </h2>
-                                <p class="cb">根据近100轮出块数量计算</p>
-                                <h4>
-                                    <label class="fl">责任系数&nbsp;</label>
-                                    <ProgressBar colorData="#82BD39" widthData="80%"></ProgressBar>
-                                </h4>
-                                <p class="cb">根据近100轮违规情况和出块正确性计算</p>
-                            </div>
                         </div>
                         <el-pagination layout="prev, pager, next" :page-size="3" :total=this.totalAll class="cb"
                                        v-show="totalAllOk = this.totalAll>3 ?true:false"
@@ -87,15 +77,17 @@
                     </el-tab-pane>
                     <el-tab-pane :label="$t('message.c12')" name="second">
                         <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
-                             @click="toMyNode(item.agentAddress,index)">
-                            <p class="subscript" :class="item.status === 1  ? 'stay' : ''">
+                             @click="toMyNode(item.txHash,item.agentHash)">
+                            <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
                                 {{ $t('message.status'+item.status) }}
                             </p>
                             <h3 class="overflow">{{item.agentName}}</h3>
                             <ul>
                                 <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentAddresss }}</li>
                                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                                <li><label>{{$t('message.c25')}}：</label>{{ (item.owndeposit*0.00000001).toFixed(2) }} NULS</li>
+                                <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit*0.00000001).toFixed(2) }}
+                                    NULS
+                                </li>
                                 <li class="cb">
                                     <label class="fl">{{$t('message.c19')}}：</label>{{item.memberCount}}
                                 </li>
@@ -104,8 +96,8 @@
                                 </li>
                                 <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
                                     <label class="fl cursor-p">{{$t('message.c18')}}:</label>
-                                    <ProgressBar :colorData="item.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                                                 :widthData="item.creditRatio"></ProgressBar>
+                                    <ProgressBar :colorData="item.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                                                 :widthData="item.creditVal"></ProgressBar>
                                 </li>
 
                             </ul>
@@ -127,6 +119,7 @@
   import ProgressBar from '@/components/ProgressBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import { BigNumber } from 'bignumber.js'
+  import copy from 'copy-to-clipboard'
 
   export default {
     data () {
@@ -135,7 +128,7 @@
         tabelShow: false,
         accountAddressOk: true,
         accountAddress: [],
-        accountAddressValue: '',
+        accountAddressValue: localStorage.getItem('newAccountAddress'),
         activeName: sessionStorage.getItem('consensusTabName'),
         tabName: 'first',
 
@@ -154,7 +147,7 @@
           reward: 0,
           joinAgentCount: 0,
           usableBalance: 0,
-          rewardOfDay:0,
+          rewardOfDay: 0,
         },
 
         creditColor: '#6e84f7',
@@ -169,7 +162,7 @@
         myEvents: 1,
         myTotalAll: 0,
 
-        consensusSetInterval:null,
+        consensusSetInterval: null,
 
       }
     },
@@ -193,38 +186,49 @@
         this.accountAddressValue = localStorage.getItem('newAccountAddress')
         this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
           'pageSize': '3',
-          'pageNumber':'1'
+          'pageNumber': '1'
         })
         /**
          * 5秒查询列表
          * 5second list
          */
         this.consensusSetInterval = setInterval(() => {
-          this.getConsensus('/consensus')
+          //this.getConsensus('/consensus')
           this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
-          if(this.tabName === 'first'){
+          if (this.tabName === 'first') {
             this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': this.allEvents})
-          }else {
+          } else {
             this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
               'pageSize': '3',
-              'pageNumber':this.myEvents
+              'pageNumber': this.myEvents
             })
           }
-        },10000)
+        }, 5000)
       }
     },
-    destroyed() {
+    destroyed () {
       clearInterval(this.consensusSetInterval)
     },
     methods: {
       //获取下拉选择地址
       chenckAccountAddress (chenckAddress) {
+        this.accountAddressValue = chenckAddress
         this.getConsensusAddress('/consensus/address/' + chenckAddress)
         if (sessionStorage.getItem('consensusTabName') === 'first') {
           this.getAllConsensus('/consensus/agent/list', {'pageSize': '3', 'pageNumber': '1'})
         } else {
           this.getMyConsensus('/consensus/agent/address/' + chenckAddress, {'pageSize': '3', 'pageNumber': '1'})
         }
+      },
+      /**
+       * 复制功能
+       * copy
+       */
+      accountCopy () {
+        copy(this.accountAddressValue)
+        this.$message({
+          message: this.$t('message.c129'), type: 'success', duration: '800'
+        })
       },
       //获取共识信息
       getConsensus (url) {
@@ -247,7 +251,7 @@
               let leftShift = new BigNumber(0.00000001)
               this.myInfoData = response.data
               this.myInfoData.reward = parseFloat(leftShift.times(response.data.reward).toString())
-              this.myInfoData.usableBalance = parseFloat(leftShift.times(response.data.usableBalance).toString())
+              this.myInfoData.usableBalance = leftShift.times(response.data.usableBalance).toFixed(8)
               this.myInfoData.totalDeposit = parseFloat(leftShift.times(response.data.totalDeposit).toString())
             }
           })
@@ -256,10 +260,12 @@
       getMyConsensus (url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(response);
+            //console.log(url)
+            //console.log(params)
+            console.log(response)
             this.myTotalAll = 1
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
+              let leftShift = new BigNumber(0.00000001)
               if (response.data.list.length !== 0) {
                 this.noDataOK = false
                 this.myConsensusSizeOK = true
@@ -268,8 +274,8 @@
                 this.myConsensusSizeOK = false
               }
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].creditRatios = response.data.list[i].creditRatio
-                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+                response.data.list[i].creditVals = response.data.list[i].creditVal
+                response.data.list[i].creditVal = (((((response.data.list[i].creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
@@ -294,13 +300,14 @@
           .then((response) => {
             if (response.success) {
               //console.log(response);
-              let leftShift = new BigNumber(0.00000001) ;
+              let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].creditRatios = response.data.list[i].creditRatio
-                response.data.list[i].creditRatio = (((((response.data.list[i].creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+                //console.log(response.data.list[i].creditRatio)
+                response.data.list[i].creditVals = response.data.list[i].creditVal
+                response.data.list[i].creditVal = (((((response.data.list[i].creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
                 response.data.list[i].agentAddresss = (response.data.list[i].agentAddress).substr(0, 6) + '...' + (response.data.list[i].agentAddress).substr(-6)
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
-                response.data.list[i].owndeposit = parseFloat(leftShift.times(response.data.list[i].owndeposit).toString())
+                response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString())
               }
               this.loading = false
               this.tabelShow = true
@@ -350,17 +357,18 @@
         })
       },
       //我的节点跳转
-      toMyNode (address) {
-        if (address === localStorage.getItem('newAccountAddress')) {
-          this.$router.push({
-            name: '/nodeInfo'
-          })
-        } else {
-          this.$router.push({
-            name: '/myNode',
-            params: {'agentAddress': address}
-          })
-        }
+      toMyNode (address,hash) {
+        this.$router.push({
+          name: '/myNode',
+          params: {'agentAddress': address,'agentHash': hash}
+        })
+      },
+      //查看节点
+      toCheck () {
+        this.$router.push({
+          name: '/nodeInfo',
+          params:{"txHash":this.myInfoData.agentHash}
+        })
       },
       //显示隐藏信用系数规则
       toggleShow (index) {
@@ -398,6 +406,19 @@
     @import url("../../assets/css/style");
 
     .consensus-index {
+        .account-top {
+            .copy_icon {
+                position: absolute;
+                top: 75px;
+                right: 120px;
+                width: 30px;
+                height: 20px;
+                display: block;
+                float: left;
+                background-size: @bg-size;
+                background: @bg-image -198px -46px;
+            }
+        }
         .consensus-index-title {
             width: 640px;
             margin: auto;

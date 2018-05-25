@@ -2,10 +2,12 @@
     <!--select-->
     <div class="base-select fl" @click="showDataList">
         <div class="sub-selected-value">
-            <img :src="selectedValue.value" class="language-img">
+            <span>{{selectedValue.value}}</span>
+            <!--<img :src="selectedValue.value" class="language-img" :title="$t('message.c140')">-->
             <ul class="ul" v-bind:style="{width: widthData}" v-if="showData">
                 <li v-for="(item, index) in dataList" @click.stop="select(item, index)">
-                    <img :src="item.value" class="language-img">
+                   <!-- <img :src="item.value" class="language-img">-->
+                    {{item.value}}
                 </li>
             </ul>
         </div>
@@ -23,12 +25,12 @@
                 type: Array,
                 default: [{
                     key: "en",
-                    value: "static/img/Language-en.png"
+                    value: "English"
                 }]
             },
             selectedValue: {
                 type: Object,
-                default: {value: "static/img/Language-en.png"}
+                default: {value: "English"}
             },
             widthData: {
                 type: String,
@@ -69,6 +71,11 @@
             position: absolute;
             top: -0.35rem;
             text-align: center;
+            span{
+                font-size: 12px;
+                width: 21px;
+                margin-top: 18px;
+            }
             ul {
                 position: absolute;
                 top: 2.15rem;
@@ -76,9 +83,9 @@
                 z-index: 9;
                 margin-left: -5px;
                 li {
-                    width: auto;
-                    min-width: 2rem;
+                    width: 70px;
                     height: 30px;
+                    right: 15px;
                     position: relative;
                     text-align: center;
                     border-radius: 0.2rem;

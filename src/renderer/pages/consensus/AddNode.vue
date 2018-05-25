@@ -3,18 +3,19 @@
         <Back :backTitle="this.$t('message.consensusManagement')"></Back>
         <h2>{{this.agentAddressInfo.agentName}}</h2>
         <div class="div-icon1 node-page-top">
-            <p class="subscript">
+            <p class="subscript" :class="this.agentAddressInfo.status === 0  ? 'stay' : ''">
                 {{ $t('message.status'+this.agentAddressInfo.status) }}
             </p>
             <ul>
                 <li class="li-bg overflow">
                     <label>{{$t('message.c16')}}：</label>{{this.agentAddressInfo.agentAddresss}}
+                    <span v-show="toCheckOk" @click="toCheck" class="cursor-p text-d">{{$t('message.c5_1')}}</span>
                 </li>
                 <li>
                     <label>{{$t('message.c17')}}：</label>{{this.agentAddressInfo.commissionRate}}%
                 </li>
                 <li>
-                    <label>{{$t('message.c25')}}：</label>{{this.agentAddressInfo.owndeposit}}
+                    <label>{{$t('message.c25')}}：</label>{{this.agentAddressInfo.deposit}}
                     NULS
                 </li>
                 <li>
@@ -22,8 +23,8 @@
                 </li>
                 <li>
                     <label>{{$t('message.c18')}}：</label>
-                    <ProgressBar :colorData="this.agentAddressInfo.creditRatios < 0 ? '#f64b3e':'#82bd39'"
-                                 :widthData="this.agentAddressInfo.creditRatio"></ProgressBar>
+                    <ProgressBar :colorData="this.agentAddressInfo.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                                 :widthData="this.agentAddressInfo.creditVal"></ProgressBar>
                     <span>&nbsp;{{this.agentAddressInfo.creditRatios}}</span>
                 </li>
                 <li>
@@ -59,6 +60,7 @@
   import Back from './../../components/BackBar.vue'
   import ProgressBar from './../../components/ProgressBar.vue'
   import Password from '@/components/PasswordBar.vue'
+  import * as config from '@/config.js'
   import { BigNumber } from 'bignumber.js'
 
   export default {
@@ -70,11 +72,13 @@
         setTimeout(() => {
           let re = /^\d+(?=\.{0,1}\d+$|$)/
           let res = /^\d{1,8}(\.\d{1,8})?$/
+          let values = new BigNumber(value)
+          let nu = new BigNumber(this.usable)
           if (!re.exec(value) || !res.exec(value)) {
             callback(new Error(this.$t('message.c53')))
           } else if (value < 2000) {
             callback(new Error(this.$t('message.c54')))
-          }else if (value > this.usable - 0.01) {
+          }else if (values.comparedTo(nu.minus(0.01)) === 1) {
             callback(new Error(this.$t('message.c542')))
           } else {
             callback()
@@ -96,7 +100,7 @@
         },
         usable: 0,
         placeholder: '',
-
+        toCheckOk:false,
       }
     },
     components: {
@@ -114,13 +118,16 @@
     methods: {
       //根据agentAddress获取共识节点信息
       getAgentAddressInfo (url) {
+        //console.log(url)
         this.$fetch(url)
           .then((response) => {
+            console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
-              response.data.owndeposit = parseFloat(leftShift.times(response.data.owndeposit).toString())
-              response.data.creditRatios = response.data.creditRatio
-              response.data.creditRatio = (((((response.data.creditRatio + 1) / 2)) * 100).toFixed()).toString() + '%'
+              this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress")
+              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
+              response.data.creditVals = response.data.creditVal
+              response.data.creditVal = (((((response.data.creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
               response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10)
               response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000'
               if (response.data.totalDeposit > 50000000000000) {
@@ -129,6 +136,7 @@
                 response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%'
               }
               this.agentAddressInfo = response.data
+              this.agentId = response.data.txHash
             }
           })
       },
@@ -144,13 +152,29 @@
             }
           })
       },
+      //查看节点
+      toCheck () {
+        this.$router.push({
+          name: '/nodeInfo'
+        })
+      },
       //提交追加
       onSubmit (formName) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$refs[formName].validate((valid) => {
             if (valid) {
-              this.$refs.password.showPassword(true)
+              if (localStorage.getItem('encrypted') === 'true') {
+                this.$refs.password.showPassword(true)
+              } else {
+                this.$confirm(this.$t('message.c165'), '', {
+                  confirmButtonText: this.$t('message.confirmButtonText'),
+                  cancelButtonText: this.$t('message.cancelButtonText')
+                }).then(() => {
+                  this.toSubmit('')
+                }).catch(() => {
+                })
+              }
             } else {
               return false
             }
@@ -165,13 +189,13 @@
       toSubmit (password) {
         let rightShift = new BigNumber(100000000);
         let param = '{"address":"' + localStorage.getItem('newAccountAddress')
-          + '","agentId":"' + this.agentId
+          + '","agentHash":"' + this.agentId
           + '","deposit":"' + parseFloat(rightShift.times(this.addNodeForm.nodeNo).toString())
           + '","password":"' + password + '"}'
-        //console.log(param);
+        console.log(param);
         this.$post('/consensus/deposit/', param)
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),
@@ -179,7 +203,7 @@
               })
               this.$router.push({
                 name: '/myNode',
-                params: {'agentAddress': this.agentAddress},
+                params: {'agentAddress': this.agentAddress,'agentHash': this.agentId}
               })
             } else {
               this.$message({

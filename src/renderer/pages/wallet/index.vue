@@ -2,20 +2,20 @@
     <div class="wallet">
         <div class="search">
             <div class="account-top">
-                <label>{{$t('message.indexAccountAddress')}}</label>
+                <label>{{$t('message.indexAccountAddress')}}：</label>
                 <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
             </div>
             <div class="wallet-i">
                 <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
-                   @click="accountCopy"></i>
+                   @click="accountCopy" :title="$t('message.c143')"></i>
                 <i class="qr_icon cursor-p" @click="accountCode" style="display: none"></i>
-                <i class="zhanghu_icon fr cursor-p" @click="accountChoice"></i>
+                <i class="zhanghu_icon fr cursor-p" @click="accountChoice" :title="$t('message.accountManagement')"></i>
             </div>
             <CodeBar v-show="codeShowOk" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
         </div>
         <div class="wallet-hide" v-show="walletHide">
             <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="toKeyShow"
-               class="cursor-p"></i>
+               class="cursor-p" :title="$t('message.c144')"></i>
         </div>
         <div class="wallet-tab cl">
             <el-tabs v-model="activeName" @tab-click="handleClick" @dblclick="tab-clicks">
@@ -29,21 +29,21 @@
                         <el-table-column :label="$t('message.indexSum')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.balance
+                                       :value=scope.row.balance.toString()
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexUsable')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.usable
+                                       :value=scope.row.usable.toString()
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexLock')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.locked
+                                       :value=scope.row.locked.toString()
                                        readonly="readonly" class="cursor-p text-d"
                                        @click="toLocked(accountAddressValue)">
                             </template>
@@ -59,7 +59,7 @@
                 <el-tab-pane :label="$t('message.transactionRecord')" name="second">
                     <el-table :data="dealList" @filter-change="changeType" v-loading="loading">
                         <el-table-column
-                                prop="type"
+                                prop="txType"
                                 :label="$t('message.transactionType')"
                                 width="110"
                                 align="center"
@@ -67,32 +67,37 @@
                                 :filters="[
                                     {text: this.$t('message.type1'), value: '1'},
                                     {text: this.$t('message.type2'), value: '2'},
-                                    {text: this.$t('message.type3'), value: '3'},
+                                    /*{text: this.$t('message.type3'), value: '3'},
                                     {text: this.$t('message.type4'), value: '4'},
-                                    {text: this.$t('message.type5'), value: '5'},
-                                    {text: this.$t('message.type11'), value: '11'},
+                                    {text: this.$t('message.type5'), value: '5'},*/
+                                    {text: this.$t('message.type51'), value: '51'},
                                     {text: this.$t('message.type90'), value: '90'},
                                     {text: this.$t('message.type91'), value: '91'},
                                     {text: this.$t('message.type92'), value: '92'},
-                                    {text: this.$t('message.type93'), value: '93'},
-                                    {text: this.$t('message.type94'), value: '94'},
+                                   /* {text: this.$t('message.type93'), value: '93'},
+                                    {text: this.$t('message.type94'), value: '94'},*/
                                     {text: this.$t('message.type95'), value: '95'},
                                 ]"
                                 :filter-multiple=false>
                             <template slot-scope="scope">
-                                {{$t('message.type'+scope.row.type)}}
+                                {{$t('message.type'+scope.row.txType)}}
                             </template>
                         </el-table-column>
                         <el-table-column label="txid" min-width="195" align='center'>
                             <template slot-scope="scope">
-								<span @click="toTxid(scope.row.hash)" class="cursor-p text-d overflow">
+								<span @click="toTxid(scope.row.txHash)" class="cursor-p text-d overflow">
 									{{ scope.row.hashs }}
 								</span>
                             </template>
                         </el-table-column>
+                        <el-table-column :label="$t('message.time')" width="145" align='center'>
+                            <template slot-scope="scope">
+                                <span>{{scope.row.time}}</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column :label="$t('message.assetChange')" width="138" align='center'>
                             <template slot-scope="scope">
-                                <span>{{ scope.row.values }}</span>
+                                <span :class="scope.row.info > 0 ? 'add':'minus'">{{ scope.row.info }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.state')" width="85" align='center'>
@@ -100,11 +105,7 @@
                                 <span>{{ $t('message.statusS'+scope.row.status) }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('message.time')" width="145" align='center'>
-                            <template slot-scope="scope">
-                                <span>{{scope.row.times}}</span>
-                            </template>
-                        </el-table-column>
+
                     </el-table>
                     <el-pagination layout="prev, pager, next" :page-size="9" :total=this.totalAll class="cb"
                                    v-show="totalAllOk = this.totalAll>8 ?true:false"
@@ -139,7 +140,7 @@
         totalAll: 0,
         pages: 1,
         types: '',
-        walletSetInterval:null,
+        walletSetInterval: null,
       }
     },
     components: {
@@ -163,38 +164,35 @@
        *Switching transaction record tab
        */
       if (this.activeName === 'second') {
-        this.getAccountTxList('/tx/list/', {
-          'address': this.accountAddressValue,
+        this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
           'pageSize': 9,
           'pageNumber': 1
         })
       }
       /**
-       * 5秒查询交易列表
+       * 查询交易列表
        * 5second query trade list
        */
       this.walletSetInterval = setInterval(() => {
-        if(this.activeName === 'first'){
+        if (this.activeName === 'first') {
           this.getAccountAssets('/account/assets/' + this.accountAddressValue)
-        }else {
+        } else {
           if (this.types !== '') {
-            this.getAccountTxList('/tx/list/', {
-              'address': this.accountAddressValue,
+            this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
               'type': this.types,
               'pageSize': 9,
               'pageNumber': this.pages
             })
           } else {
-            this.getAccountTxList('/tx/list/', {
-              'address': this.accountAddressValue,
+            this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
               'pageSize': 9,
               'pageNumber': this.pages
             })
           }
         }
-      }, 5000)
+      }, 5000000)
     },
-    destroyed() {
+    destroyed () {
       clearInterval(this.walletSetInterval)
     },
     methods: {
@@ -206,13 +204,14 @@
       getAccountAssets (url) {
         this.$fetch(url)
           .then((response) => {
-            //console.log(response);
+            ///console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.length; i++) {
-                response.data[i].balance = parseFloat(leftShift.times(response.data[i].balance).toString())
-                response.data[i].locked = parseFloat(leftShift.times(response.data[i].locked).toString())
-                response.data[i].usable = parseFloat(leftShift.times(response.data[i].usable).toString())
+                //console.log(leftShift.times(response.data[i].balance).toFixed(8))
+                response.data[i].balance = leftShift.times(response.data[i].balance)
+                response.data[i].locked = leftShift.times(response.data[i].locked)
+                response.data[i].usable = leftShift.times(response.data[i].usable)
               }
               this.accountData = response.data
             }
@@ -234,29 +233,20 @@
             if (response.data != null) {
               this.totalAll = response.data.total
               //判断最大页数>=当前选择的最大页数
-              if(response.data.pages >= this.pages){
-                let leftShift = new BigNumber(0.00000001)
-                if (response.data.list.length > 0) {
-                  this.dealList = response.data.list
-                  //this.$store.commit("setAccountTxList",response.data.list);
-                  for (let i = 0; i < response.data.list.length; i++) {
-                    let length = this.dealList[i].hash.length
-                    this.dealList[i].hashs = this.dealList[i].hash.substr(0, 10) + '...' + this.dealList[i].hash.substr(length - 10)
-                    this.dealList[i].values = parseFloat(leftShift.times(response.data.list[i].value).toString())
-                    this.dealList[i].times = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
-                  }
-                  this.loading = false
-                } else {
-                  this.loading = false
-                  this.dealList = []
+              if (response.data.list.length > 0) {
+                //this.$store.commit("setAccountTxList",response.data.list);
+                for (let i = 0; i < response.data.list.length; i++) {
+                  let length = response.data.list[i].txHash.length
+                  response.data.list[i].hashs = response.data.list[i].txHash.substr(0, 10) + '...' + response.data.list[i].txHash.substr(length - 10)
+                  response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
                 }
-              }else {
-                this.getAccountTxList('/tx/list/', {
-                  'address': this.accountAddressValue,
-                  'pageSize': 9,
-                  'pageNumber': response.data.pages
-                })
+                this.dealList = response.data.list
+                this.loading = false
+              } else {
+                this.loading = false
+                this.dealList = []
               }
+
             } else {
               this.loading = false
               this.dealList = []
@@ -271,11 +261,19 @@
        */
       txIdConsensusSize (events) {
         this.pages = events
-        this.getAccountTxList('/tx/list/', {
-          'address': this.accountAddressValue,
-          'pageSize': 9,
-          'pageNumber': events
-        })
+        if (this.types !== '') {
+          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+            'type': this.types,
+            'pageSize': 9,
+            'pageNumber': this.pages
+          })
+        } else {
+          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+            'pageSize': 9,
+            'pageNumber': this.pages
+          })
+        }
+
       },
 
       /**
@@ -289,7 +287,9 @@
         if (this.activeName === 'first') {
           this.getAccountAssets('/account/assets/' + chenckAddress)
         } else {
-          this.getAccountTxList('/tx/list/', {'address': chenckAddress, 'pageSize': 9, 'pageNumber': 1})
+          this.totalAll = 0
+          this.types = ''
+          this.getAccountTxList('/accountledger/tx/list/' + chenckAddress, {'pageSize': 9, 'pageNumber': 1})
         }
       },
 
@@ -299,9 +299,44 @@
        * @param typeValue
        */
       changeType (typeValue) {
+        let liValue = 0
+        if (typeValue.type[0]) {
+          switch (parseInt(typeValue.type[0])) {
+            case 51:
+              liValue = '3'
+              break
+            case 90:
+              liValue = '4'
+              break
+            case 91:
+              liValue = '5'
+              break
+            case 92:
+              liValue = '6'
+              break
+            /*case 93:
+              liValue = '10'
+              break
+            case 94:
+              liValue = '11'
+              break*/
+            case 95:
+              liValue = '7'
+              break
+            default:
+              liValue = typeValue.type[0]
+          }
+
+        }
+        let list2 = document.getElementsByClassName('el-table-filter__list')[0]//用class获取元素
+        let li = list2.getElementsByTagName('li')
+        for (let i = 0; i < li.length; i++) {
+          li[i].className = 'el-table-filter__list-item'
+        }
+        li[liValue].className = 'el-table-filter__list-item is-active'
+
         this.types = typeValue.type[0]
-        this.getAccountTxList('/tx/list/', {
-          'address': this.accountAddressValue,
+        this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
           'type': typeValue.type[0],
           'pageSize': 9,
           'pageNumber': 1
@@ -320,11 +355,10 @@
           this.activeName = 'second'
           this.walletHide = false
           let params = {
-            'address': this.accountAddressValue,
             'pageSize': 9,
             'pageNumber': 1
           }
-          this.getAccountTxList('/tx/list/', params)
+          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, params)
         } else {
           sessionStorage.setItem('walletActiveName', tab.name)
           this.walletHide = true
@@ -360,7 +394,10 @@
        *Account management jump
        */
       accountChoice () {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+        this.$router.push({
+          path: '/wallet/users/userInfo'
+        })
+        /*if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           localStorage.setItem('toUserInfo', '1')
           this.$router.push({
@@ -370,7 +407,7 @@
           this.$message({
             message: this.$t('message.c133'), duration: '800'
           })
-        }
+        }*/
       },
 
       /**
@@ -418,7 +455,7 @@
        * @param address
        */
       toTransfer (address) {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight && sessionStorage.getItem("setNodeNumberOk") === "true") {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$router.push({
             name: '/transfer',
             params: {address: address},
@@ -443,10 +480,13 @@
             margin: 0;
             float: left;
             width: 485px;
-            .address-select {
-                width: 403px;
-                .sub-select-item {
-                    width: 403px;
+            .address-select{
+                .sub-selected-value{
+                    .sub-select-list{
+                        .sub-select-item{
+                            width: 410px;
+                        }
+                    }
                 }
             }
             .el-input__suffix {
@@ -551,10 +591,20 @@
         background-color: #17202e;
         max-height: 310px;
         overflow-y: auto;
-        ul{
+        ul {
             min-width: 80px;
-            li{
+            li {
                 font-size: 12px;
+                text-align: center;
+                &.el-table-filter__list-item {
+                    line-height: 32px;
+                    &.is-active {
+                        background-color: #658ec7;
+                    }
+                }
+                &:hover {
+                    background-color: #222d3f;
+                }
             }
         }
 
@@ -571,7 +621,7 @@
 
         &::-webkit-scrollbar-thumb {
             border-radius: 10px;
-            background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #222d3f))
+            background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #FFFFFF))
         }
     }
 

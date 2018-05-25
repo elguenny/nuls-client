@@ -91,7 +91,9 @@
       ProgressBar,
     },
     created () {
-      this.getAccountAddress('/account/balances/')
+      if(localStorage.getItem('newAccountAddress') !== ''){
+        this.getAccountAddress('/account/assets/'+localStorage.getItem('newAccountAddress'))
+      }
       this.getConsensus('/consensus')
       this.getNetWork()
       setTimeout(() => {
@@ -103,8 +105,9 @@
       setTimeout(() => {
         let map = $('#world-map-markers').vectorMap('get', 'mapObject')
         this.homeSetInterval = setInterval(() => {
-          //console.log(123456)
-          this.getAccountAddress('/account/balances/')
+          if(localStorage.getItem('newAccountAddress') !== ''){
+            this.getAccountAddress('/account/assets/'+localStorage.getItem('newAccountAddress'))
+          }
           this.getConsensus('/consensus')
           this.getNetWork()
           //console.log(this.ipObj)
@@ -112,7 +115,7 @@
             map.clearSelectedMarkers()
             map.addMarkers(this.ipObj)
           }, 1000)
-        }, 9000)
+        }, 5000)
       }, 1000)
 
     },
@@ -129,9 +132,10 @@
       getAccountAddress (url) {
         this.$fetch(url)
           .then((response) => {
+            //console.log(url)
             //console.log(response)
             if (response.success) {
-              this.balanceData = response.data
+              this.balanceData = response.data[0]
               let leftShift = new BigNumber(0.00000001)
               this.balanceData.balance = parseFloat(leftShift.times(this.balanceData.balance).toString())
               this.balanceData.locked = parseFloat(leftShift.times(this.balanceData.locked).toString())
@@ -144,6 +148,7 @@
             }
           })
       },
+
       /**
        * 获取所有共识信息
        * Get all the consensus information

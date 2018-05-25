@@ -6,6 +6,8 @@
             <el-form ref="newNodeForm" :model="newNodeForm" :rules="newNodeRules" size="mini" label-position="top">
                 <el-form-item :label="$t('message.c22')+':'">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
+                    <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="copyValue"
+                       @click="accountCopy" :title="$t('message.c143')"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.c23')+':'" prop="packingAddress">
                     <el-input v-model.trim="newNodeForm.packingAddress"></el-input>
@@ -41,7 +43,9 @@
   import Back from './../../components/BackBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
+  import * as config from '@/config.js'
   import { BigNumber } from 'bignumber.js'
+  import copy from 'copy-to-clipboard'
 
   export default {
     data () {
@@ -56,7 +60,7 @@
             callback(new Error(this.$t('message.c32')))
           } else if (value < 20000) {
             callback(new Error(this.$t('message.c541')))
-          }else if (value > this.usable - 0.01 ) {
+          } else if (value > config.FloatSub(this.usable, 0.01)) {
             callback(new Error(this.$t('message.c543')))
           } else {
             callback()
@@ -80,6 +84,7 @@
       return {
         submitId: 'newNode',
         accountAddress: [],
+        copyValue: localStorage.getItem('newAccountAddress'),
         usable: '0',
         placeholder: '',
         newNodeForm: {
@@ -123,12 +128,24 @@
       //获取下拉选择地址
       chenckAccountAddress (chenckAddress) {
         this.newNodeForm.accountAddressValue = chenckAddress
+        this.copyValue = chenckAddress
         this.getBalanceAddress('/account/balance/' + chenckAddress)
         setTimeout(() => {
           if (this.newNodeForm.deposit !== '') {
             this.$refs.newNodeForm.validateField('deposit')
           }
         }, 500)
+      },
+
+      /**
+       * 复制功能
+       * copy
+       */
+      accountCopy () {
+        copy(this.copyValue)
+        this.$message({
+          message: this.$t('message.c129'), type: 'success', duration: '800'
+        })
       },
       //根据账户地址获取账户余额
       getBalanceAddress (url) {
@@ -146,7 +163,17 @@
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$refs[formName].validate((valid) => {
             if (valid) {
-              this.$refs.password.showPassword(true)
+              if (localStorage.getItem('encrypted') === 'true') {
+                this.$refs.password.showPassword(true)
+              } else {
+                this.$confirm('共识账户没有设置密码，确定创建节点么？', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消'
+                }).then(() => {
+                  this.toSubmit('')
+                }).catch(() => {
+                })
+              }
             }
             else {
               return false
@@ -168,10 +195,10 @@
           + '","agentName":"' + this.newNodeForm.agentName
           + '","remark":"' + this.newNodeForm.remark
           + '","password":"' + password + '"}'
-        //console.log(param)
+        console.log(param)
         this.$post('/consensus/agent ', param)
           .then((response) => {
-            //console.log(response)
+            console.log(response)
             if (response.success) {
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
@@ -213,6 +240,18 @@
                         width: 396px;
                     }
                 }
+
+            }
+            .copy_icon {
+                position: absolute;
+                top: 3px;
+                right: 40px;
+                width: 30px;
+                height: 20px;
+                display: block;
+                float: left;
+                background-size: @bg-size;
+                background: @bg-image -198px -46px;
             }
             .form-left {
                 width: 50%;

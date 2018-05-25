@@ -1,10 +1,10 @@
 <template>
     <div class="set-password">
-        <Back :backTitle="this.$t('message.setManagement')" ></Back>
-        <h2>{{$t("message.c80")}}</h2>
-        <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm"  class="set-pass">
+        <Back :backTitle="this.backInfo"></Back>
+        <h2>{{this.address +" : "+$t("message.c80")}}</h2>
+        <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
             <el-form-item :label="$t('message.oldPassWord')+'：'" prop="oldPass">
-                <el-input type="password" v-model="passForm.oldPass" :maxlength=20 ></el-input>
+                <el-input type="password" v-model="passForm.oldPass" :maxlength=20></el-input>
             </el-form-item>
             <el-form-item :label="$t('message.c90')+'：'" prop="pass">
                 <el-input type="password" v-model="passForm.pass" :maxlength=20></el-input>
@@ -13,120 +13,122 @@
                 <el-input type="password" v-model="passForm.checkPass" :maxlength=20></el-input>
             </el-form-item>
             <el-form-item class="submitForm">
-                <el-button type="primary" @click="submitForm('passForm')" id="editorPassword">{{$t('message.passWordAffirm')}}</el-button>
+                <el-button type="primary" @click="submitForm('passForm')" id="editorPassword">
+                    {{$t('message.passWordAffirm')}}
+                </el-button>
             </el-form-item>
         </el-form>
     </div>
 
 </template>
 <script>
-    import Back from '@/components/BackBar.vue';
-    export default {
-        data() {
-            let validateOldPass = (rule, value, callback) => {
-                if ( value !== localStorage.getItem('userPass')) {
-                    callback(new Error(this.$t('message.c92')));
-                } else {
-                    if (this.passForm.checkPass !== '') {
-                        this.$refs.passForm.validateField('checkPass');
-                    }
-                    callback();
-                }
-            };
-            let validatePass = (rule, value, callback) => {
-                let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
-                if (value === '') {
-                    callback(new Error(this.$t('message.walletPassWord')));
-                } else if (!patrn.exec(value)) {
-                    callback(new Error(this.$t('message.walletPassWord')));
-                } else {
-                    if (this.passForm.checkPass !== '') {
-                        this.$refs.passForm.validateField('checkPass');
-                    }
-                    callback();
-                }
-            };
-            let validatePass2 = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error(this.$t('message.affirmWalletPassWordEmpty')));
-                } else if (value !== this.passForm.pass) {
-                    callback(new Error(this.$t('message.passWordAtypism')));
-                } else {
-                    callback();
-                }
-            };
-            return {
-                passForm: {
-                    oldPass:'',
-                    pass: '',
-                    checkPass: '',
-                    //passHelp: ''
-                },
-                rulesPass: {
-                    oldPass:[
-                        { validator: validateOldPass, trigger: 'blur' }
-                    ],
-                    pass: [
-                        { validator: validatePass, trigger: 'blur' }
-                    ],
-                    checkPass: [
-                        { validator: validatePass2, trigger: 'blur' }
-                    ]
-                }
-            };
-        },
-        components: {
-            Back,
-        },
-        created() {
-            document.onkeydown=function(e){
-                let key=window.event.keyCode;
-                if(key === 13){
-                    document.getElementById('editorPassword').click();
-                }
-            }
-        },
-        methods: {
-            /** Editor password
-             * @method submitForm
-             * @param {string} user password
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        var param = '{"password":"' + this.passForm.oldPass + '","newPassword":"' + this.passForm.pass + '"}';
-                        //console.log(param);
-                        this.$post('/wallet/reset/', param)
-                            .then((response) => {
-                                if (response.success) {
-                                    this.$message({
-                                        type: 'success', message: this.$t('message.passWordSuccess') + response.msg
-                                    });
-                                    localStorage.setItem('userPass', this.passForm.pass);
-                                    //localStorage.setItem('passWordHint', this.passForm.passWordHint);
-                                    this.$router.push({
-                                        path: '/users/setPage'
-                                    })
-                                } else {
-                                    this.$message({
-                                        type: 'success',message: this.$t('message.passWordFailed') + response.msg
-                                    });
-                                }
+  import Back from '@/components/BackBar.vue'
 
-                            });
-                    } else {
-                        /*this.$message({
-                            type: 'success', message: this.$t('message.passWordFailed')
-                        });*/
-                        return false;
-                    }
-                });
-            }
+  export default {
+    data () {
+      let validateOldPass = (rule, value, callback) => {
+      if (this.passForm.checkPass !== '') {
+        this.$refs.passForm.validateField('checkPass')
+      }
+      callback()
+      }
+      let validatePass = (rule, value, callback) => {
+        let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/
+        if (value === '') {
+          callback(new Error(this.$t('message.walletPassWord')))
+        } else if (!patrn.exec(value)) {
+          callback(new Error(this.$t('message.walletPassWord')))
+        } else {
+          if (this.passForm.checkPass !== '') {
+            this.$refs.passForm.validateField('checkPass')
+          }
+          callback()
         }
+      }
+      let validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error(this.$t('message.affirmWalletPassWordEmpty')))
+        } else if (value !== this.passForm.pass) {
+          callback(new Error(this.$t('message.passWordAtypism')))
+        } else {
+          callback()
+        }
+      }
+      return {
+        address: this.$route.params.address,
+        backInfo: this.$route.params.backInfo,
+        passForm: {
+          oldPass: '',
+          pass: '',
+          checkPass: '',
+          //passHelp: ''
+        },
+        rulesPass: {
+          oldPass: [
+            {validator: validateOldPass, trigger: 'blur'}
+          ],
+          pass: [
+            {validator: validatePass, trigger: 'blur'}
+          ],
+          checkPass: [
+            {validator: validatePass2, trigger: 'blur'}
+          ]
+        }
+      }
+    },
+    components: {
+      Back,
+    },
+    created () {
+      document.onkeydown = function (e) {
+        let key = window.event.keyCode
+        if (key === 13) {
+          document.getElementById('editorPassword').click()
+        }
+      }
+    },
+    methods: {
+      /** Editor password
+       * @method submitForm
+       * @param {string} user password
+       * @author Wave
+       * @date 2018-2-11
+       * @version 1.0
+       **/
+      submitForm (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let param = '{"password":"' + this.passForm.oldPass + '","newPassword":"' + this.passForm.pass + '"}'
+            //console.log(param);
+            this.$put('/account/password/' + this.address, param)
+              .then((response) => {
+                console.log(response)
+                if (response.success) {
+                  this.$message({
+                    type: 'success', message: this.$t('message.passWordSuccess')
+                  })
+                  localStorage.setItem('userPass', this.passForm.pass)
+                  //localStorage.setItem('passWordHint', this.passForm.passWordHint);
+                  this.$router.push({
+                    path: '/users/setPage'
+                  })
+                } else {
+                  this.$message({
+                    type: 'success', message: this.$t('message.passWordFailed') + response.msg
+                  })
+                }
+
+              })
+          } else {
+            /*this.$message({
+                type: 'success', message: this.$t('message.passWordFailed')
+            });*/
+            return false
+          }
+        })
+      }
     }
+  }
 </script>
 <style lang="less">
     @import url("../../assets/css/style");
@@ -189,7 +191,7 @@
             .el-form-item {
                 margin-bottom: 1rem;
             }
-            .submitForm{
+            .submitForm {
                 margin-top: 50px;
             }
         }

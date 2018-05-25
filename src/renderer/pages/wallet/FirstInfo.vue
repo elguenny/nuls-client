@@ -3,107 +3,113 @@
         <div class="first-info-top">
             <Back :backTitle="this.$t('message.accountManagement')" v-show="backOk"></Back>
         </div>
-        <h2>{{$t("message.firstInfoTitle")}}</h2>
+        <h2>{{$t('message.firstInfoTitle')}}</h2>
         <ul>
             <li @click="newAccount">
-                <span>{{$t("message.createNewAccount")}}</span>
-                <label>{{$t("message.createNewAccountInfo")}}</label>
+                <span>{{$t('message.createNewAccount')}}</span>
+                <label>{{$t('message.createNewAccountInfo')}}</label>
             </li>
             <li @click="importAccount">
-                <span>{{$t("message.importAccount")}}</span>
-                <label>{{$t("message.importAccountInfo")}}</label>
+                <span>{{$t('message.importAccount')}}</span>
+                <label>{{$t('message.importAccountInfo')}}</label>
             </li>
         </ul>
         <div class="backOk" v-show="backOks"></div>
-        <Password ref="password" @toSubmit="toSubmit"></Password>
+        <PasswordTow ref="passTwo" @toSubmit="toSubmit"></PasswordTow>
     </div>
 </template>
 
 <script>
-    import moment from 'moment';
-    import Back from '@/components/BackBar.vue';
-    import Password from '@/components/PasswordBar.vue';
+  import moment from 'moment'
+  import md5 from 'js-md5';
+  import Back from '@/components/BackBar.vue'
+  import PasswordTow from '@/components/PasswordTwoBar.vue'
 
-    export default {
-        data: function () {
-            return {
-                passwordValue: '',
-                backOk: localStorage.getItem('toUserInfo') === '1' ? false : true,
-                backOks: localStorage.getItem('toUserInfo') === '1' ? false : true,
-            }
-        },
-        components: {
-            Back,
-            Password,
-        },
-        created(){
-            document.onkeydown=function(e){
-                let key=window.event.keyCode;
-                console.log(this.passwordVisible);
-                /*if(key === 13){
-                    console.log(13);
-                    document.getElementsByClassName('passwordInfo').click();
-                }*/
-            }
-        },
-        methods: {
-            /** newAccount
-             * @method newAccount
-             * @author Wave
-             * @date 2018-2-11
-             * @version 1.0
-             **/
-            newAccount() {
-                this.$refs.password.showPassword(true);
-            },
-            //
-            toSubmit(password) {
-                this.passwordValue = password;
-                let params = '{"count":1,"password":"' + password + '"}';
-                this.postAccount('/account', params)
-            },
-            //输入密码提交方法
-            postAccount(url,params){
-                this.$post(url, params)
-                    .then((response) => {
-                        if (response.success) {
-                            this.$message({
-                                type: 'success', message: this.$t('message.passWordSuccess')
-                            });
-                            localStorage.setItem('newAccountAddress', response.data);
-                            localStorage.setItem('userPass', this.passwordValue);
-                            this.getAccountList("/account/list");
-                            this.$router.push({
-                                name: '/newAccount',
-                                params: {newOk: true, address: ""},
-                            })
-                        } else {
-                            this.$message({
-                                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
-                            });
-                        }
-                    });
-            },
-            //获取账户地址列表
-            getAccountList(url) {
-                this.$fetch(url)
-                    .then((response) => {
-                        //console.log(response);
-                        if(response.success){
-                            this.$store.commit("setAddressList",response.data.list);
-                        }
-                    }).catch((reject) => {
-                    console.log("User List err"+reject);
-                });
-            },
-            //导入账户跳转
-            importAccount() {
-                this.$router.push({
-                    path: '/firstInto/firstInfo/importAccount'
-                })
-            },
+  export default {
+    data: function () {
+      return {
+        passwordValue: '',
+        backOk: localStorage.getItem('newAccountAddress') === '' ? false : true,
+        backOks: localStorage.getItem('newAccountAddress') === '' ? false : true,
+      }
+    },
+    components: {
+      Back,
+      PasswordTow,
+    },
+    created () {
+      document.onkeydown = function (e) {
+        let key = window.event.keyCode
+        if (key === 13) {
+          document.getElementById('setPassTwo').click()
         }
+      }
+    },
+    methods: {
+      /**
+       *  newAccount
+       **/
+      newAccount () {
+        this.$refs.passTwo.showPasswordTwo(true)
+      },
+      //
+      toSubmit (password) {
+        let params = ''
+        if(password === ''){
+           params = '{"count":1,"password":""}'
+        }else{
+          params = '{"count":1,"password":"' + password + '"}'
+        }
+        this.postAccount('/account', params)
+      },
+      //输入密码提交方法
+      postAccount (url, params) {
+        this.$post(url, params)
+          .then((response) => {
+            //console.log(response)
+            if (response.success) {
+              localStorage.setItem('newAccountAddress', response.data[0])
+              localStorage.setItem('userPass', md5(this.passwordValue+'nuls'))
+              this.getAccountList('/account')
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              })
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
+            }
+          })
+      },
+      //获取账户地址列表
+      getAccountList (url) {
+        this.$fetch(url)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.$store.commit('setAddressList', response.data.list)
+              if(response.data.list.length === 1){
+                this.$router.push({
+                  name: '/wallet'
+                })
+              }else{
+                this.$router.push({
+                  path: '/wallet/users/userInfo'
+                })
+              }
+            }
+          }).catch((reject) => {
+          console.log('User List err' + reject)
+        })
+      },
+      //导入账户跳转
+      importAccount () {
+        this.$router.push({
+          path: '/firstInto/firstInfo/importAccount'
+        })
+      },
     }
+  }
 </script>
 <style lang="less">
     .first-info {
