@@ -10,7 +10,7 @@
                        @click="accountCopy" :title="$t('message.c143')"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.c23')+':'" prop="packingAddress">
-                    <el-input v-model.trim="newNodeForm.packingAddress"></el-input>
+                    <el-input v-model.trim="newNodeForm.packingAddress" :placeholder="this.$t('message.c167')"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c24')+':'" prop="agentName">
                     <el-input v-model.trim="newNodeForm.agentName" :maxlength="25"></el-input>
@@ -23,7 +23,7 @@
                     <el-input v-model.number="newNodeForm.commissionRate" :maxlength="5"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c27')+':'" class="cb" prop="remark">
-                    <el-input v-model.trim="newNodeForm.remark" type="textarea" :rows="2" :maxlength="80"></el-input>
+                    <el-input v-model.trim="newNodeForm.remark" type="textarea" :rows="2" :maxlength="30"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.miningFee')">
 

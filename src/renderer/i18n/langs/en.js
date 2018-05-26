@@ -332,6 +332,7 @@ const en = {
     c164:'The password is not set in this account, and the alias is set',
     c165:'There is no password in this account. Do you want to join the node',
     c166:'There is no password in the consensus account. Do you want to create nodes',
+    c167:'A block address can not have a password',
 
     //Bottom info
     refresh:'Refresh',
