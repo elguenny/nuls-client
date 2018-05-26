@@ -33,7 +33,7 @@
                         <label class="fl">{{$t('message.pledge')}}：</label>
                         <span class="number">{{this.allNodeList.entrust}} NULS</span>
                     </li>
-                    <li class="cl">
+                    <li class="cl" v-show="false">
                         <label class="fl">{{$t('message.income')}}：</label>
                         <span class="number">{{this.allNodeList.income}} NULS</span>
                     </li>

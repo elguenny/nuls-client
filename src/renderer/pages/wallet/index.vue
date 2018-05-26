@@ -394,10 +394,7 @@
        *Account management jump
        */
       accountChoice () {
-        this.$router.push({
-          path: '/wallet/users/userInfo'
-        })
-        /*if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           localStorage.setItem('toUserInfo', '1')
           this.$router.push({
@@ -407,7 +404,7 @@
           this.$message({
             message: this.$t('message.c133'), duration: '800'
           })
-        }*/
+        }
       },
 
       /**
@@ -572,6 +569,9 @@
         .wallet-tab {
             .el-tabs__item {
                 color: #FFFFFF;
+                &:hover{
+                    color: #409EFF;
+                }
             }
             .el-tabs__item.is-active {
                 color: #FFFFFF;

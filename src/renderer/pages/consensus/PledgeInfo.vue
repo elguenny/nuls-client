@@ -58,7 +58,7 @@
           .then((response) => {
             //console.log(url)
             //console.log(params)
-            console.log(response)
+            //console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               this.total = response.data.total
@@ -81,7 +81,7 @@
       handleClick (row) {
         this.$router.push({
           name: '/myNode',
-          params: {agentAddress: row.agentHash,agentHash:row.txHash},
+          params: {agentAddress: row.agentHash,agentHash:row.agentHash},
           //params: {'agentAddress': this.agentAddress,'agentHash': this.agentId}
         })
       }

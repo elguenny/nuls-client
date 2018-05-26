@@ -145,9 +145,9 @@
       },
       //备份账户
       backupUser (address, encrypted) {
+        this.setAsAddress = address
+        this.outOrBackup = 2
         if (encrypted) {
-          this.setAsAddress = address
-          this.outOrBackup = 2
           this.$refs.password.showPassword(true)
         } else {
           this.$confirm(this.$t('message.c163'), '', {

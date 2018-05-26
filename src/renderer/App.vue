@@ -84,7 +84,7 @@
         }
         else {
           if (this.retryCount === 0 || this.retryCount === 6 || this.retryCount === 10) {
-            ipc.send('CoreLauncher', 'nuls')
+            ipc.send('CoreLauncher', 'start')
           } else if (this.retryCount === 15) {
             this.$alert(this.$t('message.c137'), this.$t('message.c138'), {
               confirmButtonText: this.$t('message.confirmButtonText'),
