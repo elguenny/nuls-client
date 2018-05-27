@@ -89,8 +89,8 @@
                 localStorage.setItem('toUserInfo', '0')
               } else {
                 localStorage.setItem('fastUser', '1')
-                localStorage.setItem('newAccountAddress', response.data.list[0].address)
-                localStorage.setItem('encrypted', response.data.list[0].encrypted)
+                /*localStorage.setItem('newAccountAddress', response.data.list[0].address)
+                localStorage.setItem('encrypted', response.data.list[0].encrypted)*/
               }
               this.getAllUserList('/account')
               this.userData = response.data.list
