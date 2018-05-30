@@ -154,3 +154,5 @@ java
 zhihu/
 yarn.lock
 .project
+src/renderer/pages/users/UserInfo.vue.rej
+src/renderer/App.vue.rej

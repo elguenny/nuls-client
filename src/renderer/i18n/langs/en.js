@@ -173,7 +173,7 @@ const en = {
     c24: 'Node name',
     c25: 'Deposit',
     c26: 'Commission ratio',
-    c27: 'Introduce',
+    c27: 'Introduction',
     c28: 'Fee',
     c29: 'Confirm',
     //
@@ -333,6 +333,7 @@ const en = {
     c165:'There is no password in this account. Do you want to join the node',
     c166:'There is no password in the consensus account. Do you want to create nodes',
     c167:'A block address can not have a password',
+    c168:'The address must be combined with letters and numbers\n',
 
     //Bottom info
     refresh:'Refresh',

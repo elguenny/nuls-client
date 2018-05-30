@@ -1,6 +1,7 @@
 <template>
     <div class="all-pledge">
         <Back :backTitle="backTitle"></Back>
+        <!--<Back :backTitle="backTitle"  :backUrl="backUrl" :backParams="backParams"></Back>-->
         <h2>{{$t('message.c55')}}</h2>
         <el-table :data="pledgeData" :stripe="false">
             <el-table-column prop="address" :label="$t('message.tabName')" min-width="120" align='center'>
@@ -29,6 +30,8 @@
     data () {
       return {
         backTitle: this.$route.params.agentName,
+        backUrl:'/nodeInfo',
+        backParams:this.$route.params.txHash,
         txHash: this.$route.params.txHash,
         pledgeData: [],
         total: 0,
@@ -38,7 +41,7 @@
       Back,
     },
     mounted () {
-      let _this = this
+      let _this = this;
       this.getConsensusDeposit('/consensus/deposit/agent/' + this.txHash, {
         'pageSize': '10',
         'pageNumber': '1'

@@ -53,7 +53,7 @@
       Password,
     },
     mounted () {
-      let _this = this
+      let _this = this;
       this.getMyNodeInfo('/consensus/agent/' + this.txHash)
     },
     methods: {
@@ -63,10 +63,10 @@
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001)
+              let leftShift = new BigNumber(0.00000001);
               //response.data.reward = parseFloat(leftShift.times(response.data.reward).toString())
-              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
-              response.data.totalDeposit = parseFloat(leftShift.times(response.data.totalDeposit).toString())
+              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString());
+              response.data.totalDeposit = parseFloat(leftShift.times(response.data.totalDeposit).toString());
               this.myNodeInfo = response.data
             }
           })
@@ -100,7 +100,7 @@
               this.$message({
                 type: 'success',
                 message: this.$t('message.passWordSuccess')
-              })
+              });
               this.$router.push({
                 name: '/consensus',
                 params: {'activeName': 'first'}

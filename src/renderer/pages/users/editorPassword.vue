@@ -1,6 +1,6 @@
 <template>
     <div class="set-password">
-        <Back :backTitle="this.backInfo"></Back>
+        <Back :backTitle="this.$t('message.setManagement')"></Back>
         <h2>{{this.address +" : "+$t("message.c80")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
             <el-form-item :label="$t('message.oldPassWord')+'：'" prop="oldPass">

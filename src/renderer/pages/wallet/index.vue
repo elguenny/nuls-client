@@ -29,21 +29,21 @@
                         <el-table-column :label="$t('message.indexSum')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.balance.toString()
+                                       :value=scope.row.balance.toFixed(8)
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexUsable')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.usable.toString()
+                                       :value=scope.row.usable.toFixed(8)
                                        readonly="readonly">
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('message.indexLock')" width="150" align='center'>
                             <template slot-scope="scope">
                                 <input :type="keyShow ? 'text' : 'password'"
-                                       :value=scope.row.locked.toString()
+                                       :value=scope.row.locked.toFixed(8)
                                        readonly="readonly" class="cursor-p text-d"
                                        @click="toLocked(accountAddressValue)">
                             </template>
@@ -396,9 +396,9 @@
       accountChoice () {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
-          localStorage.setItem('toUserInfo', '1')
+          localStorage.setItem('toUserInfo', '1');
           this.$router.push({
-            path: '/wallet/users/userInfo'
+            name: '/userInfo'
           })
         } else {
           this.$message({

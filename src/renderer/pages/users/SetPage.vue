@@ -105,7 +105,7 @@
     },
     beforeCreate () {
       ipcRenderer.on('message', (event, text) => {
-        this.type = text.type
+        this.type = text.type;
         if(this.type===2){
           this.tips = this.$t('message.c155')
         }else if(this.type===3){
@@ -126,11 +126,9 @@
     },
     created () {
       if(localStorage.getItem('encrypted') ==="true"){
-        this.encrypted = true
-        console.log("encrypted="+this.encrypted)
+        this.encrypted = true;
       }else{
-        this.encrypted = false
-        console.log("encrypted===="+this.encrypted)
+        this.encrypted = false;
       }
     },
     destroyed () {
@@ -141,10 +139,11 @@
       chenckAccountAddress (chenckAddress) {
         localStorage.setItem('newAccountAddress', chenckAddress)
       },
-      //查看日志
+      //去备份
       toBackups () {
+        sessionStorage.setItem('isActive',1);
         this.$router.push({
-          path: '/wallet/users/userInfo'
+          name: '/userInfo'
         })
       },
       //通讯录管理
@@ -176,8 +175,8 @@
       },
       //版本更新
       versionUpdates () {
-        this.outerVisible = true
-        ipcRenderer.send('checkForUpdate')
+        this.outerVisible = true;
+        ipcRenderer.send('checkForUpdate');
         setTimeout(() => {
           if (this.type !== 3) {
             this.outerVisible = false

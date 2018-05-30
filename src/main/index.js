@@ -38,7 +38,7 @@ function createWindow () {
     minHeight: 560,
     maxWidth: 800,
     maxHeight: 560,
-  })
+  });
 
   /**
    *  窗口最小化

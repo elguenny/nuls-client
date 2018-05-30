@@ -94,7 +94,8 @@
                 })
               }else{
                 this.$router.push({
-                  path: '/wallet/users/userInfo'
+                  name: '/userInfo',
+                  params: {'address': ''},
                 })
               }
             }

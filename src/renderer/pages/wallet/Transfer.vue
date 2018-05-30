@@ -68,12 +68,22 @@
           }
           callback()
         }
-      }
+      };
       let checkJoinAddress = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.transferNull')))
+        }else{
+          this.address = localStorage.getItem('newAccountAddress');
+          let re = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
+          if (!re.exec(value)) {
+            callback(new Error(this.$t('message.c168')))
+          }else if (value === this.address) {
+            callback(new Error(this.$t('message.addressOrTransfer')))
+          }else{
+            callback()
+          }
         }
-        setTimeout(() => {
+        /*setTimeout(() => {
           //console.log(this.address !== undefined);
           if (this.address !== undefined) {
             if (value === this.address) {
@@ -89,32 +99,37 @@
               callback()
             }
           }
-        }, 500)
-      }
+        }, 500)*/
+      };
       let checkJoinNo = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.transferNO')))
         }
         setTimeout(() => {
           //console.log(value);
-          let re = /(^\+?|^\d?)\d*\.?\d+$/
-          let res = /^\d{1,8}(\.\d{1,8})?$/
-          let values = new BigNumber(value)
-          let nu = new BigNumber(this.usable)
+          let re = /(^\+?|^\d?)\d*\.?\d+$/;
+          let res = /^\d{1,8}(\.\d{1,8})?$/;
           if (!re.exec(value)) {
             callback(new Error(this.$t('message.transferNO1')))
-          } else if (values.comparedTo(nu.minus(0.01)) === 1) {
-            callback(new Error(this.$t('message.transferNO2')))
-          } else if (value < 0.01) {
-            callback(new Error(this.$t('message.transferNO3')))
-          } else if (!res.exec(value)) {
-            callback(new Error(this.$t('message.c136')))
           } else {
-            callback()
+            let values = new BigNumber(value);
+            let nu = new BigNumber(this.usable);
+            if (values.comparedTo(nu.minus(0.01)) === 1) {
+              callback(new Error(this.$t('message.transferNO2')))
+            } else if (value < 0.01) {
+              callback(new Error(this.$t('message.transferNO3')))
+            } else if (!res.exec(value)) {
+              callback(new Error(this.$t('message.c136')))
+            } else {
+              callback()
+            }
           }
+
+
+
         }, 100)
 
-      }
+      };
       return {
         accountAddressValue: localStorage.getItem('newAccountAddress'),
         submitId: 'transferSubmit',
@@ -352,7 +367,7 @@
             margin: auto;
             .joinNo {
                 .el-input__inner {
-                    background-color: #17202e;
+                   /* background-color: #17202e;*/
                     //border: 1px solid #24426c;
                 }
             }
@@ -435,7 +450,7 @@
                             }
                         }
                         .el-input__inner {
-                            border: 1px solid #24426c;
+                            /*border: 1px solid #24426c;*/
                             color: #FFFFFF;
                             &:hover {
                                 border-color: #658ec7;
