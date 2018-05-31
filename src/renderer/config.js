@@ -1,15 +1,15 @@
-const IS_DEV = process.env.NODE_ENV !== 'production'
+const IS_DEV = process.env.NODE_ENV !== 'production';
 //Request url
-export const API_ROOT = IS_DEV ? 'http://127.0.0.1:8001' : 'http://127.0.0.1:8001'
+export const API_ROOT = IS_DEV ? 'http://192.168.1.163:8001' : 'http://127.0.0.1:8001';
 //Request response time
-export const API_TIME = IS_DEV ? '6000' : '8000'
+export const API_TIME = IS_DEV ? '6000' : '8000';
 
 /**
  * 浮点数加法运算
  * Execute the float addition
  */
 export function FloatAdd (arg1, arg2) {
-  let r1, r2, m
+  let r1, r2, m;
   try {
     r1 = arg1.toString().split('.')[1].length
   } catch (e) {

@@ -11,7 +11,7 @@
                 <el-form-item :label="$t('message.c104')+'：'" class="label-aliasing" prop="alias"
                               style="margin-top: 30px">
                     <el-input v-model="aliasForm.alias" class="bt-aliasing"
-                              :placeholder="$t('message.c105')" :maxlength="8"></el-input>
+                              :placeholder="$t('message.c105')" :maxlength="30"></el-input>
                 </el-form-item>
                 <div class="div-text">
                     <label>{{$t('message.miningFee1')}}:</label>1.01NULS
@@ -30,15 +30,16 @@
 <script>
   import Back from '@/components/BackBar.vue'
   import Password from '@/components/PasswordBar.vue'
-  import { BigNumber } from 'bignumber.js'
+  import {BigNumber} from 'bignumber.js'
 
   export default {
-    data () {
+    data() {
       let aliasing = (rule, value, callback) => {
+        console.log(value.replace(/[^\x00-\xff]/g, '01').length);
         if (this.usable >= 1.01) {
           if (value === '') {
             callback(new Error(this.$t('message.c104')))
-          } else if (value.length > 8) {
+          } else if (value.replace(/[^\x00-\xff]/g, '01').length > 30) {
             callback(new Error(this.$t('message.c106')))
           } else {
             callback()
@@ -46,7 +47,7 @@
         } else {
           callback(new Error(this.$t('message.c107')))
         }
-      }
+      };
       return {
         submitId: 'aliasAliasing',
         address: this.$route.params.address,
@@ -66,17 +67,17 @@
       Back,
       Password,
     },
-    mounted () {
+    mounted() {
       let _this = this
       this.getBalanceAddress('/account/balance/' + this.address)
     },
     methods: {
       //根据账户地址获取账户余额
-      getBalanceAddress (url) {
+      getBalanceAddress(url) {
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001)
+              let leftShift = new BigNumber(0.00000001);
               this.usable = parseFloat(leftShift.times(response.data.usable).toString())
               //this.usable = response.data.usable * 0.000000001
             } else {
@@ -85,7 +86,7 @@
           })
       },
       //修改别名
-      aliasingSubmit (formName) {
+      aliasingSubmit(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             if (this.encrypted) {
@@ -95,8 +96,8 @@
                 confirmButtonText: this.$t('message.confirmButtonText'),
                 cancelButtonText: this.$t('message.cancelButtonText')
               }).then(() => {
-                let param = {'alias': this.aliasForm.alias, 'password': ''}
-                this.aliasing('/account/alias/' + this.address,param)
+                let param = {'alias': this.aliasForm.alias, 'password': ''};
+                this.aliasing('/account/alias/' + this.address, param)
               }).catch(() => {
 
               })
@@ -106,20 +107,20 @@
         })
       },
       //
-      toSubmit (password) {
+      toSubmit(password) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
-          let param = {'alias': this.aliasForm.alias, 'password': password}
-          this.aliasing('/account/alias/' + this.address,param)
+          let param = {'alias': this.aliasForm.alias, 'password': password};
+          this.aliasing('/account/alias/' + this.address, param)
         } else {
           this.$message({
             message: this.$t('message.c133'),
           })
         }
       },
-      aliasing (url, param) {
+      aliasing(url, param) {
         this.$post(url, param)
           .then((response) => {
-            //console.log(response)
+            console.log(response);
             if (response.success) {
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')

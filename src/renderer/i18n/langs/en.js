@@ -218,7 +218,7 @@ const en = {
     c60: 'Decide to quit',
     c61: 'Exit node',
     //nodeInfo
-    c62: 'Close node',
+    c62: 'Unregister node',
     c63: 'Please enter the key word！',
     c64: 'Deposit',
     c65: 'More excellent functions are expected soon',
@@ -266,8 +266,8 @@ const en = {
     c103: 'To ensure your account is safe, your name can not be changed after you have created one, please choose carefully.',
     c104: 'Please enter a name',
     c105: 'Please enter a name with no more than 8 characters, which may include Chinese, English, and underline',
-    c106: 'Sorry, the name length can not be more than 8 characters.',
-    c107: 'I\'m sorry, your balance is to low to complete this action.',
+    c106: 'Sorry, the alias length is 1 to 30 characters',
+    c107: 'I am sorry, your balance is to low to complete this action.',
 
     //newAccount
     c108: 'Save success! Route',

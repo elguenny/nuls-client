@@ -85,23 +85,6 @@
             callback()
           }
         }
-        /*setTimeout(() => {
-          //console.log(this.address !== undefined);
-          if (this.address !== undefined) {
-            if (value === this.address) {
-              callback(new Error(this.$t('message.addressOrTransfer')))
-            } else {
-              callback()
-            }
-          } else {
-            this.address = localStorage.getItem('newAccountAddress')
-            if (value === this.address) {
-              callback(new Error(this.$t('message.addressOrTransfer')))
-            } else {
-              callback()
-            }
-          }
-        }, 500)*/
       };
       let checkJoinNo = (rule, value, callback) => {
         if (!value) {
@@ -126,8 +109,6 @@
               callback()
             }
           }
-
-
         }, 100)
 
       };

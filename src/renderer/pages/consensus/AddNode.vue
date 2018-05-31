@@ -130,7 +130,7 @@
               response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
               response.data.creditVals = response.data.creditVal
               response.data.creditVal = (((((response.data.creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
-              response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10)
+              response.data.agentAddresss = (response.data.agentAddress).substr(0, 9) + '...' + (response.data.agentAddress).substr(-9)
               response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000'
               if (response.data.totalDeposit > 50000000000000) {
                 response.data.totalDeposit = '100%'
@@ -157,7 +157,8 @@
       //查看节点
       toCheck () {
         this.$router.push({
-          name: '/nodeInfo'
+          name: '/nodeInfo',
+          params: {txHash: this.agentAddressInfo.agentHash},
         })
       },
       //提交追加
