@@ -39,7 +39,7 @@
         if (this.usable >= 1.01) {
           if (value === '') {
             callback(new Error(this.$t('message.c104')))
-          } else if (value.replace(/[^\x00-\xff]/g, '01').length > 30) {
+          } else if (value.replace(/[^\x00-\xff]/g, '01').length > 20) {
             callback(new Error(this.$t('message.c106')))
           } else {
             callback()

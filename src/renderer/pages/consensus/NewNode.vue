@@ -57,7 +57,9 @@
           let re = /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/;
           if (!re.exec(value)) {
             callback(new Error(this.$t('message.c168')))
-          } else {
+          }else if(value === localStorage.getItem('newAccountAddress') ){
+            callback(new Error(this.$t('message.c169')))
+          }else {
             callback()
           }
         }

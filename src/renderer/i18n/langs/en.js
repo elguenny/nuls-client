@@ -265,7 +265,7 @@ const en = {
     c102: 'Your address',
     c103: 'To ensure your account is safe, your name can not be changed after you have created one, please choose carefully.',
     c104: 'Please enter a name',
-    c105: 'Please enter a name with no more than 8 characters, which may include Chinese, English, and underline',
+    c105: 'Please enter a name with no more than 1-30 characters, which may include Chinese, English, and underline',
     c106: 'Sorry, the alias length is 1 to 30 characters',
     c107: 'I am sorry, your balance is to low to complete this action.',
 
@@ -333,7 +333,8 @@ const en = {
     c165:'There is no password in this account. Do you want to join the node',
     c166:'There is no password in the consensus account. Do you want to create nodes',
     c167:'A block address can not have a password',
-    c168:'The address must be combined with letters and numbers\n',
+    c168:'The address must be combined with letters and numbers',
+    c169:'The block address is not a consensus account',
 
     //Bottom info
     refresh:'Refresh',
