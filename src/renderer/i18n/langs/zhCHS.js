@@ -44,7 +44,7 @@ const cn = {
     pledge: '委托总额',
     income: '矿金收入',
     annualYield: '节点总数',
-    applicationsNode: '共识节点',
+    applicationsNode: '网络节点',
     //set password
     set: '设置',
     oldPassWord: '旧密码',
@@ -137,7 +137,7 @@ const cn = {
     blockHeight: '区块高度',
 
     //consensus
-    c1: '总委托金额',
+    c1: '委托总额',
     c1_1: '（全网）',
     c2: '节点总数',
     c3: '我的总体情况',
@@ -189,7 +189,7 @@ const cn = {
     c38: '请输入出块地址！',
     c39: '请输入节点名称！',
     c40: '请输入节点备注！',
-    c41: '请输入节点名称不能大于50个字节',
+    c41: '请输入节点名称不能大于30个字节',
     //agencyNode
     c43: '共识代理节点',
     c44: '请输入节点名或地址',

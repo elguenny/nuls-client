@@ -14,7 +14,7 @@
                               :placeholder="this.$t('message.c167')" :maxlength="35"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c24')+':'" prop="agentName">
-                    <el-input v-model.trim="newNodeForm.agentName" :maxlength="25"></el-input>
+                    <el-input v-model.trim="newNodeForm.agentName" :maxlength="30"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c25')+'（NULS）:'" class="form-left a-new" prop="deposit">
                     <el-input v-model="newNodeForm.deposit" :placeholder=this.placeholder
@@ -53,13 +53,22 @@
       let checkpackingAddress = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.c38')))
-        }else{
+        } else {
           let re = /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/;
           if (!re.exec(value)) {
             callback(new Error(this.$t('message.c168')))
-          }else{
+          } else {
             callback()
           }
+        }
+      };
+      let checkAgentName = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('message.c39')))
+        } else if (value.replace(/[^\x00-\xff]/g, '01').length > 21) {
+          callback(new Error(this.$t('message.c41')))
+        } else {
+          callback()
         }
       };
       let checkNodeNo = (rule, value, callback) => {
@@ -70,14 +79,14 @@
           console.log(value);
           let re = /(^\+?|^\d?)\d*\.?\d+$/;
           let res = /^\d{1,8}(\.\d{1,8})?$/;
-          console.log("=="+!re.exec(value));
+          console.log("==" + !re.exec(value));
           if (!re.exec(value) || !res.exec(value)) {
             callback(new Error(this.$t('message.c136')))
           } else {
             let rightShift = new BigNumber(100000000);
             if (parseInt(rightShift.times(value).toString()) > parseInt(rightShift.times(this.usable).toString())) {
               callback(new Error(this.$t('message.c543')))
-            } else if (parseInt(rightShift.times(value).toString()) < parseInt(rightShift.times(20000).toString()) ) {
+            } else if (parseInt(rightShift.times(value).toString()) < parseInt(rightShift.times(20000).toString())) {
               callback(new Error(this.$t('message.c541')))
             } else {
               callback()
@@ -118,8 +127,9 @@
             {validator: checkpackingAddress, trigger: 'blur'},
           ],
           agentName: [
-            {required: true, message: this.$t('message.c39')},
-            {max: 50, message: this.$t('message.c41'), trigger: 'blur'}
+            {validator: checkAgentName, trigger: 'blur'},
+            /*{required: true, message: this.$t('message.c39')},
+            {max: 50, message: this.$t('message.c41'), trigger: 'blur'}*/
           ],
           deposit: [
             {validator: checkNodeNo, trigger: 'blur'},
@@ -211,9 +221,9 @@
           + '","commissionRate":"' + this.newNodeForm.commissionRate
           + '","deposit":"' + parseFloat(rightShift.times(this.newNodeForm.deposit).toString())
           + '","agentName":"' + this.newNodeForm.agentName
-          + '","remark":"' + this.newNodeForm.remark
+          + '","remark":"' + this.newNodeForm.remark.replace(/\n/g,"")
           + '","password":"' + password + '"}';
-        console.log(param);
+        //console.log(param);
         this.$post('/consensus/agent ', param)
           .then((response) => {
             console.log(response);

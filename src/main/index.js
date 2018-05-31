@@ -46,7 +46,7 @@ function createWindow () {
    */
   ipcMain.on('window-min', function () {
     mainWindow.minimize()
-  })
+  });
 
   /**
    *  窗口关闭

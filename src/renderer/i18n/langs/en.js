@@ -46,7 +46,7 @@ const en = {
     income: 'Total Minted',
     annualYield: 'Agent Nodes',
 
-    applicationsNode: 'Nodes Running',
+    applicationsNode: 'Network Node',
     //set password
     set: 'Set',
     oldPassWord: 'Current password',
@@ -188,7 +188,7 @@ const en = {
     c38: 'Please enter a block address！',
     c39: 'Please enter the name of the node！',
     c40: 'Please enter the node notes！',
-    c41: 'Please enter the name of the node not more than 50 bytes！',
+    c41: 'Please enter the name of the node not more than 30 bytes！',
     //agencyNode
     c43: 'Consensus agent node',
     c44: 'Please enter node name or address',

@@ -94,6 +94,9 @@
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
               });
+              if(this.address === localStorage.getItem('newAccountAddress')){
+                localStorage.setItem('encrypted',true);
+              }
               this.$router.push({
                 name: '/userInfo',
                 params: {'address': this.address},

@@ -103,7 +103,7 @@
     mounted () {
       //5秒循环一次我的资产和全网共识
       setTimeout(() => {
-        let map = $('#world-map-markers').vectorMap('get', 'mapObject')
+        let map = $('#world-map-markers').vectorMap('get', 'mapObject');
         this.homeSetInterval = setInterval(() => {
           if(localStorage.getItem('newAccountAddress') !== ''){
             this.getAccountAddress('/account/assets/'+localStorage.getItem('newAccountAddress'))
