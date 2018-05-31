@@ -44,18 +44,6 @@
                                      :widthData="item.creditVal"></ProgressBar>
                     </li>
                 </ul>
-                <div class="credit-valuesDiv" v-show="creditValuesShow0">
-                    <h2>
-                        <label class="fl">能力系数&nbsp;</label>
-                        <ProgressBar colorData="#82BD39" widthData="50%"></ProgressBar>
-                    </h2>
-                    <p class="cb">根据近100轮出块数量计算</p>
-                    <h4>
-                        <label class="fl">责任系数&nbsp;</label>
-                        <ProgressBar colorData="#82BD39" widthData="80%"></ProgressBar>
-                    </h4>
-                    <p class="cb">根据近100轮违规情况和出块正确性计算</p>
-                </div>
             </div>
         </div>
         <el-pagination layout="prev, pager, next" :page-size="6" :total=this.totalAll
@@ -67,13 +55,14 @@
 <script>
   import Back from './../../components/BackBar.vue'
   import ProgressBar from './../../components/ProgressBar.vue'
-  import { BigNumber } from 'bignumber.js'
+  import {BigNumber} from 'bignumber.js'
 
   export default {
-    data () {
+    data() {
       return {
         showData: false,
         sortValue: this.$t('message.c46'),
+        indexTo: this.$route.params.indexTo,
         sortKey: '',
         sortConsensusList: [
           {sortName: this.$t('message.c46'), sortKey: ''},
@@ -96,17 +85,32 @@
       Back,
       ProgressBar,
     },
-    mounted () {
-      let _this = this
-      this.getAllConsensus('/consensus/agent/list/', {'pageSize': '6', 'pageNumber': this.pageNumber})
+    mounted() {
+      let _this = this;
+      let params = '';
+      if (this.indexTo === '1') {
+        params = {'pageSize': '6', 'pageNumber': this.pageNumber};
+        this.indexTo = '2';
+        sessionStorage.removeItem("keyword");
+        sessionStorage.removeItem("sortKey");
+        sessionStorage.removeItem("pageNumber")
+      } else {
+        params = {
+          'keyword': sessionStorage.getItem('keyword'),
+          'sortType': sessionStorage.getItem('sortKey'),
+          'pageSize': '6',
+          'pageNumber': sessionStorage.getItem('pageNumber')
+        };
+      }
+      this.getAllConsensus('/consensus/agent/list/', params)
     },
     methods: {
       //获取全部共识列表
-      getAllConsensus (url, params) {
+      getAllConsensus(url, params) {
         this.$fetch(url, params)
           .then((response) => {
             //console.log(params)
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001)
               for (let i = 0; i < response.data.list.length; i++) {
@@ -125,9 +129,9 @@
           })
       },
       //全部共识分页
-      allConsensusSize (events) {
-        this.pageNumber = events
-        let params = ''
+      allConsensusSize(events) {
+        this.pageNumber = events;
+        let params = '';
         if (this.keyword !== '') {
           params = {'keyword': this.keyword, 'pageSize': '6', 'pageNumber': events}
         } else if (this.sortValue !== '请选择排序方式') {
@@ -139,11 +143,11 @@
         }
         this.getAllConsensus('/consensus/agent/list/', params)
       },
-      showDataList () {
+      showDataList() {
         this.showData = !this.showData
       },
       //搜索功能
-      searchConsensus () {
+      searchConsensus() {
         if (this.keyword !== '') {
           const params = {'keyword': this.keyword, 'pageSize': '6', 'pageNumber': '1'}
           this.getAllConsensus('/consensus/agent/list/', params)
@@ -152,29 +156,32 @@
         }
       },
       //排序共识
-      sortConsensus (sortName, sortKey) {
-        this.showData = false
-        this.sortValue = sortName
-        this.sortKey = sortKey
+      sortConsensus(sortName, sortKey) {
+        this.showData = false;
+        this.sortValue = sortName;
+        this.sortKey = sortKey;
         if (this.keyword !== '') {
-          const params = {'keyword': this.keyword, 'sortType': sortKey, 'pageSize': '6', 'pageNumber': '1'}
+          const params = {'keyword': this.keyword, 'sortType': sortKey, 'pageSize': '6', 'pageNumber': '1'};
           this.getAllConsensus('/consensus/agent/list/', params)
         } else {
-          const params = {'sortType': sortKey, 'pageSize': '6', 'pageNumber': '1'}
+          const params = {'sortType': sortKey, 'pageSize': '6', 'pageNumber': '1'};
           this.getAllConsensus('/consensus/agent/list/', params)
         }
 
       },
       //显示隐藏信用值
-      toggleShow (e) {
+      toggleShow(e) {
         this.creditValuesShow0 = !this.creditValuesShow0
       },
       //查看节点详情
-      toNodePage (index) {
+      toNodePage(index) {
         this.$router.push({
           name: '/nodePage',
           params: {address: index},
-        })
+        });
+        sessionStorage.setItem("keyword", this.keyword);
+        sessionStorage.setItem("sortKey", this.sortKey);
+        sessionStorage.setItem("pageNumber", this.pageNumber)
       }
     }
   }

@@ -38,7 +38,7 @@ function createWindow () {
     minHeight: 560,
     maxWidth: 800,
     maxHeight: 560,
-  })
+  });
 
   /**
    *  窗口最小化
@@ -46,7 +46,7 @@ function createWindow () {
    */
   ipcMain.on('window-min', function () {
     mainWindow.minimize()
-  })
+  });
 
   /**
    *  窗口关闭

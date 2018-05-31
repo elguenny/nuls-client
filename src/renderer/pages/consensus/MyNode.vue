@@ -125,15 +125,15 @@
         this.$fetch(url, params)
           .then((response) => {
             //console.log(params)
-            //console.log(response)
+            console.log(response);
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001)
-              this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress")
-              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString())
-              response.data.creditVals = response.data.creditVal
-              response.data.creditVal = (((((response.data.creditVal + 1) / 2)) * 100).toFixed()).toString() + '%'
-              response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10)
-              response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000'
+              let leftShift = new BigNumber(0.00000001);
+              this.toCheckOk = response.data.agentAddress === localStorage.getItem("newAccountAddress");
+              response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString());
+              response.data.creditVals = response.data.creditVal;
+              response.data.creditVal = (((((response.data.creditVal + 1) / 2)) * 100).toFixed()).toString() + '%';
+              response.data.agentAddresss = (response.data.agentAddress).substr(0, 10) + '...' + (response.data.agentAddress).substr(-10);
+              response.data.totalDeposits = (response.data.totalDeposit * 0.00000001).toFixed(0) + '/500000';
               if (response.data.totalDeposit > 50000000000000) {
                 response.data.totalDeposit = '100%'
               } else {
@@ -148,9 +148,9 @@
         this.$fetch(url, params)
           .then((response) => {
             if (response.success) {
-              console.log(url);
-              console.log(params);
-              console.log(response);
+              //console.log(url);
+              //console.log(params);
+              //console.log(response);
               let leftShift = new BigNumber(0.00000001)
               this.total = response.data.total
               for (let i = 0; i < response.data.list.length; i++) {
@@ -166,7 +166,7 @@
       myMortgageSize (events) {
         this.pageNumber = events;
         this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
-          'agentAddress': this.agentAddress,
+          'agentHash': this.agentAddress,
           'pageSize': '3',
           'pageNumber': events
         })
@@ -174,7 +174,8 @@
       //查看节点
       toCheck () {
         this.$router.push({
-          name: '/nodeInfo'
+          name: '/nodeInfo',
+          params: {txHash: this.agentAddressInfo.agentHash},
         })
       },
       //全部退出

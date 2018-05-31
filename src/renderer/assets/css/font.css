@@ -88,3 +88,8 @@
   content: "\e90c";
   color: #fff;
 }
+input::-webkit-input-placeholder {
+  color:#8a929b;
+  font-size: 12px;
+  text-align: right;
+}

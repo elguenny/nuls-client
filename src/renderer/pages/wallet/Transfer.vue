@@ -21,7 +21,9 @@
                 <el-form-item :label="$t('message.miningFee')" class="service-no">
                 </el-form-item>
                 <el-form-item :label="$t('message.remarks')+'：'" class="remark">
-                    <el-input type="textarea" v-model.trim="transferForm.remark" :maxlength="20"></el-input>
+                   <el-input type="textarea" v-model.trim="transferForm.remark"
+                              :maxlength="30"></el-input>
+                   <!-- <el-input type="text" v-model.trim="transferForm.remark":maxlength="30" class="remark"></el-input>-->
                 </el-form-item>
                 <el-form-item class="transfer-submit">
                     <el-button type="primary" @click="transferSubmit('transferForm')" id="transferSubmit">
@@ -39,7 +41,7 @@
                                      align='center'></el-table-column>
                     <el-table-column :label="$t('message.operation')" width="100" align='center'>
                         <template slot-scope="scope">
-                            <span class="cursor-p text-d" @click="checkedAddress(scope.row.userAddress)">{{$t('message.select')}}</span>
+                            <span class="cursor-p text-d" @click="checkedAddress(scope.row.userAddress)" >{{$t('message.select')}}</span>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -55,10 +57,10 @@
   import Password from '@/components/PasswordBar.vue'
   import copy from 'copy-to-clipboard'
   import * as config from '@/config.js'
-  import { BigNumber } from 'bignumber.js'
+  import {BigNumber} from 'bignumber.js'
 
   export default {
-    data () {
+    data() {
       let selectAddress = (rule, value, callback) => {
         if (value === '') {
           callback(new Error(this.$t('message.addressNull')))
@@ -68,12 +70,22 @@
           }
           callback()
         }
-      }
+      };
       let checkJoinAddress = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.transferNull')))
+        } else {
+          this.address = localStorage.getItem('newAccountAddress');
+          let re = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
+          if (!re.exec(value)) {
+            callback(new Error(this.$t('message.c168')))
+          } else if (value === this.address) {
+            callback(new Error(this.$t('message.addressOrTransfer')))
+          } else {
+            callback()
+          }
         }
-        setTimeout(() => {
+        /*setTimeout(() => {
           //console.log(this.address !== undefined);
           if (this.address !== undefined) {
             if (value === this.address) {
@@ -89,32 +101,36 @@
               callback()
             }
           }
-        }, 500)
-      }
+        }, 500)*/
+      };
       let checkJoinNo = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.transferNO')))
         }
         setTimeout(() => {
           //console.log(value);
-          let re = /(^\+?|^\d?)\d*\.?\d+$/
-          let res = /^\d{1,8}(\.\d{1,8})?$/
-          let values = new BigNumber(value)
-          let nu = new BigNumber(this.usable)
+          let re = /(^\+?|^\d?)\d*\.?\d+$/;
+          let res = /^\d{1,8}(\.\d{1,8})?$/;
           if (!re.exec(value)) {
             callback(new Error(this.$t('message.transferNO1')))
-          } else if (values.comparedTo(nu.minus(0.01)) === 1) {
-            callback(new Error(this.$t('message.transferNO2')))
-          } else if (value < 0.01) {
-            callback(new Error(this.$t('message.transferNO3')))
-          } else if (!res.exec(value)) {
-            callback(new Error(this.$t('message.c136')))
           } else {
-            callback()
+            let values = new BigNumber(value);
+            let nu = new BigNumber(this.usable);
+            if (values.comparedTo(nu.minus(0.01)) === 1) {
+              callback(new Error(this.$t('message.transferNO2')))
+            } else if (value < 0.01) {
+              callback(new Error(this.$t('message.transferNO3')))
+            } else if (!res.exec(value)) {
+              callback(new Error(this.$t('message.c136')))
+            } else {
+              callback()
+            }
           }
+
+
         }, 100)
 
-      }
+      };
       return {
         accountAddressValue: localStorage.getItem('newAccountAddress'),
         submitId: 'transferSubmit',
@@ -149,9 +165,9 @@
       AccountAddressBar,
       Password,
     },
-    mounted () {
-      let _this = this
-      this.openDB()
+    mounted() {
+      let _this = this;
+      this.openDB();
       this.getBalanceAddress('/account/balance/' + this.transferForm.address)
     },
     methods: {
@@ -160,7 +176,7 @@
        * Get the balance of the account according to the account address
        * @param url
        */
-      getBalanceAddress (url) {
+      getBalanceAddress(url) {
         this.$fetch(url)
           .then((response) => {
             //console.log(response)
@@ -176,7 +192,7 @@
        *Get the drop-down selection address
        * @param chenckAddress
        */
-      chenckAccountAddress (chenckAddress) {
+      chenckAccountAddress(chenckAddress) {
         this.address = chenckAddress
         this.accountAddressValue = chenckAddress
         localStorage.setItem('newAccountAddress', this.address)
@@ -189,7 +205,7 @@
        * 复制功能
        * copy
        */
-      accountCopy () {
+      accountCopy() {
         copy(this.accountAddressValue)
         this.$message({
           message: this.$t('message.c129'), type: 'success', duration: '800'
@@ -201,7 +217,7 @@
        * Choose the total amount
        * @param balance
        */
-      allUsable (balance) {
+      allUsable(balance) {
         if (balance === 0) {
           this.$message({
             message: this.$t('message.creditLow'),
@@ -218,7 +234,7 @@
        * 创建usersDB
        * New usersDB
        */
-      openDB () {
+      openDB() {
         let request = indexedDB.open('usersDB', 1)
         request.onupgradeneeded = function (e) {
           let db = e.target.result
@@ -233,7 +249,7 @@
        * 选择通讯录
        * Select the address book
        */
-      toUsersAddressList () {
+      toUsersAddressList() {
         this.dialogTableVisible = true
         let request = indexedDB.open('usersDB', 1)
         let dbData = []
@@ -258,7 +274,7 @@
        *Address the address of the address book
        * @param address
        */
-      checkedAddress (address) {
+      checkedAddress(address) {
         this.transferForm.joinAddress = address
         this.dialogTableVisible = false
       },
@@ -269,7 +285,7 @@
        * @param row
        * @param event
        */
-      dbcheckedAddress (row, event) {
+      dbcheckedAddress(row, event) {
         this.transferForm.joinAddress = row.userAddress
         this.dialogTableVisible = false
       },
@@ -279,12 +295,12 @@
        * Confirmation of transfer
        * @param fromName
        */
-      transferSubmit (fromName) {
+      transferSubmit(fromName) {
         this.$refs[fromName].validate((valid) => {
           if (valid) {
-            if(localStorage.getItem('encrypted')==="true"){
+            if (localStorage.getItem('encrypted') === "true") {
               this.$refs.password.showPassword(true)
-            }else{
+            } else {
               this.$confirm('此账户没有设置密码，确定转账？', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消'
@@ -305,16 +321,17 @@
        *Enter the password to determine the transaction
        * @param password
        */
-      toSubmit (password) {
-        let rightShift = new BigNumber(100000000)
+      toSubmit(password) {
+        let rightShift = new BigNumber(100000000);
         let param = '{"address":"' + this.address
           + '","toAddress":"' + this.transferForm.joinAddress
           + '","amount":' + rightShift.times(this.transferForm.joinNo)
           + ',"password":"' + password
-          + '","remark":"' + this.transferForm.remark + '"}'
+          + '","remark":"' + this.transferForm.remark.replace(/\n/g,"") + '"}';
+        //console.log("param======" + param)
         this.$post('/accountledger/transfer', param)
           .then((response) => {
-            //console.log("param="+param)
+            //console.log("param=" + param)
             //console.log(response)
             if (response.success) {
               this.$message({
@@ -352,7 +369,7 @@
             margin: auto;
             .joinNo {
                 .el-input__inner {
-                    background-color: #17202e;
+                    /* background-color: #17202e;*/
                     //border: 1px solid #24426c;
                 }
             }
@@ -435,7 +452,7 @@
                             }
                         }
                         .el-input__inner {
-                            border: 1px solid #24426c;
+                            /*border: 1px solid #24426c;*/
                             color: #FFFFFF;
                             &:hover {
                                 border-color: #658ec7;

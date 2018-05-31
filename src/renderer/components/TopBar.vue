@@ -75,7 +75,7 @@
         widthData: '2rem',
         errorClass: '',
         activeClass: 'active',
-        isActive: 0,
+        isActive:sessionStorage.hasOwnProperty('isActive') ? sessionStorage.getItem('isActive') : 0,
 
         showTime: true,
         count: '',
@@ -87,7 +87,7 @@
     },
     computed: {},
     mounted () {
-      this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en'
+      this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en';
       //判断是否有设置语言
       if (localStorage.hasOwnProperty('language')) {
         if (localStorage.getItem('language') === 'cn') {

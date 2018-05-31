@@ -7,19 +7,19 @@
                     <label class="fl">{{$t('message.fundTotal')}}：</label>
                     <ProgressBar colorData="#658EC7"
                                  :widthData=this.balanceData.balanceWidth></ProgressBar>
-                    <label class="number">{{this.balanceData.balance}} NULS</label>
+                    <label class="number">{{this.balanceData.balance.toFixed(8)}} NULS</label>
                 </div>
                 <div class="nav-lock cl">
                     <label class="fl">{{$t('message.fundLock')}}：</label>
                     <ProgressBar colorData="#f64b3e"
                                  :widthData=this.balanceData.lockedWidth></ProgressBar>
-                    <label class="number">{{this.balanceData.locked}} NULS</label>
+                    <label class="number">{{this.balanceData.locked.toFixed(8)}} NULS</label>
                 </div>
                 <div class="nav-usable cl">
                     <label class="fl">{{$t('message.fundUsable')}}：</label>
                     <ProgressBar colorData="#82bd39"
                                  :widthData=this.balanceData.usableWidth></ProgressBar>
-                    <label class="number">{{this.balanceData.usable}} NULS</label>
+                    <label class="number">{{this.balanceData.usable.toFixed(8)}} NULS</label>
                 </div>
             </div>
             <div class="home-nav-top">
@@ -103,7 +103,7 @@
     mounted () {
       //5秒循环一次我的资产和全网共识
       setTimeout(() => {
-        let map = $('#world-map-markers').vectorMap('get', 'mapObject')
+        let map = $('#world-map-markers').vectorMap('get', 'mapObject');
         this.homeSetInterval = setInterval(() => {
           if(localStorage.getItem('newAccountAddress') !== ''){
             this.getAccountAddress('/account/assets/'+localStorage.getItem('newAccountAddress'))

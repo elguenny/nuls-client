@@ -10,17 +10,18 @@
                        @click="accountCopy" :title="$t('message.c143')"></i>
                 </el-form-item>
                 <el-form-item :label="$t('message.c23')+':'" prop="packingAddress">
-                    <el-input v-model.trim="newNodeForm.packingAddress" :placeholder="this.$t('message.c167')"></el-input>
+                    <el-input v-model.trim="newNodeForm.packingAddress"
+                              :placeholder="this.$t('message.c167')" :maxlength="35"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c24')+':'" prop="agentName">
-                    <el-input v-model.trim="newNodeForm.agentName" :maxlength="25"></el-input>
+                    <el-input v-model.trim="newNodeForm.agentName" :maxlength="30"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c25')+'（NULS）:'" class="form-left a-new" prop="deposit">
-                    <el-input v-model.number="newNodeForm.deposit" :placeholder=this.placeholder
+                    <el-input v-model="newNodeForm.deposit" :placeholder=this.placeholder
                               :maxlength="17"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c26')+'（%）:'" class="form-left a-new" prop="commissionRate">
-                    <el-input v-model.number="newNodeForm.commissionRate" :maxlength="5"></el-input>
+                    <el-input v-model="newNodeForm.commissionRate" :maxlength="5"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('message.c27')+':'" class="cb" prop="remark">
                     <el-input v-model.trim="newNodeForm.remark" type="textarea" :rows="2" :maxlength="30"></el-input>
@@ -44,29 +45,55 @@
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
   import * as config from '@/config.js'
-  import { BigNumber } from 'bignumber.js'
+  import {BigNumber} from 'bignumber.js'
   import copy from 'copy-to-clipboard'
 
   export default {
-    data () {
+    data() {
+      let checkpackingAddress = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('message.c38')))
+        } else {
+          let re = /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/;
+          if (!re.exec(value)) {
+            callback(new Error(this.$t('message.c168')))
+          } else {
+            callback()
+          }
+        }
+      };
+      let checkAgentName = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('message.c39')))
+        } else if (value.replace(/[^\x00-\xff]/g, '01').length > 21) {
+          callback(new Error(this.$t('message.c41')))
+        } else {
+          callback()
+        }
+      };
       let checkNodeNo = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.c31')))
         }
         setTimeout(() => {
-          let re = /^\d+(?=\.{0,1}\d+$|$)/
-          let res = /^\d{1,8}(\.\d{1,8})?$/
+          console.log(value);
+          let re = /(^\+?|^\d?)\d*\.?\d+$/;
+          let res = /^\d{1,8}(\.\d{1,8})?$/;
+          console.log("==" + !re.exec(value));
           if (!re.exec(value) || !res.exec(value)) {
-            callback(new Error(this.$t('message.c32')))
-          } else if (value < 20000) {
-            callback(new Error(this.$t('message.c541')))
-          } else if (value > config.FloatSub(this.usable, 0.01)) {
-            callback(new Error(this.$t('message.c543')))
+            callback(new Error(this.$t('message.c136')))
           } else {
-            callback()
+            let rightShift = new BigNumber(100000000);
+            if (parseInt(rightShift.times(value).toString()) > parseInt(rightShift.times(this.usable).toString())) {
+              callback(new Error(this.$t('message.c543')))
+            } else if (parseInt(rightShift.times(value).toString()) < parseInt(rightShift.times(20000).toString())) {
+              callback(new Error(this.$t('message.c541')))
+            } else {
+              callback()
+            }
           }
         }, 100)
-      }
+      };
       let checkCommissionRate = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.c37')))
@@ -80,7 +107,7 @@
         } else {
           callback()
         }
-      }
+      };
       return {
         submitId: 'newNode',
         accountAddress: [],
@@ -97,11 +124,12 @@
         },
         newNodeRules: {
           packingAddress: [
-            {required: true, message: this.$t('message.c38'), trigger: 'blur'}
+            {validator: checkpackingAddress, trigger: 'blur'},
           ],
           agentName: [
-            {required: true, message: this.$t('message.c39')},
-            {max: 50, message: this.$t('message.c41'), trigger: 'blur'}
+            {validator: checkAgentName, trigger: 'blur'},
+            /*{required: true, message: this.$t('message.c39')},
+            {max: 50, message: this.$t('message.c41'), trigger: 'blur'}*/
           ],
           deposit: [
             {validator: checkNodeNo, trigger: 'blur'},
@@ -120,13 +148,13 @@
       AccountAddressBar,
       Password,
     },
-    mounted () {
+    mounted() {
       let _this = this
       this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'))
     },
     methods: {
       //获取下拉选择地址
-      chenckAccountAddress (chenckAddress) {
+      chenckAccountAddress(chenckAddress) {
         this.newNodeForm.accountAddressValue = chenckAddress
         this.copyValue = chenckAddress
         this.getBalanceAddress('/account/balance/' + chenckAddress)
@@ -141,24 +169,24 @@
        * 复制功能
        * copy
        */
-      accountCopy () {
-        copy(this.copyValue)
+      accountCopy() {
+        copy(this.copyValue);
         this.$message({
           message: this.$t('message.c129'), type: 'success', duration: '800'
         })
       },
       //根据账户地址获取账户余额
-      getBalanceAddress (url) {
+      getBalanceAddress(url) {
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              this.usable = response.data.usable * 0.00000001
-              this.placeholder = this.$t('message.currentBalance') + ' ' + response.data.usable * 0.00000001
+              this.usable = (response.data.usable * 0.00000001).toFixed(8);
+              this.placeholder = this.$t('message.currentBalance') + ' ' + (response.data.usable * 0.00000001).toFixed(8)
             }
           })
       },
       //提交创建
-      submitForm (formName) {
+      submitForm(formName) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$refs[formName].validate((valid) => {
@@ -186,19 +214,19 @@
         }
       },
       //
-      toSubmit (password) {
-        let rightShift = new BigNumber(100000000)
+      toSubmit(password) {
+        let rightShift = new BigNumber(100000000);
         let param = '{"agentAddress":"' + this.newNodeForm.accountAddressValue
           + '","packingAddress":"' + this.newNodeForm.packingAddress
           + '","commissionRate":"' + this.newNodeForm.commissionRate
           + '","deposit":"' + parseFloat(rightShift.times(this.newNodeForm.deposit).toString())
           + '","agentName":"' + this.newNodeForm.agentName
-          + '","remark":"' + this.newNodeForm.remark
-          + '","password":"' + password + '"}'
-        console.log(param)
+          + '","remark":"' + this.newNodeForm.remark.replace(/\n/g,"")
+          + '","password":"' + password + '"}';
+        //console.log(param);
         this.$post('/consensus/agent ', param)
           .then((response) => {
-            console.log(response)
+            console.log(response);
             if (response.success) {
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
@@ -294,14 +322,14 @@
             .el-form-item--mini {
                 margin-bottom: 15px;
             }
-            .a-new{
-                label{
+            .a-new {
+                label {
                     margin-left: 4px;
                 }
             }
             input::-webkit-input-placeholder {
-                color: #6d6e6f;
-                font-size: 10px;
+                color: #8a929b;
+                font-size: 12px;
                 text-align: right;
             }
         }

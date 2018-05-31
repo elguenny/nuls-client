@@ -4,7 +4,7 @@ import VueRouter from 'vue-router'
 /**
  *  加载模块
  */
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 /**
  *  路由配置
  */
@@ -142,12 +142,12 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/consensus/NewNode.vue'], resolve)
     },
     {
-      path: '/consensus/agencyNode',
+      path: '/consensus/agencyNode :indexTo',
       name: '/agencyNode',
       component: resolve => require(['@/pages/consensus/AgencyNode.vue'], resolve)
     },
     {
-      path: '/consensus/nodeInfo :nodeInfo',
+      path: '/consensus/nodeInfo :txHash',
       name: '/nodeInfo',
       component: resolve => require(['@/pages/consensus/NodeInfo.vue'], resolve)
     },

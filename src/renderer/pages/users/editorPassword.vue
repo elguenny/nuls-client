@@ -1,6 +1,6 @@
 <template>
     <div class="set-password">
-        <Back :backTitle="this.backInfo"></Back>
+        <Back :backTitle="this.$t('message.setManagement')"></Back>
         <h2>{{this.address +" : "+$t("message.c80")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
             <el-form-item :label="$t('message.oldPassWord')+'：'" prop="oldPass">
@@ -31,9 +31,9 @@
         this.$refs.passForm.validateField('checkPass')
       }
       callback()
-      }
+      };
       let validatePass = (rule, value, callback) => {
-        let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/
+        let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
         if (value === '') {
           callback(new Error(this.$t('message.walletPassWord')))
         } else if (!patrn.exec(value)) {
@@ -44,7 +44,7 @@
           }
           callback()
         }
-      }
+      };
       let validatePass2 = (rule, value, callback) => {
         if (value === '') {
           callback(new Error(this.$t('message.affirmWalletPassWordEmpty')))
@@ -53,7 +53,7 @@
         } else {
           callback()
         }
-      }
+      };
       return {
         address: this.$route.params.address,
         backInfo: this.$route.params.backInfo,
@@ -81,7 +81,7 @@
     },
     created () {
       document.onkeydown = function (e) {
-        let key = window.event.keyCode
+        let key = window.event.keyCode;
         if (key === 13) {
           document.getElementById('editorPassword').click()
         }

@@ -42,7 +42,7 @@
                 <el-form-item :label="$t('message.newAccountAddress')" class="account-address">
                     <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
                 </el-form-item>
-                <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable }} NULS</span>
+                <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable.toFixed(8) }} NULS</span>
                 <el-form-item :label="$t('message.c25')" class="number" prop="nodeNo">
                     <el-input ref="input" v-model="nodeForm.nodeNo" :maxlength="17"></el-input>
                     <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>
@@ -74,21 +74,24 @@
           callback(new Error(this.$t('message.c52')))
         }
         setTimeout(() => {
-          let re = /^\d+(?=\.{0,1}\d+$|$)/
-          let res = /^\d{1,8}(\.\d{1,8})?$/
-          let values = new BigNumber(value)
-          let nu = new BigNumber(this.usable)
+          let re = /^\d+(?=\.{0,1}\d+$|$)/;
+          let res = /^\d{1,8}(\.\d{1,8})?$/;
+
           if (!re.exec(value) || !res.exec(value)) {
             callback(new Error(this.$t('message.c53')))
-          } else if (value < 2000) {
-            callback(new Error(this.$t('message.c54')))
-          } else if (values.comparedTo(nu.minus(0.01)) === 1) {
-            callback(new Error(this.$t('message.c542')))
-          } else {
-            callback()
+          } else{
+            let values = new BigNumber(value)
+            let nu = new BigNumber(this.usable)
+            if (value < 2000) {
+              callback(new Error(this.$t('message.c54')))
+            } else if (values.comparedTo(nu.minus(0.01)) === 1) {
+              callback(new Error(this.$t('message.c542')))
+            } else {
+              callback()
+            }
           }
         }, 100)
-      }
+      };
       return {
         loading: true,
         btOk: this.$store.getters.getNetWorkInfo.localBestHeight !== this.$store.getters.getNetWorkInfo.netBestHeight,
@@ -115,12 +118,12 @@
       Password,
     },
     created () {
-      this.getConsensusAddress('/consensus/agent/' + this.address)
+      this.getConsensusAddress('/consensus/agent/' + this.address);
       this.getBalanceAddress('/account/balance/' + localStorage.getItem('newAccountAddress'))
     },
     mounted () {
-      this.$refs['input'].focus()
-      this.$refs['input'].value = ''
+      this.$refs['input'].focus();
+      this.$refs['input'].value = '';
       sessionStorage.setItem('passwordOk', '0')
     },
     methods: {
@@ -152,7 +155,7 @@
       //获取下拉选择地址
       chenckAccountAddress (chenckAddress) {
         //console.log(chenckAddress);
-        this.getBalanceAddress('/account/balance/' + chenckAddress)
+        this.getBalanceAddress('/account/balance/' + chenckAddress);
         this.$refs.nodeForm.validateField('nodeNo')
       },
       //根据账户地址获取账户余额
@@ -160,7 +163,7 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001)
+              let leftShift = new BigNumber(0.00000001);
               this.usable = parseFloat(leftShift.times(response.data.usable).toString())
             }
           })

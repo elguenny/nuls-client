@@ -1,6 +1,6 @@
 <template>
     <div class="set-password">
-        <Back :backTitle="this.backInfo"></Back>
+        <Back :backTitle="this.$t('message.setManagement')"></Back>
         <h2>{{this.address +" : "+$t("message.setPassWord")}}</h2>
         <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
             <el-form-item :label="$t('message.walletPassWord')" prop="pass">
@@ -93,9 +93,13 @@
             if (response.success) {
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
-              })
+              });
+              if(this.address === localStorage.getItem('newAccountAddress')){
+                localStorage.setItem('encrypted',true);
+              }
               this.$router.push({
-                path: '/wallet/users/userInfo'
+                name: '/userInfo',
+                params: {'address': this.address},
               })
             } else {
               this.$message({

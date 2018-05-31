@@ -345,15 +345,12 @@
           name: '/nodePage',
           params: {address: index},
         })
-        /*this.$router.push({
-            name: '/nodePage',
-            params: {address: index},
-        });*/
       },
       //委托节点跳转
       toAgencyNode () {
         this.$router.push({
           name: '/agencyNode',
+          params: {'indexTo': '1'}
         })
       },
       //我的节点跳转

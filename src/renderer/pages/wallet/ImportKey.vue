@@ -45,14 +45,14 @@
           if (valid) {
             this.$refs.passTwo.showPasswordTwo(true)
           } else {
-            console.log('error submit!!')
+            console.log('error submit!!');
             return false
           }
         })
       },
       //
       toSubmit (password) {
-        let params = ''
+        let params = '';
         if(password === ''){
           params = '{"priKey":"' + this.keyData.keyInfo + '","password":""}'
         }else{
@@ -61,21 +61,23 @@
         this.$post('/account/import/pri', params)
           .then((response) => {
             if (response.success) {
-              localStorage.setItem('newAccountAddress', response.data)
-              localStorage.setItem('userPass', password)
+              this.getAccountList('/account');
+
+
+              /*console.log(response);
+              localStorage.setItem('newAccountAddress', response.data);
               if (localStorage.getItem('toUserInfo') !== '1') {
-                this.getAccountList('/account')
+                this.getAccountList('/account');
                 this.$router.push({
                   name: '/wallet'
                 })
               } else {
                 this.$router.push({
-                  path: '/wallet/users/userInfo'
+                  name: '/userInfo',
+                  params: {'address':response.data},
                 })
-              }
-              this.$message({
-                type: 'success', message: this.$t('message.passWordSuccess')
-              })
+              }*/
+
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.msg
@@ -89,7 +91,22 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              this.$store.commit('setAddressList', response.data.list)
+              this.$store.commit('setAddressList', response.data.list);
+              if(response.data.list.length === 1){
+                localStorage.setItem('newAccountAddress', response.data.list[0].address);
+                localStorage.setItem('encrypted', response.data.list[0].encrypted)
+                this.$router.push({
+                  name: '/wallet'
+                })
+              }else {
+                this.$router.push({
+                  name: '/userInfo',
+                  params: {'address':response.data},
+                })
+              }
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              })
             }
           }).catch((reject) => {
           console.log('User List err' + reject)

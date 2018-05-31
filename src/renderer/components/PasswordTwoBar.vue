@@ -112,7 +112,6 @@
                     .el-form-item{
                         margin-bottom: 5px;
                         .el-form-item__content{
-
                             .el-input__inner{
                                 padding: 0 5px;
                                 color: #FFFFFF;
