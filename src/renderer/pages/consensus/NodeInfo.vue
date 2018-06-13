@@ -96,6 +96,7 @@
         let param = {'address': localStorage.getItem('newAccountAddress'), 'password': password}
         this.$post('/consensus/agent/stop', param)
           .then((response) => {
+            console.log(response);
             if (response.success) {
               this.$message({
                 type: 'success',

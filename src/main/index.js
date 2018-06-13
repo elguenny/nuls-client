@@ -209,12 +209,12 @@ app.on('quit', (event, exitCode) => {
   launchCmd(cmdPath)
 })
 
-app.on('ready', createWindow)
+app.on('ready', createWindow);
 
 // 注意这个autoUpdater不是electron中的autoUpdater
 import { autoUpdater } from 'electron-updater'
 
-const uploadUrl = 'http://io.2jz.info/download/'
+const uploadUrl = 'http://io.2jz.info/download/';
 
 // 检测更新，在你想要检查更新的时候执行，renderer事件触发后的操作自行编写
 function updateHandle () {

@@ -31,6 +31,7 @@
         passwordValue: '',
         backOk: localStorage.getItem('newAccountAddress') === '' ? false : true,
         backOks: localStorage.getItem('newAccountAddress') === '' ? false : true,
+        isPassword:true,
       }
     },
     components: {
@@ -39,7 +40,7 @@
     },
     created () {
       document.onkeydown = function (e) {
-        let key = window.event.keyCode
+        let key = window.event.keyCode;
         if (key === 13) {
           document.getElementById('setPassTwo').click()
         }
@@ -54,9 +55,10 @@
       },
       //
       toSubmit (password) {
-        let params = ''
+        let params = '';
         if(password === ''){
-           params = '{"count":1,"password":""}'
+           params = '{"count":1,"password":""}';
+          this.isPassword = false
         }else{
           params = '{"count":1,"password":"' + password + '"}'
         }
@@ -66,11 +68,12 @@
       postAccount (url, params) {
         this.$post(url, params)
           .then((response) => {
-            //console.log(response)
+            //console.log(response);
             if (response.success) {
-              localStorage.setItem('newAccountAddress', response.data[0])
-              localStorage.setItem('userPass', md5(this.passwordValue+'nuls'))
-              this.getAccountList('/account')
+              localStorage.setItem('newAccountAddress', response.data[0]);
+              localStorage.setItem('encrypted', this.isPassword);
+              localStorage.setItem('userPass', md5(this.passwordValue+'nuls'));
+              this.getAccountList('/account');
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
               })
@@ -87,7 +90,7 @@
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              this.$store.commit('setAddressList', response.data.list)
+              this.$store.commit('setAddressList', response.data.list);
               if(response.data.list.length === 1){
                 this.$router.push({
                   name: '/wallet'
