@@ -109,6 +109,11 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/users/SetPage.vue'], resolve)
     },
     {
+      path: '/users/UpdatedVersion',
+      name: '/updatedVersion',
+      component: resolve => require(['@/pages/users/UpdatedVersion.vue'], resolve)
+    },
+    {
       path: '/users/userAddressList',
       name: '/userAddressList',
       component: resolve => require(['@/pages/users/UserAddressList.vue'], resolve)
@@ -162,20 +167,8 @@ const router = new VueRouter({
       name: '/nodePage',
       component: resolve => require(['@/pages/consensus/NodePage.vue'], resolve)
     }
-
-    /*{
-      path: '/consensus',
-      name: '共识首页',
-      component: resolve => require(['@/pages/consensus/Index.vue'], resolve),
-      children:[{
-        path: '/consensus/pledgeInfo',
-        name: '抵押详情',
-        component: resolve => require(['@/pages/consensus/PledgeInfo.vue'], resolve)
-      }]
-    }*/
-
   ]
-})
+});
 
 /**
  *  路由出口

@@ -21,8 +21,9 @@
         <span class="cursor-p set-page-div-span" @click="toEditPassword "> {{this.encrypted ? $t('message.c160'):$t('message.c161')}}</span>
       </div>
       <div class="set-page-div">
-        <label>{{$t('message.c81')}}：V{{this.$store.getters.getPurseVersiont}}</label>
-        <span class="cursor-p set-page-div-span" @click="versionUpdates">{{$t('message.c82')}}</span>
+        <label>{{$t('message.c81')}}：V{{this.clientVersionData.myVersion}}</label>
+        <span class="cursor-p set-page-div-span" @click="versionUpdates" v-show="this.percentageNumber !==100 ? true:false">{{$t('message.c82')}} {{this.clientVersionData.newestVersion}}</span>
+        <span class="cursor-p set-page-div-span" @click="outRestart" v-show="this.percentageNumber ===100 ? true:false">{{$t('message.c180')}}</span>
       </div>
     </div>
     <el-dialog :title="$t('message.c151')"
@@ -77,6 +78,12 @@
         tips: '',
         downloadPercent: 0,
         encrypted: false,
+
+        //版本信息
+        clientVersionData:[],
+        //进度条
+        percentageNumber:0,
+
       }
     },
     components: {
@@ -92,7 +99,9 @@
       } else {
         this.encrypted = false;
       }
-      this.projectName.value = localStorage.getItem('language') === 'cn' ?  '中文':'English'
+      this.projectName.value = localStorage.getItem('language') === 'cn' ? '中文' : 'English';
+      this.clientVersion();
+      this.clientUpgrade();
     },
     destroyed() {
 
@@ -149,11 +158,73 @@
         }
 
       },
+      /**
+       * 查询版本是否可更新
+       */
+      clientVersion(){
+        this.$fetch('/client/version')
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.clientVersionData = response.data
+            }
+          })
+      },
       //版本更新
       versionUpdates() {
-        this.$message({
-          type: 'info', message: this.$t('message.c65'), duration: '800'
-        })
+        if(this.clientVersionData.upgradable){
+          this.$router.push({
+            name: '/updatedVersion'
+          });
+        }
+      },
+      /**
+       *获取下载进度
+       **/
+      clientUpgrade() {
+        this.$fetch('/client/upgrade')
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.percentageNumber = response.data.percentage;
+            }
+          })
+      },
+      /**
+       * 退出重启
+       */
+      outRestart() {
+        this.$post('/client/restart')
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              });
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
+            }
+          });
+        //关闭浏览器
+        if (navigator.userAgent.indexOf("MSIE") > 0) {
+          if (navigator.userAgent.indexOf("MSIE 6.0") > 0) {
+            window.opener = null;
+            window.close();
+          } else {
+            window.open('', '_top');
+            window.top.close();
+          }
+        } else if (navigator.userAgent.indexOf("Firefox") > 0) {
+          window.location.href = 'about:blank ';
+        } else {
+          window.location.href = "about:blank";
+          window.opener = null;
+          window.open('', '_self', '');
+          window.close();
+          console.log('guangg')
+        }
       },
     }
   }
@@ -182,13 +253,13 @@
           width: 100%;
           text-align: center;
           margin-top: 6px;
-          .sub-selected-value{
+          .sub-selected-value {
             width: 100%;
             border: 1px solid #24426c;
-            ul{
+            ul {
               margin-left: 0;
               background-color: #1c2738;
-              li{
+              li {
                 width: 100%;
                 right: 0;
                 border-bottom: 1px dotted #24426c;

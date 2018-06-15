@@ -379,7 +379,7 @@
           if (tab.name !== 'first') {
             //this.myConsensusSize(this.myEvents);
             this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
-              'pageSize': '8',
+              'pageSize': '12',
               'pageNumber': '1'
             })
           } else {

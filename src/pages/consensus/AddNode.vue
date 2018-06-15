@@ -42,8 +42,8 @@
       <el-form ref="addNodeForm" :model="addNodeForm" :rules="addNodeRules" size="mini" label-position="left"
                @submit.native.prevent>
         <el-form-item :label="$t('message.c51')+':'" class="pledge-money" prop="nodeNo">
-          <el-input ref="input" v-model="addNodeForm.nodeNo" :placeholder=this.placeholder
-                    :maxlength="17" @change="countFee"></el-input>
+          <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable.toFixed(8) }} NULS</span>
+          <el-input ref="input" v-model="addNodeForm.nodeNo":maxlength="17" @change="countFee"></el-input>
         </el-form-item>
         <el-form-item :label="$t('message.c28')+'：'+this.fee+' NULS'" class="procedure">
         </el-form-item>
@@ -104,7 +104,6 @@
         },
         usable: 0,
         fee: 0.00,
-        placeholder: '',
         toCheckOk: false,
       }
     },
@@ -152,7 +151,7 @@
             //console.log(response)
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
-              this.placeholder = '（' + this.$t('message.currentBalance') + parseFloat(leftShift.times(response.data.usable.value).toString()) + 'NULS）';
+              //this.placeholder = '（' + this.$t('message.currentBalance') + parseFloat(leftShift.times(response.data.usable.value).toString()) + 'NULS）';
               this.usable = parseFloat(leftShift.times(response.data.usable.value).toString())
             }
           })
@@ -290,7 +289,7 @@
     }
     .add-node-bottom {
       width: 90%;
-      height: 145px;
+      height: 185px;
       margin: 20px auto 0;
       border: 1px solid #658ec7;
       background-color: #17202e;
@@ -303,6 +302,11 @@
         margin: auto;
         .el-form-item__content {
           margin-bottom: 15px;
+          .allUsable {
+            margin-right: 345px;
+            position: relative;
+            margin-top: -28px;
+          }
         }
         .el-form-item__label {
           color: #C1C5C9;
@@ -322,7 +326,7 @@
         }
       }
       .pledge-money {
-        margin-top: 20px;
+        margin-top: 40px;
       }
       .el-input {
         float: left;

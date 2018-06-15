@@ -120,7 +120,10 @@
                 response.data.list[i].creditVal = (((((response.data.list[i].creditVal + 1) / 2)) * 100).toFixed()).toString() + '%';
                 response.data.list[i].totalDeposit = parseFloat(leftShift.times(response.data.list[i].totalDeposit).toString())
               }
-              this.totalAll = response.data.total;
+              this.$nextTick(function () {
+                //this.paginationShow = true
+                this.totalAll = response.data.total;
+              });
               this.allConsensus = response.data.list
             } else {
               this.totalAll = 0;
@@ -134,9 +137,9 @@
         let params = '';
         if (this.keyword !== '') {
           params = {'keyword': this.keyword, 'pageSize': '16', 'pageNumber': events}
-        } else if (this.sortValue !== '请选择排序方式') {
+        } else if (this.sortValue !== 'Comprehensive') {
           params = {'sortType': this.sortKey, 'pageSize': '16', 'pageNumber': events}
-        } else if (this.keyword !== '' && this.sortValue !== '请选择排序方式') {
+        } else if (this.keyword !== '' && this.sortValue !== 'Comprehensive') {
           params = {'keyword': this.keyword, 'sortType': this.sortKey, 'pageSize': '16', 'pageNumber': events}
         } else {
           params = {'pageSize': '16', 'pageNumber': events}
@@ -157,15 +160,16 @@
       },
       //排序共识
       sortConsensus(sortName, sortKey) {
+        this.totalAll = 0;
         this.showData = false;
         this.sortValue = sortName;
         this.sortKey = sortKey;
         if (this.keyword !== '') {
           const params = {'keyword': this.keyword, 'sortType': sortKey, 'pageSize': '16', 'pageNumber': '1'};
-          this.getAllConsensus('/consensus/agent/list/', params)
+          this.getAllConsensus('/consensus/agent/list/', params);
         } else {
           const params = {'sortType': sortKey, 'pageSize': '16', 'pageNumber': '1'};
-          this.getAllConsensus('/consensus/agent/list/', params)
+          this.getAllConsensus('/consensus/agent/list/', params);
         }
 
       },

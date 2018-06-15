@@ -43,10 +43,6 @@
 
     },
     methods: {
-      //更新版本 Update version
-      updateVersionUrl() {
-        console.log("开始更新了")
-      },
       //获取节点高度 Get node height
       getNetWorkInfo(url) {
         this.$fetch(url)

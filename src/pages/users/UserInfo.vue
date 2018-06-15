@@ -29,8 +29,8 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <el-pagination layout="prev, pager, next" :page-size="8" :total=this.totalAll class="cb"
-                           v-show="totalAllOk = this.totalAll>8 ? true:false"
+            <el-pagination layout="prev, pager, next" :page-size="20" :total=this.totalAll class="cb"
+                           v-show="totalAllOk = this.totalAll>20 ? true:false"
                            @current-change="userListSize"></el-pagination>
             <Password ref="password" @toSubmit="toSubmit"></Password>
 
@@ -58,7 +58,7 @@
     },
     mounted() {
       let _this = this;
-      this.getUserList('/account', {'pageSize': 15, 'pageNumber': 1})
+      this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1})
     },
     methods: {
       back() {
@@ -104,7 +104,7 @@
       },
       //分页功能
       userListSize(events) {
-        this.getUserList('/account', {'pageSize': 15, 'pageNumber': events})
+        this.getUserList('/account', {'pageSize': 20, 'pageNumber': events})
       },
       //点击根据地址移除账户事件
       outUser(address, encrypted) {
@@ -136,7 +136,7 @@
                 this.$message({
                   type: 'success', message: this.$t('message.passWordSuccess')
                 });
-                this.getUserList('/account', {'pageSize': 15, 'pageNumber': 1})
+                this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1})
               } else {
                 this.$message({
                   type: 'warning', message: this.$t('message.passWordFailed') + response.msg
