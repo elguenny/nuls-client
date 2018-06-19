@@ -35,6 +35,8 @@
         //进度条显示和进度数
         percentageShow: false,
         percentageNumber: 0,
+        //循环执行数
+        executionNumber:0,
         //定时器
         toUpdatedInterval: null,
         percentageInterval: null,
@@ -125,7 +127,22 @@
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              this.percentageNumber = response.data.percentage;
+              //循环次数小于10默认失败
+              if(this.executionNumber < 10){
+                this.percentageNumber = response.data.percentage;
+                if(response.data.percentage ===0){
+                  this.executionNumber = this.executionNumber+1;
+                }else {
+                  this.executionNumber = 0;
+                }
+              }else {
+                this.$message({
+                  type: 'warning', message: this.$t('message.c195')
+                });
+                this.percentageShow = false;
+                this.percentageNumber = 0;
+              }
+
             } else {
               this.percentageShow = false;
               this.$message({
@@ -145,6 +162,7 @@
           cancelButtonText: this.$t('message.cancelButtonText'),
           center: true
         }).then(() => {
+          this.executionNumber = 0;
           this.$post('/client/upgrade/stop')
             .then((response) => {
               //console.log(response);
@@ -179,13 +197,16 @@
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
               });
+              this.closeBrowser();
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.msg
               })
             }
           });
-        //关闭浏览器
+      },
+      //关闭浏览器
+      closeBrowser() {
         if (navigator.userAgent.indexOf("MSIE") > 0) {
           if (navigator.userAgent.indexOf("MSIE 6.0") > 0) {
             window.opener = null;

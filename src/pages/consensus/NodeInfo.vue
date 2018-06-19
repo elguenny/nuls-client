@@ -137,6 +137,7 @@
       text-align: center;
       line-height: 20px;
       margin-bottom: 5px;
+      font-weight: bold;
     }
     ul {
       width: 100%;

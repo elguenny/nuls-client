@@ -18,7 +18,7 @@
       <div class="key-dialog">
         <h1>{{$t('message.c185')}}</h1>
         <p>{{$t('message.c186')}}<br/>{{$t('message.c187')}}<br/>{{$t('message.c188')}}</p>
-        <el-input v-model="this.inputKey" :disabled="true"></el-input>
+        <el-input v-model="this.inputKey" :disabled="false"></el-input>
         <el-button type="primary" @click="accountCopy(inputKey)">{{$t('message.c143')}}</el-button>
       </div>
     </el-dialog>
@@ -100,7 +100,7 @@
                 elink.style.display = 'none';
                 elink.href = URL.createObjectURL(blob);
                 document.body.appendChild(elink);
-                elink.click()
+                elink.click();
                 URL.revokeObjectURL(elink.href); // 释放URL 对象
                 document.body.removeChild(elink)
               } else { // IE10+下载

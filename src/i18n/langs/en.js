@@ -360,7 +360,7 @@ const en = {
     c192:'.keystore file import has been completed',
     c193:'Private key import',
     c194:'Please select the keystore file',
-    c195:'',
+    c195:'I\'m sorry！ Download failed, please try again.',
 
     //Bottom info
     refresh: 'Refresh',

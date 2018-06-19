@@ -254,6 +254,7 @@
       text-align: center;
       line-height: 20px;
       margin-bottom: 28px;
+      font-weight: bold;
     }
     .div-icon {
       height: 118px;

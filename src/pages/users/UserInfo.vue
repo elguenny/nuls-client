@@ -269,6 +269,7 @@
       h2 {
         text-align: center;
         line-height: 3rem;
+        font-weight: bold;
       }
     }
     .el-table th {

@@ -3,36 +3,39 @@
     <div class="home-nav">
       <div class="home-nav-top">
         <div class="nav-title">{{$t('message.fund')}}</div>
-        <div class="nav-all">
-          <div class="nav-left">
-            {{$t('message.fundTotal')}}：
+        <div class="nav-info">
+          <div class="nav-all">
+            <div class="nav-left">
+              {{$t('message.fundTotal')}}：
+            </div>
+            <div class="nav-right">
+              <ProgressBar colorData="#658EC7" :widthData=this.balanceData.balanceWidth></ProgressBar>
+              <label class="number">{{this.balanceData.balance.toFixed(8)}} NULS</label>
+            </div>
           </div>
-          <div class="nav-right">
-            <ProgressBar colorData="#658EC7" :widthData=this.balanceData.balanceWidth></ProgressBar>
-            <label class="number">{{this.balanceData.balance.toFixed(8)}} NULS</label>
+          <div class="nav-all cl">
+            <div class="nav-left">
+              {{$t('message.fundLock')}}：
+            </div>
+            <div class="nav-right">
+              <ProgressBar colorData="#f64b3e" :widthData=this.balanceData.lockedWidth></ProgressBar>
+              <label class="number">{{this.balanceData.locked.toFixed(8)}} NULS</label>
+            </div>
           </div>
-        </div>
-        <div class="nav-all cl">
-          <div class="nav-left">
-            {{$t('message.fundLock')}}：
-          </div>
-          <div class="nav-right">
-            <ProgressBar colorData="#f64b3e" :widthData=this.balanceData.lockedWidth></ProgressBar>
-            <label class="number">{{this.balanceData.locked.toFixed(8)}} NULS</label>
-          </div>
-        </div>
-        <div class="nav-all cl">
-          <div class="nav-left">
-            {{$t('message.fundUsable')}}：
-          </div>
-          <div class="nav-right">
-            <ProgressBar colorData="#82bd39" :widthData=this.balanceData.usableWidth></ProgressBar>
-            <label class="number">{{this.balanceData.usable.toFixed(8)}} NULS</label>
+          <div class="nav-all cl">
+            <div class="nav-left">
+              {{$t('message.fundUsable')}}：
+            </div>
+            <div class="nav-right">
+              <ProgressBar colorData="#82bd39" :widthData=this.balanceData.usableWidth></ProgressBar>
+              <label class="number">{{this.balanceData.usable.toFixed(8)}} NULS</label>
+            </div>
           </div>
         </div>
       </div>
       <div class="home-nav-top">
         <div class="nav-title">{{$t('message.consensus1')}}</div>
+        <div class="nav-info">
         <ul>
           <li class="cl">
             <label class="fl">{{$t('message.annualYield')}}：</label>
@@ -47,6 +50,7 @@
             <span class="number">{{this.allNodeList.consensusAccountNumber}} {{$t('message.c30')}}</span>
           </li>
         </ul>
+        </div>
       </div>
     </div>
     <div class="div-title">{{$t('message.applicationsNode')}}</div>
@@ -122,7 +126,6 @@
           });
         }
       }
-
     },
     mounted() {
       //5秒循环一次我的资产和全网共识
@@ -313,24 +316,28 @@
     background-color: #0c1323;
     .home-nav {
       width: 1024px;
-      height: 200px;
+      height: 245px;
       margin: auto;
       .home-nav-top {
         width: 47%;
-        height: 130px;
+        height: auto;
         float: left;
-        margin: 68px 40px 0 0;
-        border: 1px solid #658ec7;
-        background-color: #17202e;
+        margin: 68px 0 0;
         .nav-title {
           text-align: center;
-          font-size: 16px;
-          margin: 20px 0 5px;
+          font-size: 18px;
+          margin: 20px 0;
           font-weight: bold;
+        }
+        .nav-info{
+          border: 1px solid #658ec7;
+          background-color: #17202e;
+          height: 90px;
+          padding: 20px 0 0;
         }
         ul {
           li {
-            font-size: 12px;
+            font-size: 16px;
             line-height: 22px;
             width: 100%;
             label {
@@ -351,7 +358,7 @@
         }
 
         .nav-all {
-          font-size: 12px;
+          font-size: 16px;
           line-height: 1.5rem;
           margin: 0 30px;
           .nav-left {
@@ -389,7 +396,7 @@
       height: 50px;
       text-align: center;
       line-height: 50px;
-      font-size: 14px;
+      font-size: 18px;
       margin-top: 20px;
       font-weight: bold;
     }

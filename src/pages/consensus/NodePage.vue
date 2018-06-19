@@ -288,6 +288,7 @@
       text-align: center;
       line-height: 20px;
       margin-bottom: 28px;
+      font-weight: bold;
     }
     .node-page-top{
       width: 100%;

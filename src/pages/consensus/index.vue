@@ -423,7 +423,7 @@
       margin:30px auto 0;
       font-size: 12px;
       line-height: 32px;
-      color: #7b8eac;
+      color: #658ec7;
       text-align: left;
       clear: both;
       label {

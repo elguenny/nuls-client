@@ -22,7 +22,8 @@
       </div>
       <div class="set-page-div">
         <label>{{$t('message.c81')}}：V{{this.clientVersionData.myVersion}}</label>
-        <span class="cursor-p set-page-div-span" @click="versionUpdates" v-show="this.percentageNumber !==100 ? true:false">{{$t('message.c82')}} {{this.clientVersionData.newestVersion}}</span>
+        <span class="cursor-p set-page-div-span" @click="versionUpdates"
+              v-show="this.percentageNumber !==100 ? true:false">{{$t('message.c82')}} {{this.clientVersionData.newestVersion}}</span>
         <span class="cursor-p set-page-div-span" @click="outRestart" v-show="this.percentageNumber ===100 ? true:false">{{$t('message.c180')}}</span>
       </div>
     </div>
@@ -80,9 +81,9 @@
         encrypted: false,
 
         //版本信息
-        clientVersionData:[],
+        clientVersionData: [],
         //进度条
-        percentageNumber:0,
+        percentageNumber: 0,
 
       }
     },
@@ -161,7 +162,7 @@
       /**
        * 查询版本是否可更新
        */
-      clientVersion(){
+      clientVersion() {
         this.$fetch('/client/version')
           .then((response) => {
             //console.log(response);
@@ -172,7 +173,7 @@
       },
       //版本更新
       versionUpdates() {
-        if(this.clientVersionData.upgradable){
+        if (this.clientVersionData.upgradable) {
           this.$router.push({
             name: '/updatedVersion'
           });
@@ -201,13 +202,16 @@
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
               });
+              this.closeBrowser();
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.msg
               })
             }
           });
-        //关闭浏览器
+      },
+      //关闭浏览器
+      closeBrowser() {
         if (navigator.userAgent.indexOf("MSIE") > 0) {
           if (navigator.userAgent.indexOf("MSIE 6.0") > 0) {
             window.opener = null;
