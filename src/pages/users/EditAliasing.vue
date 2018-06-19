@@ -98,7 +98,6 @@
         if (this.aliasForm.alias !== '') {
           let params = "address=" + this.address
             + "&alias=" + this.aliasForm.alias;
-          //console.log("params=" + params);
           this.$fetch('/account/alias/fee?' + params)
             .then((response) => {
               //console.log(response);

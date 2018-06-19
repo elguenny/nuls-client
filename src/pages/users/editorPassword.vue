@@ -2,7 +2,7 @@
   <div class="set-password">
     <Back :backTitle="this.$t('message.setManagement')"></Back>
     <h2>{{$t("message.c80")}}</h2>
-    <el-form :model="passForm" status-icon :rules="rulesPass" ref="passForm" class="set-pass">
+    <el-form :model="passForm" :rules="rulesPass" ref="passForm" class="set-pass">
       <el-form-item>
         <div>{{$t("message.indexAccountAddress")}}: {{this.address}}</div>
       </el-form-item>
@@ -30,10 +30,14 @@
   export default {
     data() {
       let validateOldPass = (rule, value, callback) => {
-        if (this.passForm.checkPass !== '') {
-          this.$refs.passForm.validateField('checkPass')
+        let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
+        if (value === '') {
+          callback(new Error(this.$t('message.c92')))
+        } else if (!patrn.exec(value)) {
+          callback(new Error(this.$t('message.walletPassWord1')))
+        } else {
+          callback()
         }
-        callback()
       };
       let validatePass = (rule, value, callback) => {
         let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
@@ -117,7 +121,7 @@
                   })
                 } else {
                   this.$message({
-                    type: 'success', message: this.$t('message.passWordFailed') + response.msg
+                    type: 'warning', message: this.$t('message.passWordFailed')+":" + response.msg
                   })
                 }
 

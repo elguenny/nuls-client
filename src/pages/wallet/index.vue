@@ -69,13 +69,13 @@
                          /*{text: this.$t('message.type3'), value: '3'},
                          {text: this.$t('message.type4'), value: '4'},
                          {text: this.$t('message.type5'), value: '5'},*/
-                         {text: this.$t('message.type51'), value: '51'},
-                         {text: this.$t('message.type90'), value: '90'},
-                         {text: this.$t('message.type91'), value: '91'},
-                         {text: this.$t('message.type92'), value: '92'},
-                          /* {text: this.$t('message.type93'), value: '93'},
-                          {text: this.$t('message.type94'), value: '94'},*/
-                          {text: this.$t('message.type95'), value: '95'},
+                         {text: this.$t('message.type3'), value: '3'},
+                         {text: this.$t('message.type4'), value: '4'},
+                         {text: this.$t('message.type5'), value: '5'},
+                         {text: this.$t('message.type6'), value: '6'},
+                          /* {text: this.$t('message.type7'), value: '7'},
+                          {text: this.$t('message.type8'), value: '8'},*/
+                          {text: this.$t('message.type9'), value: '9'},
                           ]"
               :filter-multiple=false>
               <template slot-scope="scope">
@@ -300,28 +300,11 @@
        * @param typeValue
        */
       changeType(typeValue) {
+        //console.log(typeValue.type[0]);
         let liValue = 0;
         if (typeValue.type[0]) {
           switch (parseInt(typeValue.type[0])) {
-            case 51:
-              liValue = '3';
-              break;
-            case 90:
-              liValue = '4';
-              break;
-            case 91:
-              liValue = '5';
-              break;
-            case 92:
-              liValue = '6';
-              break;
-            /*case 93:
-              liValue = '10'
-              break
-            case 94:
-              liValue = '11'
-              break*/
-            case 95:
+            case 9:
               liValue = '7';
               break;
             default:

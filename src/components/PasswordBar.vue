@@ -27,6 +27,16 @@
         }
     },
     data () {
+      let validatePass = (rule, value, callback) => {
+        let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
+        if (value === '') {
+          callback(new Error(this.$t('message.walletPassWord1')))
+        } else if (!patrn.exec(value)) {
+          callback(new Error(this.$t('message.walletPassWord1')))
+        } else {
+          callback()
+        }
+      };
       return {
         passwordVisible: false,
         passwordShows: 0,
@@ -35,7 +45,7 @@
         },
         passwordRules: {
           password: [
-            {required: true, message: this.$t('message.passWordTitle'), trigger: 'blur'}
+            {validator: validatePass, trigger: 'blur'}
           ]
         },
       }
@@ -77,21 +87,21 @@
       },
       //
       showPassword (boolean) {
-        this.$store.commit('setPasswordShow', false)
-        this.passwordForm.password = ''
+        this.$store.commit('setPasswordShow', false);
+        this.passwordForm.password = '';
         this.passwordVisible = boolean
       },
       //弹出密码输入框
       dialogSubmit (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$emit('toSubmit', this.passwordForm.password)
+            this.$emit('toSubmit', this.passwordForm.password);
             //this.$refs[formName].resetFields()
-            this.passwordVisible = false
+            this.passwordVisible = false;
             this.submitId = 'null'
           } else {
-            console.log('error submit!!')
-            this.$refs[formName].resetFields()
+            console.log('error submit!!');
+            this.$refs[formName].resetFields();
             return false
           }
         })

@@ -1,41 +1,41 @@
 <template>
-    <div class="users">
-        <Back :backTitle="this.$t('message.walletManagement')" :backUrl="backUrl"></Back>
-        <div class="freeze-list-tabs">
-            <h2>{{$t('message.userInfoTitle')}}</h2>
-            <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"></el-button>
-            <el-table :data="userData">
-                <el-table-column prop="address" :label="$t('message.tabName')" width="350" align='center'>
-                </el-table-column>
-                <el-table-column :label="$t('message.tabAlias')" width="100" class="user-aliasing">
-                    <template slot-scope="scope">
-                        <span>{{ scope.row.alias != null  ? scope.row.alias : '-' }}</span>
-                        <i class="el-icon-edit cursor-p"
-                           v-show="scope.row.alias != null  ? false : true"
-                           @click="editAliasing(scope.row.address,scope.row.encrypted)"></i>
-                    </template>
-                </el-table-column>
-                <el-table-column :label="$t('message.operation')" min-width="150" align='center'>
-                    <template slot-scope="scope">
-                        <el-button size="mini" type="text" @click="outUser(scope.row.address,scope.row.encrypted)">
-                            {{$t('message.tabRemove')}}
-                        </el-button>
-                        <el-button size="mini" type="text" @click="backupUser(scope.row.address,scope.row.encrypted)">
-                            {{$t('message.tabBackups')}}
-                        </el-button>
-                        <el-button size="mini" type="text" @click="toPassword(scope.row.address,scope.row.encrypted)">
-                            {{scope.row.encrypted ? $t('message.c160'):$t('message.c161')}}
-                        </el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <el-pagination layout="prev, pager, next" :page-size="20" :total=this.totalAll class="cb"
-                           v-show="totalAllOk = this.totalAll>20 ? true:false"
-                           @current-change="userListSize"></el-pagination>
-            <Password ref="password" @toSubmit="toSubmit"></Password>
+  <div class="users">
+    <Back :backTitle="this.$t('message.walletManagement')" :backUrl="backUrl"></Back>
+    <div class="freeze-list-tabs">
+      <h2>{{$t('message.userInfoTitle')}}</h2>
+      <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"></el-button>
+      <el-table :data="userData">
+        <el-table-column prop="address" :label="$t('message.tabName')" width="350" align='center'>
+        </el-table-column>
+        <el-table-column :label="$t('message.tabAlias')" width="100" class="user-aliasing">
+          <template slot-scope="scope">
+            <span>{{ scope.row.alias != null  ? scope.row.alias : '-' }}</span>
+            <i class="el-icon-edit cursor-p"
+               v-show="scope.row.alias != null  ? false : true"
+               @click="editAliasing(scope.row.address,scope.row.encrypted)"></i>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('message.operation')" min-width="150" align='center'>
+          <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="outUser(scope.row.address,scope.row.encrypted)">
+              {{$t('message.tabRemove')}}
+            </el-button>
+            <el-button size="mini" type="text" @click="backupUser(scope.row.address,scope.row.encrypted)">
+              {{$t('message.tabBackups')}}
+            </el-button>
+            <el-button size="mini" type="text" @click="toPassword(scope.row.address,scope.row.encrypted)">
+              {{scope.row.encrypted ? $t('message.c160'):$t('message.c161')}}
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination layout="prev, pager, next" :page-size="20" :total=this.totalAll class="cb"
+                     v-show="totalAllOk = this.totalAll>20 ? true:false"
+                     @current-change="userListSize"></el-pagination>
+      <Password ref="password" @toSubmit="toSubmit"></Password>
 
-        </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -192,15 +192,30 @@
           let params = '{"password":"' + password + '"}';
           this.outUserAddress('/account/remove/' + this.setAsAddress, params)
         } else {
-          //console.log("outOrBackup="+this.outOrBackup);
           localStorage.setItem('userPass', password);
-          this.$router.push({
-            name: '/newAccount',
-            params: {newOk: false, address: this.setAsAddress},
-          })
+          let params = '{"password":"' + password + '"}';
+          this.queryPassword('/account/password/validation/' + this.setAsAddress, params)
         }
-
       },
+
+      //查询密码是否正确
+      queryPassword(url, params) {
+        this.$post(url, params)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.$router.push({
+                name: '/newAccount',
+                params: {newOk: false, address: this.setAsAddress},
+              })
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
+            }
+          })
+      },
+
       //修改别名
       editAliasing(Address, encrypted) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
@@ -233,38 +248,38 @@
   }
 </script>
 <style lang="less">
-    @import url("../../assets/css/style.less");
+  @import url("../../assets/css/style.less");
 
-    .users {
-        width: 1024px;
-        margin: auto;
-        .freeze-list-tabs {
-            width: 100%;
-            margin: auto;
-            .newAccount {
-                width: 30px;
-               /* line-height: 20px;*/
-                height: 30px;
-                background-color: #0b1422;
-                float: right;
-                border: 1px solid #0b1422;
-                margin-bottom: 10px;
-                margin-right: 40px;
-            }
-            h2 {
-                text-align: center;
-                line-height: 3rem;
-            }
-        }
-        .el-table th {
-            background-color: #17202e;
-        }
-        .el-table tr {
-            background-color: #0c1323;
-        }
-        .el-pagination {
-            margin-top: 1rem;
-            text-align: center;
-        }
+  .users {
+    width: 1024px;
+    margin: auto;
+    .freeze-list-tabs {
+      width: 100%;
+      margin: auto;
+      .newAccount {
+        width: 30px;
+        /* line-height: 20px;*/
+        height: 30px;
+        background-color: #0b1422;
+        float: right;
+        border: 1px solid #0b1422;
+        margin-bottom: 10px;
+        margin-right: 40px;
+      }
+      h2 {
+        text-align: center;
+        line-height: 3rem;
+      }
     }
+    .el-table th {
+      background-color: #17202e;
+    }
+    .el-table tr {
+      background-color: #0c1323;
+    }
+    .el-pagination {
+      margin-top: 1rem;
+      text-align: center;
+    }
+  }
 </style>

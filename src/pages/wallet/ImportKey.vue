@@ -79,7 +79,7 @@
               this.$store.commit('setAddressList', response.data.list);
               if(response.data.list.length === 1){
                 localStorage.setItem('newAccountAddress', response.data.list[0].address);
-                localStorage.setItem('encrypted', response.data.list[0].encrypted)
+                localStorage.setItem('encrypted', response.data.list[0].encrypted);
                 this.$router.push({
                   name: '/wallet'
                 })

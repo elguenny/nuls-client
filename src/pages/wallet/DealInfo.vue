@@ -70,14 +70,14 @@
       getHashInfo (url) {
         this.$fetch(url)
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             this.infoData = response.data;
             this.times = moment(response.data.time).format('YYYY-MM-DD HH:mm:ss');
             let leftShift = new BigNumber(0.00000001);
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {
                 response.data.inputs[i].address = response.data.inputs[i].address.substr(0, 10) + '...' + response.data.inputs[i].address.substr(length - 10)
-                response.data.inputs[i].value =leftShift.times(response.data.inputs[i].value).toFixed(8)
+                response.data.inputs[i].value =leftShift.times(response.data.inputs[i].value).toFixed(8);
                 this.allInputs = BigNumber(this.allInputs).plus(response.data.inputs[i].value).toString()
               }
             }

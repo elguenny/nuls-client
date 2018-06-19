@@ -38,8 +38,8 @@
     methods: {
       //验证文件格式和大小  Verify file format and size
       beforeAvatarUpload (file) {
-        const isType = file.name.substr(file.name.length - 8) === 'keystore'
-        const isLt2M = file.size / 1024 / 1024 < 2
+        const isType = file.name.substr(file.name.length - 8) === 'keystore';
+        const isLt2M = file.size / 1024 / 1024 < 2;
         if (!isType) {
           this.$message.error('上传只能是 keystore 格式文件!')
         } else if (!isLt2M) {
@@ -56,7 +56,7 @@
           if (valid) {
             this.$refs.password.showPassword(true)
           } else {
-            console.log('error submit!!')
+            console.log('error submit!!');
             return false
           }
         })
@@ -73,12 +73,12 @@
 
       //输入密码后提交
       toSubmit (password) {
-        let fs = require('fs')
-        let dataInfo = fs.readFileSync(this.keyStorePath, 'utf-8')
+        let fs = require('fs');
+        let dataInfo = fs.readFileSync(this.keyStorePath, 'utf-8');
         let param = {
           accountKeyStoreDto: eval('(' + dataInfo + ')'),
           password: password,
-        }
+        };
         this.postKeyStore('/account/import', param)
       },
 
@@ -88,11 +88,11 @@
         //console.log('params=' + params)
         this.$post(url, params)
           .then((response) => {
-            console.log(response)
+            console.log(response);
             if (response.success) {
-              localStorage.setItem('newAccountAddress', response.data)
+              localStorage.setItem('newAccountAddress', response.data);
               if (localStorage.getItem('toUserInfo') !== '1') {
-                this.getAccountList('/account')
+                this.getAccountList('/account');
                 this.$router.push({
                   name: '/wallet'
                 })

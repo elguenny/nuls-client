@@ -1,230 +1,164 @@
 <template>
-    <div class="new-account">
-        <Back :backTitle="this.$t('message.accountManagement')" v-show="newOks"></Back>
-        <div class="new-account-top">
-            <h1 v-show="newOk" style="text-align: center"> {{$t('message.newAccountTitle')}}</h1>
-            <h2>
-                {{$t('message.newAccountAddress')}}：{{ this.newAccountAddress }}
-            </h2>
-            <div class="new-account-key">
-                <h3 class="fl">
-                    {{$t('message.newAccountKey')}}：
-                    <input :type="keyShow ? 'text' : 'password'" v-model="keyInfo" readonly="readonly"
-                           style="margin-left: -5px">
-                </h3>
-                <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="keyShow = !keyShow"></i>
-                <i class="" @click="keyCode"></i>
-                <CodeBar v-show="codeShowOk " :keyInfo="keyInfo" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
-            </div>
-        </div>
-        <ul>
-            <li @click="backupsKey">
-                <span>{{$t('message.newAccountBackupsKey')}}</span>
-                <label>{{$t('message.newAccountBackupsKeyInfo')}}</label>
-            </li>
-            <li @click="backupsKeyStore" v-show="false">
-                <span>点击备份KeyStore</span>
-                <label>{{$t('message.newAccountBackupsKeyInfo')}}</label>
-            </li>
-            <!-- <li @click="backupsCode">
-                 <span>{{$t("message.newAccountBackupsCode")}}</span>
-                 <label>{{$t("message.newAccountBackupsCodeInfo")}}</label>
-             </li>-->
-        </ul>
-        <div class="cl new-bt">
-            <el-button type="primary" class="new-submit" @click="newSubmit()">{{$t('message.newAccountSubmit')}}
-            </el-button>
-            <el-button type="primary" class="new-reset" @click="newReset()" v-show="newOk">
-                {{$t('message.newAccountReset')}}
-            </el-button>
-        </div>
+  <div class="new-account">
+    <Back :backTitle="this.$t('message.accountManagement')" v-show="!newOk"></Back>
+    <div class="new-account-top">
+      <h1 v-show="newOk"> {{$t('message.newAccountTitle')}}</h1>
+      <h2>
+        {{$t('message.newAccountAddress')}}：<span>{{ this.newAccountAddress }}</span>
+        <i class="copy_icon cursor-p" @click="accountCopy(newAccountAddress)" :title="$t('message.c143')"></i>
+      </h2>
     </div>
+    <div @click="backupsKeyStore" class="keystore cursor-p">
+      <span>{{$t('message.c181')}}</span>
+      <label>{{$t('message.c182')}}<br/>{{$t('message.c183')}}</label>
+    </div>
+    <div @click="backupsKey" class="key text-d cursor-p">{{$t('message.c184')}}</div>
+
+    <el-dialog title="" :visible.sync="keyDialogVisible" width="45%" center>
+      <div class="key-dialog">
+        <h1>{{$t('message.c185')}}</h1>
+        <p>{{$t('message.c186')}}<br/>{{$t('message.c187')}}<br/>{{$t('message.c188')}}</p>
+        <el-input v-model="this.inputKey" :disabled="true"></el-input>
+        <el-button type="primary" @click="accountCopy(inputKey)">{{$t('message.c143')}}</el-button>
+      </div>
+    </el-dialog>
+    <div class="cl new-bt">
+      <el-button type="primary" class="new-submit" @click="newSubmit()">{{$t('message.newAccountSubmit')}}
+      </el-button>
+      <el-button type="primary" class="new-reset" v-show="newOk" @click="newReset()">
+        {{$t('message.newAccountReset')}}
+      </el-button>
+    </div>
+  </div>
 </template>
 
 <script>
+  import axios from 'axios'
   import Back from '@/components/BackBar.vue'
   import CodeBar from '@/components/CodeBar.vue'
+  import copy from 'copy-to-clipboard'
 
   export default {
-    data () {
+    data() {
       return {
         keyShow: false,
         keyInfo: '',
-        keyStoreInfo:[],
+        keyStoreInfo: [],
         newAccountAddress: this.$route.params.address === '' ? localStorage.getItem('newAccountAddress') : this.$route.params.address,
         codeShowOk: false,
         newOk: this.$route.params.newOk,
-        newOks: this.$route.params.newOk ? false : true,
+        //私钥弹框
+        keyDialogVisible: false,
+        //私钥
+        inputKey: '123456789'
       }
     },
     components: {
       Back,
       CodeBar
     },
-    mounted () {
+    mounted() {
       let _this = this;
-      let params = '{"password":"' + localStorage.getItem('userPass') + '"}';
-      this.getPrikey('/account/prikey/'+ this.newAccountAddress, params);
-      this.getKeyStore('/account/export/'+ this.newAccountAddress, params)
     },
     methods: {
-      //获取私钥
-      getPrikey (url, params) {
-        this.$post(url, params)
-          .then((response) => {
-            if (response.success) {
-              this.keyInfo = response.data;
-              this.passwordVisible = false
-            } else {
-              this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg, duration: '800'
-              });
-              this.$router.push({
-                path: '/wallet/users/userInfo'
-              })
-            }
-          })
+      /**
+       * 复制功能
+       * copy
+       */
+      accountCopy(copyInfo) {
+        copy(copyInfo);
+        //javaUtil.copy(this.accountAddressValue);
+        this.$message({
+          message: this.$t('message.c129'), type: 'success', duration: '800'
+        });
+      },
+
+      /**
+       *备份KeyStore  backups KeyStore
+       **/
+      backupsKeyStore() {
+        let params = '{"password":"' + localStorage.getItem('userPass') + '"}';
+        this.getKeyStore('/account/export/' + this.newAccountAddress, params);
       },
       //获取 keyStore
-      getKeyStore (url, params) {
+      getKeyStore(url, params) {
         this.$post(url, params)
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              this.keyStoreInfo = response.data
+              const content = '{"address":"' + response.data.address +
+                '","encryptedPrivateKey":"' + response.data.encryptedPrivateKey +
+                '","alias":"' + response.data.alias +
+                '","pubKey":"' + response.data.pubKey +
+                '","prikey":"' + response.data.prikey +
+                '"}';
+              const blob = new Blob([content]);
+              const fileName = this.newAccountAddress + '.keystore';
+              if ('download' in document.createElement('a')) { // 非IE下载
+                const elink = document.createElement('a');
+                elink.download = fileName;
+                elink.style.display = 'none';
+                elink.href = URL.createObjectURL(blob);
+                document.body.appendChild(elink);
+                elink.click()
+                URL.revokeObjectURL(elink.href); // 释放URL 对象
+                document.body.removeChild(elink)
+              } else { // IE10+下载
+                navigator.msSaveBlob(blob, fileName)
+              }
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.msg, duration: '800'
               });
-              this.$router.push({
-                path: '/wallet/users/userInfo'
-              })
             }
           })
+      },
 
+      // 下载文件
+      download(data) {
+        if (!data) {
+          return
+        }
+        let url = window.URL.createObjectURL(new Blob([data]));
+        let link = document.createElement('a');
+        link.style.display = 'none';
+        link.href = url;
+        link.setAttribute('download', '123456.keystore');
+
+        document.body.appendChild(link);
+        link.click()
       },
-      //二维码显示隐藏
-      keyCode () {
-        this.$refs.codeBar.codeMaker(this.keyInfo);
-        this.codeShowOk = !this.codeShowOk
-      },
-      codeShowOks () {
-        this.codeShowOk = false
-      },
+
 
       /**
        * 备份私钥
        * Backups Key
        * @method backupsKey
        **/
-      backupsKey () {
-        /*let backupsKeyUrl =javaUtil.download(this.keyInfo);
-        this.$message({
-          message:this.$t('message.c129') +':'+ backupsKeyUrl,type: 'success', duration: '2000'
-        });*/
-        let blob = new Blob([this.keyInfo], { type: 'application/x-xls' });
-        let link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = this.newAccountAddress+'_'+'BackupsKey.txt';
-        link.click()
+      backupsKey() {
+        this.keyDialogVisible = true;
+        let params = '{"password":"' + localStorage.getItem('userPass') + '"}';
+        this.getPrikey('/account/prikey/' + this.newAccountAddress, params);
       },
-
-      //备份KeyStore  backups KeyStore
-      backupsKeyStore(){
-        let keyStoreInfo = "{'address':'"+this.keyStoreInfo.address+
-          "','alias':'"+this.keyStoreInfo.alias+
-          "','encryptedPrivateKey':'"+this.keyStoreInfo.encryptedPrivateKey+
-          "','pubKey':'"+this.keyStoreInfo.pubKey+
-          "'}";
-        console.log("backupsKeyStore="+keyStoreInfo);
-        /*const {dialog} = require('electron').remote;*/
-        dialog.showSaveDialog({
-          properties: [
-            'openFile',
-          ],
-          filters: [
-            {name: 'All Files', extensions: ['*'],}
-          ]
-        }, function (res) {
-          let path = require('path');
-          if (res) {
-            let _path = path.join(res + '.keystore');
-            let fs = require('fs');
-            fs.writeFile(_path, keyStoreInfo, function (err) {
-              if (!err) {
-                alert(res + '.keystore')
-              }
-            })
-          }
-        })
-
-
+      //获取私钥
+      getPrikey(url, params) {
+        this.$post(url, params)
+          .then((response) => {
+            if (response.success) {
+              this.inputKey = response.data;
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg, duration: '800'
+              });
+            }
+          })
       },
-
-      /**
-       * 备份二维码
-       * Backups Code
-       * @method backupsCode
-       **/
-      backupsCode () {
-        $('.qrcode').qrcode({
-          render: 'canvas',
-          width: 256,
-          height: 256,
-          text: this.keyInfo,
-          typeNumber: -1,
-          correctLevel: 2,
-          background: '#ffffff',
-          foreground: '#000000'
-        });
-        this.exportCanvasAsPNG($('.qrcode').find('canvas')[0], this.newAccountAddress + '_privateKey.png')
-      },
-
-      /**
-       * 二维码保存到本地
-       * Export Canvas As PNG
-       * @method exportCanvasAsPNG
-       **/
-      exportCanvasAsPNG (canvas, fileName) {
-       /* const {dialog} = require('electron').remote;*/
-        dialog.showOpenDialog({
-          defaultPath: '../Desktop',
-          properties: [
-            'openDirectory',
-          ],
-          filters: [
-            {name: 'All', extensions: ['*']},
-          ]
-        }, function (res) {
-          if (res[0] !== '') {
-            var MIME_TYPE = 'image/png';
-            var dlLink = document.createElement('a');
-            dlLink.download = fileName;
-            dlLink.href = canvas.toDataURL('image/png');
-            //var fs = require('fs');
-            //fs.writeFileSync('code11.png', dlLink.href.slice('22'), 'utf8');
-            let path = require('path');
-            let _path = path.join(__dirname, process.execPath.substr(0, process.execPath.length - 14) + this.newAccountAddress + '_privateKey.png');
-            //var _path = "D:/work/nuls-client/"+this.newAccountAddress+"_privateKey.png";
-            ipcRenderer.send('download', _path + '+' + res[0]);
-            dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.href].join(':');
-            document.body.appendChild(dlLink);
-            dlLink.click();
-            document.body.removeChild(dlLink);
-            $('.qrcode').html('');
-            alert(res)
-          } else {
-            alert(this.$t('message.c109'))
-          }
-        })
-      },
-
       /**
        * 完成备份提示跳转
        * New Submit
        * @method newSubmit
        **/
-      newSubmit () {
+      newSubmit() {
         this.$confirm(this.$t('message.c110'), this.$t('message.c86'), {
           confirmButtonText: this.$t('message.c111'),
           cancelButtonText: this.$t('message.c112'),
@@ -246,7 +180,7 @@
        * New Reset
        * @method newReset
        **/
-      newReset () {
+      newReset() {
         this.$router.push({
           path: '/wallet'
         })
@@ -256,124 +190,113 @@
 </script>
 
 <style lang="less">
-    @import url("../../assets/css/style.less");
+  @import url("../../assets/css/style.less");
 
-    .new-account {
-      width: 1024px;
-      margin: auto;
-        font-size: 14px;
-        line-height: 1.6rem;
-        .back {
-            margin-left: 0;
-        }
-        .new-account-top {
-            width: 100%;
-            height: 110px;
-            margin: 15px auto 10px;
-            text-align: left;
-            h1 {
-                padding: 1.2rem 0;
-                font-size: 16px;
-                font-weight: 500;
-            }
-            h2 {
-            }
-            .new-account-key {
-                width: 125%;
-                margin: auto;
-                text-align: left;
-                h3 {
-                    width: 72%;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    input {
-                        width: 100%;
-                        border: none;
-                    }
-                }
-                .icon {
-                    width: 30px;
-                    height: 20px;
-                    display: block;
-                    float: left;
-                    background-size: @bg-size;
-                    background: @bg-image
-                }
-                .icon-eye {
-                    background-position: -159px -46px;
-                }
-                .icon-eye-blocked {
-                    background-position: -226px -77px;
-                }
-                .modal-overlay {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    height: 100%;
-                    text-align: center;
-                    z-index: 1000;
-                    background-color: #333;
-                    opacity: 0.85;
-                }
-                .modal-data {
-                    width: 100%;
-                    height: 100%;
-                    padding: 100px auto;
-                    text-align: center;
-                    .qrcode {
-                        padding: 20% 0 0 0;
-                    }
-                }
-            }
-        }
-        ul {
-            width: 90%;
-            height: 50%;
-            margin: 20px auto 0;
-            li {
-                width: 32%;
-                height: 11rem;
-                float: left;
-                margin-right: 5%;
-                //margin-left: 8%;
-                margin-left: 33%;
-                border: 1px solid #658cc5;
-                background-color: #181f2f;
-                text-align: center;
-                span {
-                    display: block;
-                    font-size: 1rem;
-                    padding: 1.2rem 0;
-                }
-                label {
-                    display: block;
-                    font-size: 0.8rem;
-                    padding: 0 0.5rem;
-                    text-align: center;
-                }
-            }
-            li:last-child {
-            }
-        }
-        .new-bt {
-            width: 60%;
-            margin: auto;
-            padding-top: 2%;
-            button {
-                display: block;
-                width: 50%;
-                margin: 5% auto 0;
-
-            }
-            .new-submit {
-            }
-            .new-reset {
-                background-color: #181f2f;
-                border-color: #658cc5;
-            }
-        }
-
+  .new-account {
+    width: 1024px;
+    margin: auto;
+    font-size: 14px;
+    line-height: 1.6rem;
+    .back {
+      margin-left: 0;
     }
+    .new-account-top {
+      width: 100%;
+      height: 110px;
+      margin: 15px auto 10px;
+      text-align: center;
+      h1 {
+        margin-top: 82pt;
+        font-size: 20px;
+      }
+      h2 {
+        width: 580px;
+        font-size: 20px;
+        margin: 10pt auto 0;
+        span {
+          color: #f5c757;
+        }
+        i {
+          width: 30px;
+          height: 20px;
+          display: block;
+          float: right;
+          background-size: @bg-size;
+          background: @bg-image
+        }
+        .copy_icon {
+          background-position: -198px -46px;
+        }
+      }
+    }
+    .keystore {
+      width: 285px;
+      height: 270px;
+      margin: 40pt auto 8pt;
+      border: 1px solid #658cc5;
+      background-color: #17202e;
+      text-align: center;
+      span {
+        display: block;
+        font-size: 16px;
+        padding: 80px 0 0;
+      }
+      label {
+        display: block;
+        font-size: 14px;
+        padding-top: 40px;
+        text-align: center;
+      }
+    }
+    .key {
+      width: 280px;
+      margin: auto;
+      color: #3a8ee6;
+      font-size: 16px;
+      text-align: center;
+    }
+    .new-bt {
+      width: 60%;
+      margin: auto;
+      padding-top: 20pt;
+      button {
+        display: block;
+        width: 50%;
+        margin: 5pt auto 0;
+      }
+      .new-submit {
+      }
+      .new-reset {
+        background-color: #181f2f;
+        border-color: #658cc5;
+      }
+    }
+
+    .el-dialog__wrapper {
+      .el-dialog--center {
+        .el-dialog__body {
+          text-align: center;
+          .key-dialog {
+            margin: 0 24pt;
+            h1 {
+              text-align: center;
+              padding: 20pt 0 10pt;
+              font-size: 20px;
+            }
+            p {
+              text-align: left;
+              font-size: 14px;
+            }
+            input {
+              margin: 8pt 0 20pt;
+            }
+            button {
+              margin-bottom: 20pt;
+            }
+          }
+        }
+      }
+    }
+
+  }
 </style>
