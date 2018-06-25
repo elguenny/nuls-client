@@ -70,16 +70,15 @@
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              localStorage.setItem('newAccountAddress', response.data[0]);
+              localStorage.setItem('newAccountAddress', response.data.list[0]);
               localStorage.setItem('encrypted', this.isPassword);
-              localStorage.setItem('userPass', md5(this.passwordValue + 'nuls'));
               this.getAccountList('/account');
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
               })
             } else {
               this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
           })

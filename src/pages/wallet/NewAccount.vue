@@ -18,7 +18,9 @@
       <div class="key-dialog">
         <h1>{{$t('message.c185')}}</h1>
         <p>{{$t('message.c186')}}<br/>{{$t('message.c187')}}<br/>{{$t('message.c188')}}</p>
-        <el-input v-model="this.inputKey" :disabled="false"></el-input>
+        <div class="key-info">
+          {{this.inputKey}}
+        </div>
         <el-button type="primary" @click="accountCopy(inputKey)">{{$t('message.c143')}}</el-button>
       </div>
     </el-dialog>
@@ -50,7 +52,7 @@
         //私钥弹框
         keyDialogVisible: false,
         //私钥
-        inputKey: '123456789'
+        inputKey: ''
       }
     },
     components: {
@@ -144,8 +146,9 @@
       getPrikey(url, params) {
         this.$post(url, params)
           .then((response) => {
+            //console.log(response);
             if (response.success) {
-              this.inputKey = response.data;
+              this.inputKey = response.data.value;
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.msg, duration: '800'
@@ -287,8 +290,14 @@
               text-align: left;
               font-size: 14px;
             }
-            input {
+            .key-info{
+              background: #0b1422;
+              border-radius: 0.05rem;
+              height: 26px;
+              border: 1px solid #24426c;
               margin: 8pt 0 20pt;
+              text-align: left;
+              font-size: 12px;
             }
             button {
               margin-bottom: 20pt;

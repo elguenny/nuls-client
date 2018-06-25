@@ -1,55 +1,57 @@
 <template>
-    <div class="agency-node">
-        <Back :backTitle="this.$t('message.consensusManagement')"></Back>
-        <h2>{{$t('message.c43')}}</h2>
-        <div class="agency-node-top">
-            <div class="search-div fl">
-                <el-input :placeholder="this.$t('message.c44')" v-model="keyword">
-                    <template slot="append">
-                        <el-button slot="append" @click="searchConsensus">{{$t('message.c45')}}</el-button>
-                    </template>
-                </el-input>
+  <div class="agency-node">
+    <Back :backTitle="this.$t('message.consensusManagement')"></Back>
+    <h2>{{$t('message.c43')}}</h2>
+    <div class="agency-node-top">
+      <div class="search-div fl">
+        <el-input :placeholder="this.$t('message.c44')" v-model="keyword">
+          <template slot="append">
+            <el-button slot="append" @click="searchConsensus">{{$t('message.c45')}}</el-button>
+          </template>
+        </el-input>
+      </div>
+      <div class="select-div fl">
+        <div class="address-select sort-select" @click="showDataList">
+          <div class="sub-selected-value">
+            {{this.sortValue}}
+            <div class="sub-select-list" v-if="showData">
+              <div class="sub-select-item sort-select-item" v-for="item in sortConsensusList"
+                   @click.stop="sortConsensus(item.sortName,item.sortKey)">
+                {{item.sortName}}
+              </div>
             </div>
-            <div class="select-div fl">
-                <div class="address-select sort-select" @click="showDataList">
-                    <div class="sub-selected-value">
-                        {{this.sortValue}}
-                        <div class="sub-select-list" v-if="showData">
-                            <div class="sub-select-item sort-select-item" v-for="item in sortConsensusList"
-                                 @click.stop="sortConsensus(item.sortName,item.sortKey)">
-                                {{item.sortName}}
-                            </div>
-                        </div>
-                    </div>
-                    <i class="el-icon-arrow-up" :class="showData ? 'i_reverse':''"></i>
-                </div>
-            </div>
+          </div>
+          <i class="el-icon-arrow-up" :class="showData ? 'i_reverse':''"></i>
         </div>
-        <div class="agency-node-bottom">
-            <div class="div-icon cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentHash)">
-                <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
-                    {{ $t('message.status'+item.status) }}
-                </p>
-                <h3>{{item.agentId}}</h3>
-                <ul>
-                    <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentName ? item.agentName : item.agentAddresss }}</li>
-                    <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                    <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit).toFixed(2)}} NULS</li>
-                    <li class="cb">
-                        <label class="fl">{{$t('message.c47')}}：</label>{{(item.totalDeposit).toFixed(2)}}
-                    </li>
-                    <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
-                        <label class="fl cursor-p">{{$t('message.c18')}}:</label>
-                        <ProgressBar :colorData="item.creditVals < 0 ? '#f64b3e':'#82bd39'"
-                                     :widthData="item.creditVal"></ProgressBar>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <el-pagination layout="prev, pager, next" :page-size="16" :total=this.totalAll
-                       v-show="totalOK = this.totalAll > 16 ? true:false" class="cb"
-                       @current-change="allConsensusSize"></el-pagination>
+      </div>
     </div>
+    <div class="agency-node-bottom">
+      <div class="div-icon cursor-p" v-for="(item,index) in allConsensus" @click="toNodePage(item.agentHash)">
+        <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
+          {{ $t('message.status'+item.status) }}
+        </p>
+        <h3>{{item.agentId}}</h3>
+        <ul>
+          <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentName ? item.agentName :
+            item.agentAddresss }}
+          </li>
+          <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
+          <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit).toFixed(2)}} NULS</li>
+          <li class="cb">
+            <label class="fl">{{$t('message.c47')}}：</label>{{(item.totalDeposit).toFixed(2)}}
+          </li>
+          <li @mouseover="toggleShow(index)" @mouseout="toggleShow(index)">
+            <label class="fl cursor-p">{{$t('message.c18')}}:</label>
+            <ProgressBar :colorData="item.creditVals < 0 ? '#f64b3e':'#82bd39'"
+                         :widthData="item.creditVal"></ProgressBar>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <el-pagination layout="prev, pager, next" :page-size="16" :total=this.totalAll
+                   v-show="totalOK = this.totalAll > 16 ? true:false" class="cb"
+                   @current-change="allConsensusSize"></el-pagination>
+  </div>
 </template>
 
 <script>
@@ -62,7 +64,7 @@
       return {
         showData: false,
         sortValue: this.$t('message.c46'),
-        indexTo: this.$route.params.indexTo,
+        indexTo: this.$route.query.indexTo,
         sortKey: '',
         sortConsensusList: [
           {sortName: this.$t('message.c46'), sortKey: ''},
@@ -102,6 +104,7 @@
           'pageNumber': sessionStorage.getItem('pageNumber')
         };
       }
+      //console.log(params);
       this.getAllConsensus('/consensus/agent/list/', params)
     },
     methods: {
@@ -109,8 +112,8 @@
       getAllConsensus(url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(params)
-            //console.log(response);
+            console.log(params);
+            console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
               for (let i = 0; i < response.data.list.length; i++) {
@@ -180,81 +183,81 @@
       //查看节点详情
       toNodePage(index) {
         this.$router.push({
-          name: '/nodePage',
-          params: {address: index},
+          path: '/consensus/nodePage',
+          query: {address: index}
         });
         sessionStorage.setItem("keyword", this.keyword);
         sessionStorage.setItem("sortKey", this.sortKey);
-        sessionStorage.setItem("pageNumber", this.pageNumber)
+        //sessionStorage.setItem("pageNumber", this.pageNumber)
       }
     }
   }
 </script>
 
 <style lang="less">
-    @import url("../../assets/css/style.less");
+  @import url("../../assets/css/style.less");
 
-    .agency-node {
-      width: 1024px;
+  .agency-node {
+    width: 1024px;
+    margin: auto;
+    h2 {
+      font-size: 16px;
+      text-align: center;
+      line-height: 20px;
+      margin-bottom: 30px;
+    }
+    .agency-node-top {
+      width: 100%;
       margin: auto;
-        h2 {
-            font-size: 16px;
-            text-align: center;
-            line-height: 20px;
-            margin-bottom: 30px;
+      height: 30px;
+      .search-div {
+        width: 70%;
+        input[type="text"],
+        select {
+          background-color: #17202e;
+          border: 1px solid #658ec7;
+          padding: 0 6px;
+          color: #FFFFFF;
         }
-        .agency-node-top {
-            width: 100%;
-            margin: auto;
-            height: 30px;
-            .search-div {
-                width: 70%;
-                input[type="text"],
-                select {
-                    background-color: #17202e;
-                    border: 1px solid #658ec7;
-                    padding: 0 6px;
-                    color: #FFFFFF;
-                }
-                .el-select-dropdown__list {
-                    width: 165px;
-                }
-                .el-input-group__append {
-                    border-left: 0;
-                    background-color: #658ec7;
-                    border-color: #658ec7;
-                    border-radius: 0;
-                    color: #ffffff;
-                    font-size: 12px;
-                }
-            }
-            .select-div {
-                margin-left: 3%;
-                width: 165px;
-                .sort-select {
-                    width: 260px;
-                    .sort-select-item {
-                        width: 260px;
-                    }
-                }
-            }
+        .el-select-dropdown__list {
+          width: 165px;
         }
-        .agency-node-bottom {
-            width: 100%;
-            margin: auto;
-            .div-icon {
-                height: 145px;
-                margin-top: 5px;
-                margin-right: 8px;
-                display: inline-block;
-            }
+        .el-input-group__append {
+          border-left: 0;
+          background-color: #658ec7;
+          border-color: #658ec7;
+          border-radius: 0;
+          color: #ffffff;
+          font-size: 12px;
         }
-        .el-scrollbar__wrap {
-            overflow: visible;
+      }
+      .select-div {
+        margin-left: 3%;
+        width: 165px;
+        .sort-select {
+          width: 260px;
+          .sort-select-item {
+            width: 260px;
+          }
         }
+      }
     }
+    .agency-node-bottom {
+      width: 100%;
+      margin: auto;
+      .div-icon {
+        height: 145px;
+        margin-top: 5px;
+        margin-right: 8px;
+        display: inline-block;
+      }
+    }
+    .el-scrollbar__wrap {
+      overflow: visible;
+    }
+  }
 
-    .el-popper[x-placement^=bottom] .popper__arrow {
-        display: none;
-    }
+  .el-popper[x-placement^=bottom] .popper__arrow {
+    display: none;
+  }
 </style>

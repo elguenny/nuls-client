@@ -128,6 +128,7 @@
       },
       //去备份
       toBackups() {
+        sessionStorage.setItem('isActive',1);
         this.$router.push({
           name: '/userInfo'
         })

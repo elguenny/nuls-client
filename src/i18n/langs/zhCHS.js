@@ -52,6 +52,7 @@ const cn = {
     setPassWord1: '设置密码',
     walletPassWord: '账户密码',
     walletPassWord1: '8-20位字符,需包含字母和数字',
+    walletPassWord2: '密码错误',
     affirmWalletPassWord: '确认密码',
     passWordHint: '密码提示(可选)',
     passWordInfo: '请认真保存当前账户的密码，若账户密码丢失，很可能导致您的资产丢失！',
@@ -68,7 +69,7 @@ const cn = {
     createNewAccount: '创建账户',
     createNewAccountInfo: '您可以创建一个全新的账户',
     importAccount: '导入账户',
-    importAccountInfo: '您可以导入原账户文件，支持明文私钥',
+    importAccountInfo: '您可以导入keystore文件或明文私钥',
     //new account
     newAccountTitle: '恭喜！您已成功创建账户，请立即备份！',
     newAccountAddress: '地址',
@@ -309,7 +310,7 @@ const cn = {
     c142: '关闭',
     c143: '复制',
     c144: '显示/隐藏',
-    c145: '点击复制txid',
+    c145: '点击复制',
 
     c146: 'KeyStore格式导入',
     c147: '只能上传keystore文件，且不超过2M',
@@ -364,12 +365,8 @@ const cn = {
     c193:'私钥导入',
     c194:'请选择keystore文件',
     c195:'对不起！下载失败，请重试。',
-
-
-
-
-
-
+    c196:'对不起，您的浏览器不支持indexedDB,不能使用通讯录功能 ',
+    c197:'导入账户申请已经提交完成，后台需要一点时间处理完成后会在账户列表里展示。',
 
     refresh: '刷新',
     //bottomInfo

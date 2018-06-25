@@ -233,7 +233,7 @@
               })
             } else {
               this.$message({
-                message: this.$t('message.passWordFailed') + response.msg,
+                message: this.$t('message.passWordFailed') + response.data.msg,
                 type: 'warning',
               })
             }

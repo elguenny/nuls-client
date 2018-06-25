@@ -105,31 +105,24 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            let param = '{"password":"' + this.passForm.oldPass + '","newPassword":"' + this.passForm.pass + '"}'
-            //console.log(param);
+            let param = '{"password":"' + this.passForm.oldPass + '","newPassword":"' + this.passForm.pass + '"}';
             this.$put('/account/password/' + this.address, param)
               .then((response) => {
-                console.log(response)
+                console.log(response);
                 if (response.success) {
                   this.$message({
                     type: 'success', message: this.$t('message.passWordSuccess')
-                  })
-                  localStorage.setItem('userPass', this.passForm.pass)
-                  //localStorage.setItem('passWordHint', this.passForm.passWordHint);
+                  });
                   this.$router.push({
-                    path: '/users/setPage'
+                    name: '/userInfo'
                   })
                 } else {
                   this.$message({
-                    type: 'warning', message: this.$t('message.passWordFailed')+":" + response.msg
+                    type: 'warning', message: this.$t('message.passWordFailed')+":" + response.data.msg,
                   })
                 }
-
               })
           } else {
-            /*this.$message({
-                type: 'success', message: this.$t('message.passWordFailed')
-            });*/
             return false
           }
         })

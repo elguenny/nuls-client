@@ -73,6 +73,9 @@
     mounted() {
       this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en';
 
+      setInterval(() => {
+       this.isActive = sessionStorage.hasOwnProperty('isActive') ? parseInt(sessionStorage.getItem('isActive')) : 0 ;
+      }, 500)
     },
     methods: {
 
@@ -234,7 +237,7 @@
           background-position: -130px 0;
         }
         .more_icon {
-          background-position: -165px 0;
+          background-position: -236px 0;
         }
         span {
           margin-left: 20px;

@@ -71,8 +71,6 @@ export function patch (url, data = {}) {
  * */
 export function put (url, data = {}) {
   return new Promise((resolve, reject) => {
-    console.log(url);
-    console.log(data);
     axios.put(url, data)
       .then(response => {
         resolve(response.data)

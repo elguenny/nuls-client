@@ -1,9 +1,12 @@
 <template>
   <div id="app">
     <Top></Top>
-    <transition>
-      <router-view></router-view>
-    </transition>
+    <keep-alive>
+      <router-view v-if="$route.meta.keepAlive">
+      </router-view>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keepAlive">
+    </router-view>
     <Bottom></Bottom>
   </div>
 </template>
@@ -35,11 +38,12 @@
       getBottromInfo() {
         this.$fetch('/client/version')
           .then((response) => {
+            //console.log(response);
             if (response.success) {
               this.$store.commit('setVersionInfo', response.data);
             }
           }).catch((reject) => {
-          console.log(reject);
+          //console.log(reject);
         })
       },
     }

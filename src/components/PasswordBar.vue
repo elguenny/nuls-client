@@ -30,9 +30,9 @@
       let validatePass = (rule, value, callback) => {
         let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
         if (value === '') {
-          callback(new Error(this.$t('message.walletPassWord1')))
+          callback(new Error(this.$t('message.walletPassWord2')))
         } else if (!patrn.exec(value)) {
-          callback(new Error(this.$t('message.walletPassWord1')))
+          callback(new Error(this.$t('message.walletPassWord2')))
         } else {
           callback()
         }

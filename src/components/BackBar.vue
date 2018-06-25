@@ -21,10 +21,8 @@
     methods: {
       back() {
         if (this.backUrl === "1") {
-          //console.log("11111");
           this.$router.go(-1);
         } else {
-          //console.log("2222");
           this.$router.push({
             name: this.backUrl,
           })

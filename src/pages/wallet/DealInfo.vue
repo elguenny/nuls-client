@@ -6,7 +6,8 @@
                 <div>&nbsp;&nbsp;{{$t('message.input')}}<span> {{this.allInputs.toString()}} NULS</span></div>
                 <ul>
                     <li v-for="inItem in inputs">
-                        {{ inItem.address }}<span>{{inItem.value.toString()}}</span>
+                        <label @click="hashCopy(inItem.address)" class="cursor-p" :title="$t('message.c145')">{{ inItem.address }}</label>
+                      <span>{{inItem.value.toString()}}</span>
                     </li>
                 </ul>
             </div>
@@ -14,7 +15,8 @@
                 <div>&nbsp;&nbsp;{{$t('message.output')}}<span>{{this.allOutputs.toString()}} NULS</span></div>
                 <ul>
                     <li v-for="outItem in outputs">
-                        {{ outItem.address }}<span>{{outItem.value.toString()}}</span>
+                      <label @click="hashCopy(outItem.address)" class="cursor-p" :title="$t('message.c145')">{{ outItem.address }}</label>
+                      <span>{{outItem.value.toString()}}</span>
                     </li>
                 </ul>
             </div>
@@ -76,7 +78,7 @@
             let leftShift = new BigNumber(0.00000001);
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {
-                response.data.inputs[i].address = response.data.inputs[i].address.substr(0, 10) + '...' + response.data.inputs[i].address.substr(length - 10)
+                //response.data.inputs[i].address = response.data.inputs[i].address.substr(0, 10) + '...' + response.data.inputs[i].address.substr(length - 10)
                 response.data.inputs[i].value =leftShift.times(response.data.inputs[i].value).toFixed(8);
                 this.allInputs = BigNumber(this.allInputs).plus(response.data.inputs[i].value).toString()
               }
@@ -85,7 +87,7 @@
 
             if (response.data.outputs.length > 0) {
               for (let i = 0; i < response.data.outputs.length; i++) {
-                response.data.outputs[i].address = response.data.outputs[i].address.substr(0, 10) + '...' + response.data.outputs[i].address.substr(length - 10)
+                //response.data.outputs[i].address = response.data.outputs[i].address.substr(0, 10) + '...' + response.data.outputs[i].address.substr(length - 10)
                 response.data.outputs[i].value = leftShift.times(response.data.outputs[i].value).toFixed(8)
                 this.allOutputs = BigNumber(this.allOutputs).plus(response.data.outputs[i].value).toString()
               }

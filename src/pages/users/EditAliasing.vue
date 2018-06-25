@@ -35,6 +35,7 @@
   import Password from '@/components/PasswordBar.vue'
   import {BigNumber} from 'bignumber.js'
 
+
   export default {
     data() {
       let aliasing = (rule, value, callback) => {
@@ -74,20 +75,23 @@
     },
     mounted() {
       let _this = this;
-      this.getBalanceAddress('/accountledger/balance/' + this.address)
+      this.getBalanceAddress()
     },
     methods: {
       //根据账户地址获取账户余额
-      getBalanceAddress(url) {
-        this.$fetch(url)
+      getBalanceAddress() {
+        this.utils.getBalance(this.address)
           .then((response) => {
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
-              this.usable = parseFloat(leftShift.times(response.data.usable.value).toString())
+              this.usable = parseFloat(leftShift.times(response.data.usable.value).toString());
               //this.usable = response.data.usable * 0.000000001
             } else {
               this.usable = 0
             }
+          })
+          .catch((reject) => {
+            console.log(reject)
           })
       },
       /**
@@ -151,11 +155,12 @@
                 type: 'success', message: this.$t('message.passWordSuccess')
               });
               this.$router.push({
-                name: '/userInfo'
+                path: '/wallet/users/userInfo',
+                query: {address: this.address}
               })
             } else {
               this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg,
               })
             }
           })

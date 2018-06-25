@@ -149,8 +149,6 @@
         this.$fetch(url, params)
           .then((response) => {
             if (response.success) {
-              //console.log(url);
-              //console.log(params);
               //console.log(response);
               let leftShift = new BigNumber(0.00000001);
               this.total = response.data.total;

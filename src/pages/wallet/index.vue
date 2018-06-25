@@ -137,7 +137,7 @@
         activeName: sessionStorage.getItem('walletActiveName'),
         tabName: 'first',
         totalAll: 0,
-        pages: 1,
+        pages: 1 ,
         types: '',
         walletSetInterval: null,
       }
@@ -147,15 +147,6 @@
       AccountAddressBar,
     },
     created() {
-      /**
-       *  判断显示隐藏数字
-       *Judgment display hidden numbers
-       */
-      if (localStorage.getItem('keyShow') === 'true') {
-        this.keyShow = true
-      } else {
-        this.keyShow = false
-      }
       this.getAccountAssets('/account/assets/' + this.accountAddressValue);
 
       /**
@@ -204,16 +195,16 @@
       getAccountAssets(url) {
         this.$fetch(url)
           .then((response) => {
-            ///console.log(response);
+           //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
-              for (let i = 0; i < response.data.length; i++) {
+              for (let i = 0; i < response.data.list.length; i++) {
                 //console.log(leftShift.times(response.data[i].balance).toFixed(8))
-                response.data[i].balance = leftShift.times(response.data[i].balance);
-                response.data[i].locked = leftShift.times(response.data[i].locked);
-                response.data[i].usable = leftShift.times(response.data[i].usable)
+                response.data.list[i].balance = leftShift.times(response.data.list[i].balance);
+                response.data.list[i].locked = leftShift.times(response.data.list[i].locked);
+                response.data.list[i].usable = leftShift.times(response.data.list[i].usable)
               }
-              this.accountData = response.data
+              this.accountData = response.data.list
             }
           })
       },
@@ -228,7 +219,7 @@
         //console.log(param)
         this.$fetch(url, param)
           .then((response) => {
-            //console.log(response)
+            //console.log(response);
             //判断是否查询到数据
             if (response.data != null) {
               this.totalAll = response.data.total;
@@ -236,8 +227,6 @@
               if (response.data.list.length > 0) {
                 //this.$store.commit("setAccountTxList",response.data.list);
                 for (let i = 0; i < response.data.list.length; i++) {
-                  let length = response.data.list[i].txHash.length;
-                  //response.data.list[i].hashs = response.data.list[i].txHash.substr(0, 10) + '...' + response.data.list[i].txHash.substr(length - 10);
                   response.data.list[i].hashs = response.data.list[i].txHash;
                   response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
                 }
@@ -345,6 +334,8 @@
           this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, params)
         } else {
           sessionStorage.setItem('walletActiveName', tab.name);
+          this.types='';
+          this.pages = 1;
           this.walletHide = true;
           this.getAccountAssets('/account/assets/' + this.accountAddressValue)
         }

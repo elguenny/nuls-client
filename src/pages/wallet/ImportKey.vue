@@ -24,6 +24,7 @@
     data () {
       return {
         submitId: 'importKey',
+        encrypted:false,
         keyData: {
           keyInfo: ''
         },
@@ -56,19 +57,30 @@
         if(password === ''){
           params = '{"priKey":"' + this.keyData.keyInfo + '","password":""}'
         }else{
-          params = '{"priKey":"' + this.keyData.keyInfo + '","password":"' + password + '"}'
+          params = '{"priKey":"' + this.keyData.keyInfo + '","password":"' + password + '"}';
+          this.encrypted = true
         }
         this.$post('/account/import/pri', params)
           .then((response) => {
-            console.log("/account/import/pri===" +params);
+            //console.log(response);
             if (response.success) {
+              //导入的新账户默认为当前账户
+              localStorage.setItem('newAccountAddress', response.data.value);
+              localStorage.setItem('encrypted', this.encrypted.toString());
               this.getAccountList('/account');
             } else {
               this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
             this.passwordVisible = false
+          })
+          .catch(err => {
+            //console.log(err);
+            this.getAccountList('/account');
+            this.$message({
+              type: 'success', message: this.$t('message.c197'), duration: '3000'
+            })
           })
       },
       //获取账户地址列表
@@ -89,9 +101,9 @@
                   params: {'address':response.data},
                 })
               }
-              this.$message({
+              /*this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
-              })
+              })*/
             }
           }).catch((reject) => {
           console.log('User List err' + reject)

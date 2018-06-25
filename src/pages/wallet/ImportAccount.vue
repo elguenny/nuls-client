@@ -26,7 +26,7 @@
       return {
         //定时获取文件路径
         fellPathSetInterval: null,
-
+        encrypted:false,
         imageUrl: '',
         keyStorePath: '',
         keyStoreInfo: {},
@@ -66,8 +66,6 @@
                   reader.readAsText(file);
                   //定时导入
                   setTimeout(() => {
-                    //this.keyStoreInfo = JSON.parse(p.innerHTML);
-                    //console.log(JSON.parse(p.innerHTML));
                     let params = JSON.parse(p.innerHTML);
                     this.keyStoreInfo = {
                       address: params.address === "null" ? null : params.address,
@@ -77,7 +75,8 @@
                       prikey: params.prikey === "null" ? null : params.prikey
                     };
                     if (JSON.parse(p.innerHTML).encryptedPrivateKey !== 'null') {
-                      this.$refs.password.showPassword(true)
+                      this.encrypted = true;
+                      this.$refs.password.showPassword(true);
                     } else {
                       let param = {
                         accountKeyStoreDto: this.keyStoreInfo,
@@ -169,11 +168,14 @@
       postKeyStore(url, params) {
         this.$post(url, params)
           .then((response) => {
-            //console.log(params);
             //console.log(response);
             if (response.success) {
               let p = document.querySelector('#preview');
               p.innerHTML = '';
+              //导入的新账户默认为当前账户
+              localStorage.setItem('newAccountAddress', response.data.value);
+              localStorage.setItem('encrypted', this.encrypted.toString());
+
               this.getAccountList('/account');
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
@@ -192,8 +194,6 @@
             if (response.success) {
               this.$store.commit('setAddressList', response.data.list);
               if(response.data.list.length === 1){
-                localStorage.setItem('newAccountAddress', response.data.list[0].address);
-                localStorage.setItem('encrypted', response.data.list[0].encrypted);
                 this.$router.push({
                   name: '/wallet'
                 })

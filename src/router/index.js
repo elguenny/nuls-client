@@ -76,7 +76,10 @@ const router = new VueRouter({
     {
       path: '/wallet',
       name: '/wallet',
-      component: resolve => require(['@/pages/wallet/Index.vue'], resolve)
+      component: resolve => require(['@/pages/wallet/Index.vue'], resolve),
+      meta: {
+        keepAlive: true,
+      }
     },
     {
       path: '/wallet/index/freezeList :address',
@@ -122,8 +125,10 @@ const router = new VueRouter({
       //共识首页
       path: '/consensus',
       name: '/consensus',
-      component: resolve => require(['@/pages/consensus/Index.vue'], resolve)
-
+      component: resolve => require(['@/pages/consensus/Index.vue'], resolve),
+      meta: {
+        keepAlive: true,
+      }
     },
     {
       path: '/consensus/myNode :agentAddress/:agentHash',
@@ -139,37 +144,55 @@ const router = new VueRouter({
     },
     {
       path: '/consensus/pledgeInfo',
-      name: 'pledgeInfo',
+      name: '/pledgeInfo',
       component: resolve => require(['@/pages/consensus/PledgeInfo.vue'], resolve)
     },
     {
       path: '/consensus/newNode',
-      name: 'newNode',
+      name: '/newNode',
       component: resolve => require(['@/pages/consensus/NewNode.vue'], resolve)
     },
     {
-      path: '/consensus/agencyNode :indexTo',
+      path: '/consensus/agencyNode',
       name: '/agencyNode',
-      component: resolve => require(['@/pages/consensus/AgencyNode.vue'], resolve)
+      component: resolve => require(['@/pages/consensus/AgencyNode.vue'], resolve),
+      meta: {
+        keepAlive: true,
+      }
     },
     {
-      path: '/consensus/nodeInfo :txHash',
+      path: '/consensus/nodeInfo',
       name: '/nodeInfo',
       component: resolve => require(['@/pages/consensus/NodeInfo.vue'], resolve)
     },
     {
-      path: '/consensus/nodeInfo/allPledge :agentName/:txHash',
+      path: '/consensus/nodePage',
+      name: '/nodePage',
+      component: resolve => require(['@/pages/consensus/NodePage.vue'], resolve)
+    },
+    {
+      path: '/consensus/allPledge',
       name: '/allPledge',
       component: resolve => require(['@/pages/consensus/AllPledge.vue'], resolve)
     },
-    {
-      path: '/consensus/nodeInfo/nodePage :address',
-      name: '/nodePage',
-      component: resolve => require(['@/pages/consensus/NodePage.vue'], resolve)
-    }
   ]
 });
 
+/**
+ * 判断是前进还是后退
+ */
+router.beforeEach((to, from, next) => {
+  /*console.log(to.name);
+   console.log(from.name);
+   console.log(from.name === '/dealInfo' || from.name === '/nodePage');*/
+  if (from.name === '/dealInfo' || from.name === '/nodePage') {
+    to.meta.keepAlive = true;
+    from.meta.keepAlive = false;
+  } else {
+    to.meta.keepAlive = false;
+  }
+  next()
+});
 /**
  *  路由出口
  */

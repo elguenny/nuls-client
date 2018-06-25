@@ -54,7 +54,9 @@
               </p>
               <h3 class="overflow">{{item.agentId}}</h3>
               <ul>
-                <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentName ? item.agentName : item.agentAddresss }}</li>
+                <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentName ? item.agentName :
+                  item.agentAddresss }}
+                </li>
                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
                 <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit).toFixed(2)}} NULS</li>
                 <li class="cb">
@@ -77,13 +79,15 @@
           </el-tab-pane>
           <el-tab-pane :label="$t('message.c12')" name="second">
             <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
-                 @click="toMyNode(item.txHash,item.agentHash)">
+                 @click="toMyNode(item.agentAddress,item.agentHash)">
               <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
                 {{ $t('message.status'+item.status) }}
               </p>
               <h3 class="overflow">{{item.agentId}}</h3>
               <ul>
-                <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentName ? item.agentName : item.agentAddresss }}</li>
+                <li class="overflow"><label>{{$t('message.c16')}}：</label>{{ item.agentName ? item.agentName :
+                  item.agentAddresss }}
+                </li>
                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
                 <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit*0.00000001).toFixed(2) }}
                   NULS
@@ -181,7 +185,6 @@
         this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
       }
       this.getAllConsensus('/consensus/agent/list', {'pageSize': '12', 'pageNumber': '1'});
-
       if (localStorage.getItem('newAccountAddress') !== '') {
         this.accountAddressValue = localStorage.getItem('newAccountAddress');
         this.getMyConsensus('/consensus/agent/address/' + localStorage.getItem('newAccountAddress'), {
@@ -260,9 +263,7 @@
       getMyConsensus(url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(url)
-            //console.log(params)
-            //console.log(response)
+            //console.log(response);
             this.myTotalAll = 1;
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
@@ -341,29 +342,49 @@
       //点击全部共识跳转加入节点页面
       toNodePage(index) {
         this.$router.push({
-          name: '/nodePage',
-          params: {address: index},
+          path: '/consensus/nodePage',
+          query: {address: index}
         })
       },
       //委托节点跳转
       toAgencyNode() {
         this.$router.push({
-          name: '/agencyNode',
-          params: {'indexTo': '1'}
+          path: '/consensus/agencyNode',
+          query: {indexTo: 1}
         })
       },
       //我的节点跳转
       toMyNode(address, hash) {
-        this.$router.push({
-          name: '/myNode',
-          params: {'agentAddress': address, 'agentHash': hash}
-        })
+        this.$fetch('/consensus/deposit/address/' + address, {'agentHash': hash, 'pageSize': '10', 'pageNumber': this.pageNumber})
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              if (response.data.list.length > 0) {
+                this.$router.push({
+                  name: '/myNode',
+                  params: {'agentAddress': address, 'agentHash': hash}
+                })
+              } else {
+                this.$router.push({
+                  path: '/consensus/nodePage',
+                  query: {address: hash}
+                })
+              }
+            } else {
+              this.$router.push({
+                path: '/consensus/nodePage',
+                query: {address: hash}
+              })
+            }
+          });
       },
+
       //查看节点
       toCheck() {
+        console.log(this.myInfoData.agentHash);
         this.$router.push({
-          name: '/nodeInfo',
-          params: {"txHash": this.myInfoData.agentHash}
+          path: '/consensus/nodeInfo',
+          query: {"txHash": this.myInfoData.agentHash}
         })
       },
       //显示隐藏信用系数规则
@@ -409,7 +430,7 @@
       width: 530px;
       .copy_icon {
         position: relative;
-       margin-left: 10px;
+        margin-left: 10px;
         width: 30px;
         height: 20px;
         display: block;
@@ -420,7 +441,7 @@
     }
     .consensus-index-title {
       width: 100%;
-      margin:30px auto 0;
+      margin: 30px auto 0;
       font-size: 12px;
       line-height: 32px;
       color: #658ec7;

@@ -6,7 +6,7 @@
       </el-col>
       <el-col :span="14" class='footer-right'>
         {{$t('message.blockState')}}：{{$t('message.local')}} {{ netWorkInfo.localBestHeight }}<span
-        v-show="timeOffsetOk"><!--（ {{$t('message.backward')}} {{ netWorkInfo.timeOffset }} ）--></span> /
+        v-show="timeOffsetOk"></span> /
         {{$t('message.theMain')}} {{netWorkInfo.netBestHeight}}
         <i :class="iconWifi" :title="connectNumber"></i>
       </el-col>
@@ -16,8 +16,6 @@
 </template>
 
 <script>
-  import * as config from '@/config.js'
-
   export default {
     data() {
       return {
@@ -94,6 +92,9 @@
           .then((response) => {
             //console.log(response);
             if (response.success) {
+              this.$store.commit('setAddressList', response.data.list);
+            }
+            /*if (response.success) {
               if (response.data.list.length > 0) {
                 this.$store.commit('setAddressList', response.data.list);
                 if (localStorage.getItem('newAccountAddress') === '') {
@@ -109,7 +110,7 @@
               this.$store.commit('setAddressList', '');
               localStorage.setItem('newAccountAddress', '');
               localStorage.setItem('fastUser', '0')
-            }
+            }*/
           }).catch((reject) => {
           localStorage.setItem('newAccountAddress', '');
           localStorage.setItem('fastUser', '0')

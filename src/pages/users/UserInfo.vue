@@ -50,6 +50,9 @@
         setAsAddress: this.$route.params.address,
         userData: [],
         totalAll: 0,
+        //定时刷新列表
+        userInfoSetInterval:null,
+
       }
     },
     components: {
@@ -58,7 +61,16 @@
     },
     mounted() {
       let _this = this;
-      this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1})
+      this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1});
+      if (this.$route.query.address) {
+        this.userInfoSetInterval = setInterval(() => {
+          this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1});
+        }, 10000)
+      }
+    },
+    //离开当前页面后执行
+    destroyed() {
+      clearInterval(this.userInfoSetInterval)
     },
     methods: {
       back() {
@@ -66,10 +78,14 @@
           name: '/wallete',
         })
       },
+      callback() {
+        console.log("倒计时完成")
+      },
       //获取所有账户列表
       getAllUserList(url) {
         this.$fetch(url)
           .then((response) => {
+            //console.log(response);
             if (response.success) {
               this.$store.commit('setAddressList', response.data.list);
             }
@@ -80,23 +96,20 @@
         this.$fetch(url, params)
           .then((response) => {
             if (response.success) {
-              //console.log(response);
-              this.totalAll = response.data.total;
-              if (response.data.list.length === 0) {
-                localStorage.setItem('fastUser', '0');
-                localStorage.setItem('newAccountAddress', '');
-                localStorage.setItem('toUserInfo', '0')
-              } else if (response.data.list.length === 1) {
-                localStorage.setItem('fastUser', '1');
-                localStorage.setItem('newAccountAddress', response.data.list[0].address);
-                localStorage.setItem('encrypted', response.data.list[0].encrypted)
-              } else {
-                localStorage.setItem('fastUser', '1');
-                if (this.setAsAddress === localStorage.getItem('newAccountAddress')) {
+              if (response.data.list.length > 0) {
+                let set = new Set();
+                for (let i = 0; i < response.data.list.length; i++) {
+                  set.add(response.data.list[i].address);
+                }
+                if (!set.has(localStorage.getItem('newAccountAddress'))) {
                   localStorage.setItem('newAccountAddress', response.data.list[0].address);
                   localStorage.setItem('encrypted', response.data.list[0].encrypted)
                 }
+              } else {
+                localStorage.setItem('newAccountAddress', '');
+                localStorage.setItem('encrypted', '')
               }
+              this.totalAll = response.data.total;
               this.getAllUserList('/account');
               this.userData = response.data.list
             }
@@ -139,7 +152,7 @@
                 this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1})
               } else {
                 this.$message({
-                  type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                  type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
                 })
               }
             })
@@ -188,7 +201,6 @@
       //输入密码提交
       toSubmit(password) {
         if (this.outOrBackup === 1) {
-          //console.log(this.outOrBackup);
           let params = '{"password":"' + password + '"}';
           this.outUserAddress('/account/remove/' + this.setAsAddress, params)
         } else {

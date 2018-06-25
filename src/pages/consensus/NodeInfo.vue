@@ -44,7 +44,7 @@
   export default {
     data() {
       return {
-        txHash: this.$route.params.txHash,
+        txHash: this.$route.query.txHash,
         myNodeInfo: [],
       }
     },
@@ -54,6 +54,7 @@
     },
     mounted() {
       let _this = this;
+      console.log(this.txHash);
       this.getMyNodeInfo('/consensus/agent/' + this.txHash)
     },
     methods: {
@@ -117,8 +118,9 @@
       //查看我创建节点的抵押明细
       toallPledge() {
         this.$router.push({
-          name: '/allPledge',
-          params: {'agentName': this.myNodeInfo.agentId, 'txHash': this.myNodeInfo.txHash}
+          path: '/consensus/allPledge',
+          query: {'agentName': this.myNodeInfo.agentId, 'txHash': this.myNodeInfo.txHash},
+          //params: {'agentName': this.myNodeInfo.agentId, 'txHash': this.myNodeInfo.txHash}
         })
       }
     }

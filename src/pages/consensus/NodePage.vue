@@ -8,7 +8,8 @@
       </p>
       <ul>
         <li class="li-bg overflow">
-          <label>{{$t('message.c16')}}：</label>{{ this.nodeData.agentName ? this.nodeData.agentName : this.nodeData.agentAddresss}}
+          <label>{{$t('message.c16')}}：</label>{{ this.nodeData.agentName ? this.nodeData.agentName :
+          this.nodeData.agentAddresss}}
           <span v-show="toCheckOk" @click="toCheck()" class="cursor-p text-d">{{$t('message.c5_1')}}</span>
         </li>
         <li>
@@ -24,12 +25,12 @@
           <label>{{$t('message.c18')}}：</label>
           <ProgressBar :colorData="this.nodeData.creditVals < 0 ? '#f64b3e':'#82bd39'"
                        :widthData="this.nodeData.creditVal"></ProgressBar>
-          <span>&nbsp;{{this.nodeData.creditVals}}</span>
+          <span>{{this.nodeData.creditVals}}</span>
         </li>
         <li>
           <label>{{$t('message.c64')}}：</label>
           <ProgressBar colorData="#58a5c9" :widthData="this.nodeData.totalDeposit"></ProgressBar>
-          <span>&nbsp;{{this.nodeData.totalDeposits}}</span>
+          <span>{{this.nodeData.totalDeposits}}</span>
         </li>
         <!-- <li class="li-info overflow">
              <label>{{$t('message.c27')}}：</label>{{this.nodeData.introduction}}
@@ -45,11 +46,11 @@
         <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable.toFixed(8) }} NULS</span>
         <el-form-item :label="$t('message.c25')+':'" class="number" prop="nodeNo">
           <el-input ref="input" v-model="nodeForm.nodeNo" :maxlength="17" @change="countFee"></el-input>
-         <!-- <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>-->
+          <!-- <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>-->
         </el-form-item>
-       <div class="procedure"><label>{{$t('message.c28')}}:</label><span>{{this.fee}} NULS</span></div>
-       <!-- <el-form-item :label="$t('message.c28')+' '+this.fee+' NULS'" class="procedure">
-        </el-form-item>-->
+        <div class="procedure"><label>{{$t('message.c28')}}:</label><span>{{this.fee}} NULS</span></div>
+        <!-- <el-form-item :label="$t('message.c28')+' '+this.fee+' NULS'" class="procedure">
+         </el-form-item>-->
 
         <el-form-item size="large" class="submit">
           <el-button type="primary" @click="onSubmit('nodeForm')" id="nodePage">
@@ -99,7 +100,7 @@
         loading: true,
         btOk: this.$store.getters.getNetWorkInfo.localBestHeight !== this.$store.getters.getNetWorkInfo.netBestHeight,
         submitId: 'nodePage',
-        address: this.$route.params.address,
+        address: this.$route.query.address,
         agentId: '',
         nodeData: [],
         usable: 0,
@@ -204,7 +205,7 @@
             + "&agentHash=" + this.agentId
             + "&deposit=" + rightShift.times(this.nodeForm.nodeNo);
           //console.log("params=" + params);
-          this.$fetch('/consensus/deposit/fee?'+ params)
+          this.$fetch('/consensus/deposit/fee?' + params)
             .then((response) => {
               //console.log(response);
               if (response.success) {
@@ -267,7 +268,7 @@
               })*/
             } else {
               this.$message({
-                message: this.$t('message.passWordFailed') + response.msg,
+                message: this.$t('message.passWordFailed') + response.data.msg,
                 type: 'warning',
               })
             }
@@ -290,7 +291,7 @@
       margin-bottom: 28px;
       font-weight: bold;
     }
-    .node-page-top{
+    .node-page-top {
       width: 100%;
     }
     .div-icon {
@@ -376,7 +377,7 @@
         width: 415px;
         color: #FFFFFF;
       }
-      .el-form{
+      .el-form {
         width: 90%;
         margin: auto;
         .el-form-item {

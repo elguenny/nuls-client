@@ -113,7 +113,7 @@
         this.methodsMaps(this.ipObj)
       }, 1000);
       //页面第一次进入判断浏览器内核
-      console.log("浏览器:" + this.defaultBrowser());
+      //console.log("浏览器:" + this.defaultBrowser());
       if (!sessionStorage.hasOwnProperty('browserOk')) {
         if (this.defaultBrowser() !== 'Chrome') {
           this.$alert(this.$t('message.c174'), '', {
@@ -159,10 +159,9 @@
       getAccountAddress(url) {
         this.$fetch(url)
           .then((response) => {
-            //console.log(url)
-            //console.log(response)
+            //console.log(response);
             if (response.success) {
-              this.balanceData = response.data[0];
+              this.balanceData = response.data.list[0];
               let leftShift = new BigNumber(0.00000001);
               this.balanceData.balance = parseFloat(leftShift.times(this.balanceData.balance).toString());
               this.balanceData.locked = parseFloat(leftShift.times(this.balanceData.locked).toString());
@@ -203,7 +202,7 @@
           .then((response) => {
             if (response.success) {
               //console.log(response);
-              this.ipData = response.data;
+              this.ipData = response.data.list;
               if (this.ipData.length > 0) {
                 this.ipObj = [];
                 let leng = this.ipData.length > 50 ? 50 : this.ipData.length;
@@ -325,7 +324,7 @@
         margin: 68px 0 0;
         .nav-title {
           text-align: center;
-          font-size: 18px;
+          font-size: 16px;
           margin: 20px 0;
           font-weight: bold;
         }
@@ -363,10 +362,10 @@
           margin: 0 30px;
           .nav-left {
             float: left;
-            width:15%;
+            width:20%;
           }
           .nav-right {
-            width: 85%;
+            width: 80%;
             float: left;
             .bar-bg{
              margin-top: 12px;
@@ -396,7 +395,7 @@
       height: 50px;
       text-align: center;
       line-height: 50px;
-      font-size: 18px;
+      font-size: 16px;
       margin-top: 20px;
       font-weight: bold;
     }

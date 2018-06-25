@@ -229,9 +229,9 @@
        * New usersDB
        */
       openDB() {
-        let request = indexedDB.open('usersDB', 1)
+        let request = indexedDB.open('usersDB', 1);
         request.onupgradeneeded = function (e) {
-          let db = e.target.result
+          let db = e.target.result;
           // 如果不存在Users对象仓库则创建
           if (!db.objectStoreNames.contains('usersDB')) {
             let store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false})
@@ -349,11 +349,9 @@
           + '","amount":' + rightShift.times(this.transferForm.joinNo)
           + ',"password":"' + password
           + '","remark":"' + this.transferForm.remark.replace(/\n/g, "") + '"}';
-        //console.log("param======" + param)
         this.$post('/accountledger/transfer', param)
           .then((response) => {
-            //console.log("param=" + param)
-            //console.log(response)
+            console.log(response);
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),
@@ -369,7 +367,7 @@
               })
             } else {
               this.$message({
-                message: this.$t('message.passWordFailed') + response.msg,
+                message: this.$t('message.passWordFailed') + response.data.msg,
                 type: 'warning',
               })
             }
