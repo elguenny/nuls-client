@@ -1,0 +1,298 @@
+<template>
+  <div class="users">
+    <Back :backTitle="this.$t('message.walletManagement')" :backUrl="backUrl"></Back>
+    <div class="freeze-list-tabs">
+      <h2>{{$t('message.userInfoTitle')}}</h2>
+      <el-button type="primary" icon="el-icon-plus" @click="toNewAccount" class="newAccount"></el-button>
+      <el-table :data="userData">
+        <el-table-column prop="address" :label="$t('message.tabName')" width="350" align='center'>
+        </el-table-column>
+        <el-table-column :label="$t('message.tabAlias')" width="100" class="user-aliasing">
+          <template slot-scope="scope">
+            <span>{{ scope.row.alias != null  ? scope.row.alias : '-' }}</span>
+            <i class="el-icon-edit cursor-p"
+               v-show="scope.row.alias != null  ? false : true"
+               @click="editAliasing(scope.row.address,scope.row.encrypted)"></i>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('message.operation')" min-width="150" align='center'>
+          <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="outUser(scope.row.address,scope.row.encrypted)">
+              {{$t('message.tabRemove')}}
+            </el-button>
+            <el-button size="mini" type="text" @click="backupUser(scope.row.address,scope.row.encrypted)">
+              {{$t('message.tabBackups')}}
+            </el-button>
+            <el-button size="mini" type="text" @click="toPassword(scope.row.address,scope.row.encrypted)">
+              {{scope.row.encrypted ? $t('message.c160'):$t('message.c161')}}
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination layout="prev, pager, next" :page-size="20" :total=this.totalAll class="cb"
+                     v-show="totalAllOk = this.totalAll>20 ? true:false"
+                     @current-change="userListSize"></el-pagination>
+      <Password ref="password" @toSubmit="toSubmit"></Password>
+
+    </div>
+  </div>
+</template>
+
+<script>
+  import Back from '@/components/BackBar.vue'
+  import Password from '@/components/PasswordBar.vue'
+
+  export default {
+    data() {
+      return {
+        outOrBackup: 0,
+        backUrl: '/wallet',
+        setAsAddress: this.$route.params.address,
+        userData: [],
+        totalAll: 0,
+        //定时刷新列表
+        userInfoSetInterval:null,
+
+      }
+    },
+    components: {
+      Back,
+      Password,
+    },
+    mounted() {
+      let _this = this;
+      this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1});
+      if (this.$route.query.address) {
+        this.userInfoSetInterval = setInterval(() => {
+          this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1});
+        }, 10000)
+      }
+    },
+    //离开当前页面后执行
+    destroyed() {
+      clearInterval(this.userInfoSetInterval)
+    },
+    methods: {
+      back() {
+        this.$router.push({
+          name: '/wallete',
+        })
+      },
+      callback() {
+        console.log("倒计时完成")
+      },
+      //获取所有账户列表
+      getAllUserList(url) {
+        this.$fetch(url)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.$store.commit('setAddressList', response.data.list);
+            }
+          })
+      },
+      //获取账户列表
+      getUserList(url, params) {
+        this.$fetch(url, params)
+          .then((response) => {
+            if (response.success) {
+              if (response.data.list.length > 0) {
+                let set = new Set();
+                for (let i = 0; i < response.data.list.length; i++) {
+                  set.add(response.data.list[i].address);
+                }
+                if (!set.has(localStorage.getItem('newAccountAddress'))) {
+                  localStorage.setItem('newAccountAddress', response.data.list[0].address);
+                  localStorage.setItem('encrypted', response.data.list[0].encrypted)
+                }
+              } else {
+                localStorage.setItem('newAccountAddress', '');
+                localStorage.setItem('encrypted', '')
+              }
+              this.totalAll = response.data.total;
+              this.getAllUserList('/account');
+              this.userData = response.data.list
+            }
+          })
+      },
+      //分页功能
+      userListSize(events) {
+        this.getUserList('/account', {'pageSize': 20, 'pageNumber': events})
+      },
+      //点击根据地址移除账户事件
+      outUser(address, encrypted) {
+        this.setAsAddress = address;
+        this.outOrBackup = 1;
+        if (encrypted) {
+          this.$refs.password.showPassword(true)
+        } else {
+          this.$confirm(this.$t('message.c162'), '', {
+            confirmButtonText: this.$t('message.confirmButtonText'),
+            cancelButtonText: this.$t('message.cancelButtonText')
+          }).then(() => {
+            let params = '{"password":""}';
+            this.outUserAddress('/account/remove/' + address, params)
+          }).catch(() => {
+
+          })
+        }
+
+      },
+      //移除账户
+      outUserAddress(url, params) {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+        ) {
+          this.$post(url, params)
+            .then((response) => {
+              //console.log("params="+params)
+              if (response.success) {
+                this.$message({
+                  type: 'success', message: this.$t('message.passWordSuccess')
+                });
+                this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1})
+              } else {
+                this.$message({
+                  type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
+                })
+              }
+            })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
+      },
+      //备份账户
+      backupUser(address, encrypted) {
+        this.setAsAddress = address;
+        this.outOrBackup = 2;
+        if (encrypted) {
+          this.$refs.password.showPassword(true)
+        } else {
+          this.$confirm(this.$t('message.c163'), '', {
+            confirmButtonText: this.$t('message.confirmButtonText'),
+            cancelButtonText: this.$t('message.cancelButtonText')
+          }).then(() => {
+            localStorage.setItem('userPass', '');
+            this.$router.push({
+              name: '/newAccount',
+              params: {newOk: false, address: this.setAsAddress},
+            })
+          }).catch(() => {
+
+          })
+        }
+      },
+      //修改or设置密码
+      toPassword(address, encrypted) {
+        if (encrypted) {
+          this.$router.push({
+            name: '/editorPassword',
+            params: {address: address, backInfo: this.$t('message.accountManagement')},
+          })
+        } else {
+          this.$router.push({
+            name: '/setPassword',
+            params: {address: address, backInfo: this.$t('message.accountManagement')},
+          })
+        }
+
+      },
+      //输入密码提交
+      toSubmit(password) {
+        if (this.outOrBackup === 1) {
+          let params = '{"password":"' + password + '"}';
+          this.outUserAddress('/account/remove/' + this.setAsAddress, params)
+        } else {
+          localStorage.setItem('userPass', password);
+          let params = '{"password":"' + password + '"}';
+          this.queryPassword('/account/password/validation/' + this.setAsAddress, params)
+        }
+      },
+
+      //查询密码是否正确
+      queryPassword(url, params) {
+        this.$post(url, params)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.$router.push({
+                name: '/newAccount',
+                params: {newOk: false, address: this.setAsAddress},
+              })
+            } else {
+              this.$message({
+                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+              })
+            }
+          })
+      },
+
+      //修改别名
+      editAliasing(Address, encrypted) {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          this.$router.push({
+            name: '/editAliasing',
+            params: {address: Address, encrypted: encrypted},
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
+      },
+      //新增账户
+      toNewAccount() {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
+          && sessionStorage.getItem('setNodeNumberOk') === 'true') {
+          localStorage.setItem('toUserInfo', '0');
+          this.$router.push({
+            name: '/firstInfo',
+          })
+        } else {
+          this.$message({
+            message: this.$t('message.c133'), duration: '800'
+          })
+        }
+      }
+    }
+  }
+</script>
+<style lang="less">
+  @import url("../../assets/css/style.less");
+
+  .users {
+    width: 1024px;
+    margin: auto;
+    .freeze-list-tabs {
+      width: 100%;
+      margin: auto;
+      .newAccount {
+        width: 30px;
+        /* line-height: 20px;*/
+        height: 30px;
+        background-color: #0b1422;
+        float: right;
+        border: 1px solid #0b1422;
+        margin-bottom: 10px;
+        margin-right: 40px;
+      }
+      h2 {
+        text-align: center;
+        line-height: 3rem;
+        font-weight: bold;
+      }
+    }
+    .el-table th {
+      background-color: #17202e;
+    }
+    .el-table tr {
+      background-color: #0c1323;
+    }
+    .el-pagination {
+      margin-top: 1rem;
+      text-align: center;
+    }
+  }
+</style>
