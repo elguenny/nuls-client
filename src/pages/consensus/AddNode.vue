@@ -42,7 +42,7 @@
       <el-form ref="addNodeForm" :model="addNodeForm" :rules="addNodeRules" size="mini" label-position="left"
                @submit.native.prevent>
         <el-form-item :label="$t('message.c51')+':'" class="pledge-money" prop="nodeNo">
-          <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable.toFixed(8) }} NULS</span>
+          <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable }} NULS</span>
           <el-input ref="input" v-model="addNodeForm.nodeNo":maxlength="17" @change="countFee"></el-input>
         </el-form-item>
         <el-form-item :label="$t('message.c28')+'：'+this.fee+' NULS'" class="procedure">
@@ -62,7 +62,7 @@
   import Back from './../../components/BackBar.vue'
   import ProgressBar from './../../components/ProgressBar.vue'
   import Password from '@/components/PasswordBar.vue'
-  import * as config from '@/config.js'
+  import {LeftShiftEight} from '@/api/util.js'
   import {BigNumber} from 'bignumber.js'
 
   export default {
@@ -91,8 +91,8 @@
       };
       return {
         submitId: 'addNode',
-        agentAddress: this.$route.params.agentAddress,
-        agentId: this.$route.params.agentId,
+        agentAddress: this.$route.query.agentAddress,
+        agentId: this.$route.query.agentId,
         agentAddressInfo: [],
         addNodeForm: {
           nodeNo: ''
@@ -113,7 +113,7 @@
       Password,
     },
     created() {
-      this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress);
+      this.getAgentAddressInfo('/consensus/agent/' + this.agentId);
       this.getBalanceAddress('/accountledger/balance/' + localStorage.getItem('newAccountAddress'))
     },
     mounted() {
@@ -150,9 +150,7 @@
           .then((response) => {
             //console.log(response)
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
-              //this.placeholder = '（' + this.$t('message.currentBalance') + parseFloat(leftShift.times(response.data.usable.value).toString()) + 'NULS）';
-              this.usable = parseFloat(leftShift.times(response.data.usable.value).toString())
+              this.usable=parseFloat(LeftShiftEight(response.data.usable.value).toString());
             }
           })
       },
@@ -229,7 +227,7 @@
               });
               this.$router.push({
                 name: '/myNode',
-                params: {'agentAddress': this.agentAddress, 'agentHash': this.agentId}
+                query: {'agentAddress': this.agentAddress, 'agentHash': this.agentId}
               })
             } else {
               this.$message({

@@ -355,14 +355,17 @@
       },
       //我的节点跳转
       toMyNode(address, hash) {
-        this.$fetch('/consensus/deposit/address/' + address, {'agentHash': hash, 'pageSize': '10', 'pageNumber': this.pageNumber})
+        this.$fetch('/consensus/deposit/address/' + address, {
+          'agentHash': hash,
+          'pageSize': '10',
+          'pageNumber': this.pageNumber
+        })
           .then((response) => {
-            //console.log(response);
             if (response.success) {
               if (response.data.list.length > 0) {
                 this.$router.push({
-                  name: '/myNode',
-                  params: {'agentAddress': address, 'agentHash': hash}
+                  path: '/consensus/myNode',
+                  query: {'agentAddress': address, 'agentHash': hash}
                 })
               } else {
                 this.$router.push({
@@ -381,7 +384,6 @@
 
       //查看节点
       toCheck() {
-        console.log(this.myInfoData.agentHash);
         this.$router.push({
           path: '/consensus/nodeInfo',
           query: {"txHash": this.myInfoData.agentHash}

@@ -219,8 +219,6 @@
             this.$refs.transferForm.validateField('joinAddress');
             this.$refs.transferForm.validateField('joinNo')
           }, 500);
-
-
         }
       },
 
@@ -283,7 +281,7 @@
        * @param event
        */
       dbcheckedAddress(row, event) {
-        this.transferForm.joinAddress = row.userAddress
+        this.transferForm.joinAddress = row.userAddress;
         this.dialogTableVisible = false
       },
 
@@ -349,9 +347,10 @@
           + '","amount":' + rightShift.times(this.transferForm.joinNo)
           + ',"password":"' + password
           + '","remark":"' + this.transferForm.remark.replace(/\n/g, "") + '"}';
+        //console.log(param);
         this.$post('/accountledger/transfer', param)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),

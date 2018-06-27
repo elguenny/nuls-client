@@ -72,7 +72,7 @@
       getHashInfo (url) {
         this.$fetch(url)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             this.infoData = response.data;
             this.times = moment(response.data.time).format('YYYY-MM-DD HH:mm:ss');
             let leftShift = new BigNumber(0.00000001);
@@ -88,7 +88,7 @@
             if (response.data.outputs.length > 0) {
               for (let i = 0; i < response.data.outputs.length; i++) {
                 //response.data.outputs[i].address = response.data.outputs[i].address.substr(0, 10) + '...' + response.data.outputs[i].address.substr(length - 10)
-                response.data.outputs[i].value = leftShift.times(response.data.outputs[i].value).toFixed(8)
+                response.data.outputs[i].value = leftShift.times(response.data.outputs[i].value).toFixed(8);
                 this.allOutputs = BigNumber(this.allOutputs).plus(response.data.outputs[i].value).toString()
               }
             }

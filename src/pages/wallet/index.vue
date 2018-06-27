@@ -8,15 +8,9 @@
       <div class="wallet-i">
         <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="this.accountAddressValue"
            @click="accountCopy" :title="$t('message.c143')"></i>
-        <i class="qr_icon cursor-p" @click="accountCode" style="display: none"></i>
         <i class="zhanghu_icon fr cursor-p" @click="accountChoice" :title="$t('message.accountManagement')"></i>
       </div>
-      <CodeBar v-show="codeShowOk" v-on:codeShowOks="codeShowOks" ref="codeBar"></CodeBar>
     </div>
-    <!-- <div class="wallet-hide" v-show="walletHide">
-       <i :class="`icon ${keyShow ? 'icon-eye' : 'icon-eye-blocked'}`" @click="toKeyShow"
-          class="cursor-p" :title="$t('message.c144')"></i>
-     </div>-->
     <div class="wallet-tab cl">
       <el-tabs v-model="activeName" @tab-click="handleClick" @dblclick="tab-clicks">
         <el-tab-pane :label="$t('message.indexAccountHome')" name="first">
@@ -28,24 +22,17 @@
             </el-table-column>
             <el-table-column :label="$t('message.indexSum')" width="180" align='center'>
               <template slot-scope="scope">
-                <input type="text"
-                       :value=scope.row.balance.toFixed(8)
-                       readonly="readonly">
+                <span>{{ scope.row.balance }}</span>
               </template>
             </el-table-column>
             <el-table-column :label="$t('message.indexUsable')" width="280" align='center'>
               <template slot-scope="scope">
-                <input type="text"
-                       :value=scope.row.usable.toFixed(8)
-                       readonly="readonly">
+                <span>{{ scope.row.usable }}</span>
               </template>
             </el-table-column>
             <el-table-column :label="$t('message.indexLock')" width="280" align='center'>
               <template slot-scope="scope">
-                <input type="text"
-                       :value=scope.row.locked.toFixed(8)
-                       readonly="readonly" class="cursor-p text-d"
-                       @click="toLocked(accountAddressValue)">
+                <span class="cursor-p text-d" @click="toLocked(accountAddressValue)">{{ scope.row.locked }}</span>
               </template>
             </el-table-column>
             <el-table-column :label="$t('message.operation')" align='center'>
@@ -54,7 +41,6 @@
               </template>
             </el-table-column>
           </el-table>
-          <!--<el-pagination layout="prev, pager, next":total="1000 "></el-pagination>-->
         </el-tab-pane>
         <el-tab-pane :label="$t('message.transactionRecord')" name="second">
           <el-table :data="dealList" @filter-change="changeType" v-loading="loading">
@@ -85,7 +71,7 @@
             <el-table-column label="txid" min-width="195" align='center'>
               <template slot-scope="scope">
 								<span @click="toTxid(scope.row.txHash)" class="cursor-p text-d overflow">
-									{{ scope.row.hashs }}
+									{{ scope.row.txHash}}
 								</span>
               </template>
             </el-table-column>
@@ -116,29 +102,32 @@
 </template>
 
 <script>
+  import moment from 'moment'
   import CodeBar from '@/components/CodeBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
-  import moment from 'moment'
-  import {BigNumber} from 'bignumber.js'
-  import copy from 'copy-to-clipboard'
+  import {copys,LeftShiftEight} from '@/api/util.js'
+  import {getAccountAssets,getAccountTxList} from '@/api/httpData.js'
 
   export default {
     data() {
       return {
+        //交易记录列表加载loading
         loading: true,
-        walletHide: true,
-        keyShow: false,
-        codeShowOk: false,
-        locale: localStorage.getItem('language'),
-        accountAddress: [],
+        //默认账户
         accountAddressValue: localStorage.getItem('newAccountAddress'),
+        //账户资产
         accountData: [],
+        //交易信息
         dealList: [],
+        //tab名称
         activeName: sessionStorage.getItem('walletActiveName'),
-        tabName: 'first',
+        //总页数
         totalAll: 0,
+        //当前页
         pages: 1 ,
+        //类型
         types: '',
+        //定时器
         walletSetInterval: null,
       }
     },
@@ -147,14 +136,14 @@
       AccountAddressBar,
     },
     created() {
-      this.getAccountAssets('/account/assets/' + this.accountAddressValue);
+      this.getAccountAssets(this.accountAddressValue);
 
       /**
        * 切换交易记录tab
        *Switching transaction record tab
        */
       if (this.activeName === 'second') {
-        this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+        this.getAccountTxList(this.accountAddressValue, {
           'pageSize': 20,
           'pageNumber': 1
         })
@@ -166,16 +155,16 @@
        */
       this.walletSetInterval = setInterval(() => {
         if (this.activeName === 'first') {
-          this.getAccountAssets('/account/assets/' + this.accountAddressValue)
+          this.getAccountAssets(this.accountAddressValue)
         } else {
           if (this.types !== '') {
-            this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+            this.getAccountTxList(this.accountAddressValue, {
               'type': this.types,
               'pageSize': 20,
               'pageNumber': this.pages
             })
           } else {
-            this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+            this.getAccountTxList( this.accountAddressValue, {
               'pageSize': 20,
               'pageNumber': this.pages
             })
@@ -192,17 +181,15 @@
        *Obtaining a list of assets based on the account address
        * @param url
        */
-      getAccountAssets(url) {
-        this.$fetch(url)
+      getAccountAssets(address) {
+        getAccountAssets(address)
           .then((response) => {
            //console.log(response);
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
               for (let i = 0; i < response.data.list.length; i++) {
-                //console.log(leftShift.times(response.data[i].balance).toFixed(8))
-                response.data.list[i].balance = leftShift.times(response.data.list[i].balance);
-                response.data.list[i].locked = leftShift.times(response.data.list[i].locked);
-                response.data.list[i].usable = leftShift.times(response.data.list[i].usable)
+                response.data.list[i].balance = LeftShiftEight(response.data.list[i].balance).toString();
+                response.data.list[i].locked = LeftShiftEight(response.data.list[i].locked).toString();
+                response.data.list[i].usable = LeftShiftEight(response.data.list[i].usable).toString()
               }
               this.accountData = response.data.list
             }
@@ -212,34 +199,19 @@
       /**
        * 根据用户地址获取用户交易列表
        *Obtaining a user's trade list based on the user address
-       * @param url
-       * @param param
+       * @param address params
        */
-      getAccountTxList(url, param) {
-        //console.log(param)
-        this.$fetch(url, param)
+      getAccountTxList(address, params) {
+        getAccountTxList(address, params)
           .then((response) => {
             //console.log(response);
-            //判断是否查询到数据
-            if (response.data != null) {
-              this.totalAll = response.data.total;
-              //判断最大页数>=当前选择的最大页数
-              if (response.data.list.length > 0) {
-                //this.$store.commit("setAccountTxList",response.data.list);
-                for (let i = 0; i < response.data.list.length; i++) {
-                  response.data.list[i].hashs = response.data.list[i].txHash;
-                  response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
-                }
-                this.dealList = response.data.list;
-                this.loading = false
-              } else {
-                this.loading = false;
-                this.dealList = []
+            if(response.success){
+              for (let i = 0; i < response.data.list.length; i++) {
+                response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
               }
-
-            } else {
+              this.totalAll = response.data.total;
+              this.dealList = response.data.list;
               this.loading = false;
-              this.dealList = []
             }
           })
       },
@@ -252,13 +224,13 @@
       txIdConsensusSize(events) {
         this.pages = events;
         if (this.types !== '') {
-          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+          this.getAccountTxList(this.accountAddressValue, {
             'type': this.types,
             'pageSize': 20,
             'pageNumber': this.pages
           })
         } else {
-          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+          this.getAccountTxList(this.accountAddressValue, {
             'pageSize': 20,
             'pageNumber': this.pages
           })
@@ -275,11 +247,11 @@
         //console.log(chenckAddress)
         this.accountAddressValue = chenckAddress;
         if (this.activeName === 'first') {
-          this.getAccountAssets('/account/assets/' + chenckAddress)
+          this.getAccountAssets(chenckAddress)
         } else {
           this.totalAll = 0;
           this.types = '';
-          this.getAccountTxList('/accountledger/tx/list/' + chenckAddress, {'pageSize': 20, 'pageNumber': 1})
+          this.getAccountTxList(chenckAddress, {'pageSize': 20, 'pageNumber': 1})
         }
       },
 
@@ -309,7 +281,7 @@
         li[liValue].className = 'el-table-filter__list-item is-active';
 
         this.types = typeValue.type[0];
-        this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, {
+        this.getAccountTxList(this.accountAddressValue, {
           'type': typeValue.type[0],
           'pageSize': 20,
           'pageNumber': 1
@@ -323,21 +295,19 @@
        * @param event
        */
       handleClick(tab, event) {
-        this.tabName = tab.name;
         if (tab.name !== 'first') {
           this.activeName = 'second';
-          this.walletHide = false;
           let params = {
             'pageSize': 20,
             'pageNumber': 1
           };
-          this.getAccountTxList('/accountledger/tx/list/' + this.accountAddressValue, params)
+          this.getAccountTxList( this.accountAddressValue, params)
         } else {
           sessionStorage.setItem('walletActiveName', tab.name);
           this.types='';
           this.pages = 1;
           this.walletHide = true;
-          this.getAccountAssets('/account/assets/' + this.accountAddressValue)
+          this.getAccountAssets(this.accountAddressValue)
         }
       },
 
@@ -346,23 +316,10 @@
        * copy
        */
       accountCopy() {
-        copy(this.accountAddressValue);
-        //javaUtil.copy(this.accountAddressValue);
+        copys(this.accountAddressValue);
         this.$message({
           message: this.$t('message.c129'), type: 'success', duration: '800'
         });
-      },
-
-      /**
-       * 二维码显示
-       * Two-dimensional code display
-       */
-      accountCode() {
-        this.$refs.codeBar.codeMaker(localStorage.getItem('newAccountAddress'));
-        this.codeShowOk = !this.codeShowOk
-      },
-      codeShowOks() {
-        this.codeShowOk = false
       },
 
       /**
@@ -373,20 +330,6 @@
         this.$router.push({
           name: '/userInfo'
         })
-      },
-
-      /**
-       * 金额显示隐藏
-       * Amount display concealment
-       */
-      toKeyShow() {
-        if (this.keyShow) {
-          localStorage.setItem('keyShow', false);
-          this.keyShow = false
-        } else {
-          localStorage.setItem('keyShow', true);
-          this.keyShow = true
-        }
       },
 
       /**

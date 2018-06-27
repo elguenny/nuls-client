@@ -379,5 +379,5 @@ const cn = {
     theMain: '测试网',
   },
   ...zhLocale
-}
+};
 export default cn

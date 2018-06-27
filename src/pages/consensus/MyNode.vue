@@ -80,8 +80,8 @@
     data() {
       return {
         address: '',
-        agentAddress: this.$route.params.agentAddress,
-        agentHash: this.$route.params.agentHash,
+        agentAddress: this.$route.query.agentAddress,
+        agentHash: this.$route.query.agentHash,
         agentAddressInfo: [],
         myMortgageData: [],
         total: 0,
@@ -101,7 +101,7 @@
     },
     mounted() {
       let _this = this;
-      this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress);
+      this.getAgentAddressInfo('/consensus/agent/' + this.agentHash);
       this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
         'agentHash': this.agentHash,
         'pageSize': '10',
@@ -109,7 +109,7 @@
       });
 
       this.myNodeSetInterval = setInterval(() => {
-        this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress);
+        this.getAgentAddressInfo('/consensus/agent/' + this.agentHash);
         this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
           'agentHash': this.agentHash,
           'pageSize': '10',
@@ -125,7 +125,6 @@
       getAgentAddressInfo(url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(params)
             //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
@@ -173,8 +172,8 @@
       //查看节点
       toCheck() {
         this.$router.push({
-          name: '/nodeInfo',
-          params: {txHash: this.agentAddressInfo.agentHash},
+          path: '/consensus/nodeInfo',
+          query: {"txHash": this.agentAddressInfo.txHash}
         })
       },
       //全部退出
@@ -185,8 +184,8 @@
       addNode() {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
           this.$router.push({
-            name: '/addNode',
-            params: {agentAddress: this.agentAddress, agentId: this.agentAddressInfo.agentHash},
+            path: '/consensus/myNode/addNode',
+            query: {'agentAddress': this.agentAddress, 'agentId': this.agentAddressInfo.agentHash},
           })
         } else {
           this.$message({
@@ -220,7 +219,7 @@
         let param = {'address': this.outInfo.address, 'password': password, 'txHash': this.outInfo.txHash};
         this.$post('/consensus/withdraw/', param)
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.success) {
               this.$message({
                 type: 'success',
@@ -234,7 +233,7 @@
             } else {
               this.$message({
                 type: 'warning',
-                message: this.$t('message.passWordFailed') + response.msg
+                message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
             this.outInfo.address = '';

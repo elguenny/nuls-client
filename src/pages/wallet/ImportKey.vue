@@ -68,6 +68,9 @@
               localStorage.setItem('newAccountAddress', response.data.value);
               localStorage.setItem('encrypted', this.encrypted.toString());
               this.getAccountList('/account');
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              })
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
@@ -101,9 +104,7 @@
                   params: {'address':response.data},
                 })
               }
-              /*this.$message({
-                type: 'success', message: this.$t('message.passWordSuccess')
-              })*/
+
             }
           }).catch((reject) => {
           console.log('User List err' + reject)

@@ -54,7 +54,6 @@
     },
     mounted() {
       let _this = this;
-      console.log(this.txHash);
       this.getMyNodeInfo('/consensus/agent/' + this.txHash)
     },
     methods: {

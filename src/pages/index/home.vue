@@ -10,7 +10,7 @@
             </div>
             <div class="nav-right">
               <ProgressBar colorData="#658EC7" :widthData=this.balanceData.balanceWidth></ProgressBar>
-              <label class="number">{{this.balanceData.balance.toFixed(8)}} NULS</label>
+              <label class="number">{{this.balanceData.balance}} NULS</label>
             </div>
           </div>
           <div class="nav-all cl">
@@ -19,7 +19,7 @@
             </div>
             <div class="nav-right">
               <ProgressBar colorData="#f64b3e" :widthData=this.balanceData.lockedWidth></ProgressBar>
-              <label class="number">{{this.balanceData.locked.toFixed(8)}} NULS</label>
+              <label class="number">{{this.balanceData.locked}} NULS</label>
             </div>
           </div>
           <div class="nav-all cl">
@@ -28,7 +28,7 @@
             </div>
             <div class="nav-right">
               <ProgressBar colorData="#82bd39" :widthData=this.balanceData.usableWidth></ProgressBar>
-              <label class="number">{{this.balanceData.usable.toFixed(8)}} NULS</label>
+              <label class="number">{{this.balanceData.usable}} NULS</label>
             </div>
           </div>
         </div>
@@ -69,7 +69,8 @@
   import '@/assets/css/jquery-jvectormap.css'
   import {jvectormap} from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
   import {jvectormap1} from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
-  import {BigNumber} from 'bignumber.js'
+  import {LeftShiftEight} from '@/api/util.js'
+  import {getAccountAssets,getConsensus} from '@/api/httpData.js'
 
   export default {
     data() {
@@ -105,9 +106,9 @@
     },
     created() {
       if (localStorage.getItem('newAccountAddress') !== '') {
-        this.getAccountAddress('/account/assets/' + localStorage.getItem('newAccountAddress'))
+        this.getAccountAddress(localStorage.getItem('newAccountAddress'))
       }
-      this.getConsensus('/consensus');
+      this.queryConsensus();
       this.getNetWork();
       setTimeout(() => {
         this.methodsMaps(this.ipObj)
@@ -133,14 +134,14 @@
         let map = $('#world-map-markers').vectorMap('get', 'mapObject');
         this.homeSetInterval = setInterval(() => {
           if (localStorage.getItem('newAccountAddress') !== '') {
-            this.getAccountAddress('/account/assets/' + localStorage.getItem('newAccountAddress'))
+            this.getAccountAddress(localStorage.getItem('newAccountAddress'))
           }
-          this.getConsensus('/consensus');
+          this.queryConsensus();
           this.getNetWork();
           //console.log(this.ipObj)
           setTimeout(() => {
             map.clearSelectedMarkers();
-            map.addMarkers(this.ipObj)
+            map.addMarkers(this.ipObj);
           }, 1000)
         }, 5000)
       }, 1000)
@@ -154,18 +155,16 @@
       /**
        * 根据账户地址获取总金、冻结、可用额
        *Get the total amount, freezing and availability according to the account address.
-       * @param url
+       * @param address
        */
-      getAccountAddress(url) {
-        this.$fetch(url)
+      getAccountAddress(address) {
+        getAccountAssets(address)
           .then((response) => {
-            //console.log(response);
             if (response.success) {
               this.balanceData = response.data.list[0];
-              let leftShift = new BigNumber(0.00000001);
-              this.balanceData.balance = parseFloat(leftShift.times(this.balanceData.balance).toString());
-              this.balanceData.locked = parseFloat(leftShift.times(this.balanceData.locked).toString());
-              this.balanceData.usable = parseFloat(leftShift.times(this.balanceData.usable).toString());
+              this.balanceData.balance = LeftShiftEight(this.balanceData.balance).toString();
+              this.balanceData.locked = LeftShiftEight(this.balanceData.locked).toString();
+              this.balanceData.usable = LeftShiftEight(this.balanceData.usable).toString();
               if (this.balanceData.balance !== 0) {
                 this.balanceData.balanceWidth = (this.balanceData.balance / this.balanceData.balance * 100).toFixed(2) + '%';
                 this.balanceData.lockedWidth = (this.balanceData.locked / this.balanceData.balance * 100).toFixed(2) + '%';
@@ -173,21 +172,22 @@
               }
             }
           })
+          .catch((reject) => {
+            console.log(reject)
+          });
       },
 
       /**
        * 获取所有共识信息
        * Get all the consensus information
-       * @param url
        */
-      getConsensus(url) {
-        this.$fetch(url)
+      queryConsensus() {
+        getConsensus()
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
               this.allNodeList.nodeNumber = response.data.consensusAccountNumber;
-              this.allNodeList.entrust = parseFloat(leftShift.times(response.data.totalDeposit).toString());
+              this.allNodeList.entrust = LeftShiftEight(response.data.totalDeposit).toString();
               this.allNodeList.consensusAccountNumber = response.data.packingAgentCount
             }
           })
@@ -212,7 +212,7 @@
                       //console.log(response.data);
                       let latLngs = [response.data.latitude, response.data.longitude];
                       let names = response.data.region_code;
-                      this.ipObj.push({'latLng': latLngs, 'name': names})
+                      this.ipObj.push({'latLng': latLngs, 'name': names});
                     })
                 }
               } else {

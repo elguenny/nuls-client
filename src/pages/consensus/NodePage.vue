@@ -137,7 +137,6 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              //console.log(response);
               let leftShift = new BigNumber(0.00000001);
               this.toCheckOk = response.data.agentAddress === localStorage.getItem('newAccountAddress');
               response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString());
@@ -189,8 +188,8 @@
       //查看节点
       toCheck() {
         this.$router.push({
-          name: '/nodeInfo',
-          params: {"txHash": this.agentId}
+          path: '/consensus/nodeInfo',
+          query: {"txHash": this.agentId}
         })
       },
 

@@ -131,13 +131,13 @@ const router = new VueRouter({
       }
     },
     {
-      path: '/consensus/myNode :agentAddress/:agentHash',
+      path: '/consensus/myNode',
       name: '/myNode',
       component: resolve => require(['@/pages/consensus/MyNode.vue'], resolve)
 
     },
     {
-      path: '/consensus/myNode/addNode :agentAddress/:agentId',
+      path: '/consensus/myNode/addNode',
       name: '/addNode',
       component: resolve => require(['@/pages/consensus/AddNode.vue'], resolve)
 

@@ -42,7 +42,7 @@
       Back,
     },
     mounted() {
-      let _this = this
+      let _this = this;
       if (localStorage.getItem('newAccountAddress') !== '') {
         this.getConsensusDeposit('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
           'pageSize': '20',
@@ -60,10 +60,10 @@
             //console.log(params)
             //console.log(response)
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001)
-              this.total = response.data.total
+              let leftShift = new BigNumber(0.00000001);
+              this.total = response.data.total;
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString())
+                response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString());
                 response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
               }
               this.pledgeData = response.data.list
@@ -81,8 +81,7 @@
       handleClick(row) {
         this.$router.push({
           name: '/myNode',
-          params: {agentAddress: row.agentHash, agentHash: row.agentHash},
-          //params: {'agentAddress': this.agentAddress,'agentHash': this.agentId}
+          query: {'agentAddress': row.agentHash, 'agentHash': row.agentHash}
         })
       }
     }
