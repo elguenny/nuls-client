@@ -363,7 +363,8 @@ const en = {
     c194:'Please select the keystore file',
     c195:'I\'m sorry！ Download failed, please try again.',
     c196:'Sorry, your browser does not support indexedDB, nor can you use the address book function.',
-    c197:'The application of the import account has been completed. The background needs a little time to process. It will be displayed in the account list after completion.',
+    c197:'Your request has been submitted and our network will need a few minutes to confirm, please be patient. After it\'s done, you can check the status in 【Account Management】',
+    c198:'Sorry, the password is wrong',
 
     //Bottom info
     refresh: 'Refresh',

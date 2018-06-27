@@ -79,7 +79,7 @@
           </el-tab-pane>
           <el-tab-pane :label="$t('message.c12')" name="second">
             <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
-                 @click="toMyNode(item.agentAddress,item.agentHash)">
+                 @click="toMyNode(accountAddressValue,item.agentHash)">
               <p class="subscript" :class="item.status === 0  ? 'stay' : ''">
                 {{ $t('message.status'+item.status) }}
               </p>
@@ -361,6 +361,7 @@
           'pageNumber': this.pageNumber
         })
           .then((response) => {
+            console.log(response);
             if (response.success) {
               if (response.data.list.length > 0) {
                 this.$router.push({

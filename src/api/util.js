@@ -34,21 +34,3 @@ export const copys = (value) => copy(value);
 
 
 
-
-/*
-export default {
-  getBalance:function (address) {
-    return new Promise((resolve, reject) => {
-      axios.get('/accountledger/balance/' + address)
-        .then(response => {
-          resolve(response.data)
-        })
-        .catch(err => {
-          reject(err)
-        })
-    })
-  }
-*/
-
-
-

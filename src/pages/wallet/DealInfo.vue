@@ -43,9 +43,10 @@
 
 <script>
   import Back from '@/components/BackBar.vue'
-  import copy from 'copy-to-clipboard'
   import moment from 'moment'
   import { BigNumber } from 'bignumber.js'
+  import {copys,LeftShiftEight} from '@/api/util.js'
+  import {getHashInfo} from '@/api/httpData.js'
 
   export default {
     data () {
@@ -65,21 +66,18 @@
     },
     mounted () {
       let _this = this;
-      this.getHashInfo('/accountledger/tx/' + this.hash)
+      this.getHashInfo(this.hash)
     },
     methods: {
       //根据hash获取交易信息
-      getHashInfo (url) {
-        this.$fetch(url)
+      getHashInfo (hash) {
+        getHashInfo(hash)
           .then((response) => {
-            //console.log(response);
             this.infoData = response.data;
             this.times = moment(response.data.time).format('YYYY-MM-DD HH:mm:ss');
-            let leftShift = new BigNumber(0.00000001);
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {
-                //response.data.inputs[i].address = response.data.inputs[i].address.substr(0, 10) + '...' + response.data.inputs[i].address.substr(length - 10)
-                response.data.inputs[i].value =leftShift.times(response.data.inputs[i].value).toFixed(8);
+                response.data.inputs[i].value =LeftShiftEight(response.data.inputs[i].value);
                 this.allInputs = BigNumber(this.allInputs).plus(response.data.inputs[i].value).toString()
               }
             }
@@ -87,8 +85,7 @@
 
             if (response.data.outputs.length > 0) {
               for (let i = 0; i < response.data.outputs.length; i++) {
-                //response.data.outputs[i].address = response.data.outputs[i].address.substr(0, 10) + '...' + response.data.outputs[i].address.substr(length - 10)
-                response.data.outputs[i].value = leftShift.times(response.data.outputs[i].value).toFixed(8);
+                response.data.outputs[i].value = LeftShiftEight(response.data.outputs[i].value);
                 this.allOutputs = BigNumber(this.allOutputs).plus(response.data.outputs[i].value).toString()
               }
             }
@@ -97,7 +94,7 @@
       },
       //复制功能
       hashCopy (hash) {
-        copy(hash);
+        copys(hash);
         this.$message({
           message: this.$t('message.c129'), type: 'success', duration: '800'
         })

@@ -133,7 +133,7 @@
             let params = '{"password":""}';
             this.outUserAddress('/account/remove/' + address, params)
           }).catch(() => {
-
+            console.log("err")
           })
         }
 
@@ -215,14 +215,14 @@
         this.$post(url, params)
           .then((response) => {
             //console.log(response);
-            if (response.success) {
+            if (response.data.value) {
               this.$router.push({
                 name: '/newAccount',
                 params: {newOk: false, address: this.setAsAddress},
               })
             } else {
               this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                type: 'warning', message: this.$t('message.c198')
               })
             }
           })

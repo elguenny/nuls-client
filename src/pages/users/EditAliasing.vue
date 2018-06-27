@@ -31,10 +31,11 @@
 </template>
 
 <script>
+  import {BigNumber} from 'bignumber.js'
   import Back from '@/components/BackBar.vue'
   import Password from '@/components/PasswordBar.vue'
-  import {BigNumber} from 'bignumber.js'
-
+  import {LeftShiftEight} from '@/api/util.js'
+  import {getBalance} from '@/api/httpData.js'
 
   export default {
     data() {
@@ -80,12 +81,10 @@
     methods: {
       //根据账户地址获取账户余额
       getBalanceAddress() {
-        this.utils.getBalance(this.address)
+        getBalance(this.address)
           .then((response) => {
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
-              this.usable = parseFloat(leftShift.times(response.data.usable.value).toString());
-              //this.usable = response.data.usable * 0.000000001
+              this.usable = LeftShiftEight(response.data.usable.value).toString();
             } else {
               this.usable = 0
             }
@@ -106,8 +105,7 @@
             .then((response) => {
               //console.log(response);
               if (response.success) {
-                let leftShift = new BigNumber(0.00000001);
-                this.fee = leftShift.times(response.data.value);
+                this.fee = LeftShiftEight(response.data.value);
                 let Bplsus = new BigNumber(1);
                 this.allFee = Bplsus.plus(this.fee);
               }

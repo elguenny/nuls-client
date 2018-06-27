@@ -93,7 +93,7 @@
       },
       //
       toSubmit(password) {
-        let param = {'address': localStorage.getItem('newAccountAddress'), 'password': password}
+        let param = {'address': localStorage.getItem('newAccountAddress'), 'password': password};
         this.$post('/consensus/agent/stop', param)
           .then((response) => {
             //console.log(response);
@@ -109,7 +109,7 @@
             } else {
               this.$message({
                 type: 'waring',
-                message: this.$t('message.passWordFailed') + response.msg
+                message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
           })
