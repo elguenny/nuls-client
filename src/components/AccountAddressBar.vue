@@ -51,14 +51,7 @@
         if (this.$store.getters.getAddressList.length !== 0) {
           this.showData = !this.showData
         } else {
-          //console.log(sessionStorage.getItem('userList')==='1');
-          if (sessionStorage.getItem('userList') !== '1') {
-            this.$message({
-              type: 'info', message: this.$t('message.c131'), duration: '800'
-            })
-          } else {
-            this.accountAddressValue = this.$t('message.c134')
-          }
+          this.accountAddressValue = this.$t('message.c134')
         }
       },
       /**
@@ -70,14 +63,14 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              localStorage.setItem('newAccountAddress', response.data[0].address);
-              localStorage.setItem('encrypted', response.data[0].encrypted);
+              localStorage.setItem('newAccountAddress', response.data.list[0].address);
+              localStorage.setItem('encrypted', response.data.list[0].encrypted);
               this.$store.commit('setAddressList', response.data.list)
             } else {
               this.$store.commit('setAddressList', '')
             }
           }).catch((reject) => {
-          console.log('User List err' + reject);
+          //console.log('User List err' + reject);
           this.$store.commit('setAddressList', '')
         })
       },

@@ -228,10 +228,17 @@
        * copy
        */
       accountCopy() {
-        copy(this.accountAddressValue);
-        this.$message({
-          message: this.$t('message.c129'), type: 'success', duration: '800'
-        })
+
+        if(this.accountAddressValue !== ''){
+          copy(this.accountAddressValue);
+          this.$message({
+            message: this.$t('message.c129'), type: 'success', duration: '800'
+          })
+        }else {
+          this.$message({
+            message: this.$t('message.c199'), duration: '800'
+          })
+        }
       },
       //获取共识信息
       getConsensus(url) {
@@ -387,7 +394,7 @@
       toCheck() {
         this.$router.push({
           path: '/consensus/nodeInfo',
-          query: {"txHash": this.myInfoData.agentHash}
+          query: {"agentHash": this.myInfoData.agentHash}
         })
       },
       //显示隐藏信用系数规则
@@ -491,6 +498,21 @@
     .consensus-bottom {
       width: 100%;
       margin: 5px auto 0;
+      .el-tabs{
+        .el-tabs__header{
+          .el-tabs__nav-wrap{
+            .el-tabs__nav-scroll{
+              .el-tabs__nav{
+                .el-tabs__item{
+                  &:hover{
+                    color: #3a8ee6;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
       h3 {
         text-align: center;
         font-size: 14px;

@@ -173,7 +173,7 @@
       toCheck() {
         this.$router.push({
           path: '/consensus/nodeInfo',
-          query: {"txHash": this.agentAddressInfo.txHash}
+          query: {"agentHash": this.agentAddressInfo.agentHash}
         })
       },
       //全部退出

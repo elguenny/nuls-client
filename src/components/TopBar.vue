@@ -72,7 +72,7 @@
     computed: {},
     mounted() {
       this.$i18n.locale = localStorage.hasOwnProperty('language') ? localStorage.getItem('language') : 'en';
-
+      //this.$i18n.locale = 'en';
       setInterval(() => {
        this.isActive = sessionStorage.hasOwnProperty('isActive') ? parseInt(sessionStorage.getItem('isActive')) : 0 ;
       }, 500)

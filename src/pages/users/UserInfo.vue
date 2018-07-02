@@ -51,7 +51,7 @@
         userData: [],
         totalAll: 0,
         //定时刷新列表
-        userInfoSetInterval:null,
+        userInfoSetInterval: null,
 
       }
     },
@@ -62,11 +62,9 @@
     mounted() {
       let _this = this;
       this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1});
-      if (this.$route.query.address) {
-        this.userInfoSetInterval = setInterval(() => {
-          this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1});
-        }, 10000)
-      }
+      this.userInfoSetInterval = setInterval(() => {
+        this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1});
+      }, 10000)
     },
     //离开当前页面后执行
     destroyed() {
@@ -79,7 +77,7 @@
         })
       },
       callback() {
-        console.log("倒计时完成")
+
       },
       //获取所有账户列表
       getAllUserList(url) {
@@ -95,6 +93,7 @@
       getUserList(url, params) {
         this.$fetch(url, params)
           .then((response) => {
+            //console.log(response);
             if (response.success) {
               if (response.data.list.length > 0) {
                 let set = new Set();

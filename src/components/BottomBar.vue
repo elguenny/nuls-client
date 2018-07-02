@@ -32,8 +32,14 @@
       this.getNetWorkInfo();
       //5秒获取一次区块高度 encapsulated https
       setInterval(() => {
-        this.getNetWorkInfo()
-      }, 5000)
+        this.getNetWorkInfo();
+        if (this.$store.getters.getAddressList.length === 0) {
+          this.getAccountList()
+        }
+      }, 5000);
+
+      //调用查询账户列表
+      this.getAccountList();
 
     },
     methods: {
@@ -44,8 +50,6 @@
             //console.log(response)
             if (response.success) {
 
-              //调用查询账户列表
-              this.getAccountList();
               this.netWorkInfo = response.data;
               this.$store.commit('setNetWorkInfo', response.data);
 
@@ -79,7 +83,14 @@
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              this.$store.commit('setAddressList', response.data.list);
+              if(response.data.list.length !== 0){
+                localStorage.setItem('newAccountAddress', response.data.list[0].address);
+                localStorage.setItem('encrypted', response.data.list[0].encrypted);
+                this.$store.commit('setAddressList', response.data.list);
+              }else {
+                this.$store.commit('setAddressList', '');
+                localStorage.setItem('newAccountAddress', '');
+              }
             }
           }).catch((reject) => {
           localStorage.setItem('newAccountAddress', '');

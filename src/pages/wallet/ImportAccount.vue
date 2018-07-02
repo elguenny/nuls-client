@@ -1,5 +1,5 @@
 <template>
-  <div class="import-account">
+  <div class="import-account" v-loading="importAccountLoading">
     <Back :backTitle="this.$t('message.firstInfoTitle')"></Back>
     <h1>{{$t("message.inportAccount")}}</h1>
     <input type="file" id="fileId" class="hidden">
@@ -26,10 +26,11 @@
       return {
         //定时获取文件路径
         fellPathSetInterval: null,
-        encrypted:false,
+        encrypted: false,
         imageUrl: '',
         keyStorePath: '',
         keyStoreInfo: {},
+        importAccountLoading: false,
       }
     },
     components: {
@@ -166,6 +167,7 @@
 
       //导入keyStore import keyStore
       postKeyStore(url, params) {
+        this.importAccountLoading = true;
         this.$post(url, params)
           .then((response) => {
             //console.log(response);
@@ -185,27 +187,36 @@
                 type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
+            this.importAccountLoading = false;
+          })
+          .catch(err => {
+            //console.log(err);
+            this.getAccountList('/account');
+            this.$message({
+              type: 'success', message: this.$t('message.c197'), duration: '3000'
+            });
+            this.importAccountLoading = false;
           })
       },
       //获取账户地址列表
-      getAccountList (url) {
+      getAccountList(url) {
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
               this.$store.commit('setAddressList', response.data.list);
-              if(response.data.list.length === 1){
+              if (response.data.list.length === 1) {
                 this.$router.push({
                   name: '/wallet'
                 })
-              }else {
+              } else {
                 this.$router.push({
                   name: '/userInfo',
-                  params: {'address':response.data},
+                  params: {'address': response.data},
                 })
               }
-              this.$message({
+             /* this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
-              })
+              })*/
             }
           }).catch((reject) => {
           console.log('User List err' + reject)

@@ -69,7 +69,7 @@
             let rightShift = new BigNumber(100000000);
             if (parseInt(rightShift.times(value).toString()) > parseInt(rightShift.times(this.usable).toString())) {
               callback(new Error(this.$t('message.c543')))
-            } else if (parseInt(rightShift.times(value).toString()) < parseInt(rightShift.times(20000).toString())) {
+            } else if (parseInt(rightShift.times(value).toString()) < 20000*100000000 || parseInt(rightShift.times(value).toString()) > 200000*100000000) {
               callback(new Error(this.$t('message.c541')))
             } else {
               callback()
@@ -145,16 +145,23 @@
        * copy
        */
       accountCopy() {
-        copy(this.copyValue);
-        this.$message({
-          message: this.$t('message.c129'), type: 'success', duration: '800'
-        })
+
+        if(this.copyValue !== ''){
+          copy(this.copyValue);
+          this.$message({
+            message: this.$t('message.c129'), type: 'success', duration: '800'
+          })
+        }else {
+          this.$message({
+            message: this.$t('message.c199'), duration: '800'
+          })
+        }
       },
       //根据账户地址获取账户余额
       getBalanceAddress(url) {
         this.$fetch(url)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               this.usable = (response.data.usable.value * 0.00000001).toFixed(8);
               this.placeholder = this.$t('message.currentBalance') + ' ' + (response.data.usable.value * 0.00000001).toFixed(8)

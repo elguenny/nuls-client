@@ -136,6 +136,7 @@
       getConsensusAddress(url) {
         this.$fetch(url)
           .then((response) => {
+            //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
               this.toCheckOk = response.data.agentAddress === localStorage.getItem('newAccountAddress');
@@ -150,7 +151,7 @@
                 response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%'
               }
               //response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
-              this.agentId = response.data.txHash;
+              this.agentId = response.data.agentHash;
               this.nodeData = response.data;
               this.loading = false
             }
@@ -189,7 +190,10 @@
       toCheck() {
         this.$router.push({
           path: '/consensus/nodeInfo',
-          query: {"txHash": this.agentId}
+          query: {"agentHash": this.agentId}
+
+          /*name:'/nodeInfo',
+          params:{agentHash: this.agentId}*/
         })
       },
 

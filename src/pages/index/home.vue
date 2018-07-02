@@ -36,20 +36,20 @@
       <div class="home-nav-top">
         <div class="nav-title">{{$t('message.consensus1')}}</div>
         <div class="nav-info">
-        <ul>
-          <li class="cl">
-            <label class="fl">{{$t('message.annualYield')}}：</label>
-            <span>{{this.allNodeList.nodeNumber}} {{$t('message.c30')}}</span>
-          </li>
-          <li class="cl">
-            <label class="fl">{{$t('message.pledge')}}：</label>
-            <span class="number">{{this.allNodeList.entrust}} NULS</span>
-          </li>
-          <li class="cl">
-            <label class="fl">{{$t('message.income')}}：</label>
-            <span class="number">{{this.allNodeList.consensusAccountNumber}} {{$t('message.c30')}}</span>
-          </li>
-        </ul>
+          <ul>
+            <li class="cl">
+              <label class="fl">{{$t('message.annualYield')}}：</label>
+              <span>{{this.allNodeList.nodeNumber}} {{$t('message.c30')}}</span>
+            </li>
+            <li class="cl">
+              <label class="fl">{{$t('message.pledge')}}：</label>
+              <span class="number">{{this.allNodeList.entrust}} NULS</span>
+            </li>
+            <li class="cl">
+              <label class="fl">{{$t('message.income')}}：</label>
+              <span class="number">{{this.allNodeList.consensusAccountNumber}} {{$t('message.c30')}}</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -67,10 +67,10 @@
   import axios from 'axios'
   import ProgressBar from '@/components/ProgressBar.vue'
   import '@/assets/css/jquery-jvectormap.css'
-  import {jvectormap} from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
-  import {jvectormap1} from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
+  import '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
+  import '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
   import {LeftShiftEight} from '@/api/util.js'
-  import {getAccountAssets,getConsensus} from '@/api/httpData.js'
+  import {getAccountAssets, getConsensus} from '@/api/httpData.js'
 
   export default {
     data() {
@@ -108,13 +108,22 @@
       if (localStorage.getItem('newAccountAddress') !== '') {
         this.getAccountAddress(localStorage.getItem('newAccountAddress'))
       }
+      //设置后端语言
+      if (localStorage.hasOwnProperty('language')) {
+        this.selectLanguage();
+      }
       this.queryConsensus();
       this.getNetWork();
+
       setTimeout(() => {
+        this.getCoordinate(this.ipData);
+      }, 300);
+      setTimeout(() => {
+        //console.log(this.ipObj);
         this.methodsMaps(this.ipObj)
       }, 1000);
       //页面第一次进入判断浏览器内核
-      //console.log("浏览器:" + this.defaultBrowser());
+      console.log("浏览器:" + this.defaultBrowser());
       if (!sessionStorage.hasOwnProperty('browserOk')) {
         if (this.defaultBrowser() !== 'Chrome') {
           this.$alert(this.$t('message.c174'), '', {
@@ -130,22 +139,20 @@
     },
     mounted() {
       //5秒循环一次我的资产和全网共识
-      setTimeout(() => {
-        let map = $('#world-map-markers').vectorMap('get', 'mapObject');
-        this.homeSetInterval = setInterval(() => {
-          if (localStorage.getItem('newAccountAddress') !== '') {
-            this.getAccountAddress(localStorage.getItem('newAccountAddress'))
-          }
-          this.queryConsensus();
-          this.getNetWork();
-          //console.log(this.ipObj)
-          setTimeout(() => {
-            map.clearSelectedMarkers();
-            map.addMarkers(this.ipObj);
-          }, 1000)
-        }, 5000)
-      }, 1000)
+      this.homeSetInterval = setInterval(() => {
 
+        if (localStorage.getItem('newAccountAddress') !== '') {
+          this.getAccountAddress(localStorage.getItem('newAccountAddress'))
+        }
+        this.queryConsensus();
+        this.getNetWork();
+
+        let map = $('#world-map-markers').vectorMap('get', 'mapObject');
+        setTimeout(() => {
+          map.clearSelectedMarkers();
+          map.addMarkers(this.ipObj)
+        }, 1000)
+      }, 9000);
     },
     //离开当前页面后执行
     destroyed() {
@@ -194,38 +201,62 @@
       },
 
       /**
-       * getNetWork
+       * 获取 ip
        * getNetWork
        */
       getNetWork() {
         this.$fetch('/network/nodes')
           .then((response) => {
+            //console.log(response);
             if (response.success) {
-              //console.log(response);
               this.ipData = response.data.list;
-              if (this.ipData.length > 0) {
-                this.ipObj = [];
-                let leng = this.ipData.length > 50 ? 50 : this.ipData.length;
-                for (let j = 0; j < leng; j++) {
-                  axios.get('http://freegeoip.net/json/' + this.ipData[j])
-                    .then((response) => {
-                      //console.log(response.data);
-                      let latLngs = [response.data.latitude, response.data.longitude];
-                      let names = response.data.region_code;
-                      this.ipObj.push({'latLng': latLngs, 'name': names});
-                    })
-                }
-              } else {
-                console.log('没有获取到ip')
-              }
             }
           })
+          .catch((reject) => {
+            console.log(reject)
+          });
       },
+
+      /**
+       * 根据ip 获取经纬度
+       **/
+      getCoordinate(arr) {
+        //新数组
+        let newArr = [];
+        let s = parseInt((arr.length / 50).toString());
+        let n = 0;
+        for (let i = 1; i <= s; i++) {
+          let star = (i - 1) * 50;
+          newArr[n++] = arr.slice(star, star + 50);
+        }
+        let y = arr.length - s * 50;
+        if (y > 0) {
+          newArr[n++] = arr.slice(s * 50);
+        }
+
+        this.ipObj = [];
+        //循环新数组，获取经纬度
+        for (let k = 0; k < newArr.length; k++) {
+          axios.get("http://192.168.1.233:8766/nuls/ip/getlist/?iplist=" + newArr[k])
+            .then((response) => {
+              //console.log(response);
+              if (response.data.success) {
+                for (let j = 0; j < response.data.data.length; j++) {
+                  let latLngs = [response.data.data[j].latitude, response.data.data[j].longitude];
+                  let names = response.data.data[j].city;
+                  this.ipObj.push({'latLng': latLngs, 'name': names});
+                }
+              } else {
+                console.log("Failure to convert coordinates to IP")
+              }
+            })
+        }
+      },
+
       /**
        * 根据坐标标注位置
        * According to coordinate annotation position
-       * @param url
-       * @param data
+       * @param maps
        * @returns {Promise}
        */
       methodsMaps(maps) {
@@ -279,6 +310,32 @@
       },
 
       /**
+       * 修改描点
+       */
+      eMethodsMaps(maps) {
+        console.log("修改描点");
+        //let map = $('#world-map-markers').vectorMap();
+
+        /* let map = new jvectormap.Map({
+
+         });*/
+        //map.clearSelectedRegions();
+      },
+
+      //设置后端返回语言
+      selectLanguage() {
+        let param = localStorage.getItem('language');
+        this.$put('/sys/lang/' + param)
+          .then((response) => {
+            if (response.success) {
+
+            } else {
+
+            }
+          })
+      },
+
+      /**
        *判断默认浏览器信息
        **/
       defaultBrowser() {
@@ -302,7 +359,29 @@
       },
 
     },
-    watch: {}
+    watch: {
+      newValue(val, oldVal) {
+        let newValue = new Set(val);
+        let oldValue = new Set(oldVal);
+        //加入
+        let inDifference = new Set([...newValue].filter(x => !oldValue.has(x)));
+        //重复
+        let intersect = new Set([...newValue].filter(x => oldValue.has(x)));
+        //移除
+        let outDifference = new Set([...oldValue].filter(x => !newValue.has(x)));
+        /* this.eMethodsMaps("123456");*/
+        console.log(inDifference);
+        console.log("inDifference");
+        console.log(intersect);
+        console.log("intersect");
+        console.log(outDifference)
+      },
+    },
+    computed: {
+      newValue() {
+        return this.ipObj
+      }
+    }
   }
 </script>
 <style lang="less">
@@ -328,7 +407,7 @@
           margin: 20px 0;
           font-weight: bold;
         }
-        .nav-info{
+        .nav-info {
           border: 1px solid #658ec7;
           background-color: #17202e;
           height: 90px;
@@ -362,13 +441,13 @@
           margin: 0 30px;
           .nav-left {
             float: left;
-            width:20%;
+            width: 20%;
           }
           .nav-right {
             width: 80%;
             float: left;
-            .bar-bg{
-             margin-top: 12px;
+            .bar-bg {
+              margin-top: 12px;
             }
             .number {
               display: block;

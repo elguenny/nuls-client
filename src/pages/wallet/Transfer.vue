@@ -17,7 +17,7 @@
         <el-form-item :label="$t('message.transferAmount')+'：'" prop="joinNo">
           <span class="allUsable">{{$t('message.currentBalance')}}: {{usable}} NULS</span>
           <el-input type="text" v-model="transferForm.joinNo" :maxlength="17" @change="countFee"></el-input>
-         <!-- <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>-->
+          <!-- <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>-->
         </el-form-item>
         <el-form-item :label="$t('message.remarks')+'：'">
           <el-input type="textarea" v-model.trim="transferForm.remark"
@@ -73,7 +73,7 @@
         }
       };
       let checkJoinAddress = (rule, value, callback) => {
-        if (!value ) {
+        if (!value) {
           callback(new Error(this.$t('message.transferNull')))
         } else {
           this.address = localStorage.getItem('newAccountAddress');
@@ -246,22 +246,22 @@
           type: 'info', message: this.$t('message.c65'), duration: '800'
         })*/
         this.dialogTableVisible = true;
-         let request = indexedDB.open('usersDB', 1);
-         let dbData = [];
-         request.onsuccess = function (event) {
-           let db = event.target.result;
-           let tx = db.transaction('addressList', 'readonly');
-           let store = tx.objectStore('addressList');
-           // 打开游标，遍历customers中所有数据
-           store.openCursor().onsuccess = function (event) {
-             let cursor = event.target.result;
-             if (cursor) {
-               dbData.push(cursor.value);
-               cursor.continue()
-             }
-           }
-         };
-         this.userAddressList = dbData
+        let request = indexedDB.open('usersDB', 1);
+        let dbData = [];
+        request.onsuccess = function (event) {
+          let db = event.target.result;
+          let tx = db.transaction('addressList', 'readonly');
+          let store = tx.objectStore('addressList');
+          // 打开游标，遍历customers中所有数据
+          store.openCursor().onsuccess = function (event) {
+            let cursor = event.target.result;
+            if (cursor) {
+              dbData.push(cursor.value);
+              cursor.continue()
+            }
+          }
+        };
+        this.userAddressList = dbData
       },
 
       /**
@@ -296,8 +296,8 @@
           let params = "address=" + this.address
             + "&toAddress=" + this.transferForm.joinAddress
             + "&amount=" + rightShift.times(this.transferForm.joinNo)
-            + "&remark=" + this.transferForm.remark.replace(/\n/g, "");
-          //console.log("params=="+params);
+            + "&remark=" + this.stripscript(this.transferForm.remark.replace(/\n\r/g, ""));
+          //console.log(params);
           this.$fetch('/accountledger/transfer/fee?' + params)
             .then((response) => {
               //console.log(response);
@@ -308,6 +308,22 @@
             });
         }
       },
+
+      /**
+       * 字符转换
+       **/
+      stripscript(str) {
+        let s = "";
+        if (str.length === 0) return "";
+        s = str.replace(/&/g, "&amp;");
+        s = s.replace(/</g, "&lt;");
+        s = s.replace(/>/g, "&gt;");
+        s = s.replace(/ /g, "&nbsp;");
+        s = s.replace(/\'/g, "&#39;");
+        s = s.replace(/\"/g, "&quot;");
+        return s;
+      },
+
 
       /**
        * 确认转账

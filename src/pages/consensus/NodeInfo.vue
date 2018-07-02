@@ -44,7 +44,7 @@
   export default {
     data() {
       return {
-        txHash: this.$route.query.txHash,
+        agentHash: this.$route.query.agentHash,
         myNodeInfo: [],
       }
     },
@@ -52,15 +52,23 @@
       Back,
       Password,
     },
-    mounted() {
-      let _this = this;
-      this.getMyNodeInfo('/consensus/agent/' + this.txHash)
+    created() {
+
+    },
+    mounted(){
+      this.getMyNodeInfo('/consensus/agent/' + this.$route.query.agentHash);
+    },
+    activated(){
+      this.getMyNodeInfo('/consensus/agent/' + this.$route.query.agentHash);
+    },
+    destroyed() {
     },
     methods: {
       //获取我创建的节点信息
       getMyNodeInfo(url) {
         this.$fetch(url)
           .then((response) => {
+            //console.log(this.agentHash);
             //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
@@ -122,6 +130,12 @@
           //params: {'agentName': this.myNodeInfo.agentId, 'txHash': this.myNodeInfo.txHash}
         })
       }
+    },
+    watch: {
+      agentHash(val, oldVal) {//普通的watch监听
+        console.log("agentHash: " + val, oldVal);
+        this.getMyNodeInfo('/consensus/agent/' + this.agentHash);
+      },
     }
   }
 </script>

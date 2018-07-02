@@ -111,6 +111,7 @@
       //语言切换
       selectLanguage() {
         this.$i18n.locale = this.projectName.key;
+        localStorage.setItem('language',this.projectName.key);
         let param = '';
         if (this.projectName.key !== 'en') {
           param = 'zh-CHS'
@@ -141,24 +142,29 @@
       },
       //修改密码
       toEditPassword() {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
-          if (this.encrypted) {
-            this.$router.push({
-              name: '/editorPassword',
-              params: {address: localStorage.getItem('newAccountAddress'), backInfo: this.$t('message.setManagement')},
-            })
+        if(localStorage.getItem('newAccountAddress') !==''){
+          if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
+            if (this.encrypted) {
+              this.$router.push({
+                name: '/editorPassword',
+                params: {address: localStorage.getItem('newAccountAddress'), backInfo: this.$t('message.setManagement')},
+              })
+            } else {
+              this.$router.push({
+                name: '/setPassword',
+                params: {address: localStorage.getItem('newAccountAddress'), backInfo: this.$t('message.setManagement')},
+              })
+            }
           } else {
-            this.$router.push({
-              name: '/setPassword',
-              params: {address: localStorage.getItem('newAccountAddress'), backInfo: this.$t('message.setManagement')},
+            this.$message({
+              message: this.$t('message.c133'), duration: '800'
             })
           }
-        } else {
+        }else {
           this.$message({
-            message: this.$t('message.c133'), duration: '800'
+            message: this.$t('message.c199'), duration: '800'
           })
         }
-
       },
       /**
        * 查询版本是否可更新

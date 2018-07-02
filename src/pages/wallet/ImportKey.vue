@@ -1,5 +1,5 @@
 <template>
-    <div class="import-key">
+    <div class="import-key" v-loading="importKeyLoading">
         <Back :backTitle="this.$t('message.inportAccount')"></Back>
         <h2>{{$t('message.key')}}</h2>
         <el-form ref="keyData" :model="keyData" :rules="keyRules" label-position="top">
@@ -33,6 +33,7 @@
             {required: true, message: this.$t('message.keyLow'), trigger: 'blur'}
           ]
         },
+        importKeyLoading:false,
       }
     },
     components: {
@@ -53,6 +54,7 @@
       },
       //
       toSubmit (password) {
+        this.importKeyLoading = true;
         let params = '';
         if(password === ''){
           params = '{"priKey":"' + this.keyData.keyInfo + '","password":""}'
@@ -70,12 +72,14 @@
               this.getAccountList('/account');
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
-              })
+              });
+
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
+            this.importKeyLoading = false;
             this.passwordVisible = false
           })
           .catch(err => {
@@ -83,7 +87,8 @@
             this.getAccountList('/account');
             this.$message({
               type: 'success', message: this.$t('message.c197'), duration: '3000'
-            })
+            });
+            this.importKeyLoading = false;
           })
       },
       //获取账户地址列表
@@ -103,8 +108,7 @@
                   name: '/userInfo',
                   params: {'address':response.data},
                 })
-              }
-
+            }
             }
           }).catch((reject) => {
           console.log('User List err' + reject)
