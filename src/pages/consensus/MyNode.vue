@@ -195,7 +195,7 @@
       },
       //退出共识
       outNode(row) {
-        this.$confirm(this.$t('message.c60') + row.agentName + '？( ' + this.$t('message.c51') + row.deposit + ' NULS)', this.$t('message.c61'), {
+        this.$confirm(this.$t('message.c61') + row.deposit + ' NULS ' + this.$t('message.c60') + row.agentName, '', {
           confirmButtonText: this.$t('message.confirmButtonText'),
           cancelButtonText: this.$t('message.cancelButtonText'),
         }).then(() => {

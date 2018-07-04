@@ -134,7 +134,7 @@ const cn = {
     overview: '概览',
     tradingTime: '交易时间',
     miningFee1: '手续费',
-    autograph: 'txid',
+    autograph: 'TxID',
     transactionState: '交易状态',
     blockHeight: '区块高度',
 
@@ -217,8 +217,8 @@ const cn = {
     c57: '追加',
     c58: '退出',
     c59: '已取消',
-    c60: '确定退出',
-    c61: '退出节点',
+    c60: '从节点: ',
+    c61: '确定取出 ',
     //nodeInfo
     c62: '注销节点',
     c63: '请输入搜索关键字！',

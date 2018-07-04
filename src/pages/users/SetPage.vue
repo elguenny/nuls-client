@@ -120,6 +120,7 @@
         }
         this.$put('/sys/lang/' + param)
           .then((response) => {
+            //console.log(response);
             if (response.success) {
               //console.log('success')
             } else {

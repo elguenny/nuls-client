@@ -202,11 +202,9 @@
        * @param address params
        */
       getAccountTxList(address, params) {
-        console.log(address);
-        console.log(params);
         getAccountTxList(address, params)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if(response.success){
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
@@ -303,7 +301,6 @@
             'pageSize': 20,
             'pageNumber': 1
           };
-          console.lo
           this.getAccountTxList( this.accountAddressValue, params)
         } else {
           sessionStorage.setItem('walletActiveName', tab.name);

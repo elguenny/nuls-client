@@ -114,12 +114,11 @@
       }
       this.queryConsensus();
       this.getNetWork();
-
       setTimeout(() => {
         this.getCoordinate(this.ipData);
       }, 300);
       setTimeout(() => {
-        //console.log(this.ipObj);
+        //console.log(this.arrCount(this.ipObj));
         this.methodsMaps(this.ipObj)
       }, 1000);
       //页面第一次进入判断浏览器内核
@@ -140,17 +139,18 @@
     mounted() {
       //5秒循环一次我的资产和全网共识
       this.homeSetInterval = setInterval(() => {
-
         if (localStorage.getItem('newAccountAddress') !== '') {
           this.getAccountAddress(localStorage.getItem('newAccountAddress'))
         }
         this.queryConsensus();
         this.getNetWork();
-
+        setTimeout(() => {
+          this.getCoordinate(this.ipData);
+        }, 500);
         let map = $('#world-map-markers').vectorMap('get', 'mapObject');
         setTimeout(() => {
           map.clearSelectedMarkers();
-          map.addMarkers(this.ipObj)
+          map.addMarkers(this.ipObj);
         }, 1000)
       }, 9000);
     },
@@ -237,20 +237,48 @@
         this.ipObj = [];
         //循环新数组，获取经纬度
         for (let k = 0; k < newArr.length; k++) {
-          axios.get("http://192.168.1.233:8766/nuls/ip/getlist/?iplist=" + newArr[k])
+          axios.get("http://50.62.6.187:8766/nuls/ip/getlist/?iplist=" + newArr[k])
             .then((response) => {
               //console.log(response);
               if (response.data.success) {
                 for (let j = 0; j < response.data.data.length; j++) {
-                  let latLngs = [response.data.data[j].latitude, response.data.data[j].longitude];
-                  let names = response.data.data[j].city;
-                  this.ipObj.push({'latLng': latLngs, 'name': names});
+                  this.ipObj.push({
+                    'ip': response.data.data[j].ip,
+                    'latLng': [response.data.data[j].latitude, response.data.data[j].longitude],
+                    'name': response.data.data[j].city
+                  });
                 }
               } else {
                 console.log("Failure to convert coordinates to IP")
               }
             })
         }
+      },
+
+      //数组统计
+      arrCount(arr) {
+        let list = arr;
+        let newlist = [];
+        let listMap = [];
+        for (let i = 0, len = list.length, latLng, name, key; i < len; i++) {
+          latLng = list[i].latLng;
+          name = list[i].name;
+          key = latLng + '-' + name;
+          if (!!listMap[key]) {
+            listMap[key]++;
+          } else {
+            listMap[key] = 1;
+          }
+        }
+        for (let item in listMap) {
+          newlist.push({
+            latLng: [item.split('-')[0].split(',')[0], item.split('-')[0].split(',')[0]],
+            name: item.split('-')[1]+" "+listMap[item],
+            //number: listMap[item],
+            style: {r: 2, fill: '#fesdfe'}
+          })
+        }
+        return newlist;
       },
 
       /**
@@ -260,52 +288,56 @@
        * @returns {Promise}
        */
       methodsMaps(maps) {
-        $('#world-map-markers').vectorMap({
-          map: 'world_mill_en',
-          normalizeFunction: 'polynomial',
-          hoverOpacity: 0.7,
-          hoverColor: false,
-          zoomOnScroll: false,
-          zoomStep: 1,
-          backgroundColor: 'transparent',
-          regionStyle: {
-            initial: {
-              fill: 'none',
-              'fill-opacity': 0.5,
-              stroke: '#6da6f5',
-              'stroke-width': 0.8,
-              'stroke-opacity': 0.6
+        setTimeout(() => {
+          $('#world-map-markers').vectorMap({
+            map: 'world_mill_en',
+            normalizeFunction: 'polynomial',
+            hoverOpacity: 0.7,
+            hoverColor: false,
+            zoomOnScroll: false,
+            zoomStep: 1,
+            backgroundColor: 'transparent',
+            regionStyle: {
+              initial: {
+                fill: 'none',
+                'fill-opacity': 0.5,
+                stroke: '#6da6f5',
+                'stroke-width': 0.8,
+                'stroke-opacity': 0.6
+              },
+              hover: {
+                'fill-opacity': 0.7,
+                cursor: 'pointer'
+              },
+              selected: {
+                fill: 'yellow'
+              },
+              selectedHover: {}
             },
-            hover: {
-              'fill-opacity': 0.7,
-              cursor: 'pointer'
+            markerStyle: {
+              initial: {
+                fill: '#00a65a',
+                stroke: '#82bd39',
+                r: 3,
+              },
+              hover: {
+                r: 4,
+                fill: '#dbf433',
+                stroke: '#82bd39',
+              }
             },
-            selected: {
-              fill: 'yellow'
-            },
-            selectedHover: {}
-          },
-          markerStyle: {
-            initial: {
-              fill: '#00a65a',
-              stroke: '#82bd39',
-              r: 3,
-            },
-            hover: {
-              r: 4,
-              fill: '#dbf433',
-              stroke: '#82bd39',
-            }
-          },
-          markers: maps,
-          /* markers: [
-             {latLng: [34.62, 112.45], name: '河南 - 洛阳  家'},
-             {latLng: [34.74, 113.66], name: '河南 - 郑州  2010,2011,2012'},
-             {latLng: [39.95, 116.34], name: '北京  2013'},
-             {latLng: [38.97, 121.53], name: '辽宁 - 大连  2010-2014'},
-             {latLng: [29.88, 121.64], name: '浙江 - 宁波  2014.04'},
-             ]*/
-        });
+            markers: maps,
+            /* markers: [
+               {latLng: [30.2936, 120.1614], name: 'Hangzhou 5'},
+               {latLng: [34.74, 113.66], name: '河南 - 郑州  2010,2011,2012'},
+               {latLng: [39.95, 116.34], name: '北京  2013'},
+               {latLng: [38.97, 121.53], name: '辽宁 - 大连  2010-2014'},
+               {latLng: [29.88, 121.64], name: '浙江 - 宁波  2014.04'},
+               ]*/
+          });
+        }, 1000);
+
+
         this.loading = false
       },
 
@@ -314,12 +346,7 @@
        */
       eMethodsMaps(maps) {
         console.log("修改描点");
-        //let map = $('#world-map-markers').vectorMap();
 
-        /* let map = new jvectormap.Map({
-
-         });*/
-        //map.clearSelectedRegions();
       },
 
       //设置后端返回语言
@@ -370,11 +397,11 @@
         //移除
         let outDifference = new Set([...oldValue].filter(x => !newValue.has(x)));
         /* this.eMethodsMaps("123456");*/
-        console.log(inDifference);
-        console.log("inDifference");
-        console.log(intersect);
-        console.log("intersect");
-        console.log(outDifference)
+        /* console.log(inDifference);
+         console.log("inDifference");
+         console.log(intersect);
+         console.log("intersect");
+         console.log(outDifference)*/
       },
     },
     computed: {
@@ -441,13 +468,14 @@
           margin: 0 30px;
           .nav-left {
             float: left;
-            width: 20%;
+            width: 16%;
           }
           .nav-right {
-            width: 80%;
+            width: 84%;
             float: left;
             .bar-bg {
               margin-top: 12px;
+              width: 150px;
             }
             .number {
               display: block;
