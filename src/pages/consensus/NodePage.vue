@@ -78,6 +78,14 @@
           callback(new Error(this.$t('message.c52')))
         }
         setTimeout(() => {
+
+          let rightShift = new BigNumber(100000000);
+          let leftShift = new BigNumber(0.00000001);
+          if (rightShift.times(this.nodeForm.nodeNo).toString() === rightShift.times(this.usable).toString()) {
+            this.nodeForm.nodeNo = leftShift.times(rightShift.times(this.usable) - rightShift.times(this.fee)).toString();
+            value = this.nodeForm.nodeNo;
+          }
+
           let re = /^\d+(?=\.{0,1}\d+$|$)/;
           let res = /^\d{1,8}(\.\d{1,8})?$/;
 
@@ -88,7 +96,7 @@
             let nu = new BigNumber(this.usable);
             if (value < 2000) {
               callback(new Error(this.$t('message.c54')))
-            } else if (values.comparedTo(nu.minus(0.01)) === 1) {
+            } else if (values.comparedTo(nu.minus(this.fee)) === 1) {
               callback(new Error(this.$t('message.c542')))
             } else {
               callback()
@@ -104,7 +112,7 @@
         agentId: '',
         nodeData: [],
         usable: 0,
-        fee: '0',
+        fee: 0,
         nodeForm: {
           nodeNo: '',
         },
@@ -210,7 +218,7 @@
           //console.log("params=" + params);
           this.$fetch('/consensus/deposit/fee?' + params)
             .then((response) => {
-              //console.log(response);
+              console.log(response);
               if (response.success) {
                 let leftShift = new BigNumber(0.00000001);
                 this.fee = parseFloat(leftShift.times(response.data.value).toString());

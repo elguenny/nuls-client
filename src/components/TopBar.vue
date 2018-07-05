@@ -14,25 +14,6 @@
         <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="more_icon"></i>
           <span>{{$t('message.setManagement')}}</span></li>
       </ul>
-      <div class="top-icon fl">
-        <!-- <div class="refresh">
-             <i v-show="showTime" class="refresh_icon" @click="toRefresh" :title="$t('message.refresh')"></i>
-             <span v-show="!showTime" class="refresh_count">{{count}}s</span>
-         </div>-->
-        <!--<el-badge class="news">
-            <i class="message_icon" @click="news" :title="$t('message.news')"></i>
-        </el-badge>-->
-        <!--<el-badge :value="0" class="news">
-            <i class="message_icon" @click="news"></i>
-        </el-badge>-->
-        <!--<div class="set"><i class="set_icon" @click="toSetUp" :title="$t('message.set')"></i></div>-->
-        <!--<SelecBar @select="selectLanguage" :selectedValue="projectName" :dataList="languageItem"
-                  :widthData="widthData"></SelecBar>-->
-        <!--<div class="minusClose">
-            <i class="el-icon-minus minus-close fl" @click="toMinus" :title="$t('message.c141')"></i>
-            <i class="el-icon-close minus-close fl " @click="toClose" :title="$t('message.c142')"></i>
-        </div>-->
-      </div>
       <div class="news-div" v-show="newsOk">
         <h2>{{$t('message.news')}}</h2>
         <div class="news-div-info">
@@ -45,7 +26,6 @@
       </div>
     </nav>
   </div>
-
 </template>
 
 <script>
@@ -78,10 +58,8 @@
       }, 500)
     },
     methods: {
-
       //菜单跳转
       to(url, index) {
-
         if (url === 'home') {
           sessionStorage.setItem('isActive',0);
           this.isActive = 0;
@@ -128,48 +106,6 @@
           })
         }
 
-      },
-      //刷新
-      toRefresh() {
-        let url = this.$route.fullPath;
-        this.$router.push({
-          name: '/empty',
-          params: {url: url},
-        });
-
-        const TIME_COUNT = 20;
-        if (!this.timer) {
-          this.count = TIME_COUNT;
-          this.showTime = false;
-          this.timer = setInterval(() => {
-            if (this.count > 0 && this.count <= TIME_COUNT) {
-              this.count--
-            } else {
-              this.showTime = true;
-              clearInterval(this.timer);
-              this.timer = null
-            }
-          }, 1000)
-        }
-
-      },
-      //消息方案
-      news() {
-        /*this.newsOk = !this.newsOk*/
-      },
-      //设置界面跳转
-      toSetUp() {
-        sessionStorage.setItem('isActive',9);
-        this.isActive = 9;
-        if (this.$store.getters.getAddressList.length === 0) {
-          this.$router.push({
-            name: '/firstInfo'
-          })
-        } else {
-          this.$router.push({
-            path: '/users/setPage'
-          })
-        }
       },
     }
   }

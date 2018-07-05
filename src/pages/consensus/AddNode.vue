@@ -72,6 +72,14 @@
           callback(new Error(this.$t('message.c52')))
         }
         setTimeout(() => {
+
+          let rightShift = new BigNumber(100000000);
+          let leftShift = new BigNumber(0.00000001);
+          if (rightShift.times(this.addNodeForm.nodeNo).toString() === rightShift.times(this.usable).toString()) {
+            this.addNodeForm.nodeNo = leftShift.times(rightShift.times(this.usable) - rightShift.times(this.fee)).toString();
+            value = this.addNodeForm.nodeNo;
+          }
+
           let re = /^\d+(?=\.{0,1}\d+$|$)/;
           let res = /^\d{1,8}(\.\d{1,8})?$/;
           if (!re.exec(value) || !res.exec(value)) {
@@ -81,13 +89,13 @@
             let nu = new BigNumber(this.usable);
             if (value < 2000) {
               callback(new Error(this.$t('message.c54')))
-            } else if (values.comparedTo(nu.minus(0.01)) === 1) {
+            } else if (values.comparedTo(nu.minus(this.fee)) === 1) {
               callback(new Error(this.$t('message.c542')))
             } else {
               callback()
             }
           }
-        }, 100)
+        }, 300)
       };
       return {
         submitId: 'addNode',
@@ -103,7 +111,7 @@
           ],
         },
         usable: 0,
-        fee: 0.00,
+        fee: 0,
         toCheckOk: false,
       }
     },

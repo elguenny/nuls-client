@@ -90,28 +90,34 @@
       let checkJoinNo = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.transferNO')))
-        }
-        setTimeout(() => {
-          //console.log(value);
-          let re = /(^\+?|^\d?)\d*\.?\d+$/;
-          let res = /^\d{1,8}(\.\d{1,8})?$/;
-          if (!re.exec(value)) {
-            callback(new Error(this.$t('message.transferNO1')))
-          } else {
-            let values = new BigNumber(value);
-            let nu = new BigNumber(this.usable);
-            if (values.comparedTo(nu.minus(0.01)) === 1) {
-              callback(new Error(this.$t('message.transferNO2')))
-            } else if (value < 0.01) {
-              callback(new Error(this.$t('message.transferNO3')))
-            } else if (!res.exec(value)) {
-              callback(new Error(this.$t('message.c136')))
-            } else {
-              callback()
+        }else {
+          setTimeout(() => {
+            let rightShift = new BigNumber(100000000);
+            let leftShift = new BigNumber(0.00000001);
+            if (rightShift.times(this.transferForm.joinNo).toString() === rightShift.times(this.usable).toString()) {
+              this.transferForm.joinNo = leftShift.times(rightShift.times(this.usable) - rightShift.times(this.fee));
+              value = this.transferForm.joinNo;
             }
-          }
-        }, 100)
+            let re = /(^\+?|^\d?)\d*\.?\d+$/;
+            let res = /^\d{1,8}(\.\d{1,8})?$/;
+            if (!re.exec(value)) {
+              callback(new Error(this.$t('message.transferNO1')))
+            } else {
+              let values = new BigNumber(value);
+              let nu = new BigNumber(this.usable);
+              if (values.comparedTo(nu.minus(this.fee)) === 1) {
+                callback(new Error(this.$t('message.transferNO2')))
+              } else if (value < this.fee) {
+                callback(new Error(this.$t('message.transferNO3')))
+              } else if (!res.exec(value)) {
+                callback(new Error(this.$t('message.c136')))
+              } else {
+                callback()
+              }
+            }
+          }, 100)
 
+        }
       };
       return {
         accountAddressValue: localStorage.getItem('newAccountAddress'),
@@ -290,7 +296,6 @@
        *Calculation fee
        **/
       countFee() {
-        //console.log("feeOk="+this.transferForm.joinAddress !=='' && this.transferForm.joinNo > 0);
         if (this.transferForm.joinAddress !== '' && this.transferForm.joinNo > 0) {
           let rightShift = new BigNumber(100000000);
           let params = "address=" + this.address

@@ -73,6 +73,7 @@
       getHashInfo (hash) {
         getHashInfo(hash)
           .then((response) => {
+            //console.log(response);
             this.infoData = response.data;
             this.times = moment(response.data.time).format('YYYY-MM-DD HH:mm:ss');
             if (response.data.inputs.length > 0) {
