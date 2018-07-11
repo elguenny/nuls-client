@@ -10,7 +10,7 @@ const cn = {
     consensusManagement: '共识',
     setManagement: '设置',
     all: '全部',
-    miningFee: '手续费：0.01 NULS',
+    miningFee: ', 手续费： ',
     remarks: '备注',
     addressNull: '请选择账户地址！',
     transferNull: '请输入转账地址！',
@@ -260,7 +260,7 @@ const cn = {
     c95: '删除',
     c96: '新增通讯录',
     c97: '似乎已断开与互联网的连接，请连接后重试。确定关闭NULS钱包客户端？',
-    c98: '确定关闭',
+    c98: '确定注销',
     c99: '节点么?',
     //editAliasin
     c100: '设置别名',
@@ -378,7 +378,7 @@ const cn = {
     blockState: '区块高度',
     local: '本地',
     backward: '落后',
-    theMain: '测试网',
+    theMain: '主网',
   },
   ...zhLocale
 };

@@ -139,8 +139,7 @@
       },
       //移除账户
       outUserAddress(url, params) {
-        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
-        ) {
+        if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
           this.$post(url, params)
             .then((response) => {
               //console.log("params="+params)

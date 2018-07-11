@@ -13,7 +13,7 @@
     </div>
     <div class="key text-d cursor-p" @click="importKey">{{$t('message.c193')}}</div>
     <!--<PasswordTow ref="passTwo" @toSubmit="toSubmit"></PasswordTow>-->
-    <Password ref="password" @toSubmit="toSubmit"></Password>
+    <Password ref="password" @toSubmit="toSubmit" @toClose="toClose"></Password>
   </div>
 </template>
 
@@ -51,6 +51,7 @@
         //定时获取文件路径
         this.fellPathSetInterval = setInterval(() => {
           fellPath = this.getFullPath(obj);
+          //console.log(fellPath);
           if (fellPath !== '') {
             let obj = document.getElementById("fileId");
             let p = document.querySelector('#preview');
@@ -75,7 +76,7 @@
                       pubKey: params.pubKey === "null" ? null : params.pubKey,
                       prikey: params.prikey === "null" ? null : params.prikey
                     };
-                    if (JSON.parse(p.innerHTML).encryptedPrivateKey !== 'null') {
+                    if (JSON.parse(p.innerHTML).encryptedPrivateKey !== 'null' && JSON.parse(p.innerHTML).encryptedPrivateKey !== null) {
                       this.encrypted = true;
                       this.$refs.password.showPassword(true);
                     } else {
@@ -91,7 +92,7 @@
               } else {
                 obj.outerHTML = obj.outerHTML;
                 this.$message({
-                  type: 'warning', message: this.$t('message.c194'), duration: '800'
+                  type: 'warning', message: this.$t('message.c194'), duration: '2000'
                 })
               }
             }
@@ -113,26 +114,6 @@
           reader.readAsText(file);
         }
         return true;
-        //支持IE 7 8 9 10
-        /*else if (typeof window.ActiveXObject !== 'undefined') {
-          let xmlDoc;
-          xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-          xmlDoc.async = false;
-          xmlDoc.load(input.value);
-          //alert(xmlDoc.xml);
-          //this.keyStoreInfo = xmlDoc.xml
-        }*/
-        //支持FF
-        /*else if (document.implementation && document.implementation.createDocument) {
-          let xmlDoc;
-          xmlDoc = document.implementation.createDocument("", "", null);
-          xmlDoc.async = false;
-          xmlDoc.load(input.value);
-          //alert(xmlDoc.xml);
-          //this.keyStoreInfo = xmlDoc.xml
-        } else {
-          alert('error');
-        }*/
       },
       //判断是否选择文件
       getFullPath(obj) {
@@ -150,6 +131,13 @@
             return obj.value;
           }
           return obj.value;
+        }
+      },
+
+      //回调关闭或取消
+      toClose(boolean){
+        if(!boolean){
+          document.getElementById("fileId").value ='';
         }
       },
 

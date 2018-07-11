@@ -195,31 +195,43 @@
       },
       //退出共识
       outNode(row) {
-        this.$confirm(this.$t('message.c61') + row.deposit + ' NULS ' + this.$t('message.c60') + row.agentName, '', {
-          confirmButtonText: this.$t('message.confirmButtonText'),
-          cancelButtonText: this.$t('message.cancelButtonText'),
-        }).then(() => {
-          this.outInfo.address = row.address;
-          this.outInfo.txHash = row.txHash;
+        //获取撤销委托节点的手续费
+        this.$fetch('/consensus/withdraw/fee?address=' + row.address + '&depositTxHash=' + row.txHash)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              let rightShift = new BigNumber(0.00000001);
+              this.$confirm(this.$t('message.c61') + row.deposit + ' NULS ' + this.$t('message.c60') + row.agentName + this.$t('message.miningFee') + rightShift.times(response.data.value) + ' NULS', '', {
+                confirmButtonText: this.$t('message.confirmButtonText'),
+                cancelButtonText: this.$t('message.cancelButtonText'),
+              }).then(() => {
+                this.outInfo.address = row.address;
+                this.outInfo.txHash = row.txHash;
 
-          if (localStorage.getItem('encrypted') === "true") {
-            this.$refs.password.showPassword(true)
-          } else {
-            this.toSubmit('')
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: this.$t('message.c59')
-          })
-        })
+                if (localStorage.getItem('encrypted') === "true") {
+                  this.$refs.password.showPassword(true)
+                } else {
+                  this.toSubmit('')
+                }
+              }).catch(() => {
+                this.$message({
+                  type: 'info',
+                  message: this.$t('message.c59')
+                })
+              })
+            }else {
+              console.log("get fee err")
+            }
+          });
+
+
       },
       //
       toSubmit(password) {
         let param = {'address': this.outInfo.address, 'password': password, 'txHash': this.outInfo.txHash};
         this.$post('/consensus/withdraw/', param)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               this.$message({
                 type: 'success',

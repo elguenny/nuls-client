@@ -165,8 +165,8 @@
       //查看节点
       toCheck() {
         this.$router.push({
-          name: '/nodeInfo',
-          params: {txHash: this.agentAddressInfo.agentHash},
+          path: '/consensus/nodeInfo',
+          query: {"agentHash": this.agentAddressInfo.agentHash}
         })
       },
       /**

@@ -86,7 +86,7 @@
       getKeyStore(url, params) {
         this.$post(url, params)
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.success) {
               const content = '{"address":"' + response.data.address +
                 '","encryptedPrivateKey":"' + response.data.encryptedPrivateKey +

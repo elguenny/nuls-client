@@ -55,10 +55,10 @@
     created() {
 
     },
-    mounted(){
+    mounted() {
       this.getMyNodeInfo('/consensus/agent/' + this.$route.query.agentHash);
     },
-    activated(){
+    activated() {
       this.getMyNodeInfo('/consensus/agent/' + this.$route.query.agentHash);
     },
     destroyed() {
@@ -79,25 +79,34 @@
             }
           })
       },
+
       //关闭我创建的节点信息
       closedNode() {
-        this.$confirm(this.$t('message.c98') + " " + this.myNodeInfo.agentId + " " + this.$t('message.c99') + this.$t('message.miningFee'), this.$t('message.c86'), {
-          confirmButtonText: this.$t('message.confirmButtonText'),
-          cancelButtonText: this.$t('message.cancelButtonText'),
-        }).then(() => {
-          if (localStorage.getItem('encrypted') === "true") {
-            this.$refs.password.showPassword(true)
-          } else {
-            this.toSubmit('')
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'waring',
-            message: this.$t('message.c59'),
-            duration: '1000'
-          })
-        })
-
+        this.$fetch('/consensus/agent/stop/fee?address=' + localStorage.getItem('newAccountAddress'))
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              let rightShift = new BigNumber(0.00000001);
+              this.$confirm(this.$t('message.c98') + " " + this.myNodeInfo.agentId + " " + this.$t('message.c99') + this.$t('message.miningFee') + rightShift.times(response.data.value) + 'NULS', this.$t('message.c86'), {
+                confirmButtonText: this.$t('message.confirmButtonText'),
+                cancelButtonText: this.$t('message.cancelButtonText'),
+              }).then(() => {
+                if (localStorage.getItem('encrypted') === "true") {
+                  this.$refs.password.showPassword(true)
+                } else {
+                  this.toSubmit('')
+                }
+              }).catch(() => {
+                this.$message({
+                  type: 'waring',
+                  message: this.$t('message.c59'),
+                  duration: '1000'
+                })
+              })
+            }else {
+              console.log("get fee err")
+            }
+          });
       },
       //
       toSubmit(password) {

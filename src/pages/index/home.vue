@@ -122,7 +122,7 @@
         this.methodsMaps(this.ipObj)
       }, 1000);
       //页面第一次进入判断浏览器内核
-      console.log("浏览器:" + this.defaultBrowser());
+      console.log("V1.0.0:" + this.defaultBrowser());
       if (!sessionStorage.hasOwnProperty('browserOk')) {
         if (this.defaultBrowser() !== 'Chrome') {
           this.$alert(this.$t('message.c174'), '', {
@@ -242,11 +242,11 @@
               //console.log(response);
               if (response.data.success) {
                 for (let j = 0; j < response.data.data.length; j++) {
-                  this.ipObj.push({
-                    'ip': response.data.data[j].ip,
-                    'latLng': [response.data.data[j].latitude, response.data.data[j].longitude],
-                    'name': response.data.data[j].city
-                  });
+                    this.ipObj.push({
+                      'ip': response.data.data[j].ip,
+                      'latLng': [response.data.data[j].latitude, response.data.data[j].longitude],
+                      'name': response.data.data[j].city === 'null' ? '':response.data.data[j].city
+                    });
                 }
               } else {
                 console.log("Failure to convert coordinates to IP")

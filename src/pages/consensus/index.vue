@@ -179,7 +179,8 @@
         return this.$store.getters.getAddressList
       },
     },
-    created() {
+    mounted() {
+      let _this = this;
       this.getConsensus('/consensus');
       if (localStorage.getItem('newAccountAddress') !== '') {
         this.getConsensusAddress('/consensus/address/' + localStorage.getItem('newAccountAddress'))
@@ -368,7 +369,7 @@
           'pageNumber': this.pageNumber
         })
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               if (response.data.list.length > 0) {
                 this.$router.push({
@@ -497,6 +498,7 @@
     }
     .consensus-bottom {
       width: 100%;
+      min-height: 620px;
       margin: 5px auto 0;
       .el-tabs{
         .el-tabs__header{

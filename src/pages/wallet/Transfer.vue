@@ -233,6 +233,7 @@
        * New usersDB
        */
       openDB() {
+        const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
         let request = indexedDB.open('usersDB', 1);
         request.onupgradeneeded = function (e) {
           let db = e.target.result;
@@ -240,7 +241,7 @@
           if (!db.objectStoreNames.contains('usersDB')) {
             let store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false})
           }
-        }
+        };
       },
 
       /**
@@ -248,15 +249,13 @@
        * Select the address book
        */
       toUsersAddressList() {
-        /*this.$message({
-          type: 'info', message: this.$t('message.c65'), duration: '800'
-        })*/
+        const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
         this.dialogTableVisible = true;
         let request = indexedDB.open('usersDB', 1);
         let dbData = [];
         request.onsuccess = function (event) {
           let db = event.target.result;
-          let tx = db.transaction('addressList', 'readonly');
+          let tx = db.transaction(["addressList"], 'readonly');
           let store = tx.objectStore('addressList');
           // 打开游标，遍历customers中所有数据
           store.openCursor().onsuccess = function (event) {
@@ -301,7 +300,7 @@
           let params = "address=" + this.address
             + "&toAddress=" + this.transferForm.joinAddress
             + "&amount=" + rightShift.times(this.transferForm.joinNo)
-            + "&remark=" + this.stripscript(this.transferForm.remark.replace(/\n\r/g, ""));
+            + "&remark=" + this.stripscript(this.transferForm.remark);
           //console.log(params);
           this.$fetch('/accountledger/transfer/fee?' + params)
             .then((response) => {
@@ -318,17 +317,12 @@
        * 字符转换
        **/
       stripscript(str) {
-        let s = "";
-        if (str.length === 0) return "";
-        s = str.replace(/&/g, "&amp;");
-        s = s.replace(/</g, "&lt;");
-        s = s.replace(/>/g, "&gt;");
-        s = s.replace(/ /g, "&nbsp;");
-        s = s.replace(/\'/g, "&#39;");
-        s = s.replace(/\"/g, "&quot;");
-        return s;
+        // 去掉转义字符
+        str = str.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
+        // 去掉特殊字符
+        str = str.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/);
+        return str;
       },
-
 
       /**
        * 确认转账
@@ -347,7 +341,7 @@
               }).then(() => {
                 this.toSubmit('')
               }).catch(() => {
-
+                console.log("")
               })
             }
           } else {
@@ -367,7 +361,7 @@
           + '","toAddress":"' + this.transferForm.joinAddress
           + '","amount":' + rightShift.times(this.transferForm.joinNo)
           + ',"password":"' + password
-          + '","remark":"' + this.transferForm.remark.replace(/\n/g, "") + '"}';
+          + '","remark":"' +  this.stripscript(this.transferForm.remark)+ '"}';
         //console.log(param);
         this.$post('/accountledger/transfer', param)
           .then((response) => {
@@ -380,7 +374,7 @@
               this.transferForm.joinAddress = '';
               this.transferForm.joinNo = '';
               this.transferForm.remark = '';
-              this.getBalanceAddress('/account/balance/' + this.transferForm.address);
+              this.getBalanceAddress('/accountledger/balance/' + this.transferForm.address);
               sessionStorage.setItem('walletActiveName', 'second');
               this.$router.push({
                 name: '/wallet',

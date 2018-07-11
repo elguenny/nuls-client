@@ -50,7 +50,14 @@
       },
       //语言切换
       selectLanguage() {
-        this.$put('/sys/lang/' + localStorage.getItem('language'))
+        let param = '';
+        if (localStorage.getItem('language') === 'cn') {
+          param = 'zh-CHS'
+        } else {
+          param = 'en'
+        }
+
+        this.$put('/sys/lang/' + param)
           .then((response) => {
             //console.log(response);
             if (response.success) {

@@ -312,7 +312,7 @@ export const putSetLanguage = (language) => put('/sys/lang/'+language);
  * @param hash
  * @returns {Promise}
  */
-export const getHashInfos= (hash) => fetch('/tx/hash/'+hash);
+export const getHashInfos= (hash) => fetch('/accountledger/tx/'+hash);
 
 
 //network

@@ -9,7 +9,7 @@ const en = {
     consensusManagement: 'Consensus',
     setManagement: 'Settings',
     all: 'All',
-    miningFee: 'Fee：0.01 NULS',
+    miningFee: ', Fee: ',
     remarks: 'Remarks',
     addressNull: 'Please select sending address',
     transferNull: 'Please enter recipient',
@@ -25,7 +25,7 @@ const en = {
     confirmButtonText: 'Confirm ',
     cancelButtonText: 'Cancel',
     passWordSuccess: 'Congratulations, operation has been issued',
-    passWordFailed: 'Sorry, failed!',
+    passWordFailed: 'Sorry, failed! ',
     passWordWasincorrect: 'Incorrect password',
     enterCance: 'Cancel',
     //top nav
@@ -59,7 +59,7 @@ const en = {
     passWordHintEmpty: 'Password hint can not be empty!',
     walletPassWordEmpty: 'Please input your password',
     affirmWalletPassWordEmpty: 'Please confirm your password',
-    passWordAtypism: 'Old passwords not match',
+    passWordAtypism: 'New passwords not match',
     passWordAffirm: 'Confirm',
     passWordCancel: 'I understand the risk, keep my password blank',
     passWordCuo: 'Incorrect password',
@@ -111,7 +111,7 @@ const en = {
     select: 'Select',
     //freezeList
     freezeList: 'Frozen list',
-    type: 'type',
+    type: 'Type',
     amount: 'Amount change',
     freezeTime: 'Freeze Date',
     thawingTime: 'Unfreeze date',
@@ -195,7 +195,7 @@ const en = {
     c44: 'Input address alias or node ID',
     c45: 'Search',
     c46: 'Comprehensive',
-    c47: 'Deposit amount',
+    c47: 'Total deposit',
     //pledgeInfo
     c48: 'My deposits details',
     c49: 'Join time',
@@ -258,7 +258,7 @@ const en = {
     c95: 'Delete',
     c96: 'New address book',
     c97: 'It seems that you do not have an internet connection, please try again later. Would you like to close the NULS Client?',
-    c98: 'Determine the closure',
+    c98: 'Confirm the closure',
     c99: 'node?',
     //editAliasin
     c100: 'Alias Settings',
@@ -268,7 +268,7 @@ const en = {
     c1041: 'Please enter aliases (use only lowercase letters, numbers, underlines (underline can not be at both ends)',
     c105: 'only allow lowercase letters, numbers and underscored(not at both ends)',
     c106: 'Sorry, the alias length can not be more than 8 characters',
-    c107: 'I\'m sorry, your balance is too low to complete this action.',
+    c107: 'I am sorry, your balance is too low to complete this action',
     //newAccount
     c108: 'Save complete!',
     c109: 'Please select a folder where you would like to save your backup',
@@ -376,8 +376,8 @@ const en = {
     blockState: 'Block',
     local: 'Local height',
     backward: 'Behind',
-    theMain: 'Testnet height',
+    theMain: 'Mainnet height',
   },
   ...enLocale
-}
+};
 export default en

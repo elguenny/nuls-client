@@ -84,8 +84,10 @@
             //console.log(response);
             if (response.success) {
               if(response.data.list.length !== 0){
-                localStorage.setItem('newAccountAddress', response.data.list[0].address);
-                localStorage.setItem('encrypted', response.data.list[0].encrypted);
+                if(localStorage.getItem('newAccountAddress') ===''){
+                  localStorage.setItem('newAccountAddress', response.data.list[0].address);
+                  localStorage.setItem('encrypted', response.data.list[0].encrypted);
+                }
                 this.$store.commit('setAddressList', response.data.list);
               }else {
                 this.$store.commit('setAddressList', '');
