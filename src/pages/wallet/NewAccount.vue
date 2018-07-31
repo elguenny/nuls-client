@@ -62,6 +62,11 @@
     mounted() {
       let _this = this;
     },
+    destroyed() {
+      if(localStorage.hasOwnProperty("userPass")){
+        localStorage.removeItem("userPass")
+      }
+    },
     methods: {
       /**
        * 复制功能
@@ -69,7 +74,6 @@
        */
       accountCopy(copyInfo) {
         copy(copyInfo);
-        //javaUtil.copy(this.accountAddressValue);
         this.$message({
           message: this.$t('message.c129'), type: 'success', duration: '800'
         });
@@ -86,7 +90,7 @@
       getKeyStore(url, params) {
         this.$post(url, params)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               const content = '{"address":"' + response.data.address +
                 '","encryptedPrivateKey":"' + response.data.encryptedPrivateKey +

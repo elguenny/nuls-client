@@ -81,7 +81,7 @@ const en = {
     newAccountBackupsNuls: '.NULS backup',
     newAccountBackupsNulsInfo: 'Click to download .NULS file, DO NOT this file share under any circumstances and keep in a safe place',
     newAccountSubmit: 'Submit',
-    newAccountReset: 'I understand the risk, I do not wish to backup my account',
+    newAccountReset: 'I do not wish to backup my account',
     //wallet index
     indexAccountAddress: 'Account',
     indexAccountHome: 'Account assets',
@@ -119,6 +119,7 @@ const en = {
     userInfoTitle: 'Account Address',
     tabName: 'Account',
     tabAlias: 'Alias',
+    tabAlias1: 'label',
     tabRemove: 'Remove',
     tabBackups: 'Backup',
     //inportAccount
@@ -333,7 +334,7 @@ const en = {
     c165: 'Unencrypted account, do you want to deposit?',
     c166: 'Unencrypted account, do you want to create an agent node?',
     c167: 'Packing address should not be encrypted',
-    c168: 'Packing address is illegal',
+    c168: 'Address is illegal',
     c169: 'PackingOne NULS for Alias setting address cannot be consensus account',
     c170: 'One NULS for setting Alias',
     c171: 'Total cost',
@@ -349,7 +350,7 @@ const en = {
     c180:'Update completion, reboot',
 
     c181:'Click back keystore',
-    c182:'The.Keystore file will be downloaded by clicking',
+    c182:'Keystore file will be downloaded by clicking',
     c183:'Please save it to a safe place',
     c184:'Private key backup of plaintext',
     c185:'Warning',
@@ -367,6 +368,9 @@ const en = {
     c196:'Sorry, your browser does not support indexedDB, nor can you use the address book function',
     c197:'Your request has been submitted and our network will need a few minutes to confirm, please be patient. After it\'s done, you can check the status in 【Account Management】',
     c198:'Sorry, the password is wrong',
+    c199:'You have no account yet',
+    c200:'Exit management',
+    c201:'Exit system',
 
     //Bottom info
     refresh: 'Refresh',
@@ -376,7 +380,8 @@ const en = {
     blockState: 'Block',
     local: 'Local height',
     backward: 'Behind',
-    theMain: 'Mainnet height',
+    theMain: 'test height',
+    //theMain: 'Mainnet height',
   },
   ...enLocale
 };

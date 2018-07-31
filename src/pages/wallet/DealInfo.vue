@@ -45,7 +45,7 @@
   import Back from '@/components/BackBar.vue'
   import moment from 'moment'
   import { BigNumber } from 'bignumber.js'
-  import {copys,LeftShiftEight} from '@/api/util.js'
+  import {copys,LeftShiftEight,getLocalTime} from '@/api/util.js'
   import {getHashInfo} from '@/api/httpData.js'
 
   export default {
@@ -75,7 +75,7 @@
           .then((response) => {
             //console.log(response);
             this.infoData = response.data;
-            this.times = moment(response.data.time).format('YYYY-MM-DD HH:mm:ss');
+            this.times = moment(getLocalTime(response.data.time)).format('YYYY-MM-DD HH:mm:ss');
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {
                 response.data.inputs[i].value =LeftShiftEight(response.data.inputs[i].value);

@@ -44,7 +44,7 @@
         if (key === 13) {
           document.getElementById('setPassTwo').click()
         }
-      }
+      };
     },
     methods: {
       /**
@@ -60,25 +60,28 @@
           params = '{"count":1,"password":""}';
           this.isPassword = false
         } else {
+          localStorage.setItem("userPass",password);
           params = '{"count":1,"password":"' + password + '"}'
         }
         this.postAccount('/account', params)
       },
       //输入密码提交方法
       postAccount(url, params) {
+        let _this= this;
         this.$post(url, params)
           .then((response) => {
-            //console.log(response);
             if (response.success) {
               localStorage.setItem('newAccountAddress', response.data.list[0]);
-              localStorage.setItem('encrypted', this.isPassword);
-              this.getAccountList('/account');
-              this.$message({
-                type: 'success', message: this.$t('message.passWordSuccess')
+              localStorage.setItem('addressAlias','');
+              localStorage.setItem('addressRemark','');
+              localStorage.setItem('encrypted', _this.isPassword);
+              _this.getAccountList('/account');
+              _this.$message({
+                type: 'success', message: _this.$t('message.passWordSuccess')
               })
             } else {
-              this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
+              _this.$message({
+                type: 'warning', message: _this.$t('message.passWordFailed') + response.data.msg
               })
             }
           })
@@ -90,16 +93,10 @@
             //console.log(response);
             if (response.success) {
               this.$store.commit('setAddressList', response.data.list);
-              if (response.data.list.length === 1) {
-                this.$router.push({
-                  name: '/wallet'
-                })
-              } else {
-                this.$router.push({
-                  name: '/userInfo',
-                  params: {'address': ''},
-                })
-              }
+              this.$router.push({
+                name: '/newAccount',
+                params: {newOk: true, address: localStorage.getItem('newAccountAddress')},
+              })
             }
           }).catch((reject) => {
           console.log('User List err' + reject)

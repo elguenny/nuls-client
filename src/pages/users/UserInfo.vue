@@ -15,6 +15,14 @@
                @click="editAliasing(scope.row.address,scope.row.encrypted)"></i>
           </template>
         </el-table-column>
+        <el-table-column :label="$t('message.tabAlias1')" width="220" class="user-aliasing">
+          <template slot-scope="scope">
+            <span class="cursor-p text-d" @click="setRemark(scope.row.address,scope.row.remark)">{{ scope.row.remark != null  ? scope.row.remark : '' }}</span>
+            <i class="el-icon-edit cursor-p"
+               v-show="scope.row.remark != null  ? false : true"
+               @click="setRemark(scope.row.address,scope.row.remark)"></i>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('message.operation')" min-width="150" align='center'>
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="outUser(scope.row.address,scope.row.encrypted)">
@@ -33,8 +41,24 @@
                      v-show="totalAllOk = this.totalAll>20 ? true:false"
                      @current-change="userListSize"></el-pagination>
       <Password ref="password" @toSubmit="toSubmit"></Password>
-
     </div>
+    <el-dialog :title="$t('message.setManagement')+$t('message.tabAlias1')" :visible.sync="setRemarkDialog"
+               class="setRemark_Dialog" @close="setRemarkCancel('setRemarkForm')">
+      <el-form :model="setRemarkForm" :rules="setRemarkRules" ref="setRemarkForm">
+        <el-form-item prop="remark">
+          <el-input v-model.trim="setRemarkForm.remark" :maxlength="15"
+                    onkeyup="value=value.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]/g,'')"
+                    onpaste="value=value.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]/g,'')"
+                    oncontextmenu="value=value.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]/g,'')">
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="setRemarkCancel('setRemarkForm')">{{$t('message.cancelButtonText')}}</el-button>
+        <el-button type="primary" @click="setRemarkSubmit('setRemarkForm')">{{$t('message.confirmButtonText')}}
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -52,7 +76,16 @@
         totalAll: 0,
         //定时刷新列表
         userInfoSetInterval: null,
-
+        setRemarkForm: {
+          remark: ''
+        },
+        setRemarkRules: {
+          remark: [
+            {min: 0, max: 21, message: '超出长度', trigger: 'blur'}
+          ]
+        },
+        setRemarkAddress: '',
+        setRemarkDialog: false,
       }
     },
     components: {
@@ -76,9 +109,7 @@
           name: '/wallete',
         })
       },
-      callback() {
 
-      },
       //获取所有账户列表
       getAllUserList(url) {
         this.$fetch(url)
@@ -89,6 +120,7 @@
             }
           })
       },
+
       //获取账户列表
       getUserList(url, params) {
         this.$fetch(url, params)
@@ -102,10 +134,14 @@
                 }
                 if (!set.has(localStorage.getItem('newAccountAddress'))) {
                   localStorage.setItem('newAccountAddress', response.data.list[0].address);
+                  localStorage.setItem('addressAlias', response.data.list[0].alias ? response.data.list[0].alias : '');
+                  localStorage.setItem('addressRemark', response.data.list[0].remark ? response.data.list[0].alias : '');
                   localStorage.setItem('encrypted', response.data.list[0].encrypted)
                 }
               } else {
                 localStorage.setItem('newAccountAddress', '');
+                localStorage.setItem('addressAlias', '');
+                localStorage.setItem('addressRemark', '');
                 localStorage.setItem('encrypted', '')
               }
               this.totalAll = response.data.total;
@@ -114,10 +150,12 @@
             }
           })
       },
+
       //分页功能
       userListSize(events) {
         this.getUserList('/account', {'pageSize': 20, 'pageNumber': events})
       },
+
       //点击根据地址移除账户事件
       outUser(address, encrypted) {
         this.setAsAddress = address;
@@ -137,6 +175,7 @@
         }
 
       },
+
       //移除账户
       outUserAddress(url, params) {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
@@ -160,6 +199,7 @@
           })
         }
       },
+
       //备份账户
       backupUser(address, encrypted) {
         this.setAsAddress = address;
@@ -171,7 +211,6 @@
             confirmButtonText: this.$t('message.confirmButtonText'),
             cancelButtonText: this.$t('message.cancelButtonText')
           }).then(() => {
-            localStorage.setItem('userPass', '');
             this.$router.push({
               name: '/newAccount',
               params: {newOk: false, address: this.setAsAddress},
@@ -181,6 +220,7 @@
           })
         }
       },
+
       //修改or设置密码
       toPassword(address, encrypted) {
         if (encrypted) {
@@ -196,6 +236,7 @@
         }
 
       },
+
       //输入密码提交
       toSubmit(password) {
         if (this.outOrBackup === 1) {
@@ -240,6 +281,63 @@
           })
         }
       },
+
+      /**
+       * 设置备注
+       * Set remark
+       * @param address
+       */
+      setRemark(address, remark) {
+        //console.log(address)
+        this.setRemarkAddress = address;
+        this.setRemarkForm.remark = remark;
+        this.setRemarkDialog = true
+      },
+
+      /**
+       * 设置备注提交
+       * Set remark submit
+       * @param formName
+       */
+      setRemarkSubmit(formName) {
+        //console.log(formName)
+        let _this = this;
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let params = {"remark": _this.setRemarkForm.remark};
+            _this.$post("/account/remark/" + _this.setRemarkAddress, params)
+              .then((response) => {
+                //console.log(response);
+                if (response.success) {
+                  if (_this.setRemarkAddress === localStorage.getItem('newAccountAddress')) {
+                    localStorage.setItem('addressRemark', _this.setRemarkForm.remark)
+                  }
+                  _this.getUserList('/account', {'pageSize': 20, 'pageNumber': 1});
+                  _this.setRemarkAddress = '';
+                  _this.setRemarkDialog = false
+                } else {
+                  _this.$message({
+                    type: 'warning', message: this.$t('message.passWordFailed')
+                  })
+                }
+              })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+
+      /**
+       * 取消设置备注
+       * @param formName
+       */
+      setRemarkCancel(formName) {
+        this.$refs[formName].resetFields();
+        this.setRemarkAddress = '';
+        this.setRemarkDialog = false
+      },
+
       //新增账户
       toNewAccount() {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
@@ -253,7 +351,8 @@
             message: this.$t('message.c133'), duration: '800'
           })
         }
-      }
+      },
+
     }
   }
 </script>
@@ -292,5 +391,29 @@
       margin-top: 1rem;
       text-align: center;
     }
+    .setRemark_Dialog {
+      .el-dialog {
+        width: 500px;
+        .el-dialog__header {
+          .el-dialog__title {
+            color: #FFFFFF;
+            text-align: center;
+            line-height: 80px;
+            margin-left: 45%;
+          }
+        }
+        .el-dialog__body {
+
+        }
+        .el-dialog__footer {
+          .dialog-footer {
+            .el-button {
+              width: 150px;
+            }
+          }
+        }
+      }
+    }
+
   }
 </style>

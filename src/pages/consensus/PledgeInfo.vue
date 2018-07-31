@@ -30,6 +30,7 @@
   import Back from './../../components/BackBar.vue'
   import moment from 'moment'
   import {BigNumber} from 'bignumber.js'
+  import {getLocalTime} from  '@/api/util'
 
   export default {
     data() {
@@ -56,26 +57,25 @@
       getConsensusDeposit(url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(url)
-            //console.log(params)
-            //console.log(response)
+            //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
               this.total = response.data.total;
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString());
-                response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
+                response.data.list[i].time = moment(getLocalTime(response.data.list[i].time)).format('YYYY-MM-DD HH:mm:ss')
               }
               this.pledgeData = response.data.list
             }
           })
       },
+
       //分页功能
       pledgeSize(events) {
         this.getConsensusDeposit('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
           'pageNumber': events,
           'pageSize': '20'
-        })
+       })
       },
       //查看节点详情
       handleClick(row) {

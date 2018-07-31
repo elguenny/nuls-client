@@ -15,13 +15,14 @@
 </template>
 
 <script>
-  import {getNetworkInfo,getAccountList} from '@/api/httpData.js'
+  import {getNetworkInfo} from '@/api/httpData.js'
+  import {accountList} from '@/api/util.js'
   export default {
     data() {
       return {
         //区块高度信息
         netWorkInfo: [],
-       //wifi连接数量
+        //wifi连接数量
         connectNumber: '0',
         //WiFi icon
         iconWifi: 'no-wifi_icon',
@@ -74,30 +75,21 @@
               }
             }
           }).catch((reject) => {
-            console.log(reject)
+          console.log(reject)
         })
       },
       //获取账户地址列表 Get a list of account addresses
       getAccountList() {
-        getAccountList()
-          .then((response) => {
-            //console.log(response);
-            if (response.success) {
-              if(response.data.list.length !== 0){
-                if(localStorage.getItem('newAccountAddress') ===''){
-                  localStorage.setItem('newAccountAddress', response.data.list[0].address);
-                  localStorage.setItem('encrypted', response.data.list[0].encrypted);
-                }
-                this.$store.commit('setAddressList', response.data.list);
-              }else {
-                this.$store.commit('setAddressList', '');
-                localStorage.setItem('newAccountAddress', '');
-              }
-            }
-          }).catch((reject) => {
-          localStorage.setItem('newAccountAddress', '');
-        })
-      },
+        accountList().then((response) => {
+          //console.log(response);
+          if(response.success){
+            this.$store.commit('setAddressList', response.list);
+          }else {
+            this.$store.commit('setAddressList', '');
+            console.log("err")
+          }
+        });
+      }
     }
   }
 </script>

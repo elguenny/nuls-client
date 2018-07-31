@@ -120,6 +120,7 @@ const cn = {
     userInfoTitle: '账户管理',
     tabName: '账户',
     tabAlias: '别名',
+    tabAlias1: '备注',
     tabRemove: '移除',
     tabBackups: '备份',
     //inportAccount
@@ -334,7 +335,7 @@ const cn = {
     c165: '此账户没有设置密码，确定加入节点么',
     c166: '共识账户没有设置密码，确定创建节点么',
     c167: '出块地址不能有密码',
-    c168: '出块地址不合法',
+    c168: '地址不合法',
     c169: '出块地址不能为共识账户',
     c170: '设置别名需要花费一个NULS',
     c171: '总花费',
@@ -369,6 +370,9 @@ const cn = {
     c197:'导入账户申请已经提交，我们的网络需要一些时间确认，完成后您可以在【账户管理】中查看，请耐心等待。',
     c198:'对不起，密码错误',
     c199:'您还没有账户',
+    c200:'退出管理',
+    c201:'退出系统',
+
 
     refresh: '刷新',
     //bottomInfo
@@ -378,7 +382,8 @@ const cn = {
     blockState: '区块高度',
     local: '本地',
     backward: '落后',
-    theMain: '主网',
+    theMain: '测试网',
+    //theMain: '主网',
   },
   ...zhLocale
 };

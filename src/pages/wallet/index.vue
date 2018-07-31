@@ -105,7 +105,7 @@
   import moment from 'moment'
   import CodeBar from '@/components/CodeBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
-  import {copys,LeftShiftEight} from '@/api/util.js'
+  import {copys,LeftShiftEight,getLocalTime} from '@/api/util.js'
   import {getAccountAssets,getAccountTxList} from '@/api/httpData.js'
 
   export default {
@@ -207,7 +207,7 @@
             //console.log(response);
             if(response.success){
               for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD HH:mm:ss')
+                response.data.list[i].time = moment(getLocalTime(response.data.list[i].time)).format('YYYY-MM-DD HH:mm:ss')
               }
               this.totalAll = response.data.total;
               this.dealList = response.data.list;

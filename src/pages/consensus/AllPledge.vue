@@ -25,6 +25,7 @@
   import Back from './../../components/BackBar.vue'
   import moment from 'moment'
   import {BigNumber} from 'bignumber.js'
+  import {getLocalTime} from  '@/api/util'
 
   export default {
     data() {
@@ -62,7 +63,7 @@
               let leftShift = new BigNumber(0.00000001);
               for (let i = 0; i < response.data.list.length; i++) {
                 response.data.list[i].deposit = parseFloat(leftShift.times(response.data.list[i].deposit).toString());
-                response.data.list[i].time = moment(response.data.list[i].time).format('YYYY-MM-DD hh:mm:ss')
+                response.data.list[i].time = moment(getLocalTime(response.data.list[i].time)).format('YYYY-MM-DD hh:mm:ss')
               }
               this.pledgeData = response.data.list
             }

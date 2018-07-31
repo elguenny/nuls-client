@@ -62,11 +62,10 @@ export const postSetAlias = (address,params) => post('/account/alias/'+address, 
 
 /**
  * 根据私钥导入账户 Import key
- * @param address
  * @param params
  * @returns {Promise}
  */
-export const postImportKey = (address,params) => post('/account/import/pri', params);
+export const postImportKey = (params) => post('/account/import/pri', params);
 
 /**
  * [导出] 导出KeyStore Expot keystore
@@ -78,10 +77,10 @@ export const postExportKeystore = (address,params) => post('/account/export/'+ad
 
 /**
  *  查询账户信息 Get account info
- * @param params
+ * @param address
  * @returns {Promise}
  */
-export const getAccountInfo = (params) => fetch('/account/', params);
+export const getAccountInfo = (address) => fetch('/account/'+address);
 
 /**
  *  设置账户密码 Set password

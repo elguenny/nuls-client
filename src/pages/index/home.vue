@@ -122,7 +122,7 @@
         this.methodsMaps(this.ipObj)
       }, 1000);
       //页面第一次进入判断浏览器内核
-      console.log("V1.0.0:" + this.defaultBrowser());
+      console.log("V1.0.1:" + this.defaultBrowser());
       if (!sessionStorage.hasOwnProperty('browserOk')) {
         if (this.defaultBrowser() !== 'Chrome') {
           this.$alert(this.$t('message.c174'), '', {

@@ -97,6 +97,7 @@
             if (value < 2000) {
               callback(new Error(this.$t('message.c54')))
             } else if (values.comparedTo(nu.minus(this.fee)) === 1) {
+              //this.nodeRules.nodeNo = '55555';
               callback(new Error(this.$t('message.c542')))
             } else {
               callback()

@@ -116,7 +116,6 @@
               }
             }
           }, 100)
-
         }
       };
       return {
@@ -164,6 +163,7 @@
       this.getBalanceAddress('/accountledger/balance/' + this.address)
     },
     methods: {
+
       /**
        *根据账户地址获取账户余额
        * Get the balance of the account according to the account address
@@ -250,23 +250,27 @@
        */
       toUsersAddressList() {
         const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
-        this.dialogTableVisible = true;
-        let request = indexedDB.open('usersDB', 1);
-        let dbData = [];
-        request.onsuccess = function (event) {
-          let db = event.target.result;
-          let tx = db.transaction(["addressList"], 'readonly');
-          let store = tx.objectStore('addressList');
-          // 打开游标，遍历customers中所有数据
-          store.openCursor().onsuccess = function (event) {
-            let cursor = event.target.result;
-            if (cursor) {
-              dbData.push(cursor.value);
-              cursor.continue()
+        if(!indexedDB){
+          console.log("你的浏览器不支持IndexedDB");
+        }else {
+          this.dialogTableVisible = true;
+          let request = indexedDB.open('usersDB', 1);
+          let dbData = [];
+          request.onsuccess = function (event) {
+            let db = event.target.result;
+            let tx = db.transaction(["addressList"], 'readonly');
+            let store = tx.objectStore('addressList');
+            // 打开游标，遍历customers中所有数据
+            store.openCursor().onsuccess = function (event) {
+              let cursor = event.target.result;
+              if (cursor) {
+                dbData.push(cursor.value);
+                cursor.continue()
+              }
             }
-          }
-        };
-        this.userAddressList = dbData
+          };
+          this.userAddressList = dbData
+        }
       },
 
       /**
@@ -276,6 +280,7 @@
        */
       checkedAddress(address) {
         this.transferForm.joinAddress = address;
+        this.$refs.transferForm.validateField('joinAddress');
         this.dialogTableVisible = false
       },
 
