@@ -44,7 +44,7 @@
   export default {
     data() {
       return {
-        txHash: this.$route.query.txHash,
+        agentHash: this.$route.query.agentHash,
         myNodeInfo: [],
       }
     },
@@ -52,16 +52,23 @@
       Back,
       Password,
     },
+    created() {
+
+    },
     mounted() {
-      let _this = this;
-      console.log(this.txHash);
-      this.getMyNodeInfo('/consensus/agent/' + this.txHash)
+      this.getMyNodeInfo('/consensus/agent/' + this.$route.query.agentHash);
+    },
+    activated() {
+      this.getMyNodeInfo('/consensus/agent/' + this.$route.query.agentHash);
+    },
+    destroyed() {
     },
     methods: {
       //获取我创建的节点信息
       getMyNodeInfo(url) {
         this.$fetch(url)
           .then((response) => {
+            //console.log(this.agentHash);
             //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
@@ -72,29 +79,38 @@
             }
           })
       },
+
       //关闭我创建的节点信息
       closedNode() {
-        this.$confirm(this.$t('message.c98') + " " + this.myNodeInfo.agentId + " " + this.$t('message.c99') + this.$t('message.miningFee'), this.$t('message.c86'), {
-          confirmButtonText: this.$t('message.confirmButtonText'),
-          cancelButtonText: this.$t('message.cancelButtonText'),
-        }).then(() => {
-          if (localStorage.getItem('encrypted') === "true") {
-            this.$refs.password.showPassword(true)
-          } else {
-            this.toSubmit('')
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'waring',
-            message: this.$t('message.c59'),
-            duration: '1000'
-          })
-        })
-
+        this.$fetch('/consensus/agent/stop/fee?address=' + localStorage.getItem('newAccountAddress'))
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              let rightShift = new BigNumber(0.00000001);
+              this.$confirm(this.$t('message.c98') + " " + this.myNodeInfo.agentId + " " + this.$t('message.c99') + this.$t('message.miningFee') + rightShift.times(response.data.value) + 'NULS', this.$t('message.c86'), {
+                confirmButtonText: this.$t('message.confirmButtonText'),
+                cancelButtonText: this.$t('message.cancelButtonText'),
+              }).then(() => {
+                if (localStorage.getItem('encrypted') === "true") {
+                  this.$refs.password.showPassword(true)
+                } else {
+                  this.toSubmit('')
+                }
+              }).catch(() => {
+                this.$message({
+                  type: 'waring',
+                  message: this.$t('message.c59'),
+                  duration: '1000'
+                })
+              })
+            }else {
+              console.log("get fee err")
+            }
+          });
       },
       //
       toSubmit(password) {
-        let param = {'address': localStorage.getItem('newAccountAddress'), 'password': password}
+        let param = {'address': localStorage.getItem('newAccountAddress'), 'password': password};
         this.$post('/consensus/agent/stop', param)
           .then((response) => {
             //console.log(response);
@@ -110,7 +126,7 @@
             } else {
               this.$message({
                 type: 'waring',
-                message: this.$t('message.passWordFailed') + response.msg
+                message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
           })
@@ -123,6 +139,12 @@
           //params: {'agentName': this.myNodeInfo.agentId, 'txHash': this.myNodeInfo.txHash}
         })
       }
+    },
+    watch: {
+      agentHash(val, oldVal) {//普通的watch监听
+        console.log("agentHash: " + val, oldVal);
+        this.getMyNodeInfo('/consensus/agent/' + this.agentHash);
+      },
     }
   }
 </script>

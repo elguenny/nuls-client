@@ -10,7 +10,7 @@
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button @click="passwordVisible = false">{{$t('message.cancelButtonText')}}</el-button>
+            <el-button @click="passwordClose">{{$t('message.cancelButtonText')}}</el-button>
             <el-button type="primary" @click="dialogSubmit('passwordForm')" id="passwordInfo">
                 {{$t('message.confirmButtonText')}}
             </el-button>
@@ -82,6 +82,8 @@
         //document.getElementById("passwords").focus();
       },
       passwordClose () {
+        this.$emit('toClose', false);
+        this.passwordVisible = false;
         this.$store.commit('setPasswordShow', false)
         //this.$refs['passwordForm'].resetFields()
       },

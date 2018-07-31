@@ -42,7 +42,7 @@
       <el-form ref="addNodeForm" :model="addNodeForm" :rules="addNodeRules" size="mini" label-position="left"
                @submit.native.prevent>
         <el-form-item :label="$t('message.c51')+':'" class="pledge-money" prop="nodeNo">
-          <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable.toFixed(8) }} NULS</span>
+          <span class="allUsable">{{$t('message.currentBalance')}}: {{this.usable }} NULS</span>
           <el-input ref="input" v-model="addNodeForm.nodeNo":maxlength="17" @change="countFee"></el-input>
         </el-form-item>
         <el-form-item :label="$t('message.c28')+'：'+this.fee+' NULS'" class="procedure">
@@ -62,7 +62,7 @@
   import Back from './../../components/BackBar.vue'
   import ProgressBar from './../../components/ProgressBar.vue'
   import Password from '@/components/PasswordBar.vue'
-  import * as config from '@/config.js'
+  import {LeftShiftEight} from '@/api/util.js'
   import {BigNumber} from 'bignumber.js'
 
   export default {
@@ -72,6 +72,14 @@
           callback(new Error(this.$t('message.c52')))
         }
         setTimeout(() => {
+
+          let rightShift = new BigNumber(100000000);
+          let leftShift = new BigNumber(0.00000001);
+          if (rightShift.times(this.addNodeForm.nodeNo).toString() === rightShift.times(this.usable).toString()) {
+            this.addNodeForm.nodeNo = leftShift.times(rightShift.times(this.usable) - rightShift.times(this.fee)).toString();
+            value = this.addNodeForm.nodeNo;
+          }
+
           let re = /^\d+(?=\.{0,1}\d+$|$)/;
           let res = /^\d{1,8}(\.\d{1,8})?$/;
           if (!re.exec(value) || !res.exec(value)) {
@@ -81,18 +89,18 @@
             let nu = new BigNumber(this.usable);
             if (value < 2000) {
               callback(new Error(this.$t('message.c54')))
-            } else if (values.comparedTo(nu.minus(0.01)) === 1) {
+            } else if (values.comparedTo(nu.minus(this.fee)) === 1) {
               callback(new Error(this.$t('message.c542')))
             } else {
               callback()
             }
           }
-        }, 100)
+        }, 300)
       };
       return {
         submitId: 'addNode',
-        agentAddress: this.$route.params.agentAddress,
-        agentId: this.$route.params.agentId,
+        agentAddress: this.$route.query.agentAddress,
+        agentId: this.$route.query.agentId,
         agentAddressInfo: [],
         addNodeForm: {
           nodeNo: ''
@@ -103,7 +111,7 @@
           ],
         },
         usable: 0,
-        fee: 0.00,
+        fee: 0,
         toCheckOk: false,
       }
     },
@@ -113,7 +121,7 @@
       Password,
     },
     created() {
-      this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress);
+      this.getAgentAddressInfo('/consensus/agent/' + this.agentId);
       this.getBalanceAddress('/accountledger/balance/' + localStorage.getItem('newAccountAddress'))
     },
     mounted() {
@@ -150,17 +158,15 @@
           .then((response) => {
             //console.log(response)
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
-              //this.placeholder = '（' + this.$t('message.currentBalance') + parseFloat(leftShift.times(response.data.usable.value).toString()) + 'NULS）';
-              this.usable = parseFloat(leftShift.times(response.data.usable.value).toString())
+              this.usable=parseFloat(LeftShiftEight(response.data.usable.value).toString());
             }
           })
       },
       //查看节点
       toCheck() {
         this.$router.push({
-          name: '/nodeInfo',
-          params: {txHash: this.agentAddressInfo.agentHash},
+          path: '/consensus/nodeInfo',
+          query: {"agentHash": this.agentAddressInfo.agentHash}
         })
       },
       /**
@@ -229,7 +235,7 @@
               });
               this.$router.push({
                 name: '/myNode',
-                params: {'agentAddress': this.agentAddress, 'agentHash': this.agentId}
+                query: {'agentAddress': this.agentAddress, 'agentHash': this.agentId}
               })
             } else {
               this.$message({

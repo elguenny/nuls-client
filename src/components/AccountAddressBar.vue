@@ -5,8 +5,9 @@
       {{accountAddressValue}}
       <div class="sub-select-list" v-if="showData">
         <div class="sub-select-item" v-for="item in getAddressList"
-             @click.stop="accountAddressChecked(item.address,item.encrypted)">
-          {{item.address}}
+             @click.stop="accountAddressChecked(item)">
+          {{item.address}}&nbsp;{{item.remark !== null ? "("+item.remark+")": item.alias !== null ? "("+item.alias+")" :
+          "" }}
         </div>
       </div>
     </div>
@@ -32,8 +33,16 @@
        * 判断是不有默认账户
        * There is no default account
        */
-      if (localStorage.getItem('newAccountAddress') !== '') {
-        this.accountAddressValue = localStorage.getItem('newAccountAddress')
+      if (localStorage.hasOwnProperty('newAccountAddress')) {
+        if (localStorage.getItem('addressRemark')) {
+          this.accountAddressValue = localStorage.getItem('newAccountAddress') + "(" + localStorage.getItem('addressRemark') + ")"
+        } else {
+          if (localStorage.getItem('addressAlias')) {
+            this.accountAddressValue = localStorage.getItem('newAccountAddress') + "(" + localStorage.getItem('addressAlias') + ")"
+          } else {
+            this.accountAddressValue = localStorage.getItem('newAccountAddress') !== '' ? localStorage.getItem('newAccountAddress') : this.$t('message.addressNull')
+          }
+        }
       } else {
         this.accountAddressValue = this.$t('message.addressNull')
       }
@@ -51,14 +60,7 @@
         if (this.$store.getters.getAddressList.length !== 0) {
           this.showData = !this.showData
         } else {
-          //console.log(sessionStorage.getItem('userList')==='1');
-          if (sessionStorage.getItem('userList') !== '1') {
-            this.$message({
-              type: 'info', message: this.$t('message.c131'), duration: '800'
-            })
-          } else {
-            this.accountAddressValue = this.$t('message.c134')
-          }
+          this.accountAddressValue = this.$t('message.c134')
         }
       },
       /**
@@ -70,14 +72,20 @@
         this.$fetch(url)
           .then((response) => {
             if (response.success) {
-              localStorage.setItem('newAccountAddress', response.data[0].address);
-              localStorage.setItem('encrypted', response.data[0].encrypted);
-              this.$store.commit('setAddressList', response.data.list)
+              if (response.data.list.length !== 0) {
+                localStorage.setItem('newAccountAddress', response.data.list[0].address);
+                localStorage.setItem('addressAlias', response.data.list[0].alias ? response.data.list[0].alias : '');
+                localStorage.setItem('addressRemark', response.data.list[0].remark ? response.data.list[0].remark : '');
+                localStorage.setItem('encrypted', response.data.list[0].encrypted);
+                this.$store.commit('setAddressList', response.data.list)
+              } else {
+                this.$store.commit('setAddressList', '')
+              }
             } else {
               this.$store.commit('setAddressList', '')
             }
           }).catch((reject) => {
-          console.log('User List err' + reject);
+          //console.log('User List err' + reject);
           this.$store.commit('setAddressList', '')
         })
       },
@@ -87,13 +95,22 @@
        *Select account address
        * @param accountAddress
        */
-      accountAddressChecked(accountAddress, encrypted) {
+      accountAddressChecked(list) {
         this.showData = false;
-        this.accountAddressValue = accountAddress;
-        this.$emit('chenckAccountAddress', accountAddress);
-        localStorage.setItem('newAccountAddress', accountAddress);
-        localStorage.setItem('encrypted', encrypted)
-        //console.log(accountAddress);
+        if (list.remark) {
+          this.accountAddressValue = list.address + "(" + list.remark + ")";
+        } else {
+          if (list.alias) {
+            this.accountAddressValue = list.address + "(" + list.alias + ")"
+          } else {
+            this.accountAddressValue = list.address
+          }
+        }
+        this.$emit('chenckAccountAddress', list.address);
+        localStorage.setItem('newAccountAddress', list.address);
+        localStorage.setItem('addressAlias', list.alias ? list.alias : '');
+        localStorage.setItem('addressRemark', list.remark ? list.remark : '');
+        localStorage.setItem('encrypted', list.encrypted)
       }
     },
   }

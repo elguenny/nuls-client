@@ -1,5 +1,5 @@
 <template>
-    <div class="import-key">
+    <div class="import-key" v-loading="importKeyLoading">
         <Back :backTitle="this.$t('message.inportAccount')"></Back>
         <h2>{{$t('message.key')}}</h2>
         <el-form ref="keyData" :model="keyData" :rules="keyRules" label-position="top">
@@ -19,6 +19,8 @@
 <script>
   import Back from '@/components/BackBar.vue'
   import PasswordTow from '@/components/PasswordTwoBar.vue'
+  import {postImportKey,getAccountInfo} from '@/api/httpData.js'
+  import {accountList} from '@/api/util.js'
 
   export default {
     data () {
@@ -33,6 +35,7 @@
             {required: true, message: this.$t('message.keyLow'), trigger: 'blur'}
           ]
         },
+        importKeyLoading:false,
       }
     },
     components: {
@@ -53,6 +56,7 @@
       },
       //
       toSubmit (password) {
+        this.importKeyLoading = true;
         let params = '';
         if(password === ''){
           params = '{"priKey":"' + this.keyData.keyInfo + '","password":""}'
@@ -60,54 +64,61 @@
           params = '{"priKey":"' + this.keyData.keyInfo + '","password":"' + password + '"}';
           this.encrypted = true
         }
-        this.$post('/account/import/pri', params)
+        postImportKey(params)
           .then((response) => {
             //console.log(response);
             if (response.success) {
               //导入的新账户默认为当前账户
               localStorage.setItem('newAccountAddress', response.data.value);
+              getAccountInfo(response.data.value).then((response) =>{
+                //console.log(response);
+                if (response.success) {
+                  localStorage.setItem('addressAlias',response.data.alias);
+                }
+              });
               localStorage.setItem('encrypted', this.encrypted.toString());
-              this.getAccountList('/account');
+              this.getAccountList();
+              this.$message({
+                type: 'success', message: this.$t('message.passWordSuccess')
+              });
             } else {
               this.$message({
                 type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
+            this.importKeyLoading = false;
             this.passwordVisible = false
           })
           .catch(err => {
             //console.log(err);
-            this.getAccountList('/account');
+            this.getAccountList();
             this.$message({
               type: 'success', message: this.$t('message.c197'), duration: '3000'
-            })
+            });
+            this.importKeyLoading = false;
           })
       },
       //获取账户地址列表
-      getAccountList (url) {
-        this.$fetch(url)
+      getAccountList () {
+        accountList()
           .then((response) => {
-            if (response.success) {
-              this.$store.commit('setAddressList', response.data.list);
-              if(response.data.list.length === 1){
-                localStorage.setItem('newAccountAddress', response.data.list[0].address);
-                localStorage.setItem('encrypted', response.data.list[0].encrypted);
+            //console.log(response);
+            if(response.success){
+              this.$store.commit('setAddressList', response.list);
+              if(response.list.length === 1){
                 this.$router.push({
                   name: '/wallet'
                 })
               }else {
                 this.$router.push({
                   name: '/userInfo',
-                  params: {'address':response.data},
                 })
               }
-              /*this.$message({
-                type: 'success', message: this.$t('message.passWordSuccess')
-              })*/
+            }else {
+              this.$store.commit('setAddressList', '');
+              console.log("err")
             }
-          }).catch((reject) => {
-          console.log('User List err' + reject)
-        })
+          })
       },
     }
   }

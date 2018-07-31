@@ -17,7 +17,7 @@
         <el-form-item :label="$t('message.transferAmount')+'：'" prop="joinNo">
           <span class="allUsable">{{$t('message.currentBalance')}}: {{usable}} NULS</span>
           <el-input type="text" v-model="transferForm.joinNo" :maxlength="17" @change="countFee"></el-input>
-         <!-- <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>-->
+          <!-- <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>-->
         </el-form-item>
         <el-form-item :label="$t('message.remarks')+'：'">
           <el-input type="textarea" v-model.trim="transferForm.remark"
@@ -73,7 +73,7 @@
         }
       };
       let checkJoinAddress = (rule, value, callback) => {
-        if (!value ) {
+        if (!value) {
           callback(new Error(this.$t('message.transferNull')))
         } else {
           this.address = localStorage.getItem('newAccountAddress');
@@ -90,28 +90,33 @@
       let checkJoinNo = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.transferNO')))
-        }
-        setTimeout(() => {
-          //console.log(value);
-          let re = /(^\+?|^\d?)\d*\.?\d+$/;
-          let res = /^\d{1,8}(\.\d{1,8})?$/;
-          if (!re.exec(value)) {
-            callback(new Error(this.$t('message.transferNO1')))
-          } else {
-            let values = new BigNumber(value);
-            let nu = new BigNumber(this.usable);
-            if (values.comparedTo(nu.minus(0.01)) === 1) {
-              callback(new Error(this.$t('message.transferNO2')))
-            } else if (value < 0.01) {
-              callback(new Error(this.$t('message.transferNO3')))
-            } else if (!res.exec(value)) {
-              callback(new Error(this.$t('message.c136')))
-            } else {
-              callback()
+        }else {
+          setTimeout(() => {
+            let rightShift = new BigNumber(100000000);
+            let leftShift = new BigNumber(0.00000001);
+            if (rightShift.times(this.transferForm.joinNo).toString() === rightShift.times(this.usable).toString()) {
+              this.transferForm.joinNo = leftShift.times(rightShift.times(this.usable) - rightShift.times(this.fee));
+              value = this.transferForm.joinNo;
             }
-          }
-        }, 100)
-
+            let re = /(^\+?|^\d?)\d*\.?\d+$/;
+            let res = /^\d{1,8}(\.\d{1,8})?$/;
+            if (!re.exec(value)) {
+              callback(new Error(this.$t('message.transferNO1')))
+            } else {
+              let values = new BigNumber(value);
+              let nu = new BigNumber(this.usable);
+              if (values.comparedTo(nu.minus(this.fee)) === 1) {
+                callback(new Error(this.$t('message.transferNO2')))
+              } else if (value < this.fee) {
+                callback(new Error(this.$t('message.transferNO3')))
+              } else if (!res.exec(value)) {
+                callback(new Error(this.$t('message.c136')))
+              } else {
+                callback()
+              }
+            }
+          }, 100)
+        }
       };
       return {
         accountAddressValue: localStorage.getItem('newAccountAddress'),
@@ -158,6 +163,7 @@
       this.getBalanceAddress('/accountledger/balance/' + this.address)
     },
     methods: {
+
       /**
        *根据账户地址获取账户余额
        * Get the balance of the account according to the account address
@@ -219,8 +225,6 @@
             this.$refs.transferForm.validateField('joinAddress');
             this.$refs.transferForm.validateField('joinNo')
           }, 500);
-
-
         }
       },
 
@@ -229,6 +233,7 @@
        * New usersDB
        */
       openDB() {
+        const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
         let request = indexedDB.open('usersDB', 1);
         request.onupgradeneeded = function (e) {
           let db = e.target.result;
@@ -236,7 +241,7 @@
           if (!db.objectStoreNames.contains('usersDB')) {
             let store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false})
           }
-        }
+        };
       },
 
       /**
@@ -244,26 +249,28 @@
        * Select the address book
        */
       toUsersAddressList() {
-        /*this.$message({
-          type: 'info', message: this.$t('message.c65'), duration: '800'
-        })*/
-        this.dialogTableVisible = true;
-         let request = indexedDB.open('usersDB', 1);
-         let dbData = [];
-         request.onsuccess = function (event) {
-           let db = event.target.result;
-           let tx = db.transaction('addressList', 'readonly');
-           let store = tx.objectStore('addressList');
-           // 打开游标，遍历customers中所有数据
-           store.openCursor().onsuccess = function (event) {
-             let cursor = event.target.result;
-             if (cursor) {
-               dbData.push(cursor.value);
-               cursor.continue()
-             }
-           }
-         };
-         this.userAddressList = dbData
+        const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
+        if(!indexedDB){
+          console.log("你的浏览器不支持IndexedDB");
+        }else {
+          this.dialogTableVisible = true;
+          let request = indexedDB.open('usersDB', 1);
+          let dbData = [];
+          request.onsuccess = function (event) {
+            let db = event.target.result;
+            let tx = db.transaction(["addressList"], 'readonly');
+            let store = tx.objectStore('addressList');
+            // 打开游标，遍历customers中所有数据
+            store.openCursor().onsuccess = function (event) {
+              let cursor = event.target.result;
+              if (cursor) {
+                dbData.push(cursor.value);
+                cursor.continue()
+              }
+            }
+          };
+          this.userAddressList = dbData
+        }
       },
 
       /**
@@ -273,6 +280,7 @@
        */
       checkedAddress(address) {
         this.transferForm.joinAddress = address;
+        this.$refs.transferForm.validateField('joinAddress');
         this.dialogTableVisible = false
       },
 
@@ -283,7 +291,7 @@
        * @param event
        */
       dbcheckedAddress(row, event) {
-        this.transferForm.joinAddress = row.userAddress
+        this.transferForm.joinAddress = row.userAddress;
         this.dialogTableVisible = false
       },
 
@@ -292,14 +300,13 @@
        *Calculation fee
        **/
       countFee() {
-        //console.log("feeOk="+this.transferForm.joinAddress !=='' && this.transferForm.joinNo > 0);
         if (this.transferForm.joinAddress !== '' && this.transferForm.joinNo > 0) {
           let rightShift = new BigNumber(100000000);
           let params = "address=" + this.address
             + "&toAddress=" + this.transferForm.joinAddress
             + "&amount=" + rightShift.times(this.transferForm.joinNo)
-            + "&remark=" + this.transferForm.remark.replace(/\n/g, "");
-          //console.log("params=="+params);
+            + "&remark=" + this.stripscript(this.transferForm.remark);
+          //console.log(params);
           this.$fetch('/accountledger/transfer/fee?' + params)
             .then((response) => {
               //console.log(response);
@@ -309,6 +316,17 @@
               }
             });
         }
+      },
+
+      /**
+       * 字符转换
+       **/
+      stripscript(str) {
+        // 去掉转义字符
+        str = str.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
+        // 去掉特殊字符
+        str = str.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/);
+        return str;
       },
 
       /**
@@ -328,7 +346,7 @@
               }).then(() => {
                 this.toSubmit('')
               }).catch(() => {
-
+                console.log("")
               })
             }
           } else {
@@ -348,10 +366,11 @@
           + '","toAddress":"' + this.transferForm.joinAddress
           + '","amount":' + rightShift.times(this.transferForm.joinNo)
           + ',"password":"' + password
-          + '","remark":"' + this.transferForm.remark.replace(/\n/g, "") + '"}';
+          + '","remark":"' +  this.stripscript(this.transferForm.remark)+ '"}';
+        //console.log(param);
         this.$post('/accountledger/transfer', param)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               this.$message({
                 message: this.$t('message.passWordSuccess'),
@@ -360,7 +379,7 @@
               this.transferForm.joinAddress = '';
               this.transferForm.joinNo = '';
               this.transferForm.remark = '';
-              this.getBalanceAddress('/account/balance/' + this.transferForm.address);
+              this.getBalanceAddress('/accountledger/balance/' + this.transferForm.address);
               sessionStorage.setItem('walletActiveName', 'second');
               this.$router.push({
                 name: '/wallet',

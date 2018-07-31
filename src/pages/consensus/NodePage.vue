@@ -78,6 +78,14 @@
           callback(new Error(this.$t('message.c52')))
         }
         setTimeout(() => {
+
+          let rightShift = new BigNumber(100000000);
+          let leftShift = new BigNumber(0.00000001);
+          if (rightShift.times(this.nodeForm.nodeNo).toString() === rightShift.times(this.usable).toString()) {
+            this.nodeForm.nodeNo = leftShift.times(rightShift.times(this.usable) - rightShift.times(this.fee)).toString();
+            value = this.nodeForm.nodeNo;
+          }
+
           let re = /^\d+(?=\.{0,1}\d+$|$)/;
           let res = /^\d{1,8}(\.\d{1,8})?$/;
 
@@ -88,7 +96,8 @@
             let nu = new BigNumber(this.usable);
             if (value < 2000) {
               callback(new Error(this.$t('message.c54')))
-            } else if (values.comparedTo(nu.minus(0.01)) === 1) {
+            } else if (values.comparedTo(nu.minus(this.fee)) === 1) {
+              //this.nodeRules.nodeNo = '55555';
               callback(new Error(this.$t('message.c542')))
             } else {
               callback()
@@ -104,7 +113,7 @@
         agentId: '',
         nodeData: [],
         usable: 0,
-        fee: '0',
+        fee: 0,
         nodeForm: {
           nodeNo: '',
         },
@@ -136,8 +145,8 @@
       getConsensusAddress(url) {
         this.$fetch(url)
           .then((response) => {
+            //console.log(response);
             if (response.success) {
-              //console.log(response);
               let leftShift = new BigNumber(0.00000001);
               this.toCheckOk = response.data.agentAddress === localStorage.getItem('newAccountAddress');
               response.data.deposit = parseFloat(leftShift.times(response.data.deposit).toString());
@@ -151,7 +160,7 @@
                 response.data.totalDeposit = (response.data.totalDeposit / 500000000000).toString() + '%'
               }
               //response.data.totalDeposit = ((response.data.totalDeposit*0.00000001) / 5000).toFixed(2) + '%';
-              this.agentId = response.data.txHash;
+              this.agentId = response.data.agentHash;
               this.nodeData = response.data;
               this.loading = false
             }
@@ -189,8 +198,11 @@
       //查看节点
       toCheck() {
         this.$router.push({
-          name: '/nodeInfo',
-          params: {"txHash": this.agentId}
+          path: '/consensus/nodeInfo',
+          query: {"agentHash": this.agentId}
+
+          /*name:'/nodeInfo',
+          params:{agentHash: this.agentId}*/
         })
       },
 

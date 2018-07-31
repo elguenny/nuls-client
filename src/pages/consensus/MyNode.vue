@@ -80,8 +80,8 @@
     data() {
       return {
         address: '',
-        agentAddress: this.$route.params.agentAddress,
-        agentHash: this.$route.params.agentHash,
+        agentAddress: this.$route.query.agentAddress,
+        agentHash: this.$route.query.agentHash,
         agentAddressInfo: [],
         myMortgageData: [],
         total: 0,
@@ -101,7 +101,7 @@
     },
     mounted() {
       let _this = this;
-      this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress);
+      this.getAgentAddressInfo('/consensus/agent/' + this.agentHash);
       this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
         'agentHash': this.agentHash,
         'pageSize': '10',
@@ -109,7 +109,7 @@
       });
 
       this.myNodeSetInterval = setInterval(() => {
-        this.getAgentAddressInfo('/consensus/agent/' + this.agentAddress);
+        this.getAgentAddressInfo('/consensus/agent/' + this.agentHash);
         this.getAddressList('/consensus/deposit/address/' + localStorage.getItem('newAccountAddress'), {
           'agentHash': this.agentHash,
           'pageSize': '10',
@@ -125,7 +125,6 @@
       getAgentAddressInfo(url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            //console.log(params)
             //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
@@ -173,8 +172,8 @@
       //查看节点
       toCheck() {
         this.$router.push({
-          name: '/nodeInfo',
-          params: {txHash: this.agentAddressInfo.agentHash},
+          path: '/consensus/nodeInfo',
+          query: {"agentHash": this.agentAddressInfo.agentHash}
         })
       },
       //全部退出
@@ -185,8 +184,8 @@
       addNode() {
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight) {
           this.$router.push({
-            name: '/addNode',
-            params: {agentAddress: this.agentAddress, agentId: this.agentAddressInfo.agentHash},
+            path: '/consensus/myNode/addNode',
+            query: {'agentAddress': this.agentAddress, 'agentId': this.agentAddressInfo.agentHash},
           })
         } else {
           this.$message({
@@ -196,24 +195,36 @@
       },
       //退出共识
       outNode(row) {
-        this.$confirm(this.$t('message.c60') + row.agentName + '？( ' + this.$t('message.c51') + row.deposit + ' NULS)', this.$t('message.c61'), {
-          confirmButtonText: this.$t('message.confirmButtonText'),
-          cancelButtonText: this.$t('message.cancelButtonText'),
-        }).then(() => {
-          this.outInfo.address = row.address;
-          this.outInfo.txHash = row.txHash;
+        //获取撤销委托节点的手续费
+        this.$fetch('/consensus/withdraw/fee?address=' + row.address + '&depositTxHash=' + row.txHash)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              let rightShift = new BigNumber(0.00000001);
+              this.$confirm(this.$t('message.c61') + row.deposit + ' NULS ' + this.$t('message.c60') + row.agentName + this.$t('message.miningFee') + rightShift.times(response.data.value) + ' NULS', '', {
+                confirmButtonText: this.$t('message.confirmButtonText'),
+                cancelButtonText: this.$t('message.cancelButtonText'),
+              }).then(() => {
+                this.outInfo.address = row.address;
+                this.outInfo.txHash = row.txHash;
 
-          if (localStorage.getItem('encrypted') === "true") {
-            this.$refs.password.showPassword(true)
-          } else {
-            this.toSubmit('')
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: this.$t('message.c59')
-          })
-        })
+                if (localStorage.getItem('encrypted') === "true") {
+                  this.$refs.password.showPassword(true)
+                } else {
+                  this.toSubmit('')
+                }
+              }).catch(() => {
+                this.$message({
+                  type: 'info',
+                  message: this.$t('message.c59')
+                })
+              })
+            }else {
+              console.log("get fee err")
+            }
+          });
+
+
       },
       //
       toSubmit(password) {
@@ -234,7 +245,7 @@
             } else {
               this.$message({
                 type: 'warning',
-                message: this.$t('message.passWordFailed') + response.msg
+                message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
             this.outInfo.address = '';

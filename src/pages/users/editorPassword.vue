@@ -108,7 +108,7 @@
             let param = '{"password":"' + this.passForm.oldPass + '","newPassword":"' + this.passForm.pass + '"}';
             this.$put('/account/password/' + this.address, param)
               .then((response) => {
-                console.log(response);
+                //console.log(response);
                 if (response.success) {
                   this.$message({
                     type: 'success', message: this.$t('message.passWordSuccess')

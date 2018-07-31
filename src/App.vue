@@ -30,8 +30,10 @@
       sessionStorage.setItem('walletActiveName', 'first');
       sessionStorage.setItem('consensusTabName', 'first');
     },
+    mounted() {
+      this.selectLanguage();
+    },
     methods: {
-
       /**
        * 获取版本信息
        **/
@@ -45,6 +47,25 @@
           }).catch((reject) => {
           //console.log(reject);
         })
+      },
+      //语言切换
+      selectLanguage() {
+        let param = '';
+        if (localStorage.getItem('language') === 'cn') {
+          param = 'zh-CHS'
+        } else {
+          param = 'en'
+        }
+
+        this.$put('/sys/lang/' + param)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              //console.log('success')
+            } else {
+              //console.log('err')
+            }
+          })
       },
     }
   }

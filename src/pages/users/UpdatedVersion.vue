@@ -17,7 +17,7 @@
     </div>
     <div class="updated-info-over" v-show="updatedOver">
       <h1>{{this.$t('message.c175')}}</h1>
-      <p>{{this.$t('message.c81')}}：NulsWalletForWindowsV0.9.11</p>
+      <p>{{this.clientVersionData.newestVersion}}</p>
       <p>{{this.$t('message.c177')}}</p>
       <div class="updated-info-bt">
         <el-button type="primary" @click="outRestart" id="closeBt">{{this.$t('message.c178')}}</el-button>
@@ -88,7 +88,7 @@
       clientVersion() {
         this.$fetch('/client/version')
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.success) {
               // \n转换为<br/>
               response.data.infromation = response.data.infromation.replace(/[\n\r]/g, "<br>");

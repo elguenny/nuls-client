@@ -10,7 +10,7 @@
             </div>
             <div class="nav-right">
               <ProgressBar colorData="#658EC7" :widthData=this.balanceData.balanceWidth></ProgressBar>
-              <label class="number">{{this.balanceData.balance.toFixed(8)}} NULS</label>
+              <label class="number">{{this.balanceData.balance}} NULS</label>
             </div>
           </div>
           <div class="nav-all cl">
@@ -19,7 +19,7 @@
             </div>
             <div class="nav-right">
               <ProgressBar colorData="#f64b3e" :widthData=this.balanceData.lockedWidth></ProgressBar>
-              <label class="number">{{this.balanceData.locked.toFixed(8)}} NULS</label>
+              <label class="number">{{this.balanceData.locked}} NULS</label>
             </div>
           </div>
           <div class="nav-all cl">
@@ -28,7 +28,7 @@
             </div>
             <div class="nav-right">
               <ProgressBar colorData="#82bd39" :widthData=this.balanceData.usableWidth></ProgressBar>
-              <label class="number">{{this.balanceData.usable.toFixed(8)}} NULS</label>
+              <label class="number">{{this.balanceData.usable}} NULS</label>
             </div>
           </div>
         </div>
@@ -36,20 +36,20 @@
       <div class="home-nav-top">
         <div class="nav-title">{{$t('message.consensus1')}}</div>
         <div class="nav-info">
-        <ul>
-          <li class="cl">
-            <label class="fl">{{$t('message.annualYield')}}：</label>
-            <span>{{this.allNodeList.nodeNumber}} {{$t('message.c30')}}</span>
-          </li>
-          <li class="cl">
-            <label class="fl">{{$t('message.pledge')}}：</label>
-            <span class="number">{{this.allNodeList.entrust}} NULS</span>
-          </li>
-          <li class="cl">
-            <label class="fl">{{$t('message.income')}}：</label>
-            <span class="number">{{this.allNodeList.consensusAccountNumber}} {{$t('message.c30')}}</span>
-          </li>
-        </ul>
+          <ul>
+            <li class="cl">
+              <label class="fl">{{$t('message.annualYield')}}：</label>
+              <span>{{this.allNodeList.nodeNumber}} {{$t('message.c30')}}</span>
+            </li>
+            <li class="cl">
+              <label class="fl">{{$t('message.pledge')}}：</label>
+              <span class="number">{{this.allNodeList.entrust}} NULS</span>
+            </li>
+            <li class="cl">
+              <label class="fl">{{$t('message.income')}}：</label>
+              <span class="number">{{this.allNodeList.consensusAccountNumber}} {{$t('message.c30')}}</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -67,9 +67,10 @@
   import axios from 'axios'
   import ProgressBar from '@/components/ProgressBar.vue'
   import '@/assets/css/jquery-jvectormap.css'
-  import {jvectormap} from '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
-  import {jvectormap1} from '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
-  import {BigNumber} from 'bignumber.js'
+  import '@/assets/js/jvectormap/jquery-jvectormap-2.0.3.min'
+  import '@/assets/js/jvectormap/jquery-jvectormap-world-mill-en.js'
+  import {LeftShiftEight} from '@/api/util.js'
+  import {getAccountAssets, getConsensus} from '@/api/httpData.js'
 
   export default {
     data() {
@@ -105,15 +106,23 @@
     },
     created() {
       if (localStorage.getItem('newAccountAddress') !== '') {
-        this.getAccountAddress('/account/assets/' + localStorage.getItem('newAccountAddress'))
+        this.getAccountAddress(localStorage.getItem('newAccountAddress'))
       }
-      this.getConsensus('/consensus');
+      //设置后端语言
+      if (localStorage.hasOwnProperty('language')) {
+        this.selectLanguage();
+      }
+      this.queryConsensus();
       this.getNetWork();
       setTimeout(() => {
+        this.getCoordinate(this.ipData);
+      }, 300);
+      setTimeout(() => {
+        //console.log(this.arrCount(this.ipObj));
         this.methodsMaps(this.ipObj)
       }, 1000);
       //页面第一次进入判断浏览器内核
-      //console.log("浏览器:" + this.defaultBrowser());
+      console.log("V1.0.1:" + this.defaultBrowser());
       if (!sessionStorage.hasOwnProperty('browserOk')) {
         if (this.defaultBrowser() !== 'Chrome') {
           this.$alert(this.$t('message.c174'), '', {
@@ -129,22 +138,21 @@
     },
     mounted() {
       //5秒循环一次我的资产和全网共识
-      setTimeout(() => {
+      this.homeSetInterval = setInterval(() => {
+        if (localStorage.getItem('newAccountAddress') !== '') {
+          this.getAccountAddress(localStorage.getItem('newAccountAddress'))
+        }
+        this.queryConsensus();
+        this.getNetWork();
+        setTimeout(() => {
+          this.getCoordinate(this.ipData);
+        }, 500);
         let map = $('#world-map-markers').vectorMap('get', 'mapObject');
-        this.homeSetInterval = setInterval(() => {
-          if (localStorage.getItem('newAccountAddress') !== '') {
-            this.getAccountAddress('/account/assets/' + localStorage.getItem('newAccountAddress'))
-          }
-          this.getConsensus('/consensus');
-          this.getNetWork();
-          //console.log(this.ipObj)
-          setTimeout(() => {
-            map.clearSelectedMarkers();
-            map.addMarkers(this.ipObj)
-          }, 1000)
-        }, 5000)
-      }, 1000)
-
+        setTimeout(() => {
+          map.clearSelectedMarkers();
+          map.addMarkers(this.ipObj);
+        }, 1000)
+      }, 9000);
     },
     //离开当前页面后执行
     destroyed() {
@@ -154,18 +162,16 @@
       /**
        * 根据账户地址获取总金、冻结、可用额
        *Get the total amount, freezing and availability according to the account address.
-       * @param url
+       * @param address
        */
-      getAccountAddress(url) {
-        this.$fetch(url)
+      getAccountAddress(address) {
+        getAccountAssets(address)
           .then((response) => {
-            //console.log(response);
             if (response.success) {
               this.balanceData = response.data.list[0];
-              let leftShift = new BigNumber(0.00000001);
-              this.balanceData.balance = parseFloat(leftShift.times(this.balanceData.balance).toString());
-              this.balanceData.locked = parseFloat(leftShift.times(this.balanceData.locked).toString());
-              this.balanceData.usable = parseFloat(leftShift.times(this.balanceData.usable).toString());
+              this.balanceData.balance = LeftShiftEight(this.balanceData.balance).toString();
+              this.balanceData.locked = LeftShiftEight(this.balanceData.locked).toString();
+              this.balanceData.usable = LeftShiftEight(this.balanceData.usable).toString();
               if (this.balanceData.balance !== 0) {
                 this.balanceData.balanceWidth = (this.balanceData.balance / this.balanceData.balance * 100).toFixed(2) + '%';
                 this.balanceData.lockedWidth = (this.balanceData.locked / this.balanceData.balance * 100).toFixed(2) + '%';
@@ -173,109 +179,187 @@
               }
             }
           })
+          .catch((reject) => {
+            console.log(reject)
+          });
       },
 
       /**
        * 获取所有共识信息
        * Get all the consensus information
-       * @param url
        */
-      getConsensus(url) {
-        this.$fetch(url)
+      queryConsensus() {
+        getConsensus()
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
               this.allNodeList.nodeNumber = response.data.consensusAccountNumber;
-              this.allNodeList.entrust = parseFloat(leftShift.times(response.data.totalDeposit).toString());
+              this.allNodeList.entrust = LeftShiftEight(response.data.totalDeposit).toString();
               this.allNodeList.consensusAccountNumber = response.data.packingAgentCount
             }
           })
       },
 
       /**
-       * getNetWork
+       * 获取 ip
        * getNetWork
        */
       getNetWork() {
         this.$fetch('/network/nodes')
           .then((response) => {
+            //console.log(response);
             if (response.success) {
-              //console.log(response);
               this.ipData = response.data.list;
-              if (this.ipData.length > 0) {
-                this.ipObj = [];
-                let leng = this.ipData.length > 50 ? 50 : this.ipData.length;
-                for (let j = 0; j < leng; j++) {
-                  axios.get('http://freegeoip.net/json/' + this.ipData[j])
-                    .then((response) => {
-                      //console.log(response.data);
-                      let latLngs = [response.data.latitude, response.data.longitude];
-                      let names = response.data.region_code;
-                      this.ipObj.push({'latLng': latLngs, 'name': names})
-                    })
-                }
-              } else {
-                console.log('没有获取到ip')
-              }
             }
           })
+          .catch((reject) => {
+            console.log(reject)
+          });
       },
+
+      /**
+       * 根据ip 获取经纬度
+       **/
+      getCoordinate(arr) {
+        //新数组
+        let newArr = [];
+        let s = parseInt((arr.length / 50).toString());
+        let n = 0;
+        for (let i = 1; i <= s; i++) {
+          let star = (i - 1) * 50;
+          newArr[n++] = arr.slice(star, star + 50);
+        }
+        let y = arr.length - s * 50;
+        if (y > 0) {
+          newArr[n++] = arr.slice(s * 50);
+        }
+
+        this.ipObj = [];
+        //循环新数组，获取经纬度
+        for (let k = 0; k < newArr.length; k++) {
+          axios.get("http://50.62.6.187:8766/nuls/ip/getlist/?iplist=" + newArr[k])
+            .then((response) => {
+              //console.log(response);
+              if (response.data.success) {
+                for (let j = 0; j < response.data.data.length; j++) {
+                    this.ipObj.push({
+                      'ip': response.data.data[j].ip,
+                      'latLng': [response.data.data[j].latitude, response.data.data[j].longitude],
+                      'name': response.data.data[j].city === 'null' ? '':response.data.data[j].city
+                    });
+                }
+              } else {
+                console.log("Failure to convert coordinates to IP")
+              }
+            })
+        }
+      },
+
+      //数组统计
+      arrCount(arr) {
+        let list = arr;
+        let newlist = [];
+        let listMap = [];
+        for (let i = 0, len = list.length, latLng, name, key; i < len; i++) {
+          latLng = list[i].latLng;
+          name = list[i].name;
+          key = latLng + '-' + name;
+          if (!!listMap[key]) {
+            listMap[key]++;
+          } else {
+            listMap[key] = 1;
+          }
+        }
+        for (let item in listMap) {
+          newlist.push({
+            latLng: [item.split('-')[0].split(',')[0], item.split('-')[0].split(',')[0]],
+            name: item.split('-')[1]+" "+listMap[item],
+            //number: listMap[item],
+            style: {r: 2, fill: '#fesdfe'}
+          })
+        }
+        return newlist;
+      },
+
       /**
        * 根据坐标标注位置
        * According to coordinate annotation position
-       * @param url
-       * @param data
+       * @param maps
        * @returns {Promise}
        */
       methodsMaps(maps) {
-        $('#world-map-markers').vectorMap({
-          map: 'world_mill_en',
-          normalizeFunction: 'polynomial',
-          hoverOpacity: 0.7,
-          hoverColor: false,
-          zoomOnScroll: false,
-          zoomStep: 1,
-          backgroundColor: 'transparent',
-          regionStyle: {
-            initial: {
-              fill: 'none',
-              'fill-opacity': 0.5,
-              stroke: '#6da6f5',
-              'stroke-width': 0.8,
-              'stroke-opacity': 0.6
+        setTimeout(() => {
+          $('#world-map-markers').vectorMap({
+            map: 'world_mill_en',
+            normalizeFunction: 'polynomial',
+            hoverOpacity: 0.7,
+            hoverColor: false,
+            zoomOnScroll: false,
+            zoomStep: 1,
+            backgroundColor: 'transparent',
+            regionStyle: {
+              initial: {
+                fill: 'none',
+                'fill-opacity': 0.5,
+                stroke: '#6da6f5',
+                'stroke-width': 0.8,
+                'stroke-opacity': 0.6
+              },
+              hover: {
+                'fill-opacity': 0.7,
+                cursor: 'pointer'
+              },
+              selected: {
+                fill: 'yellow'
+              },
+              selectedHover: {}
             },
-            hover: {
-              'fill-opacity': 0.7,
-              cursor: 'pointer'
+            markerStyle: {
+              initial: {
+                fill: '#00a65a',
+                stroke: '#82bd39',
+                r: 3,
+              },
+              hover: {
+                r: 4,
+                fill: '#dbf433',
+                stroke: '#82bd39',
+              }
             },
-            selected: {
-              fill: 'yellow'
-            },
-            selectedHover: {}
-          },
-          markerStyle: {
-            initial: {
-              fill: '#00a65a',
-              stroke: '#82bd39',
-              r: 3,
-            },
-            hover: {
-              r: 4,
-              fill: '#dbf433',
-              stroke: '#82bd39',
-            }
-          },
-          markers: maps,
-          /* markers: [
-             {latLng: [34.62, 112.45], name: '河南 - 洛阳  家'},
-             {latLng: [34.74, 113.66], name: '河南 - 郑州  2010,2011,2012'},
-             {latLng: [39.95, 116.34], name: '北京  2013'},
-             {latLng: [38.97, 121.53], name: '辽宁 - 大连  2010-2014'},
-             {latLng: [29.88, 121.64], name: '浙江 - 宁波  2014.04'},
-             ]*/
-        });
+            markers: maps,
+            /* markers: [
+               {latLng: [30.2936, 120.1614], name: 'Hangzhou 5'},
+               {latLng: [34.74, 113.66], name: '河南 - 郑州  2010,2011,2012'},
+               {latLng: [39.95, 116.34], name: '北京  2013'},
+               {latLng: [38.97, 121.53], name: '辽宁 - 大连  2010-2014'},
+               {latLng: [29.88, 121.64], name: '浙江 - 宁波  2014.04'},
+               ]*/
+          });
+        }, 1000);
+
+
         this.loading = false
+      },
+
+      /**
+       * 修改描点
+       */
+      eMethodsMaps(maps) {
+        console.log("修改描点");
+
+      },
+
+      //设置后端返回语言
+      selectLanguage() {
+        let param = localStorage.getItem('language');
+        this.$put('/sys/lang/' + param)
+          .then((response) => {
+            if (response.success) {
+
+            } else {
+
+            }
+          })
       },
 
       /**
@@ -302,7 +386,29 @@
       },
 
     },
-    watch: {}
+    watch: {
+      newValue(val, oldVal) {
+        let newValue = new Set(val);
+        let oldValue = new Set(oldVal);
+        //加入
+        let inDifference = new Set([...newValue].filter(x => !oldValue.has(x)));
+        //重复
+        let intersect = new Set([...newValue].filter(x => oldValue.has(x)));
+        //移除
+        let outDifference = new Set([...oldValue].filter(x => !newValue.has(x)));
+        /* this.eMethodsMaps("123456");*/
+        /* console.log(inDifference);
+         console.log("inDifference");
+         console.log(intersect);
+         console.log("intersect");
+         console.log(outDifference)*/
+      },
+    },
+    computed: {
+      newValue() {
+        return this.ipObj
+      }
+    }
   }
 </script>
 <style lang="less">
@@ -328,7 +434,7 @@
           margin: 20px 0;
           font-weight: bold;
         }
-        .nav-info{
+        .nav-info {
           border: 1px solid #658ec7;
           background-color: #17202e;
           height: 90px;
@@ -362,13 +468,14 @@
           margin: 0 30px;
           .nav-left {
             float: left;
-            width:20%;
+            width: 16%;
           }
           .nav-right {
-            width: 80%;
+            width: 84%;
             float: left;
-            .bar-bg{
-             margin-top: 12px;
+            .bar-bg {
+              margin-top: 12px;
+              width: 150px;
             }
             .number {
               display: block;

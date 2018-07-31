@@ -91,6 +91,7 @@
             console.log(response);
             if (response.success) {
               localStorage.setItem('newAccountAddress', response.data);
+              localStorage.setItem('addressAlias','');
               if (localStorage.getItem('toUserInfo') !== '1') {
                 this.getAccountList('/account');
                 this.$router.push({

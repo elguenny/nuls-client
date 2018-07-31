@@ -1,5 +1,5 @@
 <template>
-  <div class="import-account">
+  <div class="import-account" v-loading="importAccountLoading">
     <Back :backTitle="this.$t('message.firstInfoTitle')"></Back>
     <h1>{{$t("message.inportAccount")}}</h1>
     <input type="file" id="fileId" class="hidden">
@@ -13,23 +13,26 @@
     </div>
     <div class="key text-d cursor-p" @click="importKey">{{$t('message.c193')}}</div>
     <!--<PasswordTow ref="passTwo" @toSubmit="toSubmit"></PasswordTow>-->
-    <Password ref="password" @toSubmit="toSubmit"></Password>
+    <Password ref="password" @toSubmit="toSubmit" @toClose="toClose"></Password>
   </div>
 </template>
 
 <script>
   import Back from '@/components/BackBar.vue';
   import Password from '@/components/PasswordBar.vue'
+  import {postImportKeystore,getAccountInfo} from '@/api/httpData.js'
+  import {accountList} from '@/api/util.js'
 
   export default {
     data() {
       return {
         //定时获取文件路径
         fellPathSetInterval: null,
-        encrypted:false,
+        encrypted: false,
         imageUrl: '',
         keyStorePath: '',
-        keyStoreInfo: {},
+        keystoreInfo: '',
+        importAccountLoading: false,
       }
     },
     components: {
@@ -43,173 +46,159 @@
       /**
        * 导入keystore
        **/
-      keystore() {
+      keystore(){
+        let _this = this;
         let obj = document.getElementById("fileId");
         obj.click();
-        let fellPath = '';
-        //定时获取文件路径
-        this.fellPathSetInterval = setInterval(() => {
-          fellPath = this.getFullPath(obj);
-          if (fellPath !== '') {
-            let obj = document.getElementById("fileId");
-            let p = document.querySelector('#preview');
-            if (window.FileReader) {
-              let file = obj.files[0];
-              let suffixName = file.name.toLowerCase().split('.').splice(-1);
-              if (suffixName[0] === 'keystore') {
-                if (window.FileReader) {
-                  let file = obj.files[0];
-                  let reader = new FileReader();
-                  reader.onload = function () {
-                    p.innerHTML = this.result;
-                  };
-                  reader.readAsText(file);
-                  //定时导入
-                  setTimeout(() => {
-                    let params = JSON.parse(p.innerHTML);
-                    this.keyStoreInfo = {
-                      address: params.address === "null" ? null : params.address,
-                      encryptedPrivateKey: params.encryptedPrivateKey === "null" ? null : params.encryptedPrivateKey,
-                      alias: params.alias === "null" ? null : params.alias,
-                      pubKey: params.pubKey === "null" ? null : params.pubKey,
-                      prikey: params.prikey === "null" ? null : params.prikey
+        obj.onchange = function () {
+          if (this.value !== '') {
+            let file = obj.files[0];
+            let suffixName = file.name.toLowerCase().split('.').splice(-1);
+            if (suffixName[0] === 'keystore') {
+              _this.readFiles(obj);
+              //延迟执行缓存数据
+              setTimeout(() => {
+                if (_this.keystoreInfo !== '') {
+                  //console.log(JSON.parse(_this.keystoreInfo));
+                  if(JSON.parse(_this.keystoreInfo).encryptedPrivateKey ==="null"){
+                    let param = {
+                      accountKeyStoreDto: JSON.parse(_this.keystoreInfo),
+                      password: '',
+                      overwrite: false
                     };
-                    if (JSON.parse(p.innerHTML).encryptedPrivateKey !== 'null') {
-                      this.encrypted = true;
-                      this.$refs.password.showPassword(true);
-                    } else {
-                      let param = {
-                        accountKeyStoreDto: this.keyStoreInfo,
-                        password: '',
-                        overwrite: false
-                      };
-                      this.postKeyStore('/account/import', param);
-                    }
-                  }, 500)
+                    _this.postKeyStore(param);
+                  }else {
+                    _this.$refs.password.showPassword(true);
+                  }
+                } else {
+                  _this.$message({
+                    type: 'warning', message:_this.$t('message.c194'), duration: '2000'
+                  })
                 }
-              } else {
-                obj.outerHTML = obj.outerHTML;
-                this.$message({
-                  type: 'warning', message: this.$t('message.c194'), duration: '800'
-                })
-              }
+              }, 500)
+            } else {
+              _this.$message({
+                type: 'warning', message:_this.$t('message.c194'), duration: '2000'
+              })
             }
-            clearInterval(this.fellPathSetInterval)
+          } else {
+            _this.$message({
+              type: 'warning', message:_this.$t('message.c194'), duration: '2000'
+            })
           }
-        }, 500);
+        }
       },
 
-      //读取本地文件
-      upload(input) {
+      /**
+       * 读取keystore文件内容
+       * read keystore files info
+       * @param files
+       **/
+      readFiles(files) {
+        let _this = this;
         //支持chrome IE10
         if (window.FileReader) {
-          let file = input.files[0];
+          let file = files.files[0];
           let filename = file.name.split(".")[0];
           let reader = new FileReader();
           reader.onload = function () {
-            return this.result
+            //console.log(this.result);
+            _this.keystoreInfo = this.result;
           };
           reader.readAsText(file);
         }
-        return true;
         //支持IE 7 8 9 10
-        /*else if (typeof window.ActiveXObject !== 'undefined') {
+        else if (typeof window.ActiveXObject !== 'undefined') {
           let xmlDoc;
           xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
           xmlDoc.async = false;
-          xmlDoc.load(input.value);
-          //alert(xmlDoc.xml);
-          //this.keyStoreInfo = xmlDoc.xml
-        }*/
+          xmlDoc.load(files.value);
+          _this.keystoreInfo = xmlDoc.xml;
+        }
         //支持FF
-        /*else if (document.implementation && document.implementation.createDocument) {
+        else if (document.implementation && document.implementation.createDocument) {
           let xmlDoc;
           xmlDoc = document.implementation.createDocument("", "", null);
           xmlDoc.async = false;
-          xmlDoc.load(input.value);
-          //alert(xmlDoc.xml);
-          //this.keyStoreInfo = xmlDoc.xml
+          xmlDoc.load(files.value);
+          _this.keystoreInfo = xmlDoc.xml;
         } else {
           alert('error');
-        }*/
+        }
       },
-      //判断是否选择文件
-      getFullPath(obj) {
-        if (obj) {
-          //ie
-          if (window.navigator.userAgent.indexOf("MSIE") >= 1) {
-            obj.select();
-            return document.selection.createRange().text;
-          }
-          //firefox
-          else if (window.navigator.userAgent.indexOf("Firefox") >= 1) {
-            if (obj.files) {
-              return obj.files.item(0).getAsDataURL();
-            }
-            return obj.value;
-          }
-          return obj.value;
+
+      //回调关闭或取消
+      toClose(boolean){
+        if(!boolean){
+          document.getElementById("fileId").value ='';
         }
       },
 
       //输入密码导入
       toSubmit(password) {
         let param = {
-          accountKeyStoreDto: this.keyStoreInfo,
+          accountKeyStoreDto: JSON.parse(this.keystoreInfo),
           password: password,
-          overwrite: false
+          overwrite: true
         };
-        this.postKeyStore('/account/import', param);
-        let obj = document.getElementById("fileId");
-        obj.outerHTML = obj.outerHTML;
+        this.postKeyStore(param);
       },
 
       //导入keyStore import keyStore
-      postKeyStore(url, params) {
-        this.$post(url, params)
+      postKeyStore( params) {
+        this.importAccountLoading = true;
+        postImportKeystore(params)
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              let p = document.querySelector('#preview');
-              p.innerHTML = '';
               //导入的新账户默认为当前账户
               localStorage.setItem('newAccountAddress', response.data.value);
+              getAccountInfo(response.data.value).then((response) =>{
+                //console.log(response);
+                if (response.success) {
+                  localStorage.setItem('addressAlias',response.data.alias);
+                }
+              });
               localStorage.setItem('encrypted', this.encrypted.toString());
 
-              this.getAccountList('/account');
+              this.getAccountList();
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
               })
             } else {
               this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
+            this.importAccountLoading = false;
+          })
+          .catch(err => {
+            //console.log(err);
+            this.getAccountList();
+            this.$message({
+              type: 'success', message: this.$t('message.c197'), duration: '3000'
+            });
+            this.importAccountLoading = false;
           })
       },
       //获取账户地址列表
-      getAccountList (url) {
-        this.$fetch(url)
+      getAccountList() {
+        accountList()
           .then((response) => {
+            //console.log(response);
             if (response.success) {
-              this.$store.commit('setAddressList', response.data.list);
-              if(response.data.list.length === 1){
+              this.$store.commit('setAddressList', response.list);
+              if (response.list.length === 1) {
                 this.$router.push({
                   name: '/wallet'
                 })
-              }else {
+              } else {
                 this.$router.push({
-                  name: '/userInfo',
-                  params: {'address':response.data},
+                  name: '/userInfo'
                 })
               }
-              this.$message({
-                type: 'success', message: this.$t('message.passWordSuccess')
-              })
             }
-          }).catch((reject) => {
-          console.log('User List err' + reject)
-        })
+          })
       },
 
       /**

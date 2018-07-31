@@ -5,8 +5,7 @@
         <span>{{$t('message.purseVersion')}}</span>：V{{this.$store.getters.getVersionInfo.myVersion}}
       </el-col>
       <el-col :span="14" class='footer-right'>
-        {{$t('message.blockState')}}：{{$t('message.local')}} {{ netWorkInfo.localBestHeight }}<span
-        v-show="timeOffsetOk"></span> /
+        {{$t('message.blockState')}}：{{$t('message.local')}} {{ netWorkInfo.localBestHeight }} /
         {{$t('message.theMain')}} {{netWorkInfo.netBestHeight}}
         <i :class="iconWifi" :title="connectNumber"></i>
       </el-col>
@@ -16,51 +15,45 @@
 </template>
 
 <script>
+  import {getNetworkInfo} from '@/api/httpData.js'
+  import {accountList} from '@/api/util.js'
   export default {
     data() {
       return {
-        //bottomItem: [],
-        updateVersion: false,
-        timeOffsetOk: true,
-        connectNumber: '0',
+        //区块高度信息
         netWorkInfo: [],
+        //wifi连接数量
+        connectNumber: '0',
+        //WiFi icon
         iconWifi: 'no-wifi_icon',
-        rejectTime: 0,
-        rejectOut: 10,
-        messageBox: 0,
       }
     },
     mounted() {
       let _this = this;
-
-      this.getNetWorkInfo('/network/info');
+      this.getNetWorkInfo();
       //5秒获取一次区块高度 encapsulated https
       setInterval(() => {
-        this.getNetWorkInfo('/network/info')
-      }, 5000)
+        this.getNetWorkInfo();
+        if (this.$store.getters.getAddressList.length === 0) {
+          this.getAccountList()
+        }
+      }, 5000);
+
+      //调用查询账户列表
+      this.getAccountList();
 
     },
     methods: {
       //获取节点高度 Get node height
-      getNetWorkInfo(url) {
-        this.$fetch(url)
+      getNetWorkInfo() {
+        getNetworkInfo()
           .then((response) => {
             //console.log(response)
             if (response.success) {
-              if (this.rejectTime > 1) {
-                this.rejectTime = this.rejectTime - 1
-              }
-              //调用查询账户列表
-              this.getAccountList('/account');
 
-              sessionStorage.setItem('javaFile', '1');
-              sessionStorage.setItem('userList', '1');
-              this.rejectTime = 0;
               this.netWorkInfo = response.data;
-              if (this.netWorkInfo.localBestHeight === 0 || this.netWorkInfo.netBestHeight === 0) {
-                sessionStorage.setItem('userList', '0')
-              }
               this.$store.commit('setNetWorkInfo', response.data);
+
               let wifi = this.netWorkInfo.inCount + this.netWorkInfo.outCount;
               if (wifi < 2) {
                 sessionStorage.setItem('setNodeNumberOk', 'false')
@@ -82,40 +75,21 @@
               }
             }
           }).catch((reject) => {
-          this.rejectTime = this.rejectTime + 1;
-          sessionStorage.setItem('userList', '0')
+          console.log(reject)
         })
       },
       //获取账户地址列表 Get a list of account addresses
-      getAccountList(url) {
-        this.$fetch(url)
-          .then((response) => {
-            //console.log(response);
-            if (response.success) {
-              this.$store.commit('setAddressList', response.data.list);
-            }
-            /*if (response.success) {
-              if (response.data.list.length > 0) {
-                this.$store.commit('setAddressList', response.data.list);
-                if (localStorage.getItem('newAccountAddress') === '') {
-                  localStorage.setItem('newAccountAddress', response.data.list[0].address)
-                }
-                localStorage.setItem('fastUser', '1')
-              } else {
-                this.$store.commit('setAddressList', '');
-                localStorage.setItem('newAccountAddress', '');
-                localStorage.setItem('fastUser', '0')
-              }
-            } else {
-              this.$store.commit('setAddressList', '');
-              localStorage.setItem('newAccountAddress', '');
-              localStorage.setItem('fastUser', '0')
-            }*/
-          }).catch((reject) => {
-          localStorage.setItem('newAccountAddress', '');
-          localStorage.setItem('fastUser', '0')
-        })
-      },
+      getAccountList() {
+        accountList().then((response) => {
+          //console.log(response);
+          if(response.success){
+            this.$store.commit('setAddressList', response.list);
+          }else {
+            this.$store.commit('setAddressList', '');
+            console.log("err")
+          }
+        });
+      }
     }
   }
 </script>

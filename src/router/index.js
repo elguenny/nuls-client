@@ -127,17 +127,17 @@ const router = new VueRouter({
       name: '/consensus',
       component: resolve => require(['@/pages/consensus/Index.vue'], resolve),
       meta: {
-        keepAlive: true,
+        keepAlive: false,
       }
     },
     {
-      path: '/consensus/myNode :agentAddress/:agentHash',
+      path: '/consensus/myNode',
       name: '/myNode',
       component: resolve => require(['@/pages/consensus/MyNode.vue'], resolve)
 
     },
     {
-      path: '/consensus/myNode/addNode :agentAddress/:agentId',
+      path: '/consensus/myNode/addNode',
       name: '/addNode',
       component: resolve => require(['@/pages/consensus/AddNode.vue'], resolve)
 
@@ -163,7 +163,10 @@ const router = new VueRouter({
     {
       path: '/consensus/nodeInfo',
       name: '/nodeInfo',
-      component: resolve => require(['@/pages/consensus/NodeInfo.vue'], resolve)
+      component: resolve => require(['@/pages/consensus/NodeInfo.vue'], resolve),
+      meta: {
+        keepAlive: false,
+      }
     },
     {
       path: '/consensus/nodePage',

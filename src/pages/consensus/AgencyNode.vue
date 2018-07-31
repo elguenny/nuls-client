@@ -112,8 +112,8 @@
       getAllConsensus(url, params) {
         this.$fetch(url, params)
           .then((response) => {
-            console.log(params);
-            console.log(response);
+            //console.log(params);
+            //console.log(response);
             if (response.success) {
               let leftShift = new BigNumber(0.00000001);
               for (let i = 0; i < response.data.list.length; i++) {

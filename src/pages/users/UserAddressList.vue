@@ -30,10 +30,10 @@
     <el-dialog :title="$t('message.c96')" :visible.sync="dialogFormVisible" top="24vh" @close="userListClose">
       <el-form ref="userListForm" :model="userListForm" :rules="userListFormRules" label-width="80px">
         <el-form-item :label="$t('message.c69')" prop="userAddress">
-          <el-input v-model="userListForm.userAddress" :maxlength="35"></el-input>
+          <el-input v-model.trim="userListForm.userAddress" :maxlength="35"></el-input>
         </el-form-item>
         <el-form-item :label="$t('message.remarks')">
-          <el-input v-model="userListForm.userHelp" :maxlength="20"></el-input>
+          <el-input v-model.trim="userListForm.userHelp" :maxlength="20"></el-input>
         </el-form-item>
         <!--<div class="userAlias">{{$t('message.tabAlias')}} {{userListForm.userAlias}}</div>-->
       </el-form>
@@ -49,7 +49,7 @@
 
 <script>
   import Back from '@/components/BackBar.vue';
-
+  import {setDB,Editor} from '@/api/indexDB.js'
   export default {
     data() {
       return {
@@ -92,32 +92,19 @@
     methods: {
       //创建usersDB
       openDB() {
-        let request = indexedDB.open('usersDB', 1);
-        request.onupgradeneeded = function (e) {
-          let db = e.target.result;
-          // 如果不存在Users对象仓库则创建
-          if (!db.objectStoreNames.contains('usersDB')) {
-            let store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false});
-          }
-        }
+        let DB = {db_name:'usersDB',db_version:'1',db_store_name:'addressList'};
+        setDB(DB);
       },
       //给userlist添加数据
       addUserAccount(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            let request = indexedDB.open('usersDB', 1);
-            let db;
-            let value = {
+            let DB = {db_name:'usersDB',db_version:'1',db_store_name:'addressList'};
+            let params = {
               'userAddress': this.userListForm.userAddress,
-              'userAlias': this.userListForm.userAlias,
               'userHelp': this.userListForm.userHelp
             };
-            request.onsuccess = function (event) {
-              db = event.target.result;
-              let tx = db.transaction('addressList', 'readwrite');
-              let store = tx.objectStore('addressList');
-              store.put(value);
-            };
+            Editor(DB,params,this.userListForm.userAddress);
             this.getUserList(1, 15);
             this.userListForm.userAddress = '';
             this.userListForm.userHelp = '';
@@ -130,12 +117,13 @@
       },
       //读取userList
       getUserList(pageNumber, pageSize) {
-        let request = indexedDB.open('usersDB', 1);
         let dbData = [];
+        let DB = {db_name:'usersDB',db_version:'1',db_store_name:'addressList'};
+        let request = indexedDB.open(DB.db_name, DB.db_version);
         request.onsuccess = function (event) {
           let db = event.target.result;
-          let tx = db.transaction('addressList', 'readonly');
-          let store = tx.objectStore('addressList');
+          let transaction = db.transaction(DB.db_store_name, "readonly");
+          let store = transaction.objectStore(DB.db_store_name);
           // 打开游标，遍历customers中所有数据
           store.openCursor().onsuccess = function (event) {
             let cursor = event.target.result;
@@ -185,7 +173,7 @@
           let db;
           request.onsuccess = function (event) {
             db = event.target.result;
-            let tx = db.transaction('addressList', 'readwrite');
+            let tx = db.transaction(["addressList"], 'readwrite');
             let store = tx.objectStore('addressList');
             store.delete(userAddress);
           };
@@ -239,8 +227,9 @@
       }
       .el-dialog__title {
         color: #C1C5C9;
-        font-size: 14px;
+        font-size: 16px;
         text-align: center;
+        line-height: 4rem;
         font-weight: bold;
       }
       .el-dialog__header {
