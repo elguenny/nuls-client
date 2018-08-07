@@ -49,11 +49,13 @@
 
 <script>
   import Back from '@/components/BackBar.vue';
-  import {setDB,Editor} from '@/api/indexDB.js'
+  import {setDB, Editor} from '@/api/indexDB.js'
+
   export default {
     data() {
       return {
         tableData: [],
+        database: null,
         dialogFormVisible: false,
         totalAll: 0,
         userListForm: {
@@ -73,64 +75,128 @@
       Back,
     },
     mounted() {
-      let _this = this;
-      this.openDB();
-      this.getUserList(1, 15);
-      let userList = false;
-      setInterval(() => {
-        userList = this.dialogFormVisible
-      }, 500);
-      document.onkeydown = function (e) {
-        let key = window.event.keyCode;
-        if (key === 13) {
-          if (userList) {
-            document.getElementById('userList').click();
-          }
-        }
-      }
+      this.justifyIndexDEB();
+      setTimeout(() => {
+        this.getUserList(this.database,1, 15);
+      }, 200);
     },
     methods: {
-      //创建usersDB
-      openDB() {
-        let DB = {db_name:'usersDB',db_version:'1',db_store_name:'addressList'};
-        setDB(DB);
-      },
+
       //给userlist添加数据
       addUserAccount(formName) {
+        let _this = this;
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            let DB = {db_name:'usersDB',db_version:'1',db_store_name:'addressList'};
             let params = {
               'userAddress': this.userListForm.userAddress,
               'userHelp': this.userListForm.userHelp
             };
-            Editor(DB,params,this.userListForm.userAddress);
-            this.getUserList(1, 15);
-            this.userListForm.userAddress = '';
-            this.userListForm.userHelp = '';
-            this.dialogFormVisible = false
+            _this.editData(_this.database, params);
           } else {
             console.log('error submit!!');
             return false;
           }
         })
       },
-      //读取userList
-      getUserList(pageNumber, pageSize) {
+
+      /**
+       * 判断是否支持indexedDB执行下面函数
+       **/
+      justifyIndexDEB() {
+        if ("indexedDB" in window) {
+          this.createindexDB();
+        } else {
+          console.log("对不起，您的浏览器不支持indexedDB，建议您使用google浏览器");
+        }
+      },
+
+      /**
+       * 创建或者打开indexedDB
+       */
+      createindexDB() {
+        let _this = this;
+        const dbInfo = {
+          dbName: "usersDB",
+          dbVersion: 1,
+          dbInstance: {}
+        };
+        //创建数据库 indexedDB.open方法用于打开数据库。返回的是一个对象，第一个参数是数据库名称，格式为字符串。第二个参数是数据库版本。
+        let openRequest = window.indexedDB.open(dbInfo.dbName, dbInfo.dbVersion);
+        //创建数据库时会触发三个事件onupgradeneeded，success，onerror
+        openRequest.onupgradeneeded = function (e) {
+          let db = e.target.result;
+          let storeNames = db.objectStoreNames;
+          //创建数据库的表格（或者叫数据库仓库）
+          if (!storeNames.contains('addressList')) {
+            db.createObjectStore('addressList', {
+              keyPath: "userAddress",
+              autoIncrement: false
+            })
+          }
+        };
+        //success：打开成功
+        openRequest.onsuccess = function (e) {
+          _this.database = e.target.result;
+        };
+        //数据库打开失败
+        openRequest.onerror = function (e) {
+          console.log("数据库打开失败...");
+          console.dir(e);
+        }
+      },
+
+      /**
+       *添加、编辑数据
+       * @param db
+       * @param params
+       **/
+      editData(db, params) {
+        let _this = this;
+        let transaction = db.transaction(["addressList"], "readwrite");
+        let objectStore = transaction.objectStore("addressList");
+        let request = objectStore.put(params);
+        request.onsuccess = function (e) {
+          _this.getUserList(_this.database,1, 15);
+          _this.userListForm.userAddress = '';
+          _this.userListForm.userHelp = '';
+          _this.dialogFormVisible = false
+        };
+        request.onerror = function (e) {
+          console.log("Error", e);
+        };
+      },
+
+      /**
+       * 删除数据
+       * @param db
+       * * @param userAddress
+       */
+      delData(db,userAddress) {
+        let _this = this;
+        let transaction = db.transaction(["addressList"], "readwrite");
+        let req = transaction.objectStore("addressList").delete(userAddress);
+        req.onerror = function (e) {
+          console.log("删除数据失败！");
+        };
+        req.onsuccess = function (e) {
+          _this.getUserList(_this.database,1, 15);
+        }
+      },
+
+      /**
+       * 遍历数据：读取userList
+       *
+       **/
+      getUserList(db,pageNumber, pageSize) {
         let dbData = [];
-        let DB = {db_name:'usersDB',db_version:'1',db_store_name:'addressList'};
-        let request = indexedDB.open(DB.db_name, DB.db_version);
-        request.onsuccess = function (event) {
-          let db = event.target.result;
-          let transaction = db.transaction(DB.db_store_name, "readonly");
-          let store = transaction.objectStore(DB.db_store_name);
-          // 打开游标，遍历customers中所有数据
-          store.openCursor().onsuccess = function (event) {
-            let cursor = event.target.result;
-            if (cursor) {
-              dbData.push(cursor.value);
-              cursor.continue();
-            }
+        let trans = db.transaction(["addressList"], "readonly");
+        let store = trans.objectStore("addressList");
+        let cursor = store.openCursor();
+        cursor.onsuccess = function (e) {
+          let res = e.target.result;
+          if (res) {
+            dbData.push(res.value);
+            res.continue();
           }
         };
         //显示总条数
@@ -144,10 +210,15 @@
           }
         }, 50);
       },
-      //交易列表分页
+
+      /**
+       * 交易列表分页
+       * @param events
+       */
       consensusSize(events) {
         this.getUserList(events, 15);
       },
+
       //新增通讯录
       toNewAccount() {
         this.dialogFormVisible = true;
@@ -155,36 +226,27 @@
         this.userListForm.userAlias = '';
         this.userListForm.userHelp = '';
       },
+
       //修改一条通讯录
       editorRow(userAddress, userAlias, userHelps) {
-        //this.$refs['userListForm'].resetFields();
         this.dialogFormVisible = true;
         this.userListForm.userAddress = userAddress;
         this.userListForm.userAlias = userAlias;
         this.userListForm.userHelp = userHelps;
       },
+
       //删除通讯录一条记录
       deleteRow(userAddress) {
+        let _this = this;
         this.$confirm(this.$t('message.c115'), this.$t('message.c86'), {
           confirmButtonText: this.$t('message.confirmButtonText'),
           cancelButtonText: this.$t('message.cancelButtonText'),
         }).then(() => {
-          let request = indexedDB.open('usersDB', 1);
-          let db;
-          request.onsuccess = function (event) {
-            db = event.target.result;
-            let tx = db.transaction(["addressList"], 'readwrite');
-            let store = tx.objectStore('addressList');
-            store.delete(userAddress);
-          };
-          this.getUserList(1, 15);
-          this.$message({
-            type: 'success',
-            message: this.$t('message.passWordSuccess'),
-          });
+          _this.delData(_this.database,userAddress);
         }).catch(() => {
         });
       },
+
       //关闭清理数据
       userListClose() {
         this.$refs['userListForm'].resetFields();

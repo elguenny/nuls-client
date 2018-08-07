@@ -25,7 +25,7 @@
             <h3>{{$t('message.overview')}}</h3>
             <ul>
                 <li><span>{{$t('message.tradingTime')}}</span>{{this.times}}</li>
-                <li><span>{{$t('message.miningFee1')}}</span>{{parseFloat(infoData.fee) * 0.00000001}} NULS</li>
+                <li><span>{{$t('message.miningFee1')}}</span>{{infoData.fee}} NULS</li>
                 <li @click="hashCopy(infoData.hash)" class="cursor-p" :title="$t('message.c145')"><span>{{$t('message.autograph')}}</span>{{infoData.hash}}
                 </li>
                 <li><span>{{$t('message.transactionType')}}</span>
@@ -75,6 +75,7 @@
           .then((response) => {
             //console.log(response);
             this.infoData = response.data;
+            this.infoData.fee = LeftShiftEight(response.data.fee).toString();
             this.times = moment(getLocalTime(response.data.time)).format('YYYY-MM-DD HH:mm:ss');
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {
@@ -100,6 +101,12 @@
           message: this.$t('message.c129'), type: 'success', duration: '800'
         })
       },
+    },
+
+    beforeRouteLeave(to, from, next) {
+      // 设置下一个路由的 meta 不刷新index
+      to.meta.keepAlive = false;
+      next();
     }
   }
 </script>

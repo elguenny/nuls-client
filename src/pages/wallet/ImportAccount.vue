@@ -153,6 +153,7 @@
             if (response.success) {
               //导入的新账户默认为当前账户
               localStorage.setItem('newAccountAddress', response.data.value);
+              localStorage.setItem('addressRemark', '');
               getAccountInfo(response.data.value).then((response) =>{
                 //console.log(response);
                 if (response.success) {

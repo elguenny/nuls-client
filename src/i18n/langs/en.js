@@ -380,8 +380,8 @@ const en = {
     blockState: 'Block',
     local: 'Local height',
     backward: 'Behind',
-    theMain: 'test height',
-    //theMain: 'Mainnet height',
+    //theMain: 'test height',
+    theMain: 'Mainnet height',
   },
   ...enLocale
 };

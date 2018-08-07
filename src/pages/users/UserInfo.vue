@@ -135,7 +135,7 @@
                 if (!set.has(localStorage.getItem('newAccountAddress'))) {
                   localStorage.setItem('newAccountAddress', response.data.list[0].address);
                   localStorage.setItem('addressAlias', response.data.list[0].alias ? response.data.list[0].alias : '');
-                  localStorage.setItem('addressRemark', response.data.list[0].remark ? response.data.list[0].alias : '');
+                  localStorage.setItem('addressRemark', response.data.list[0].remark ? response.data.list[0].remark : '');
                   localStorage.setItem('encrypted', response.data.list[0].encrypted)
                 }
               } else {

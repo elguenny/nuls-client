@@ -382,8 +382,8 @@ const cn = {
     blockState: '区块高度',
     local: '本地',
     backward: '落后',
-    theMain: '测试网',
-    //theMain: '主网',
+    //theMain: '测试网',
+    theMain: '主网',
   },
   ...zhLocale
 };

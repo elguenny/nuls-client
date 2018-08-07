@@ -90,7 +90,7 @@
       let checkJoinNo = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.transferNO')))
-        }else {
+        } else {
           setTimeout(() => {
             let rightShift = new BigNumber(100000000);
             let leftShift = new BigNumber(0.00000001);
@@ -229,34 +229,31 @@
       },
 
       /**
-       * 创建usersDB
-       * New usersDB
-       */
-      openDB() {
-        const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
-        let request = indexedDB.open('usersDB', 1);
-        request.onupgradeneeded = function (e) {
-          let db = e.target.result;
-          // 如果不存在Users对象仓库则创建
-          if (!db.objectStoreNames.contains('usersDB')) {
-            let store = db.createObjectStore('addressList', {keyPath: 'userAddress', autoIncrement: false})
-          }
-        };
-      },
-
-      /**
        * 选择通讯录
        * Select the address book
        */
       toUsersAddressList() {
-        const indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
-        if(!indexedDB){
-          console.log("你的浏览器不支持IndexedDB");
-        }else {
-          this.dialogTableVisible = true;
-          let request = indexedDB.open('usersDB', 1);
-          let dbData = [];
-          request.onsuccess = function (event) {
+        let _this = this;
+        this.dialogTableVisible = true;
+        if ("indexedDB" in window) {
+          const dbInfo = {
+            dbName: "usersDB",
+            dbVersion: 1,
+            dbInstance: {}
+          };
+          let openRequest = window.indexedDB.open(dbInfo.dbName, dbInfo.dbVersion);
+          openRequest.onupgradeneeded = function (e) {
+            let db = e.target.result;
+            let storeNames = db.objectStoreNames;
+            if (!storeNames.contains('addressList')) {
+              db.createObjectStore('addressList', {
+                keyPath: "userAddress",
+                autoIncrement: false
+              })
+            }
+          };
+          openRequest.onsuccess = function (e) {
+            let dbData = [];
             let db = event.target.result;
             let tx = db.transaction(["addressList"], 'readonly');
             let store = tx.objectStore('addressList');
@@ -267,9 +264,19 @@
                 dbData.push(cursor.value);
                 cursor.continue()
               }
+
+              setTimeout(() => {
+                _this.userAddressList = dbData
+              }, 50)
+
             }
           };
-          this.userAddressList = dbData
+          openRequest.onerror = function (e) {
+            console.log("数据库打开失败...");
+            console.dir(e);
+          }
+        } else {
+          console.log("对不起，您的浏览器不支持indexedDB，建议您使用google浏览器");
         }
       },
 
@@ -366,7 +373,7 @@
           + '","toAddress":"' + this.transferForm.joinAddress
           + '","amount":' + rightShift.times(this.transferForm.joinNo)
           + ',"password":"' + password
-          + '","remark":"' +  this.stripscript(this.transferForm.remark)+ '"}';
+          + '","remark":"' + this.stripscript(this.transferForm.remark) + '"}';
         //console.log(param);
         this.$post('/accountledger/transfer', param)
           .then((response) => {
