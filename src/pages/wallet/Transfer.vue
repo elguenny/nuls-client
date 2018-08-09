@@ -21,6 +21,7 @@
         </el-form-item>
         <el-form-item :label="$t('message.remarks')+'：'">
           <el-input type="textarea" v-model.trim="transferForm.remark"
+                    onkeyup="this.value=this.value.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\w]/g,'')"
                     :maxlength="30" @change="countFee"></el-input>
         </el-form-item>
         <el-form-item :label="$t('message.c28')+': '+this.fee+' NULS'">
@@ -36,8 +37,8 @@
         <el-table :data="userAddressList" @row-dblclick="dbcheckedAddress">
           <el-table-column property="userAddress" :label="$t('message.tabName')" min-width="280"
                            align='center'></el-table-column>
-          <el-table-column property="userAlias" :label="$t('message.tabAlias')" width="70"
-                           align='center'></el-table-column>
+          <!--<el-table-column property="userAlias" :label="$t('message.tabAlias')" width="70"
+                           align='center'></el-table-column>-->
           <el-table-column property="userHelp" :label="$t('message.remarks')" width="110"
                            align='center'></el-table-column>
           <el-table-column :label="$t('message.operation')" width="100" align='center'>

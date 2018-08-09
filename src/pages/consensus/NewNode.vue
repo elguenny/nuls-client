@@ -10,7 +10,9 @@
              @click="accountCopy" :title="$t('message.c143')"></i>
         </el-form-item>
         <el-form-item :label="$t('message.c23')+':'" prop="packingAddress">
-          <el-input v-model.trim="newNodeForm.packingAddress" :maxlength="35" @change="countFee"></el-input>
+          <el-input v-model.trim="newNodeForm.packingAddress" :maxlength="35" @change="countFee"
+                    onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\w]/g,'')"
+          ></el-input>
         </el-form-item>
         <el-form-item :label="$t('message.c25')+'（NULS）:'" prop="deposit">
           <span class="allUsable">{{$t('message.currentBalance')}}: {{usable}} NULS</span>

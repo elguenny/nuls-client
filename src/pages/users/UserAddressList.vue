@@ -27,13 +27,17 @@
                      v-show="totalAllOk = this.totalAll>15 ?true:false" class="cb"
                      @current-change="consensusSize"></el-pagination>
     </div>
-    <el-dialog :title="$t('message.c96')" :visible.sync="dialogFormVisible" top="24vh" @close="userListClose">
+    <el-dialog :title="this.userAddressDisabled ? $t('message.c961') : $t('message.c96')" :visible.sync="dialogFormVisible" top="24vh" @close="userListClose">
       <el-form ref="userListForm" :model="userListForm" :rules="userListFormRules" label-width="80px">
         <el-form-item :label="$t('message.c69')" prop="userAddress">
-          <el-input v-model.trim="userListForm.userAddress" :maxlength="35"></el-input>
+          <el-input v-model.trim="userListForm.userAddress" :maxlength="35"  :disabled=this.userAddressDisabled
+                    onkeyup="this.value=this.value.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\w]/g,'')"
+          ></el-input>
         </el-form-item>
         <el-form-item :label="$t('message.remarks')">
-          <el-input v-model.trim="userListForm.userHelp" :maxlength="20"></el-input>
+          <el-input v-model.trim="userListForm.userHelp" :maxlength="20"
+                    onkeyup="this.value=this.value.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\w]/g,'')"
+          ></el-input>
         </el-form-item>
         <!--<div class="userAlias">{{$t('message.tabAlias')}} {{userListForm.userAlias}}</div>-->
       </el-form>
@@ -54,13 +58,18 @@
   export default {
     data() {
       return {
+        //通讯录data
         tableData: [],
+        //indexDB对象
         database: null,
-        dialogFormVisible: false,
+        //总条数
         totalAll: 0,
+        //弹框的显示
+        dialogFormVisible: false,
+        userAddressDisabled:false,
+        //输入框数据
         userListForm: {
           userAddress: '',
-          userAlias: '',
           userHelp: '',
         },
         userListFormRules: {
@@ -159,7 +168,10 @@
           _this.getUserList(_this.database,1, 15);
           _this.userListForm.userAddress = '';
           _this.userListForm.userHelp = '';
-          _this.dialogFormVisible = false
+          _this.dialogFormVisible = false;
+          if(_this.userAddressDisabled){
+            _this.userAddressDisabled=false;
+          }
         };
         request.onerror = function (e) {
           console.log("Error", e);
@@ -222,6 +234,9 @@
       //新增通讯录
       toNewAccount() {
         this.dialogFormVisible = true;
+        if(this.userAddressDisabled){
+          this.userAddressDisabled=false;
+        }
         this.userListForm.userAddress = '';
         this.userListForm.userAlias = '';
         this.userListForm.userHelp = '';
@@ -230,6 +245,7 @@
       //修改一条通讯录
       editorRow(userAddress, userAlias, userHelps) {
         this.dialogFormVisible = true;
+        this.userAddressDisabled = true;
         this.userListForm.userAddress = userAddress;
         this.userListForm.userAlias = userAlias;
         this.userListForm.userHelp = userHelps;

@@ -272,8 +272,8 @@
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$router.push({
-            name: '/editAliasing',
-            params: {address: Address, encrypted: encrypted},
+            name: 'editAliasing',
+            query: {address: Address, encrypted: encrypted},
           })
         } else {
           this.$message({

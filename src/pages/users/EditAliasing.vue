@@ -40,9 +40,7 @@
   export default {
     data() {
       let aliasing = (rule, value, callback) => {
-        //console.log(value.replace(/[^\x00-\xff]/g, '01').length);
         let re = /^(?!_)(?!.*?_$)[a-z0-9_]+$/;
-        //console.log(!re.exec(value));
         if (this.usable >= 1.01) {
           if (!value || !re.exec(value)) {
             callback(new Error(this.$t('message.c1041')))
@@ -55,8 +53,8 @@
       };
       return {
         submitId: 'aliasAliasing',
-        address: this.$route.params.address,
-        encrypted: this.$route.params.encrypted,
+        address: this.$route.query.address,
+        encrypted: this.$route.query.encrypted,
         usable: 0,
         fee: 0.00,
         allFee: 1.00,

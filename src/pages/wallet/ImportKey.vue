@@ -74,7 +74,11 @@
               getAccountInfo(response.data.value).then((response) =>{
                 //console.log(response);
                 if (response.success) {
-                  localStorage.setItem('addressAlias',response.data.alias);
+                  if(response.data.alias){
+                    localStorage.setItem('addressAlias',response.data.alias);
+                  }else {
+                    localStorage.setItem('addressAlias','');
+                  }
                 }
               });
               localStorage.setItem('encrypted', this.encrypted.toString());

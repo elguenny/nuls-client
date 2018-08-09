@@ -135,7 +135,7 @@
       CodeBar,
       AccountAddressBar,
     },
-    created() {
+    mounted() {
       this.getAccountAssets(this.accountAddressValue);
 
       /**
@@ -340,8 +340,8 @@
       toTxid(txId) {
         sessionStorage.setItem('walletActiveName', 'second');
         this.$router.push({
-          name: '/dealInfo',
-          params: {hash: txId},
+          name: 'dealInfo',
+          query: {hash: txId},
         })
       },
 

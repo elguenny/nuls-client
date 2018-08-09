@@ -51,7 +51,7 @@
   export default {
     data () {
       return {
-        hash: this.$route.params.hash,
+        hash: this.$route.query.hash,
         infoData: [],
         inputs: [],
         allInputs: 0,
@@ -105,7 +105,7 @@
 
     beforeRouteLeave(to, from, next) {
       // 设置下一个路由的 meta 不刷新index
-      to.meta.keepAlive = false;
+      to.meta.keepAlive = true;
       next();
     }
   }

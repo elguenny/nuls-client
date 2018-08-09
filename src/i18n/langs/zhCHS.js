@@ -24,8 +24,8 @@ const cn = {
     passWordTitle: '请输入密码',
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    passWordSuccess: '恭喜您，申请成功！',
-    passWordFailed: '对不起，申请失败！',
+    passWordSuccess: '恭喜您，申请成功',
+    passWordFailed: '对不起，申请失败',
     passWordWasincorrect: '您的密码不正确',
     enterCance: '取消输入',
     //topNav
@@ -260,6 +260,7 @@ const cn = {
     c94: '编辑',
     c95: '删除',
     c96: '新增通讯录',
+    c961: '编辑通讯录',
     c97: '似乎已断开与互联网的连接，请连接后重试。确定关闭NULS钱包客户端？',
     c98: '确定注销',
     c99: '节点么?',

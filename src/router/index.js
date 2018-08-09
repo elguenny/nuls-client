@@ -92,8 +92,8 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/wallet/Transfer.vue'], resolve)
     },
     {
-      path: '/wallet/index/dealInfo :hash',
-      name: '/dealInfo',
+      path: '/wallet/index/dealInfo',
+      name: 'dealInfo',
       component: resolve => require(['@/pages/wallet/DealInfo.vue'], resolve)
     },
     {
@@ -102,8 +102,8 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/users/UserInfo.vue'], resolve)
     },
     {
-      path: '/wallet/users/editAliasing :address/:encrypted',
-      name: '/editAliasing',
+      path: '/wallet/users/editAliasing',
+      name: 'editAliasing',
       component: resolve => require(['@/pages/users/EditAliasing.vue'], resolve)
     },
     {
@@ -179,22 +179,6 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/consensus/AllPledge.vue'], resolve)
     },
   ]
-});
-
-/**
- * 判断是前进还是后退
- */
-router.beforeEach((to, from, next) => {
-  /*console.log(to.name);
-   console.log(from.name);
-   console.log(from.name === '/dealInfo' || from.name === '/nodePage');*/
-  if (from.name === '/dealInfo' || from.name === '/nodePage') {
-    to.meta.keepAlive = true;
-    from.meta.keepAlive = false;
-  } else {
-    to.meta.keepAlive = false;
-  }
-  next()
 });
 /**
  *  路由出口
