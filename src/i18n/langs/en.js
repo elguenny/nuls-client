@@ -25,7 +25,7 @@ const en = {
     confirmButtonText: 'Confirm ',
     cancelButtonText: 'Cancel',
     passWordSuccess: 'Congratulations, operation has been issued',
-    passWordFailed: 'Sorry, failed! ',
+    passWordFailed: 'Sorry, failed ',
     passWordWasincorrect: 'Incorrect password',
     enterCance: 'Cancel',
     //top nav

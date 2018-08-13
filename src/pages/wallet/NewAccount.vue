@@ -192,6 +192,11 @@
           path: '/wallet'
         })
       }
+    },
+    beforeRouteLeave(to, from, next) {
+      // 设置下一个路由的 meta 不刷新index
+      to.meta.keepAlive = false;
+      next();
     }
   }
 </script>
