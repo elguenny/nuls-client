@@ -1,6 +1,7 @@
 {
   "name": "NulsWallet",
   "version": "1.0.1",
+  
   "author": "Nuls team",
   "description": "Nuls Wallet corss platform app",
   "private": true,
