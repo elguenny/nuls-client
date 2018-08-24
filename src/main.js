@@ -6,7 +6,7 @@ import store from './vuex/store.js'
 import i18n from './i18n/i18n'
 import "babel-polyfill";
 import axios from 'axios'
-import {fetch,post,put} from './api/https'
+import {fetch, post, put} from './api/https'
 
 //定义全局变量
 Vue.prototype.$fetch = fetch;
@@ -18,9 +18,11 @@ Vue.use(Vuex);
 /**引入css文件**/
 import './assets/css/base.css'
 import 'element-ui/lib/theme-chalk/index.css'
+import './assets/css/ele-base.less'
 
 Vue.http = Vue.prototype.$http = axios;
 Vue.config.productionTip = false;
+
 /**
  *  创建实例
  */

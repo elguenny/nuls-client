@@ -45,7 +45,7 @@
   import Back from '@/components/BackBar.vue'
   import moment from 'moment'
   import { BigNumber } from 'bignumber.js'
-  import {copys,LeftShiftEight,getLocalTime} from '@/api/util.js'
+  import {copys,LeftShiftEight,getLocalTime,htmlDecodeByRegExp} from '@/api/util.js'
   import {getHashInfo} from '@/api/httpData.js'
 
   export default {
@@ -77,6 +77,7 @@
             this.infoData = response.data;
             this.infoData.fee = LeftShiftEight(response.data.fee).toString();
             this.times = moment(getLocalTime(response.data.time)).format('YYYY-MM-DD HH:mm:ss');
+            response.data.remark = htmlDecodeByRegExp(response.data.remark);
             if (response.data.inputs.length > 0) {
               for (let i = 0; i < response.data.inputs.length; i++) {
                 response.data.inputs[i].value =LeftShiftEight(response.data.inputs[i].value);
@@ -102,12 +103,14 @@
         })
       },
     },
-
-    beforeRouteLeave(to, from, next) {
-      // 设置下一个路由的 meta 不刷新index
-      to.meta.keepAlive = true;
+    beforeRouteLeave(to, from, next){
+      if(to.name !== '/wallet'){
+        sessionStorage.removeItem('walletTotalAll');
+        sessionStorage.removeItem('walletPages');
+        sessionStorage.removeItem('walletTypes')
+      }
       next();
-    }
+    },
   }
 </script>
 

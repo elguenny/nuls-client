@@ -1,166 +1,262 @@
 <template>
-    <div class="import-nuls">
-        <Back :backTitle="this.$t('message.inportAccount')"></Back>
-        <h2>{{$t("message.c146")}}</h2>
-        <el-upload
-                class="avatar-uploader"
-                action="http://192.168.1.201:8001/posts/"
-                :show-file-list="true"
-                :limit="1"
-                :before-upload="beforeAvatarUpload">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            <div slot="tip" class="el-upload__tip">{{$t("message.c147")}}</div>
-        </el-upload>
-        <el-button type="primary" @click="keyStoreSubmit" id="importKeystore">
-            {{$t('message.confirmButtonText')}}
-        </el-button>
-        <Password ref="password" @toSubmit="toSubmit" :submitId="submitId"></Password>
+  <div class="import-account" v-loading="importAccountLoading">
+    <Back :backTitle="this.$t('message.firstInfoTitle')"></Back>
+    <h1>{{$t("message.inportAccount")}}</h1>
+    <input type="file" id="fileId" class="hidden">
+    <p id="preview" class="hidden" value=""></p>
+    <div class="keystore" @click="keystore">
+      <h1>{{$t('message.c189')}}</h1>
+      <p>{{$t('message.c190')}}<br>{{$t('message.c191')}}</p>
+      <h3 v-show="false">
+        {{$t('message.c192')}}
+      </h3>
     </div>
+  </div>
 </template>
 
 <script>
-  import Back from '@/components/BackBar.vue'
+  import Back from '@/components/BackBar.vue';
   import Password from '@/components/PasswordBar.vue'
+  import {postImportKeystore,getAccountInfo} from '@/api/httpData.js'
+  import {accountList} from '@/api/util.js'
 
   export default {
-    data () {
+    data() {
       return {
+        //定时获取文件路径
+        fellPathSetInterval: null,
+        encrypted: false,
         imageUrl: '',
         keyStorePath: '',
-        keyStoreInfo: '',
+        keystoreInfo: '',
+        importAccountLoading: false,
       }
     },
     components: {
       Back,
       Password,
     },
+    mounted() {
+
+    },
     methods: {
-      //验证文件格式和大小  Verify file format and size
-      beforeAvatarUpload (file) {
-        const isType = file.name.substr(file.name.length - 8) === 'keystore';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isType) {
-          this.$message.error('上传只能是 keystore 格式文件!')
-        } else if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!')
-        } else {
-          this.keyStorePath = file.path
-        }
-        return isType && isLt2M
-      },
-
-      //提交导入明文私钥
-      keySubmit (formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            this.$refs.password.showPassword(true)
+      /**
+       * 导入keystore
+       **/
+      keystore(){
+        let _this = this;
+        let obj = document.getElementById("fileId");
+        obj.click();
+        obj.onchange = function () {
+          if (this.value !== '') {
+            let file = obj.files[0];
+            let suffixName = file.name.toLowerCase().split('.').splice(-1);
+            console.log(file);
+            console.log(file.name);
+            console.log(suffixName);
           } else {
-            console.log('error submit!!');
-            return false
+            _this.$message({
+              type: 'warning', message:_this.$t('message.c194'), duration: '2000'
+            })
           }
-        })
-      },
-      //确定导入 Determine the import
-
-      keyStoreSubmit () {
-        if (this.keyStorePath !== '') {
-          this.$refs.password.showPassword(true)
-        } else {
-          this.$message.error('message.passWordFailed')
         }
       },
 
-      //输入密码后提交
-      toSubmit (password) {
-        let fs = require('fs');
-        let dataInfo = fs.readFileSync(this.keyStorePath, 'utf-8');
+      /**
+       * 读取keystore文件内容
+       * read keystore files info
+       * @param files
+       **/
+      readFiles(files) {
+        let _this = this;
+        //支持chrome IE10
+        if (window.FileReader) {
+          let file = files.files[0];
+          let filename = file.name.split(".")[0];
+          let reader = new FileReader();
+          reader.onload = function () {
+            //console.log(this.result);
+            _this.keystoreInfo = this.result;
+          };
+          reader.readAsText(file);
+        }
+        //支持IE 7 8 9 10
+        else if (typeof window.ActiveXObject !== 'undefined') {
+          let xmlDoc;
+          xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+          xmlDoc.async = false;
+          xmlDoc.load(files.value);
+          _this.keystoreInfo = xmlDoc.xml;
+        }
+        //支持FF
+        else if (document.implementation && document.implementation.createDocument) {
+          let xmlDoc;
+          xmlDoc = document.implementation.createDocument("", "", null);
+          xmlDoc.async = false;
+          xmlDoc.load(files.value);
+          _this.keystoreInfo = xmlDoc.xml;
+        } else {
+          alert('error');
+        }
+      },
+
+      //回调关闭或取消
+      toClose(boolean){
+        if(!boolean){
+          document.getElementById("fileId").value ='';
+        }
+      },
+
+      //输入密码导入
+      toSubmit(password) {
         let param = {
-          accountKeyStoreDto: eval('(' + dataInfo + ')'),
+          accountKeyStoreDto: JSON.parse(this.keystoreInfo),
           password: password,
+          overwrite: true
         };
-        this.postKeyStore('/account/import', param)
+        this.postKeyStore(param);
       },
 
       //导入keyStore import keyStore
-      postKeyStore (url, params) {
-        //console.log('url=' + url)
-        //console.log('params=' + params)
-        this.$post(url, params)
+      postKeyStore( params) {
+        this.importAccountLoading = true;
+        postImportKeystore(params)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
-              localStorage.setItem('newAccountAddress', response.data);
-              localStorage.setItem('addressAlias','');
-              if (localStorage.getItem('toUserInfo') !== '1') {
-                this.getAccountList('/account');
-                this.$router.push({
-                  name: '/wallet'
-                })
-              } else {
-                this.$router.push({
-                  path: '/wallet/users/userInfo'
-                })
-              }
+              //导入的新账户默认为当前账户
+              localStorage.setItem('newAccountAddress', response.data.value);
+              localStorage.setItem('addressRemark', '');
+              getAccountInfo(response.data.value).then((response) =>{
+                //console.log(response);
+                if (response.success) {
+                  localStorage.setItem('addressAlias',response.data.alias);
+                }
+              });
+              localStorage.setItem('encrypted', this.encrypted.toString());
+
+              this.getAccountList();
               this.$message({
                 type: 'success', message: this.$t('message.passWordSuccess')
               })
             } else {
               this.$message({
-                type: 'warning', message: this.$t('message.passWordFailed') + response.msg
+                type: 'warning', message: this.$t('message.passWordFailed') + response.data.msg
               })
             }
+            this.importAccountLoading = false;
+          })
+          .catch(err => {
+            //console.log(err);
+            this.getAccountList();
+            this.$message({
+              type: 'success', message: this.$t('message.c197'), duration: '3000'
+            });
+            this.importAccountLoading = false;
           })
       },
       //获取账户地址列表
-      getAccountList (url) {
-        this.$fetch(url)
+      getAccountList() {
+        accountList()
           .then((response) => {
+            //console.log(response);
             if (response.success) {
-              this.$store.commit('setAddressList', response.data.list)
+              this.$store.commit('setAddressList', response.list);
+              if (response.list.length === 1) {
+                this.$router.push({
+                  name: '/wallet'
+                })
+              } else {
+                this.$router.push({
+                  name: '/userInfo'
+                })
+              }
             }
           })
+      },
+
+      /**
+       * 导入私钥
+       */
+      importKey() {
+        this.$router.push({
+          path: '/firstInto/firstInfo/importKey'
+        })
       },
     }
   }
 </script>
 
 <style lang="less">
-    .import-nuls {
-        width: 90%;
-        margin: auto;
+  .import-account {
+    width: 1024px;
+    margin: auto;
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.6rem;
+    h1 {
+      line-height: 3rem;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .avatar-uploader {
+      text-align: center;
+      margin-top: 3rem;
+      .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+      .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+      }
+      .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
         text-align: center;
-        h2 {
-            text-align: center;
-            line-height: 3rem;
-        }
-        .avatar-uploader {
-            text-align: center;
-            margin-top: 3rem;
-            .el-upload {
-                border: 1px dashed #d9d9d9;
-                border-radius: 6px;
-                cursor: pointer;
-                position: relative;
-                overflow: hidden;
-            }
-            .avatar-uploader .el-upload:hover {
-                border-color: #409EFF;
-            }
-            .avatar-uploader-icon {
-                font-size: 28px;
-                color: #8c939d;
-                width: 178px;
-                height: 178px;
-                line-height: 178px;
-                text-align: center;
-            }
-            .avatar {
-                width: 178px;
-                height: 178px;
-                display: block;
-            }
-        }
+      }
+      .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+      }
+    }
+    .keystore {
+      width: 280px;
+      height: auto;
+      margin: 28pt auto;
+      border: 1px solid #1e314d;
+      background-color: #181f2f;
+      text-align: center;
+      cursor: pointer;
+      h1 {
+        font-size: 16px;
+        margin: 48px 0 20pt;
+      }
+      p {
+        font-size: 12px;
+        margin-bottom: 48pt;
+      }
+      h3 {
+
+      }
+      &:hover {
+        cursor: pointer;
+        border-color: #658ec7;
+      }
 
     }
+    .key {
+      width: 280px;
+      margin: 20pt auto 0;
+      color: #3a8ee6;
+      font-size: 16px;
+    }
+
+  }
 </style>

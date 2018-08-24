@@ -33,6 +33,7 @@ const en = {
     wallet: 'Wallet',
     consensus: 'Consensus',
     applications: 'Applications',
+    contract: 'Contract',
     more: 'More',
     news: 'Messages',
     //home
@@ -153,6 +154,18 @@ const en = {
     c10: 'Total deposit',
     c11: 'All consensus',
     c12: 'My consensus',
+
+    sortListNameundefined:'',
+    sortListName0:'Comprehensive',
+    sortListName1:'commissionRate',
+    sortListName2:'deposit',
+    sortListName3:'creditVal',
+
+    sortListKeyundefined:'',
+    sortListKey0:'',
+    sortListKey1:'commissionRate',
+    sortListKey2:'deposit',
+    sortListKey3:'creditVal',
 
     statusSundefined: '',
     statusS0: 'confirming',
@@ -296,6 +309,15 @@ const en = {
     type8: 'Red card',
     type9: 'Unregister',
 
+    type100:'创建合约',
+    type101:'调用合约',
+    type102:'删除合约',
+    type103:'合约转账',
+
+    contractStatus0:'未确认',
+    contractStatus1:'已确认',
+    contractStatus2:'已删除',
+
     c129: 'Copy success',
     c130: 'Congratulations, Application to participate in the consensus success',
     c131: 'Syncing with network, please wait',
@@ -372,6 +394,7 @@ const en = {
     c199:'You have no account yet',
     c200:'Exit management',
     c201:'Exit system',
+    c202:'Sorry, there are too many small changes ',
 
     //Bottom info
     refresh: 'Refresh',

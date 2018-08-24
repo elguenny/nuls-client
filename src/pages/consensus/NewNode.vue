@@ -8,6 +8,7 @@
           <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
           <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="copyValue"
              @click="accountCopy" :title="$t('message.c143')"></i>
+          <p v-show="this.redPunishIf">对不起此账户信用值不足，不能创建节点</p>
         </el-form-item>
         <el-form-item :label="$t('message.c23')+':'" prop="packingAddress">
           <el-input v-model.trim="newNodeForm.packingAddress" :maxlength="35" @change="countFee"
@@ -41,6 +42,7 @@
   import * as config from '@/config.js'
   import {BigNumber} from 'bignumber.js'
   import copy from 'copy-to-clipboard'
+  import {LeftShiftEight,RightShiftEight} from '@/api/util.js'
 
   export default {
     data() {
@@ -48,8 +50,8 @@
         if (!value) {
           callback(new Error(this.$t('message.c38')))
         } else {
-          let re = /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/;
-          if (!re.exec(value)) {
+          //let re = /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/;
+          if (value.length < 20 || value.length > 35) {
             callback(new Error(this.$t('message.c168')))
           } else if (value === localStorage.getItem('newAccountAddress')) {
             callback(new Error(this.$t('message.c169')))
@@ -73,6 +75,8 @@
               callback(new Error(this.$t('message.c543')))
             } else if (parseInt(rightShift.times(value).toString()) < 20000*100000000 || parseInt(rightShift.times(value).toString()) > 200000*100000000) {
               callback(new Error(this.$t('message.c541')))
+            }else if(this.maxAmount > 0  && RightShiftEight(value) > this.maxAmount){
+              callback(new Error(this.$t('message.c202') +LeftShiftEight(this.maxAmount)))
             } else {
               callback()
             }
@@ -90,6 +94,7 @@
         } else if (10 > value || value > 100) {
           callback(new Error(this.$t('message.c37')))
         } else {
+          this.$refs.newNodeForm.validateField('deposit');
           callback()
         }
       };
@@ -99,6 +104,7 @@
         copyValue: localStorage.getItem('newAccountAddress'),
         usable: '0',
         fee: 0.00,
+        maxAmount:0,
         placeholder: '',
         newNodeForm: {
           accountAddressValue: localStorage.getItem('newAccountAddress'),
@@ -117,6 +123,7 @@
             {validator: checkCommissionRate, trigger: 'blur'}
           ]
         },
+        redPunishIf:false,
       }
     },
     components: {
@@ -127,6 +134,7 @@
     mounted() {
       let _this = this;
       this.getBalanceAddress('/accountledger/balance/' + localStorage.getItem('newAccountAddress'))
+      this.getRedPunish(this.newNodeForm.accountAddressValue);
     },
     methods: {
       //获取下拉选择地址
@@ -135,6 +143,7 @@
         this.copyValue = chenckAddress;
         this.getBalanceAddress('/accountledger/balance/' + chenckAddress);
         this.countFee();
+        this.getRedPunish(chenckAddress);
         setTimeout(() => {
           if (this.newNodeForm.deposit !== '') {
             this.$refs.newNodeForm.validateField('deposit')
@@ -142,12 +151,27 @@
         }, 500)
       },
 
+      //查询默认账户是否有红牌
+      getRedPunish(address){
+        this.$fetch('/consensus/redPunish/'+address)
+          .then((response) => {
+            //console.log(response)
+            if(response.success){
+              this.redPunishIf = response.data;
+              if(response.data){
+                document.getElementsByClassName("address-select")[0].style.borderColor='#f56c6c';
+              }else {
+                document.getElementsByClassName("address-select")[0].style.borderColor='#658ec7';
+              }
+            }
+          })
+      },
+
       /**
        * 复制功能
        * copy
        */
       accountCopy() {
-
         if(this.copyValue !== ''){
           copy(this.copyValue);
           this.$message({
@@ -188,8 +212,8 @@
             .then((response) => {
               //console.log(response);
               if (response.success) {
-                let leftShift = new BigNumber(0.00000001);
-                this.fee = leftShift.times(response.data.value);
+                this.fee = LeftShiftEight(response.data.data.fee);
+                this.maxAmount = response.data.data.maxAmount;
               }
             });
         }
@@ -200,7 +224,7 @@
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight
           && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$refs[formName].validate((valid) => {
-            if (valid) {
+            if (valid && !this.redPunishIf) {
               if (localStorage.getItem('encrypted') === 'true') {
                 this.$refs.password.showPassword(true)
               } else {
@@ -335,6 +359,16 @@
       .a-new {
         label {
           margin-left: 4px;
+        }
+        .el-form-item__content{
+          p{
+            clear: none;
+            position: fixed;
+            margin-top: 35px;
+            margin-left: 5px;
+            font-size: 10px;
+            color: #f56c6c;
+          }
         }
       }
       input::-webkit-input-placeholder {

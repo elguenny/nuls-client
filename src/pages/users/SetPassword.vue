@@ -28,7 +28,7 @@
   export default {
     data() {
       let validatePass = (rule, value, callback) => {
-        let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/
+        let patrn = /(?!^((\d+)|([a-zA-Z]+)|([~!@#\$%\^&\*\(\)]+))$)^[a-zA-Z0-9~!@#\$%\^&\*\(\)]{8,21}$/;
         if (value === '') {
           callback(new Error(this.$t('message.walletPassWord1')))
         } else if (!patrn.exec(value)) {
@@ -39,7 +39,7 @@
           }
           callback()
         }
-      }
+      };
       let validatePass2 = (rule, value, callback) => {
         if (value === '') {
           callback(new Error(this.$t('message.affirmWalletPassWordEmpty')))
@@ -48,7 +48,7 @@
         } else {
           callback()
         }
-      }
+      };
       return {
         address: this.$route.params.address,
         backInfo: this.$route.params.backInfo,
@@ -71,7 +71,7 @@
     },
     created() {
       document.onkeydown = function (e) {
-        let key = window.event.keyCode
+        let key = window.event.keyCode;
         if (key === 13) {
           document.getElementById('setPass').click()
         }

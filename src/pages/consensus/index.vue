@@ -73,9 +73,12 @@
                 </li>
               </ul>
             </div>
-            <el-pagination layout="prev, pager, next" :page-size="12" :total=this.totalAll class="cb"
-                           v-show="totalAllOk = this.totalAll>12 ?true:false"
-                           @current-change="allConsensusSize"></el-pagination>
+            <el-pagination layout="prev, pager, next"
+                           :page-size="12"
+                           :total=totalAll
+                           :current-page="allEvents"
+                           @current-change="allConsensusSize"
+                           class="cb" v-show="this.totalAll>12"></el-pagination>
           </el-tab-pane>
           <el-tab-pane :label="$t('message.c12')" name="second">
             <div class="div-icon cursor-p fl" v-for="(item,index) in myConsensus"
@@ -89,9 +92,7 @@
                   item.agentAddresss }}
                 </li>
                 <li><label>{{$t('message.c17')}}：</label>{{ item.commissionRate }}%</li>
-                <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit*0.00000001).toFixed(2) }}
-                  NULS
-                </li>
+                <li><label>{{$t('message.c25')}}：</label>{{ (item.deposit*0.00000001).toFixed(2) }}NULS</li>
                 <li class="cb">
                   <label class="fl">{{$t('message.c19')}}：</label>{{item.memberCount}}
                 </li>
@@ -159,8 +160,8 @@
         memberColor: '#82BD39',
 
         allConsensus: [],
-        allEvents: 1,
-        totalAll: 0,
+        allEvents: parseInt(sessionStorage.getItem('consensusAllEvents')) || 1,
+        totalAll: parseInt(sessionStorage.getItem('consensusTotalAll')) || 100,
 
         myConsensus: [],
         myEvents: 1,
@@ -213,6 +214,18 @@
     destroyed() {
       clearInterval(this.consensusSetInterval)
     },
+
+    //出去之前
+    beforeRouteLeave(to, from, next) {
+      if(to.name === '/nodePage'){
+        sessionStorage.setItem('consensusTotalAll', this.totalAll.toString());
+        sessionStorage.setItem('consensusAllEvents', this.allEvents.toString());
+      } else {
+        sessionStorage.removeItem('consensusTotalAll');
+        sessionStorage.removeItem('consensusAllEvents');
+      }
+      next();
+    },
     methods: {
       //获取下拉选择地址
       chenckAccountAddress(chenckAddress) {
@@ -230,12 +243,12 @@
        */
       accountCopy() {
 
-        if(this.accountAddressValue !== ''){
+        if (this.accountAddressValue !== '') {
           copy(this.accountAddressValue);
           this.$message({
             message: this.$t('message.c129'), type: 'success', duration: '800'
           })
-        }else {
+        } else {
           this.$message({
             message: this.$t('message.c199'), duration: '800'
           })
@@ -500,13 +513,13 @@
       width: 100%;
       min-height: 620px;
       margin: 5px auto 0;
-      .el-tabs{
-        .el-tabs__header{
-          .el-tabs__nav-wrap{
-            .el-tabs__nav-scroll{
-              .el-tabs__nav{
-                .el-tabs__item{
-                  &:hover{
+      .el-tabs {
+        .el-tabs__header {
+          .el-tabs__nav-wrap {
+            .el-tabs__nav-scroll {
+              .el-tabs__nav {
+                .el-tabs__item {
+                  &:hover {
                     color: #3a8ee6;
                   }
                 }

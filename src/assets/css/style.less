@@ -339,7 +339,6 @@ select {
 }
 
 /**el-message-box**/
-
 .el-message-box {
   background-color: #0b1422;
   border-radius: 0;
@@ -376,6 +375,27 @@ select {
 }
 
 .el-form {
+  .el-form-item{
+    .el-form-item__label{
+      color: #FFFFFF;
+    }
+  }
+  .el-form-item__content{
+    .el-input{
+      input{
+        color: #FFFFFF;
+      }
+    }
+    .el-textarea{
+      textarea{
+        color: #FFFFFF;
+        padding: 5px;
+      }
+    }
+    .el-form-item__error{
+      top: 85%;
+    }
+  }
   .allUsable {
     color: #606266;
     float: right;
@@ -466,6 +486,27 @@ select {
   }
 }
 
+
+
+
 .el-message-box__message {
   text-align: center;
+}
+
+.scroll{
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-color: #0c1323;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 3px;
+    background-color: #0c1323;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #FFFFFF))
+  }
 }

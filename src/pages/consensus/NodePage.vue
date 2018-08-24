@@ -48,10 +48,7 @@
           <el-input ref="input" v-model="nodeForm.nodeNo" :maxlength="17" @change="countFee"></el-input>
           <!-- <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>-->
         </el-form-item>
-        <div class="procedure"><label>{{$t('message.c28')}}:</label><span>{{this.fee}} NULS</span></div>
-        <!-- <el-form-item :label="$t('message.c28')+' '+this.fee+' NULS'" class="procedure">
-         </el-form-item>-->
-
+        <div class="procedure"><label>{{$t('message.c28')}}:</label><span>{{this.fee.toString()}} NULS</span></div>
         <el-form-item size="large" class="submit">
           <el-button type="primary" @click="onSubmit('nodeForm')" id="nodePage">
             {{$t('message.confirmButtonText')}}
@@ -70,6 +67,7 @@
   import Password from '@/components/PasswordBar.vue'
   import * as config from '@/config.js'
   import {BigNumber} from 'bignumber.js'
+  import {LeftShiftEight, RightShiftEight} from '@/api/util.js'
 
   export default {
     data() {
@@ -78,7 +76,6 @@
           callback(new Error(this.$t('message.c52')))
         }
         setTimeout(() => {
-
           let rightShift = new BigNumber(100000000);
           let leftShift = new BigNumber(0.00000001);
           if (rightShift.times(this.nodeForm.nodeNo).toString() === rightShift.times(this.usable).toString()) {
@@ -99,6 +96,8 @@
             } else if (values.comparedTo(nu.minus(this.fee)) === 1) {
               //this.nodeRules.nodeNo = '55555';
               callback(new Error(this.$t('message.c542')))
+            } else if (RightShiftEight(value) > this.maxAmount) {
+              callback(new Error(this.$t('message.c202') + LeftShiftEight(this.maxAmount)))
             } else {
               callback()
             }
@@ -113,7 +112,8 @@
         agentId: '',
         nodeData: [],
         usable: 0,
-        fee: 0,
+        fee: 0.00,
+        maxAmount:0,
         nodeForm: {
           nodeNo: '',
         },
@@ -139,6 +139,16 @@
       this.$refs['input'].focus();
       this.$refs['input'].value = '';
       sessionStorage.setItem('passwordOk', '0')
+    },
+    beforeRouteLeave(to, from, next) {
+      //console.log(to);
+      if (to.name === "/consensus") {
+
+      } else {
+        sessionStorage.removeItem('consensusTotalAll');
+        sessionStorage.removeItem('consensusAllEvents');
+      }
+      next();
     },
     methods: {
       //根据address获取共识节点列表信息
@@ -219,10 +229,11 @@
           //console.log("params=" + params);
           this.$fetch('/consensus/deposit/fee?' + params)
             .then((response) => {
-              //console.log(response);
+              console.log(response);
               if (response.success) {
                 let leftShift = new BigNumber(0.00000001);
-                this.fee = parseFloat(leftShift.times(response.data.value).toString());
+                this.fee = leftShift.times(response.data.data.fee);
+                this.maxAmount = response.data.data.maxAmount;
               }
             });
         }
@@ -286,7 +297,7 @@
             }
           })
       },
-    }
+    },
   }
 </script>
 

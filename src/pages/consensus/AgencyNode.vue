@@ -11,7 +11,17 @@
         </el-input>
       </div>
       <div class="select-div fl">
-        <div class="address-select sort-select" @click="showDataList">
+        <el-select v-model="sortKey" :placeholder="sortValue" @change="showDataList" :popper-append-to-body="false">
+          <el-option
+            v-for="item in sortConsensusList"
+            :key="item.sortKey"
+            :label="item.sortName"
+            :value="item.sortKey">
+          </el-option>
+        </el-select>
+
+
+        <!--<div class="address-select sort-select" @click="showDataList">
           <div class="sub-selected-value">
             {{this.sortValue}}
             <div class="sub-select-list" v-if="showData">
@@ -22,7 +32,7 @@
             </div>
           </div>
           <i class="el-icon-arrow-up" :class="showData ? 'i_reverse':''"></i>
-        </div>
+        </div>-->
       </div>
     </div>
     <div class="agency-node-bottom">
@@ -66,12 +76,7 @@
         sortValue: this.$t('message.c46'),
         indexTo: this.$route.query.indexTo,
         sortKey: '',
-        sortConsensusList: [
-          {sortName: this.$t('message.c46'), sortKey: ''},
-          {sortName: this.$t('message.c17'), sortKey: 'commissionRate'},
-          {sortName: this.$t('message.c25'), sortKey: 'deposit'},
-          {sortName: this.$t('message.c18'), sortKey: 'creditVal'}
-        ],
+        sortConsensusList: [],
         keyword: '',
         selectKeyword: '',
         creditValuesShow0: false,
@@ -88,7 +93,6 @@
       ProgressBar,
     },
     mounted() {
-      let _this = this;
       let params = '';
       if (this.indexTo === '1') {
         params = {'pageSize': '16', 'pageNumber': this.pageNumber};
@@ -105,7 +109,24 @@
         };
       }
       //console.log(params);
-      this.getAllConsensus('/consensus/agent/list/', params)
+      this.getAllConsensus('/consensus/agent/list/', params);
+
+      //this.getShowDataList();
+    },
+    //进入路由以前
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.sortConsensusList = [];
+        vm.getShowDataList()
+      });
+    },
+    //退出路由以前
+    beforeRouteLeave(to, from, next) {
+      if (to.name !== "/nodePage") {
+        to.meta.keepAlive = false;
+        //this.$destroy()
+      }
+      next();
     },
     methods: {
       //获取全部共识列表
@@ -149,8 +170,21 @@
         }
         this.getAllConsensus('/consensus/agent/list/', params)
       },
-      showDataList() {
-        this.showData = !this.showData
+
+      //获取sort类型
+      getShowDataList() {
+        for (let i = 0; i < 4; i++) {
+          this.sortConsensusList.push({
+            sortName: this.$t('message.sortListName' + i),
+            sortKey: this.$t('message.sortListKey' + i)
+          });
+        }
+      },
+      /**
+       * 根据类型选择
+       */
+      showDataList(e) {
+        this.sortConsensus(this.sortValue, e);
       },
       //搜索功能
       searchConsensus() {
@@ -234,6 +268,35 @@
       .select-div {
         margin-left: 3%;
         width: 165px;
+        .el-select {
+          width: 260px;
+          .el-input--suffix {
+            height: 26px;
+            .el-input__inner {
+              height: 26px;
+            }
+            .el-input__suffix-inner {
+              .el-input__icon {
+                line-height: 20px;
+              }
+            }
+          }
+          .el-select-dropdown {
+            .el-scrollbar {
+              .el-select-dropdown__wrap {
+                .el-select-dropdown__list {
+                  width: 260px;
+                  li {
+                    width: 260px;
+                  }
+                  li:last-child {
+                    margin-bottom: 18px;
+                  }
+                }
+              }
+            }
+          }
+        }
         .sort-select {
           width: 260px;
           .sort-select-item {

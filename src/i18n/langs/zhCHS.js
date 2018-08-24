@@ -33,6 +33,7 @@ const cn = {
     wallet: '钱包',
     consensus: '共识',
     applications: '应用',
+    contract: '合约',
     more: '更多',
     news: '消息',
     //home
@@ -156,6 +157,18 @@ const cn = {
     c10: '委托总额',
     c11: '全部共识',
     c12: '我的共识',
+
+    sortListNameundefined:'',
+    sortListName0:'综合排序',
+    sortListName1:'佣金比例',
+    sortListName2:'保证金',
+    sortListName3:'信用值',
+
+    sortListKeyundefined:'',
+    sortListKey0:'',
+    sortListKey1:'commissionRate',
+    sortListKey2:'deposit',
+    sortListKey3:'creditVal',
 
     statusSundefined: '',
     statusS0: '确认中',
@@ -297,6 +310,16 @@ const cn = {
     type7: '黄牌惩罚',
     type8: '红牌惩罚',
     type9: '注销节点',
+
+    type100:'创建合约',
+    type101:'调用合约',
+    type102:'删除合约',
+    type103:'合约转账',
+
+    contractStatus0:'未确认',
+    contractStatus1:'已确认',
+    contractStatus2:'已删除',
+
     c129: '复制成功',
     c130: '恭喜您！申请参与共识成功！',
     c131: '数据连接中，请耐心等待一下！',
@@ -373,6 +396,7 @@ const cn = {
     c199:'您还没有账户',
     c200:'退出管理',
     c201:'退出系统',
+    c202:'对不起，零钱太多本次最多能花费 ',
 
 
     refresh: '刷新',

@@ -1,6 +1,5 @@
 import {BigNumber} from 'bignumber.js'
 import copy from 'copy-to-clipboard'
-import store from '@/vuex/store.js'
 import {getAccountList} from '@/api/httpData.js'
 
 /**
@@ -50,6 +49,63 @@ export function getLocalTime(time) {
   let localTime = utcTime + 3600000 * Math.abs(localUtc);
   return new Date(localTime);
 }
+
+/**
+ * html转码
+ * @param str
+ * @returns {s}
+ */
+export function htmlEncodeByRegExp(str){
+  let s = "";
+  if(str.length === 0) return "";
+  s = str.replace(/&/g,"&amp;");
+  s = s.replace(/</g,"&lt;");
+  s = s.replace(/>/g,"&gt;");
+  s = s.replace(/ /g,"&nbsp;");
+  s = s.replace(/[\n\r]/g,'&nbsp;');
+  s = s.replace(/\'/g,"&#39;");
+  s = s.replace(/\"/g,"&quot;");
+  return s;
+}
+
+/**
+ * html解码
+ * @param str
+ * @returns {s}
+ */
+export function htmlDecodeByRegExp(str){
+  let s = "";
+  if(str.length === 0) return "";
+  s = str.replace(/&amp;/g,"&");
+  s = s.replace(/&lt;/g,"<");
+  s = s.replace(/&gt;/g,">");
+  s = s.replace(/&nbsp;/g," ");
+  s = s.replace(/&#39;/g,"\'");
+  s = s.replace(/&quot;/g,"\"");
+  return s;
+}
+
+/**
+ * 交易动态参数是否必填项是否全部有值
+ * @param array
+ * @returns {arg}
+ */
+export function allParams(array) {
+  let arg = {success: true, params: ''};
+  for (let i of array) {
+    if (i.value) {
+      arg.params += '"' + i.value + '",';
+    }
+    if (i.request) {
+      arg.success(i.value !== '');
+    }
+  }
+  if (arg.params.length > 0) {
+    arg.params = arg.params.substr(0, arg.params.length - 1);
+  }
+  return arg
+}
+
 
 /**
  * 获取用户列表 设置用户信息

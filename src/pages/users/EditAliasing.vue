@@ -103,7 +103,8 @@
             .then((response) => {
               //console.log(response);
               if (response.success) {
-                this.fee = LeftShiftEight(response.data.value);
+                this.fee = LeftShiftEight(response.data.fee);
+                //this.maxAmount = response.data.maxAmount;
                 let Bplsus = new BigNumber(1);
                 this.allFee = Bplsus.plus(this.fee);
               }

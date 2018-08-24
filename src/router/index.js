@@ -78,7 +78,7 @@ const router = new VueRouter({
       name: '/wallet',
       component: resolve => require(['@/pages/wallet/Index.vue'], resolve),
       meta: {
-        keepAlive: true,
+        keepAlive: false,
       }
     },
     {
@@ -90,6 +90,11 @@ const router = new VueRouter({
       path: '/wallet/index/transfer :address',
       name: '/transfer',
       component: resolve => require(['@/pages/wallet/Transfer.vue'], resolve)
+    },
+    {
+      path: '/wallet/deallist',
+      name: 'deallist',
+      component: resolve => require(['@/pages/wallet/DealList.vue'], resolve)
     },
     {
       path: '/wallet/index/dealInfo',
@@ -177,6 +182,16 @@ const router = new VueRouter({
       path: '/consensus/allPledge',
       name: '/allPledge',
       component: resolve => require(['@/pages/consensus/AllPledge.vue'], resolve)
+    },
+    {
+      path: '/contract',
+      name: 'contract',
+      component: resolve => require(['@/pages/contract/Index.vue'], resolve)
+    },
+    {
+      path: '/contract/contractInfo',
+      name: 'contractInfo',
+      component: resolve => require(['@/pages/contract/ContractInfo.vue'], resolve)
     },
   ]
 });

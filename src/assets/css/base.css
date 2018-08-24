@@ -194,8 +194,12 @@ a:focus {
 }
 
 /**text-d**/
-.text-d {
-  text-decoration: underline;
+.text-d{
+  text-decoration: underline
+   }
+.text-ds{
+  box-shadow: 0 -1px #76A1DE inset;
+  color: #76A1DE;
 }
 
 /**overflow ....**/

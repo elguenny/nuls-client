@@ -11,7 +11,9 @@
           class="consensus_icon"></i> <span>{{$t('message.consensus')}}</span></li>
         <li @click="to('application','3')"><i
           class="application_icon"></i> <span>{{$t('message.applications')}}</span></li>
-        <li @click="to('more','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i class="more_icon"></i>
+        <li @click="to('contract','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i
+          class="application_icon"></i> <span>{{$t('message.contract')}}</span></li>
+        <li @click="to('more','5')" :class="[errorClass ,isActive===5 ? activeClass : '']"><i class="more_icon"></i>
           <span>{{$t('message.setManagement')}}</span></li>
       </ul>
       <div class="news-div" v-show="newsOk">
@@ -66,8 +68,7 @@
           this.$router.push({
             path: '/*',
           })
-        }
-        if (url === 'wallet') {
+        } else if (url === 'wallet') {
           sessionStorage.setItem('isActive',1);
           this.isActive = 1;
           //获取账户地址列表
@@ -81,26 +82,26 @@
               params: {language: index}
             })
           }
-        }
-        if (url === 'consensus') {
+        }else if (url === 'consensus') {
           sessionStorage.setItem('isActive',2);
           this.isActive = 2;
           this.$router.push({
             name: '/consensus'
           })
-        }
-        if (url === 'application') {
+        }else if(url ==='application'){
           //this.isActive = 3
           this.$message({
             type: 'info', message: this.$t('message.c65'), duration: '800'
           })
-        }
-        if (url === 'more') {
+        } else if (url === 'contract') {
           sessionStorage.setItem('isActive',4);
           this.isActive = 4;
-          /*this.$message({
-            type: 'info', message: this.$t('message.c65'), duration: '800'
-          })*/
+          this.$router.push({
+            name: 'contract'
+          })
+        } else{
+          sessionStorage.setItem('isActive',5);
+          this.isActive = 5;
           this.$router.push({
             path: '/users/setPage'
           })
@@ -132,7 +133,7 @@
       }
     }
     ul {
-      width: 580px;
+      width: auto;
       height: 100%;
       float: left;
       -webkit-app-region: no-drag;

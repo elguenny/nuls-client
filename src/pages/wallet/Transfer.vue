@@ -21,7 +21,6 @@
         </el-form-item>
         <el-form-item :label="$t('message.remarks')+'：'">
           <el-input type="textarea" v-model.trim="transferForm.remark"
-                    onkeyup="this.value=this.value.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\w]/g,'')"
                     :maxlength="30" @change="countFee"></el-input>
         </el-form-item>
         <el-form-item :label="$t('message.c28')+': '+this.fee+' NULS'">
@@ -60,6 +59,7 @@
   import copy from 'copy-to-clipboard'
   import * as config from '@/config.js'
   import {BigNumber} from 'bignumber.js'
+  import {htmlEncodeByRegExp} from '@/api/util.js'
 
   export default {
     data() {
@@ -78,8 +78,8 @@
           callback(new Error(this.$t('message.transferNull')))
         } else {
           this.address = localStorage.getItem('newAccountAddress');
-          let re = /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/;
-          if (!re.exec(value)) {
+          //let re = /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/;
+          if (value.length < 20 || value.length > 35) {
             callback(new Error(this.$t('message.c168')))
           } else if (value === this.address) {
             callback(new Error(this.$t('message.addressOrTransfer')))
@@ -89,7 +89,7 @@
         }
       };
       let checkJoinNo = (rule, value, callback) => {
-        if (!value) {
+        if (!value || value.toString() === '0' ) {
           callback(new Error(this.$t('message.transferNO')))
         } else {
           setTimeout(() => {
@@ -112,7 +112,9 @@
                 callback(new Error(this.$t('message.transferNO3')))
               } else if (!res.exec(value)) {
                 callback(new Error(this.$t('message.c136')))
-              } else {
+              }else  if(rightShift.times(value) > this.maxAmount){
+                callback(new Error(this.$t('message.c202') +leftShift.times(this.maxAmount)))
+              }else {
                 callback()
               }
             }
@@ -122,8 +124,12 @@
       return {
         accountAddressValue: localStorage.getItem('newAccountAddress'),
         submitId: 'transferSubmit',
+        //余额
         usable: 0,
+        //手续费
         fee: 0.00,
+        //最大转账金额
+        maxAmount:0,
         accountAddress: [],
         remnant: 0,
         address: localStorage.getItem('newAccountAddress'),
@@ -161,7 +167,12 @@
       if (this.address === '') {
         this.address = localStorage.getItem('newAccountAddress')
       }
-      this.getBalanceAddress('/accountledger/balance/' + this.address)
+      this.getBalanceAddress('/accountledger/balance/' + this.address);
+
+      setInterval(()=>{
+        //this.toSubmitsss();
+      },50)
+
     },
     methods: {
 
@@ -313,28 +324,18 @@
           let params = "address=" + this.address
             + "&toAddress=" + this.transferForm.joinAddress
             + "&amount=" + rightShift.times(this.transferForm.joinNo)
-            + "&remark=" + this.stripscript(this.transferForm.remark);
+            + "&remark=" + htmlEncodeByRegExp(this.transferForm.remark);
           //console.log(params);
           this.$fetch('/accountledger/transfer/fee?' + params)
             .then((response) => {
               //console.log(response);
               if (response.success) {
                 let leftShift = new BigNumber(0.00000001);
-                this.fee = leftShift.times(response.data.value);
+                this.fee = leftShift.times(response.data.fee);
+                this.maxAmount = response.data.maxAmount
               }
             });
         }
-      },
-
-      /**
-       * 字符转换
-       **/
-      stripscript(str) {
-        // 去掉转义字符
-        str = str.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
-        // 去掉特殊字符
-        str = str.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/);
-        return str;
       },
 
       /**
@@ -374,7 +375,7 @@
           + '","toAddress":"' + this.transferForm.joinAddress
           + '","amount":' + rightShift.times(this.transferForm.joinNo)
           + ',"password":"' + password
-          + '","remark":"' + this.stripscript(this.transferForm.remark) + '"}';
+          + '","remark":"' + htmlEncodeByRegExp(this.transferForm.remark) + '"}';
         //console.log(param);
         this.$post('/accountledger/transfer', param)
           .then((response) => {
@@ -400,6 +401,16 @@
             }
           })
       },
+
+     /* toSubmitsss() {
+        let rightShift = new BigNumber(100000000);
+        let param = '{"address":"NsdvCLtZZBX4QHkZcvkyrRfoeJjRorRW","toAddress":"Nse16StBPcR1wzGxR4ZqoLNnLYTSKKYS","amount":1587000,"password":"","remark":"sdf"}';
+        //console.log(param);
+        this.$post('/accountledger/transfer', param)
+          .then((response) => {
+            console.log(response);
+          })
+      },*/
     }
   }
 </script>
