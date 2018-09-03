@@ -94,11 +94,18 @@
             type: 'info', message: this.$t('message.c65'), duration: '800'
           })
         } else if (url === 'contract') {
-          sessionStorage.setItem('isActive',4);
-          this.isActive = 4;
-          this.$router.push({
-            name: 'contract'
-          })
+          if (this.$store.getters.getAddressList.length === 0) {
+            this.$message({
+              type: 'info', message:"对不起，您还有没账户，请先导入或创建账户", duration: '800'
+            })
+          }else {
+            sessionStorage.setItem('isActive',4);
+            this.isActive = 4;
+            this.$router.push({
+              name: 'contract'
+            })
+          }
+
         } else{
           sessionStorage.setItem('isActive',5);
           this.isActive = 5;

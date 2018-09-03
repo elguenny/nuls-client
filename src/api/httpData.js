@@ -1,6 +1,4 @@
 import {fetch, post, put} from './https'
-
-
 //account
 /**
  * 查询账户资产 Get account assets
@@ -150,7 +148,8 @@ export const getLockList = (address,params) => fetch('/accountledger/utxo/lock/'
  * @param params
  * @returns {Promise}
  */
-export const getAccountTxList = (address,params) => fetch('/accountledger/tx/list/' + address,params);
+//export const getAccountTxList = (address,params) => fetch('/accountledger/tx/list/' + address,params);
+export const getAccountTxList = (address,params) => fetch('/accountledger/tx/list/'+address+params);
 
 
 //client

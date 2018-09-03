@@ -3,13 +3,15 @@
     <Back :backTitle="this.$t('message.contract')"></Back>
     <div class="contract-info-top">
       <div class="address">
-        <h3>合约地址：{{this.contractAddress}}</h3>
+        <h3>{{$t('message.c215')}}：{{this.contractAddress}}</h3>
         <p v-show="!this.collectOk && this.contractInfo.status !=='stop'" @click="collect" class="cursor-p">
-          {{this.contractInfo.isCollect ? '已收藏':'收藏'}}
-          <i class="el-icon-star-on" :class="this.contractInfo.isCollect ? 'collects':'collect'"></i></p>
-        <p v-show="this.collectOk && this.contractInfo.status !=='stop'" @click="deleteContract" class="cursor-p">删除 <i
-          class="el-icon-delete"></i></p>
-        <p v-show="this.contractInfo.status ==='stop'">已删除 </p>
+          {{this.contractInfo.isCollect ? $t('message.c2262'):$t('message.c2261')}}
+          <i class="el-icon-star-on" :class="this.contractInfo.isCollect ? 'collects':'collect'"></i>
+        </p>
+        <p v-show="this.collectOk && this.contractInfo.status !=='stop'" @click="deleteContract" class="cursor-p">
+          {{$t('message.c95')}} <i class="el-icon-delete"></i>
+        </p>
+        <p v-show="this.contractInfo.status ==='stop'">{{$t('message.c951')}} </p>
       </div>
       <ul class="info">
         <li><span>Balance:</span>{{this.contractInfo.balance}} NULS</li>
@@ -27,23 +29,23 @@
     </div>
 
     <el-tabs v-model="activeName" @tab-click="handleClick" class="contract-info-tab">
-      <el-tab-pane label="交易记录" name="first">
+      <el-tab-pane :label="$t('message.transactionRecord')" name="first">
         <el-table :data="tradeData" style="width: 100%">
-          <el-table-column label="交易类型" width="80" align="center">
+          <el-table-column :label="$t('message.transactionType')" width="120" align="center">
             <template slot-scope="scope">
               {{$t('message.type'+scope.row.type)}}
             </template>
           </el-table-column>
-          <el-table-column prop="txData.data.sender" label="来源" min-width="180" align="center"></el-table-column>
+          <el-table-column prop="txData.data.sender" :label="$t('message.c242')" min-width="150" align="center"></el-table-column>
           <el-table-column label="txid" min-width="180" align="center">
             <template slot-scope="scope">
-								<span @click="toTxid(scope.row.hash)" class="cursor-p text-ds overflow">
+								<span @click="toTxid(scope.row.hash,scope.row.type)" class="cursor-p text-ds overflow">
 									{{ scope.row.hash}}
 								</span>
             </template>
           </el-table-column>
-          <el-table-column prop="time" label="时间" width="140" align="center"></el-table-column>
-          <el-table-column label="状态" align="center">
+          <el-table-column prop="time" :label="$t('message.time')" width="140" align="center"></el-table-column>
+          <el-table-column :label="$t('message.state')" align="center">
             <template slot-scope="scope">
               <span>{{ $t('message.statusS'+scope.row.status) }}</span>
             </template>
@@ -59,66 +61,67 @@
 
       </el-tab-pane>
 
-      <el-tab-pane label="合约详情" name="second">
+      <el-tab-pane :label="$t('message.c243')" name="second">
         <el-table :data="contractData" style="width: 100%">
-          <el-table-column prop="name" label="方法" width="150" align="center"></el-table-column>
-          <el-table-column prop="newArgs" label="参数" min-width="200" align="center">
+          <el-table-column prop="name" :label="$t('message.c218')" width="150" align="center"></el-table-column>
+          <el-table-column prop="newArgs" :label="$t('message.c219')" min-width="200" align="center">
           </el-table-column>
-          <el-table-column prop="returnArg" label="返回值类型" width="150" align="center"></el-table-column>
+          <el-table-column prop="returnArg" :label="$t('message.c220')" width="150" align="center"></el-table-column>
         </el-table>
       </el-tab-pane>
 
-      <el-tab-pane label="调用合约" name="third" :disabled="this.contractInfo.status ==='stop'">
+      <el-tab-pane :label="$t('message.type101')"  name="third" :disabled="this.contractInfo.status ==='stop'">
 
         <div class="query-info">
           <el-form :model="callForm" :rules="callRules" ref="callForm" class="call-contract">
-            <el-form-item label="请选择一个方法:" class="lable">
-              <el-select v-model="callForm.region" placeholder="请选择一个方法" @change="changeCallOptions">
+            <el-form-item :label="$t('message.c229')" class="lable">
+              <el-select v-model="callForm.region" :placeholder="$t('message.c229')" @change="changeCallOptions">
                 <el-option v-for="item in contractData" :key="item.name" :label="item.name" :value="item">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item
               v-for="(domain, index) in callForm.domains"
-              :label="domain.name + '('+domain.type+')'"
+              :label="domain.name + '('+domain.type+')' +domain.types"
               :key="domain.name"
               :prop="'domains.' + index + '.value'"
-              :rules="{required: true, message: domain.name+'不能为空', trigger: 'blur'}"
+              :rules="{required: true, message: domain.name+$t('message.c230'), trigger: 'blur'}"
             >
               <el-input v-model.trim="domain.value" @change="getCallGas(contractItem)"></el-input>
             </el-form-item>
 
-            <div class="call-senior">
-              高级选择
-              <el-switch v-model="callSeniorValue" :width="35" :disabled="this.switchDisabled"></el-switch>
+            <div class="call-senior" v-show="this.switchDisabled">
+              {{$t('message.c203')}}
+              <el-switch v-model="callSeniorValue" :width="35"></el-switch>
             </div>
             <div class="seniorInfo" v-show="callSeniorValue">
               <el-form-item label="Gas Limit" prop="gas">
                 <el-input v-model="callForm.gas" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
-                <p class="price-min" v-show="this.callForm.gas < this.systemGas">Gas值较小，有可能会导致合约失败</p>
+                <p class="price-min" v-show="this.callForm.gas < this.systemGas && this.callForm.gas > 0">{{$t('message.c206')}}</p>
               </el-form-item>
               <el-form-item label="Price" prop="price">
                 <el-input v-model="callForm.price" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
               </el-form-item>
               <el-form-item label="Value" prop="values" v-show="!valuesIf">
-                <el-input v-model="callForm.values"></el-input>
+                <el-input v-model="callForm.values" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
               </el-form-item>
               <el-form-item label="Addtion" prop="addtion">
-                <el-input v-model="callForm.addtion"></el-input>
+                <el-input v-model="callForm.addtion" :maxlength="30"></el-input>
               </el-form-item>
             </div>
 
             <el-form-item class="submit-bt" style="text-align: center">
-              <el-button type="primary" @click="submitCallForm('callForm')">调用</el-button>
+              <el-button type="primary" @click="submitCallForm('callForm')">{{$t('message.c231')}}</el-button>
             </el-form-item>
           </el-form>
 
           <div class="click-after scroll" v-show="submitCallFormIf">
             <p :class="this.submitCallFormHight <= 6 ? 'waingClass':''">
-              <span v-show="this.submitCallFormHight <= 6">{{this.submitCallFormSuccse}}</span>
-              <span v-show="this.submitCallFormHight > 6" class="cursor-p text-ds"
-                    @click="toTxid(submitCallFormSuccse)">{{this.submitCallFormSuccse}}</span>
-              <label v-show="this.submitCallFormHight <= 6 && !this.valuesIf">({{this.submitCallFormHight}}/6)</label>
+            <!--  <span v-show="this.submitCallFormHight <= 6">{{this.submitCallFormSuccse}}</span> -->
+              <span v-show="this.submitCallFormHight <= 1">{{this.submitCallFormSuccse}} {{$t('message.confirming')}}....</span>
+              <span v-show="this.submitCallFormHight > 1" class="cursor-p text-ds"
+                    @click="toTxid(submitCallFormSuccse,101)">{{this.submitCallFormSuccse}}</span>
+             <!-- <label v-show="this.submitCallFormHight <= 6 && !this.valuesIf">({{this.submitCallFormHight}}/6)</label>-->
             </p>
             <pre id="out_pre"></pre>
           </div>
@@ -135,22 +138,22 @@
   import moment from 'moment'
   import Back from './../../components/BackBar.vue'
   import Password from '@/components/PasswordBar.vue'
-  import {copys, LeftShiftEight, getLocalTime} from '@/api/util.js'
+  import {copys,RightShiftEight,LeftShiftEight, getLocalTime,allParams,htmlEncodeByRegExp} from '@/api/util.js'
 
   export default {
     data() {
       let validateGas = (rule, value, callback) => {
         if (!value) {
-          callback(new Error('请输入数值Gas：1-10000000'));
+          callback(new Error(this.$t('message.c204')));
         } else if (value < 1 || value > 10000000) {
-          callback(new Error('请输入数值Gas：1-10000000'));
+          callback(new Error(this.$t('message.c204')));
         } else {
           callback();
         }
       };
       let validatePrice = (rule, value, callback) => {
         if (!value) {
-          callback(new Error('请输入数值Price'));
+          callback(new Error(this.$t('message.c205')));
         } else {
           callback();
         }
@@ -197,7 +200,6 @@
             {validator: validatePrice, trigger: 'blur'}
           ]
         },
-
         //方法列表
         callFormOptions: [],
         //调用合约的高级显示
@@ -256,7 +258,7 @@
       getContractInfo(address) {
         this.$fetch('/contract/info/' + address + '?accountAddress=' + this.accountAddressValue)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
               this.contractInfo = response.data;
               //双层选好获取合约详情的方法参数
@@ -265,13 +267,23 @@
                   this.contractData.push(response.data.method[i]);
                 }
                 //获取合约详情的方法参数
-                for (let k in response.data.method[i].args) {
-                  if (response.data.method[i].newArgs) {
-                    response.data.method[i].newArgs = response.data.method[i].newArgs + response.data.method[i].args[k].name + '_' + response.data.method[i].args[k].type + ',';
-                  } else {
-                    response.data.method[i].newArgs = response.data.method[i].args[k].name + '_' + response.data.method[i].args[k].type + ',';
+                if(response.data.method[i].args.length > 0){
+                  for (let k in response.data.method[i].args) {
+                    if (response.data.method[i].newArgs) {
+                      response.data.method[i].newArgs = response.data.method[i].newArgs + response.data.method[i].args[k].name + ' _' + response.data.method[i].args[k].type + ',';
+                    } else {
+                      response.data.method[i].newArgs = response.data.method[i].args[k].name + ' _' + response.data.method[i].args[k].type + ',';
+                    }
                   }
+                }else {
+                  response.data.method[i].newArgs =this.$t('message.c245');
                 }
+
+                //去掉最后一个逗号
+                if ( response.data.method[i].newArgs.length > 0) {
+                  response.data.method[i].newArgs =  response.data.method[i].newArgs.substr(0,  response.data.method[i].newArgs.length - 1);
+                }
+
               }
               //判断是否自己创建的合约
               this.collectOk = this.accountAddressValue === response.data.creater;
@@ -279,6 +291,7 @@
               //判断是否显示Token Tracker
               //response.data.nrc20TokenNames = response.data.nrc20TokenName + response.data.nrc20TokenSymbol ? '(' + response.data.nrc20TokenSymbol + ')' : '';
               response.data.balance = LeftShiftEight(response.data.balance).toString();
+
             } else {
               this.$message({
                 message: this.$t('message.passWordFailed') + response.data.msg,
@@ -331,7 +344,7 @@
         if (localStorage.getItem('encrypted') === "true") {
           this.$refs.password.showPassword(true)
         } else {
-          this.$confirm(this.$t('message.c172'), '', {
+          this.$confirm(this.$t('message.c1721'), '', {
             confirmButtonText: this.$t('message.confirmButtonText'),
             cancelButtonText: this.$t('message.cancelButtonText'),
           }).then(() => {
@@ -387,10 +400,10 @@
        * toTxid跳转
        * @param txId
        */
-      toTxid(txId) {
+      toTxid(hash,type) {
         this.$router.push({
           name: 'dealInfo',
-          query: {hash: txId},
+          query: {hash: hash,type:type},
         })
       },
 
@@ -399,9 +412,19 @@
        * @param item
        **/
       changeCallOptions(item) {
+        //console.log(item);
         this.contractItem = item;
-
+        //循环那些数数组形式
+        for(let i in item.args){
+          const types = new Set(item.args[i].type);
+          if(types.has('[') && types.has(']')){
+            item.args[i].types = this.$t('message.c241')
+          }else {
+            item.args[i].types = ''
+          }
+        }
         this.callForm.domains = item.args;
+
         this.callForm.region = item.name;
         this.valuesIf = item.view;
         this.submitCallFormIf = false;
@@ -411,10 +434,10 @@
 
         //是否上链，true:不上链,false:上链
         if (!item.view) {
-          this.switchDisabled = false;
+          this.switchDisabled = true;
         } else {
           //禁止滑块打开
-          this.switchDisabled = true;
+          this.switchDisabled = false;
           //关闭滑块
           this.callSeniorValue = false;
           //给高级参数设置最小参数
@@ -432,38 +455,21 @@
 
       },
 
-      //交易动态参数是否必填项是否全部有值
-      allParams(array) {
-        let arg = {success: true, params: ''};
-        for (let i of array) {
-          if (i.value) {
-            arg.params += '"' + i.value + '",';
-          }
-          if (i.request) {
-            arg.success(i.value !== '');
-          }
-        }
-        if (arg.params.length > 0) {
-          arg.params = arg.params.substr(0, arg.params.length - 1);
-        }
-        return arg
-      },
-
       /**
        * 估算调用智能合约的Gas消耗
        **/
       getCallGas(item) {
         let param = '';
         //判断是否上链方法（true:不上链,false:上链）
-        if(!item.view){
-          if (this.callForm.domains.length > 0 ) {
-            if (this.allParams(this.callForm.domains).success) {
+        if (!item.view) {
+          if (this.callForm.domains.length > 0) {
+            if (allParams(this.callForm.domains).success) {
               param = '{"sender":"' + this.accountAddressValue
                 + '","contractAddress":"' + this.contractAddress
                 + '","value":"0","methodName":"' + item.name
                 + '","methodDesc":"' + item.desc
                 + '","price":"1"'
-                + ',"args":[' + this.allParams(this.callForm.domains).params
+                + ',"args":[' + allParams(this.callForm.domains).params
                 + ']}';
             } else {
               console.log("动态参数必填信息没填写")
@@ -512,7 +518,7 @@
                 this.$refs.password.showPassword(true)
               } else {
                 //没密码弹框
-                this.$confirm(this.$t('message.c172'), '', {
+                this.$confirm(this.$t('message.c1721'), '', {
                   confirmButtonText: this.$t('message.confirmButtonText'),
                   cancelButtonText: this.$t('message.cancelButtonText'),
                 }).then(() => {
@@ -526,13 +532,15 @@
               let param = '{"contractAddress":"' + this.contractAddress
                 + '","methodName":"' + this.contractItem.name
                 + '","methodDesc":"' + this.contractItem.desc
-                + '","args":[' + this.allParams(this.callForm.domains).params
+                + '","args":[' + allParams(this.callForm.domains).params
                 + ']}';
+              //console.log(param);
               this.$post('/contract/view', param)
                 .then((response) => {
                   //console.log(response);
                   if (response.success) {
                     this.submitCallFormIf = true;
+                    this.submitCallFormHight = 2;
                     document.getElementById('out_pre').innerText = '';
                     document.getElementById('out_pre').innerText = response.data.toString();
                   } else {
@@ -564,12 +572,12 @@
             + '","gasLimit":' + this.callForm.gas
             + ',"price":' + this.callForm.price
             + ',"password":"' + password
-            + '","remark":"' + this.callForm.addtion
+            + '","remark":"' + htmlEncodeByRegExp(this.callForm.addtion)
             + '","contractAddress":"' + this.contractAddress
-            + '","value":"' + this.callForm.values
+            + '","value":"' + RightShiftEight(this.callForm.values || 0).toString()
             + '","methodName":"' + this.contractItem.name
             + '","methodDesc":"' + this.contractItem.desc
-            + '","args":[' + this.allParams(this.callForm.domains).params
+            + '","args":[' + allParams(this.callForm.domains).params
             + ']}';
         } else {
           url = '/contract/delete';
@@ -586,7 +594,7 @@
             if (response.success) {
               if (this.passChange === 'call') {
                 //console.log(this.valuesIf);
-                this.submitCallFormSuccse='';
+                this.submitCallFormSuccse = '';
                 this.submitCallFormIf = true;
                 this.submitCallFormSuccse = response.data;
                 this.resultHash = response.data;
@@ -612,9 +620,10 @@
             //console.log(response);
             if (response.success) {
               document.getElementById('out_pre').innerText = '';
+              this.submitCallFormHight=0;
               if (response.data.flag) {
                 this.submitCallFormHight = response.data.confirmCount;
-                if (response.data.confirmCount > 6) {
+                if (response.data.confirmCount > 1) {
                   document.getElementById('out_pre').innerText = '';
                   document.getElementById('out_pre').innerText = JSON.stringify(response.data.data, null, 2);
                   this.resultHash = '';
@@ -668,6 +677,7 @@
         border: 1px solid #3a8ee6;
         height: 60px;
         padding: 10px 0;
+        font-size: 14px;
         li {
           width: 65%;
           margin-left: 5%;
@@ -767,7 +777,7 @@
           max-height: 100px;
           background-color: #1c2738;
           text-align: left;
-          margin: 0 auto 20px;
+          margin: 0 auto 40px;
           overflow: auto;
           word-wrap: break-word;
           font-size: 14px;

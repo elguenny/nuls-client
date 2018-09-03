@@ -6,23 +6,26 @@
     </div>
     <div class="contract-info cb">
       <el-tabs v-model="contractActive" @tab-click="contractHandleClick" align="center">
-        <el-tab-pane label="我的合约" name="first" class="first-index">
-          <el-table :data="contractData" style="width: 100%">
-            <el-table-column label="合约地址" min-width="180" align="center">
+        <el-tab-pane :label="$t('message.c223')" name="first" class="first-index">
+          <el-table :data="contractData">
+            <el-table-column :label="$t('message.c215')" min-width="250" align="center">
               <template slot-scope="scope">
                 <span class="waingClass" v-show="scope.row.confirmCount <= 6">
-                  {{ scope.row.contractAddress }}({{scope.row.confirmCount}}/6)
+                  {{ scope.row.contractAddress }}(
+                  <font v-show="scope.row.status !== 3 ">{{scope.row.confirmCount}}/6 </font>
+                   <font v-show="scope.row.status === 3 ">{{scope.row.msg}}</font>
+                  )
                 </span>
                 <span class="cursor-p text-ds" v-show="scope.row.status > 0 && scope.row.confirmCount >= 7"
                       @click="toContractInfo(scope.row.contractAddress)">{{ scope.row.contractAddress }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="创建时间" width="180" align="center">
+            <el-table-column :label="$t('message.freezeTime')" width="180" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.createTime }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="标签名" width="180" align="center">
+            <el-table-column :label="$t('message.c224')" width="180" align="center">
               <template slot-scope="scope">
                 <div @click="setRemarkName(scope.row.contractAddress,scope.row.remarkName)">
                   <span class="cursor-p text-ds">{{ scope.row.remarkName ? scope.row.remarkName:'' }}</span>
@@ -31,17 +34,19 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column label="状态" width="180" align="center">
+            <el-table-column :label="$t('message.state')" width="130" align="center">
               <template slot-scope="scope">
                 <span>{{ $t('message.contractStatus'+scope.row.status) }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作" align="center">
+            <el-table-column :label="$t('message.operation')" width="180" align="center">
               <template slot-scope="scope">
+                <span class="cursor-p text-ds" @click="toRemove(scope.$index, scope.row)"
+                      v-show="scope.row.status === 3 ">{{$t('message.tabRemove')}}</span>
                 <span class="cursor-p text-ds" @click="toCall(scope.$index, scope.row)"
-                      v-show="scope.row.status === 1 && scope.row.confirmCount > 6">去调用</span>
+                      v-show="scope.row.status === 1 && scope.row.confirmCount > 6">{{$t('message.c225')}}</span>
                 <span class="cursor-p text-ds" @click="cancelCollection(scope.$index, scope.row)"
-                      v-show="!scope.row.create">取消收藏</span>
+                      v-show="!scope.row.create">{{$t('message.c226')}}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -56,47 +61,50 @@
           </el-pagination>
         </el-tab-pane>
 
-        <el-tab-pane label="查找合约" name="second" class="second">
+        <el-tab-pane :label="$t('message.c227')" name="second" class="second">
 
           <el-form :inline="true" :model="queryForm" status-icon :rules="queryRules" ref="queryForm" class="quer-form">
             <el-form-item label="" prop="address">
-              <el-input type="text" v-model.trim="queryForm.address" auto-complete="off"></el-input>
+              <el-input type="text" v-model.trim="queryForm.address" auto-complete="off" :placeholder="$t('message.c246')"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="submitQueryForm('queryForm')">访问</el-button>
+              <el-button type="primary" @click="submitQueryForm('queryForm')">{{$t('message.c228')}}</el-button>
             </el-form-item>
           </el-form>
 
           <div class="query-info" v-show="queryInfoIf">
             <el-form :model="callForm" :rules="callRules" ref="callForm" class="call-contract">
               <div class="address">
-                <label>合约地址:</label><span class="cursor-p text-ds"
-                                          @click="toContractInfo(callFormAddress)">{{this.callFormAddress}}</span><i></i>
+                <label>{{$t('message.c215')}}:</label>
+                <span class="cursor-p text-ds" @click="toContractInfo(callFormAddress)">{{this.callFormAddress}}</span>
+                <i class="el-icon-star-on cursor-p" :class="this.isCollect ? 'collects':'collect'"
+                   v-show="!addressNewIf" @click="collect(accountAddressValue,callFormAddress)"></i>
               </div>
-              <el-form-item label="请选择一个方法:">
-                <el-select v-model="callForm.region" placeholder="请选择一个方法" @change="changeCallOptions">
+              <el-form-item :label="$t('message.c229')">
+                <el-select v-model="callForm.region" :placeholder="$t('message.c229')" @change="changeCallOptions">
                   <el-option v-for="item in callFormOptions" :key="item.name" :label="item.name" :value="item">
                   </el-option>
                 </el-select>
               </el-form-item>
               <el-form-item
                 v-for="(domain, index) in callForm.domains"
-                :label="domain.name + '('+domain.type+')'"
+                :label="domain.name + '('+domain.type+')' +domain.types"
                 :key="domain.name"
                 :prop="'domains.' + index + '.value'"
-                :rules="{required: true, message: domain.name+'不能为空', trigger: 'blur'}"
+                :rules="{required: true, message: domain.name+$t('message.c230'), trigger: 'blur'}"
               >
                 <el-input v-model.trim="domain.value" @change="getCallGas(contractFormItem)"></el-input>
               </el-form-item>
 
-              <div class="call-senior">
-                高级选择
-                <el-switch v-model="callSeniorValue" :width="35" :disabled="this.switchDisabled"></el-switch>
+              <div class="call-senior" v-show="this.switchDisabled">
+                {{$t('message.c203')}}
+                <el-switch v-model="callSeniorValue" :width="35"></el-switch>
               </div>
               <div class="seniorInfo" v-show="callSeniorValue">
                 <el-form-item label="Gas Limit" prop="gas">
                   <el-input v-model="callForm.gas" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
-                  <p class="price-min" v-show="this.callForm.gas < this.callSystemGas">Gas值较小，有可能会导致合约失败</p>
+                  <p style="color: #ffd966;line-height: 15px;text-align: left;" v-show="this.callForm.gas < this.callSystemGas && this.callForm.gas > 0">
+                    {{$t('message.c206')}}</p>
                 </el-form-item>
                 <el-form-item label="Price" prop="price">
                   <el-input v-model="callForm.price" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
@@ -105,33 +113,33 @@
                   <el-input v-model="callForm.values" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
                 </el-form-item>
                 <el-form-item label="Addtion" prop="addtion">
-                  <el-input v-model="callForm.addtion"></el-input>
+                  <el-input v-model="callForm.addtion" :maxlength="40"></el-input>
                 </el-form-item>
               </div>
-
               <el-form-item class="submit-bt" style="text-align: center">
-                <el-button type="primary" @click="submitCallForm('callForm')">调用</el-button>
+                <el-button type="primary" @click="submitCallForm('callForm')">{{$t('message.c231')}}</el-button>
               </el-form-item>
             </el-form>
 
             <div class="click-after scroll" v-show="submitCallFormIf">
               <p :class="this.submitCallFormHight <= 6 ? 'waingClass':''">
-                <span v-show="this.submitCallFormHight <= 6">{{this.submitCallFormSuccse}}</span>
-                <span v-show="this.submitCallFormHight > 6" class="cursor-p text-ds"
-                      @click="toTxid(submitCallFormSuccse)">{{this.submitCallFormSuccse}}</span>
-                <label v-show="this.submitCallFormHight <= 6 && !this.valuesIf">({{this.submitCallFormHight}}/6)</label></p>
+                <!--<span v-show="this.submitCallFormHight <= 6">{{this.submitCallFormSuccse}}</span>-->
+                <span v-show="this.submitCallFormHight <= 1">{{this.submitCallFormSuccse}} {{$t('message.confirming')}}....</span>
+                <span v-show="this.submitCallFormHight > 1" class="cursor-p text-ds"
+                      @click="toTxid(submitCallFormSuccse,101)">{{this.submitCallFormSuccse}}</span>
+                <!-- <label v-show="this.submitCallFormHight <= 6 && !this.valuesIf">({{this.submitCallFormHight}}/6)</label>-->
+              </p>
               <pre id="out_pre"></pre>
             </div>
-
           </div>
 
         </el-tab-pane>
 
-        <el-tab-pane label="部署合约" name="third" class="third">
+        <el-tab-pane :label="$t('message.c232')" name="third" class="third">
           <div class="third-radio">
             <el-radio-group v-model="contractRadio" @change="changeRadio">
-              <el-radio :label="0">HEX编码部署</el-radio>
-              <el-radio :label="1">Jar包部署</el-radio>
+              <el-radio :label="0">{{$t('message.c233')}}</el-radio>
+              <el-radio :label="1">{{$t('message.c234')}}</el-radio>
             </el-radio-group>
           </div>
           <el-form :model="contractForm" :rules="contractRules" ref="contractForm">
@@ -152,42 +160,43 @@
 
             <el-form-item
               v-for="(domain, index) in contractForm.domains"
-              :label="domain.name + '('+domain.type+')'"
+              :label="domain.name + '('+domain.type+')' +domain.types"
               :key="domain.name"
               :prop="'domains.' + index + '.value'"
-              :rules="{required: domain.required, message: domain.name+'不能为空', trigger: 'blur'}"
+              :rules="{required: domain.required, message: domain.name+$t('message.c230'), trigger: 'blur'}"
             >
               <el-input v-model.trim="domain.value" @change="newContractGas"></el-input>
             </el-form-item>
 
             <div class="senior">
-              高级选择
+              {{$t('message.c203')}}
               <el-switch v-model="seniorValue" :width="30"></el-switch>
             </div>
             <div class="seniorInfo" v-show="seniorValue">
 
               <el-form-item label="Gas Limit" prop="gas">
                 <el-input v-model="contractForm.gas" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
-                <p class="price-min" v-show="this.contractForm.gas < this.systemGas">Gas值较小，有可能会导致合约失败</p>
+                <p class="price-min" v-show="this.contractForm.gas < this.systemGas && this.contractForm.gas > 0 ">
+                  {{$t('message.c206')}}</p>
               </el-form-item>
               <el-form-item label="Price" prop="price">
                 <el-input v-model="contractForm.price" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
               </el-form-item>
               <el-form-item label="Addtion" prop="addtion">
-                <el-input v-model="contractForm.addtion"></el-input>
+                <el-input v-model="contractForm.addtion" :maxlength="40"></el-input>
               </el-form-item>
             </div>
             <el-form-item class="add-contrant">
               <div class="add-contrant-test">
                 <el-button type="primary" @click="testContractForm('contractForm')"
                            :class=" !this.testIf ? 'isBright' : ''"
-                           id="addContrantTest">测试合约
+                           id="addContrantTest">{{$t('message.c235')}}
                 </el-button>
                 <i :class="this.testIf ? 'el-icon-success' : 'el-icon-error'" v-show="this.testIf"></i>
               </div>
               <div class="add-contrant-submit">
                 <el-button type="primary" @click="deployContractForm('contractForm')"
-                           :class=" this.testIf ? 'isBright' : ''">部署合约
+                           :class=" this.testIf ? 'isBright' : ''">{{$t('message.c232')}}
                 </el-button>
               </div>
             </el-form-item>
@@ -196,12 +205,12 @@
       </el-tabs>
 
     </div>
-    <el-dialog title="设置修改标签名" :visible.sync="setRemarkNameDialog"
+    <el-dialog :title="$t('message.c236')" :visible.sync="setRemarkNameDialog"
                class="setRemarkName-Dialog" @close="setRemarkNameCancel('setRemarkNameForm')">
       <el-form :model="setRemarkNameForm" :rules="setRemarkNameRules" ref="setRemarkNameForm">
         <el-form-item prop="remark">
           <el-input v-model.trim="setRemarkNameForm.remark" :maxlength="15"
-                    onkeyup="value=value.replace(/[^[0-9a-zA-Z_]/g,'')">
+                    onkeyup="value=value.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]/g,'')">
           </el-input>
         </el-form-item>
       </el-form>
@@ -219,7 +228,7 @@
 
 <script>
   import moment from 'moment'
-  import {copys, LeftShiftEight, getLocalTime} from '@/api/util.js'
+  import {copys, RightShiftEight, LeftShiftEight, getLocalTime, allParams, htmlEncodeByRegExp} from '@/api/util.js'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
 
@@ -227,16 +236,18 @@
     data() {
       let validateGas = (rule, value, callback) => {
         if (!value) {
-          callback(new Error('请输入数值Gas：1-10000000'));
+          callback(new Error(this.$t('message.c204')));
         } else if (value < 1 || value > 10000000) {
-          callback(new Error('请输入数值Gas：1-10000000'));
+          callback(new Error(this.$t('message.c204')));
         } else {
           callback();
         }
       };
       let validatePrice = (rule, value, callback) => {
         if (!value) {
-          callback(new Error('请输入数值Price'));
+          callback(new Error(this.$t('message.c205')));
+        } else if (value < 1) {
+          callback(new Error(this.$t('message.c205')));
         } else {
           callback();
         }
@@ -267,7 +278,7 @@
         },
         setRemarkNameRules: {
           remark: [
-            {required: true, message: '输入标签名', trigger: 'blur'}
+            {required: true, message: this.$t('message.c237'), trigger: 'blur'}
           ]
         },
         //查询合约
@@ -276,11 +287,15 @@
         },
         queryRules: {
           address: [
-            {required: true, message: '输入address', trigger: 'blur'}
+            {required: true, message: this.$t('message.c238'), trigger: 'blur'}
           ]
         },
         //查询合约后获取的地址
         callFormAddress: '',
+        //是否为选择账户创建的合约
+        addressNewIf: false,
+        //合约是否收藏
+        isCollect: false,
         //调用合约
         callForm: {
           region: '',
@@ -337,7 +352,7 @@
         //contract form 验证
         contractRules: {
           hex: [
-            {required: true, message: '输入HEX', trigger: 'blur'}
+            {required: true, message: this.$t('message.c239'), trigger: 'blur'}
           ],
           gas: [
             {validator: validateGas, trigger: 'blur'}
@@ -381,6 +396,18 @@
       chenckAccountAddress(chenckAddress) {
         this.accountAddressValue = chenckAddress;
         this.getContractList(chenckAddress);
+        //清除tab里面的内容
+        //清除访问合约信息
+        this.$refs.queryForm.resetFields();
+        this.queryInfoIf = false;
+        //清除调用合约信息
+        this.$refs.callForm.resetFields();
+        this.callForm.domains = [];
+        this.callForm.region = '';
+        this.callFormOptions = [];
+        //清除部署合约信息
+        this.$refs.contractForm.resetFields();
+        this.contractForm.domains = '';
       },
 
       /**
@@ -396,7 +423,6 @@
             if (response.success) {
               this.contractData = response.data.list;
               this.contractDataTotal = response.data.total;
-              let contractAddresslist = [];
               for (let i in response.data.list) {
                 response.data.list[i].createTime = moment(getLocalTime(response.data.list[i].createTime)).format('YYYY-MM-DD HH:mm:ss');
               }
@@ -476,6 +502,30 @@
       },
 
       /**
+       * 移除部署失败的合约
+       *  @param index
+       *  @param row
+       **/
+      toRemove(index, row) {
+        let params = '{"accountAddress":"' + this.accountAddressValue
+          + '","contractAddress":"' + row.contractAddress
+          + '"}';
+        //console.log(params);
+        this.$post('/contract/unconfirmed/failed/remove', params)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.getContractList(this.accountAddressValue);
+            } else {
+              this.$message({
+                message: this.$t('message.passWordFailed') + response.data.msg,
+                type: 'warning',
+              })
+            }
+          });
+      },
+
+      /**
        * 去调用
        *  @param index
        *  @param row
@@ -489,12 +539,47 @@
       },
 
       /**
+       * 收藏合约
+       * Set remark submit
+       * @param formName
+       */
+      collect(accountAddress, contractAddress) {
+        let url = '';
+        let params = '';
+        if (this.isCollect) {
+          url = '/contract/collection/cancel';
+          params = '{"accountAddress":"' + accountAddress
+            + '","contractAddress":"' + contractAddress
+            + '"}';
+        } else {
+          url = '/contract/collection';
+          params = '{"accountAddress":"' + accountAddress
+            + '","contractAddress":"' + contractAddress
+            + '","remarkName":""}';
+        }
+        //console.log(url);
+        //console.log(params);
+        this.$post(url, params)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              this.isCollect = !this.isCollect;
+            } else {
+              this.$message({
+                message: this.$t('message.passWordFailed') + response.data.msg,
+                type: 'warning',
+              })
+            }
+          })
+      },
+
+      /**
        * 取消收藏
        *  @param index
        *  @param row
        **/
       cancelCollection(index, row) {
-        this.$confirm(this.$t('message.c172'), '', {
+        this.$confirm(this.$t('message.c1721'), '', {
           confirmButtonText: this.$t('message.confirmButtonText'),
           cancelButtonText: this.$t('message.cancelButtonText'),
         }).then(() => {
@@ -515,9 +600,7 @@
                 })
               }
             })
-        }).catch(() => {
-          console.log("")
-        });
+        })
       },
 
       /**
@@ -553,6 +636,22 @@
                 if (response.success) {
                   this.callFormAddress = response.data.address;
                   this.queryInfoIf = true;
+
+                  //判断用户列表里有没有查询的合约地址
+                  let set = new Set(this.contractData);
+                  for (let i of this.contractData) {
+                    set.add(i.contractAddress)
+                  }
+                  if (response.data.creater !== this.accountAddressValue) {
+                    if (!set.has(response.data.address)) {
+                      this.isCollect = false;
+                    } else {
+                      this.isCollect = true;
+                    }
+                  } else {
+                    this.addressNewIf = true;
+                  }
+
                   //this.callFormOptions = response.data.method
                   for (let i in response.data.method) {
                     if (response.data.method[i].name !== '<init>' || !response.data.method) {
@@ -579,6 +678,15 @@
        **/
       changeCallOptions(item) {
         this.contractFormItem = item;
+        //循环那些数数组形式
+        for (let i in item.args) {
+          const types = new Set(item.args[i].type);
+          if (types.has('[') && types.has(']')) {
+            item.args[i].types = this.$t('message.c241')
+          } else {
+            item.args[i].types = ''
+          }
+        }
         this.callForm.domains = item.args;
         this.callForm.region = item.name;
         this.valuesIf = item.view;
@@ -589,10 +697,10 @@
 
         //是否上链，true:不上链,false:上链
         if (!item.view) {
-          this.switchDisabled = false;
+          this.switchDisabled = true;
         } else {
           //禁止滑块打开
-          this.switchDisabled = true;
+          this.switchDisabled = false;
           //关闭滑块
           this.callSeniorValue = false;
           //给高级参数设置最小参数
@@ -615,15 +723,15 @@
       getCallGas(item) {
         let param = '';
         //判断是否上链方法（true:不上链,false:上链）
-        if(!item.view) {
+        if (!item.view) {
           if (item.args.length > 0) {
-            if (this.allParams(item.args).success) {
+            if (allParams(item.args).success) {
               param = '{"sender":"' + this.accountAddressValue
                 + '","contractAddress":"' + this.callFormAddress
                 + '","value":"0","methodName":"' + item.name
                 + '","methodDesc":"' + item.desc
                 + '","price":"1"'
-                + ',"args":[' + this.allParams(item.args).params
+                + ',"args":[' + allParams(item.args).params
                 + ']}';
             } else {
               console.log("动态参数必填信息没填写")
@@ -643,7 +751,7 @@
             .then((response) => {
               //console.log(response);
               if (response.success) {
-                this.systemCallGas = response.data.gasLimit;
+                this.callSystemGas = response.data.gasLimit;
                 this.callForm.gas = response.data.gasLimit;
                 this.callForm.price = 20;
                 this.callForm.values = 0;
@@ -693,13 +801,14 @@
               let param = '{"contractAddress":"' + this.callFormAddress
                 + '","methodName":"' + this.contractFormItem.name
                 + '","methodDesc":"' + this.contractFormItem.desc
-                + '","args":[' + this.allParams(this.contractFormItem.args).params
+                + '","args":[' + allParams(this.contractFormItem.args).params
                 + ']}';
               this.$post('/contract/view', param)
                 .then((response) => {
                   //console.log(response);
                   if (response.success) {
                     this.submitCallFormIf = true;
+                    this.submitCallFormHight = 2;
                     document.getElementById('out_pre').innerText = '';
                     document.getElementById('out_pre').innerText = response.data.toString();
                   } else {
@@ -729,11 +838,21 @@
             //console.log(response);
             if (response.success) {
               if (response.data.args.length > 0) {
-                this.contractForm.domains = response.data.args
+                this.contractForm.domains = response.data.args;
+                //循环那些数数组形式
+                for (let i in response.data.args) {
+                  const types = new Set(response.data.args[i].type);
+                  if (types.has('[') && types.has(']')) {
+                    response.data.args[i].types = this.$t('message.c241')
+                  } else {
+                    response.data.args[i].types = ''
+                  }
+                }
               } else {
                 this.newContractGas();
               }
             } else {
+              this.contractForm.domains = '';
               this.$message({
                 message: this.$t('message.passWordFailed') + response.data.msg,
                 type: 'warning',
@@ -742,34 +861,16 @@
           })
       },
 
-      //交易动态参数是否必填项是否全部有值
-      allParams(array) {
-        console.log(array);
-        let arg = {success: true, params: ''};
-        for (let i of array) {
-          if (i.value) {
-            arg.params += '"' + i.value + '",';
-          }
-          if (i.request) {
-            arg.success(i.value !== '');
-          }
-        }
-        if (arg.params.length > 0) {
-          arg.params = arg.params.substr(0, arg.params.length - 1);
-        }
-        return arg
-      },
-
       /**
        * 估算创建智能合约的Gas消耗
        **/
       newContractGas() {
         let param = '';
         if (this.contractForm.domains.length > 0) {
-          if (this.allParams(this.contractForm.domains).success) {
+          if (allParams(this.contractForm.domains).success) {
             param = '{"sender":"' + this.accountAddressValue
               + '","price":1,"contractCode":"' + this.contractForm.hex
-              + '","args":[' + this.allParams(this.contractForm.domains).params
+              + '","args":[' + allParams(this.contractForm.domains).params
               + ']}';
           } else {
             console.log("动态参数必填信息没填写")
@@ -812,7 +913,7 @@
               + ',"price":' + this.contractForm.price
               + ',"remark":"' + this.contractForm.addtion
               + '","contractCode":"' + this.contractForm.hex
-              + '","args":[' + this.allParams(this.contractForm.domains).params
+              + '","args":[' + allParams(this.contractForm.domains).params
               + ']}';
             //console.log(param);
             this.$post('/contract/precreate', param)
@@ -821,7 +922,7 @@
                 if (response.success) {
                   this.testIf = true;
                   this.$message({
-                    type: 'success', message: "恭喜您，测试通过", duration: '800'
+                    type: 'success', message: this.$t('message.c240'), duration: '800'
                   })
                 } else {
                   this.$message({
@@ -842,7 +943,7 @@
        * @param formName
        **/
       deployContractForm(formName) {
-        this.newContractGas();
+        //this.newContractGas();
         setTimeout(() => {
           this.$refs[formName].validate((valid) => {
             if (valid) {
@@ -850,7 +951,7 @@
               if (localStorage.getItem('encrypted') === "true") {
                 this.$refs.password.showPassword(true)
               } else {
-                this.$confirm(this.$t('message.c172'), '', {
+                this.$confirm(this.$t('message.c1721'), '', {
                   confirmButtonText: this.$t('message.confirmButtonText'),
                   cancelButtonText: this.$t('message.cancelButtonText'),
                 }).then(() => {
@@ -883,12 +984,12 @@
             + '","gasLimit":' + this.callForm.gas
             + ',"price":' + this.callForm.price
             + ',"password":"' + password
-            + '","remark":"' + this.callForm.addtion
+            + '","remark":"' + htmlEncodeByRegExp(this.callForm.addtion)
             + '","contractAddress":"' + this.callFormAddress
-            + '","value":"' + this.callForm.values
+            + '","value":"' + RightShiftEight(this.callForm.values || 0).toString()
             + '","methodName":"' + this.contractFormItem.name
             + '","methodDesc":"' + this.contractFormItem.desc
-            + '","args":[' + this.allParams(this.contractFormItem.args).params
+            + '","args":[' + allParams(this.contractFormItem.args).params
             + ']}';
         } else {
           url = '/contract/create';
@@ -896,9 +997,9 @@
             + '","gasLimit":' + this.contractForm.gas
             + ',"price":' + this.contractForm.price
             + ',"password":"' + password
-            + '","remark":"' + this.contractForm.addtion
+            + '","remark":"' + htmlEncodeByRegExp(this.contractForm.addtion)
             + '","contractCode":"' + this.contractForm.hex
-            + '","args":[' + this.allParams(this.contractForm.domains).params
+            + '","args":[' + allParams(this.contractForm.domains).params
             + ']}';
         }
         //console.log(url);
@@ -929,7 +1030,7 @@
                 this.getContractList(localStorage.getItem('newAccountAddress'));
                 this.$refs[this.deployForm].resetFields();
                 this.$message({
-                  type: 'success', message: "恭喜您，部署申请完成", duration: '800'
+                  type: 'success', message: this.$t('message.passWordSuccess'), duration: '800'
                 })
               } else {
                 this.$message({
@@ -947,10 +1048,11 @@
           .then((response) => {
             //console.log(response);
             if (response.success) {
+              this.submitCallFormHight = 0;
               document.getElementById('out_pre').innerText = '';
               if (response.data.flag) {
                 this.submitCallFormHight = response.data.confirmCount;
-                if (response.data.confirmCount > 6) {
+                if (response.data.confirmCount > 1) {
                   document.getElementById('out_pre').innerText = '';
                   document.getElementById('out_pre').innerText = JSON.stringify(response.data.data, null, 2);
                   this.resultHash = '';
@@ -995,7 +1097,6 @@
         }
         return isJPG && isLt2M;
       }
-
     },
   }
 </script>
@@ -1057,12 +1158,18 @@
           margin: auto;
           border: 1px solid #3a8ee6;
           .call-contract {
-            width: 430px;
+            width: 500px;
             .address {
               text-align: left;
               margin: 30px auto 10px;
               span {
                 color: #C1C5C9;
+              }
+              .collects {
+                color: #82bd39;
+              }
+              .collect {
+                color: #8a929b;
               }
             }
             .el-form-item {
@@ -1075,7 +1182,7 @@
               }
               .el-form-item__content {
                 .el-select {
-                  width: 430px;
+                  width: 500px;
                   .el-input--suffix {
                     .el-input__suffix {
                       .el-input__suffix-inner {
@@ -1087,6 +1194,7 @@
                   }
                 }
               }
+
             }
             .call-senior {
               height: 45px;
@@ -1106,11 +1214,11 @@
 
           }
           .click-after {
-            width: 430px;
+            width: 500px;
             max-height: 100px;
             background-color: #1c2738;
             text-align: left;
-            margin: 0 auto 20px;
+            margin: 0 auto 40px;
             overflow: auto;
             word-wrap: break-word;
             font-size: 14px;
@@ -1187,6 +1295,9 @@
                     background-image: -webkit-gradient(linear, 40% 0%, 75% 84%, from(#FFFFFF), to(#FFFFFF), color-stop(.6, #FFFFFF))
                   }
                 }
+              }
+              .el-form-item__error {
+                padding-top: 35px;
               }
             }
           }

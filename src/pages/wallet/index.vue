@@ -31,13 +31,13 @@
           </el-table-column>
           <el-table-column :label="$t('message.indexLock')" width="280" align='center'>
             <template slot-scope="scope">
-              <span class="cursor-p text-d" @click="toLocked(accountAddressValue)">{{ scope.row.locked }}</span>
+              <span class="cursor-p text-d" @click="toLocked(accountAddressValue)" v-show="!scope.row.address">{{ scope.row.locked }}</span>
             </template>
           </el-table-column>
           <el-table-column :label="$t('message.operation')" align='center'>
             <template slot-scope="scope">
-              <span class="cursor-p text-d" @click="toTransfer(accountAddressValue)">{{$t('message.transfer')}}</span>
-              <span class="cursor-p text-d" @click="toDealList(scope.$index, scope.row)">交易记录</span>
+              <span class="cursor-p text-d" @click="toTransfer(scope.row)">{{$t('message.transfer')}}</span>
+              <span class="cursor-p text-d" @click="toDealList(scope.$index, scope.row)">{{$t('message.transactionRecord')}}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -48,7 +48,7 @@
 
 <script>
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
-  import {copys, LeftShiftEight, getLocalTime} from '@/api/util.js'
+  import {copys, LeftShiftEight,Power,Division,getLocalTime} from '@/api/util.js'
   import {getAccountAssets, getAccountTxList} from '@/api/httpData.js'
 
   export default {
@@ -84,12 +84,18 @@
       getAccountAssets(address) {
         getAccountAssets(address)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.success) {
-              for (let i = 0; i < response.data.list.length; i++) {
-                response.data.list[i].balance = LeftShiftEight(response.data.list[i].balance).toString();
-                response.data.list[i].locked = LeftShiftEight(response.data.list[i].locked).toString();
-                response.data.list[i].usable = LeftShiftEight(response.data.list[i].usable).toString()
+              for (let i in response.data.list) {
+                //根据是否有地址判断 代币和非代币
+                if(!response.data.list[i].address){
+                  response.data.list[i].balance = LeftShiftEight(response.data.list[i].balance).toString();
+                  response.data.list[i].locked = LeftShiftEight(response.data.list[i].locked).toString();
+                  response.data.list[i].usable = LeftShiftEight(response.data.list[i].usable).toString()
+                }else {
+                  response.data.list[i].balance =Division( response.data.list[i].balance,Power(response.data.list[i].decimals)) .toString();
+                  response.data.list[i].usable = response.data.list[i].balance
+                }
               }
               this.accountData = response.data.list
             }
@@ -144,11 +150,13 @@
        * To transfer
        * @param address
        */
-      toTransfer(address) {
+      toTransfer(row) {
+        //console.log(row);
         if (this.$store.getters.getNetWorkInfo.localBestHeight === this.$store.getters.getNetWorkInfo.netBestHeight && sessionStorage.getItem('setNodeNumberOk') === 'true') {
           this.$router.push({
-            name: '/transfer',
-            params: {address: address},
+            name: 'transfer',
+            //params: {address: address},
+             query: {address: row.address,balance:row.usable,asset:row.asset,decimals:row.decimals}
           })
         } else {
           this.$message({
@@ -162,8 +170,6 @@
         this.$router.push({
           name: 'deallist'
         });
-        console.log(index);
-        console.log(row);
       },
     },
   }

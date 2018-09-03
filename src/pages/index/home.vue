@@ -167,6 +167,7 @@
       getAccountAddress(address) {
         getAccountAssets(address)
           .then((response) => {
+            //console.log(response);
             if (response.success) {
               this.balanceData = response.data.list[0];
               this.balanceData.balance = LeftShiftEight(this.balanceData.balance).toString();

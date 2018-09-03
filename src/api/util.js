@@ -25,6 +25,29 @@ export function RightShiftEight(arg) {
 }
 
 /**
+ * 10的N 次方
+ * @param arg
+ * @returns {BigNumber}
+ * @constructor
+ */
+export function Power(arg) {
+  let newPower = new BigNumber(10);
+  return newPower.pow(arg);
+}
+
+/**
+ * 除法
+ * @param nu
+ * @param arg
+ * @returns {BigNumber}
+ * @constructor
+ */
+export function Division(nu,arg) {
+  let newDiv = new BigNumber(nu);
+  return newDiv.div(arg);
+}
+
+/**
  * 复制 copy
  * @param value
  */
@@ -91,21 +114,35 @@ export function htmlDecodeByRegExp(str){
  * @returns {arg}
  */
 export function allParams(array) {
+  //console.log(array);
   let arg = {success: true, params: ''};
   for (let i of array) {
+    //判断是否有值
     if (i.value) {
-      arg.params += '"' + i.value + '",';
+      //判断是否有数组参数
+      if(i.types){
+        arg.params += i.value + ',';
+      }else {
+        arg.params += '"' + i.value + '",';
+      }
+    } else {
+      arg.params += '"",';
     }
-    if (i.request) {
-      arg.success(i.value !== '');
+    //判断必填是否有值
+    if (i.required) {
+      if (i.value) {
+        arg.success = true;
+      } else {
+        arg.success = false
+      }
     }
   }
+  //去掉最后一个逗号
   if (arg.params.length > 0) {
     arg.params = arg.params.substr(0, arg.params.length - 1);
   }
   return arg
 }
-
 
 /**
  * 获取用户列表 设置用户信息

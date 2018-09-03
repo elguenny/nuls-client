@@ -87,8 +87,8 @@ const router = new VueRouter({
       component: resolve => require(['@/pages/wallet/FreezeList.vue'], resolve)
     },
     {
-      path: '/wallet/index/transfer :address',
-      name: '/transfer',
+      path: '/wallet/index/transfer',
+      name: 'transfer',
       component: resolve => require(['@/pages/wallet/Transfer.vue'], resolve)
     },
     {

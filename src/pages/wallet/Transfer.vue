@@ -2,28 +2,46 @@
   <div class="transfer">
     <Back :backTitle="this.$t('message.walletManagement')"></Back>
     <div class="transfer-info">
-      <h2>NULS {{$t('message.transfer')}}</h2>
+      <h2>{{this.$route.query.asset}} {{$t('message.transfer')}}</h2>
 
       <el-form :model="transferForm" :rules="transferRules" ref="transferForm">
         <el-form-item :label="$t('message.sourceAddress')+'：'" class="out-address">
-          <AccountAddressBar @chenckAccountAddress="chenckAccountAddress"></AccountAddressBar>
-          <i class="copy_icon copyBtn cursor-p" :data-clipboard-text="accountAddressValue"
-             @click="accountCopy" :title="$t('message.c143')"></i>
+          <AccountAddressBar @chenckAccountAddress="chenckAccountAddress" v-show="outAddressIf"></AccountAddressBar>
+          <div class="contract-address" v-show="seniorIf && !outAddressIf">{{this.selectAddress}}</div>
+          <i class="copy_icon copyBtn cursor-p" @click="accountCopy"></i>
         </el-form-item>
         <el-form-item :label="$t('message.destinationAddress')+'：'" prop="joinAddress">
-          <el-input type="text" v-model.trim="transferForm.joinAddress" ref="joinAddress" @change="countFee"></el-input>
+          <el-input type="text" v-model.trim="transferForm.joinAddress" ref="joinAddress"
+                    @change="ifContractAddres"></el-input>
           <i class="cursor-p icons" @click="toUsersAddressList"></i>
         </el-form-item>
         <el-form-item :label="$t('message.transferAmount')+'：'" prop="joinNo">
-          <span class="allUsable">{{$t('message.currentBalance')}}: {{usable}} NULS</span>
+          <span class="allUsable">{{$t('message.currentBalance')}}: {{usable}} {{this.$route.query.asset}}</span>
           <el-input type="text" v-model="transferForm.joinNo" :maxlength="17" @change="countFee"></el-input>
-          <!-- <span class="allNo" @click="allUsable(usable)">{{$t('message.all')}}</span>-->
         </el-form-item>
+
+        <div class="contract-t" v-show="seniorIf">
+          <div class="call-senior">
+            {{$t('message.c203')}}
+            <el-switch v-model="callSeniorValue" :width="35"></el-switch>
+          </div>
+          <div class="seniorInfo" v-show="this.callSeniorValue">
+            <el-form-item label="Gas Limit" prop="gas">
+              <el-input v-model="transferForm.gas" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
+              <p class="price-min" v-show="this.transferForm.gas < this.systemGas && this.transferForm.gas > 1">
+                {{$t('message.c206')}}</p>
+            </el-form-item>
+            <el-form-item label="Price" prop="price">
+              <el-input v-model="transferForm.price" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
+            </el-form-item>
+          </div>
+        </div>
+
         <el-form-item :label="$t('message.remarks')+'：'">
           <el-input type="textarea" v-model.trim="transferForm.remark"
                     :maxlength="30" @change="countFee"></el-input>
         </el-form-item>
-        <el-form-item :label="$t('message.c28')+': '+this.fee+' NULS'">
+        <el-form-item :label="$t('message.c28')+': '+this.fee+' NULS'" v-show="outAddressIf">
         </el-form-item>
         <el-form-item class="transfer-submit">
           <el-button type="primary" @click="transferSubmit('transferForm')" id="transferSubmit">
@@ -36,8 +54,6 @@
         <el-table :data="userAddressList" @row-dblclick="dbcheckedAddress">
           <el-table-column property="userAddress" :label="$t('message.tabName')" min-width="280"
                            align='center'></el-table-column>
-          <!--<el-table-column property="userAlias" :label="$t('message.tabAlias')" width="70"
-                           align='center'></el-table-column>-->
           <el-table-column property="userHelp" :label="$t('message.remarks')" width="110"
                            align='center'></el-table-column>
           <el-table-column :label="$t('message.operation')" width="100" align='center'>
@@ -56,91 +72,91 @@
   import Back from '@/components/BackBar.vue'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
-  import copy from 'copy-to-clipboard'
-  import * as config from '@/config.js'
   import {BigNumber} from 'bignumber.js'
-  import {htmlEncodeByRegExp} from '@/api/util.js'
+  import {htmlEncodeByRegExp, LeftShiftEight, RightShiftEight, Power, Division,copys} from '@/api/util'
+  import {numbers} from '@/api/validate'
+
 
   export default {
     data() {
       let selectAddress = (rule, value, callback) => {
-        if (value === '') {
+        if (!value) {
           callback(new Error(this.$t('message.addressNull')))
         } else {
-          if (this.transferForm.checkPass !== '') {
-            this.$refs.transferForm.validateField('joinNo')
-          }
           callback()
         }
       };
       let checkJoinAddress = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.transferNull')))
+        } else if (value.length < 20 || value.length > 35) {
+          callback(new Error(this.$t('message.c168')))
+        } else if (value === this.selectAddress) {
+          callback(new Error(this.$t('message.addressOrTransfer')))
         } else {
-          this.address = localStorage.getItem('newAccountAddress');
-          //let re = /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/;
-          if (value.length < 20 || value.length > 35) {
-            callback(new Error(this.$t('message.c168')))
-          } else if (value === this.address) {
-            callback(new Error(this.$t('message.addressOrTransfer')))
-          } else {
-            callback()
-          }
+          callback()
         }
       };
       let checkJoinNo = (rule, value, callback) => {
-        if (!value || value.toString() === '0' ) {
+        if (!value) {
           callback(new Error(this.$t('message.transferNO')))
-        } else {
-          setTimeout(() => {
-            let rightShift = new BigNumber(100000000);
-            let leftShift = new BigNumber(0.00000001);
-            if (rightShift.times(this.transferForm.joinNo).toString() === rightShift.times(this.usable).toString()) {
-              this.transferForm.joinNo = leftShift.times(rightShift.times(this.usable) - rightShift.times(this.fee));
-              value = this.transferForm.joinNo;
+          //转出金额等于可以余额时减去手续费
+        }else if(!numbers(value)){
+          callback(new Error(this.$t('message.c136')))
+        }else if (value < this.fee) {
+          callback(new Error(this.$t('message.transferNO3')))
+        }else {
+          setTimeout( () =>{
+            if(RightShiftEight(this.transferForm.joinNo).toString() === RightShiftEight(this.usable).toString()) {
+              this.transferForm.joinNo = LeftShiftEight(parseInt(RightShiftEight(this.usable).toString()) - parseInt(RightShiftEight(this.fee).toString()));
+            }else if (parseInt(RightShiftEight(value).toString()) > this.maxAmount && !this.seniorIf) {
+              callback(new Error(this.$t('message.c202') + LeftShiftEight(this.maxAmount).toString()))
+            }else {
+              callback()
             }
-            let re = /(^\+?|^\d?)\d*\.?\d+$/;
-            let res = /^\d{1,8}(\.\d{1,8})?$/;
-            if (!re.exec(value)) {
-              callback(new Error(this.$t('message.transferNO1')))
-            } else {
-              let values = new BigNumber(value);
-              let nu = new BigNumber(this.usable);
-              if (values.comparedTo(nu.minus(this.fee)) === 1) {
-                callback(new Error(this.$t('message.transferNO2')))
-              } else if (value < this.fee) {
-                callback(new Error(this.$t('message.transferNO3')))
-              } else if (!res.exec(value)) {
-                callback(new Error(this.$t('message.c136')))
-              }else  if(rightShift.times(value) > this.maxAmount){
-                callback(new Error(this.$t('message.c202') +leftShift.times(this.maxAmount)))
-              }else {
-                callback()
-              }
-            }
-          }, 100)
+          },100);
         }
       };
+      let validateGas = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('message.c204')));
+        } else if (value < 1 || value > 10000000) {
+          callback(new Error(this.$t('message.c204')));
+        } else {
+          callback();
+        }
+      };
+      let validatePrice = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('message.c205')));
+        } else if (value < 1) {
+          callback(new Error(this.$t('message.c205')));
+        } else {
+          callback();
+        }
+      };
+
       return {
-        accountAddressValue: localStorage.getItem('newAccountAddress'),
+        //默认选中的账户转出地址
+        selectAddress: localStorage.getItem('newAccountAddress'),
         submitId: 'transferSubmit',
         //余额
-        usable: 0,
+        usable: this.$route.query.balance,
         //手续费
         fee: 0.00,
         //最大转账金额
-        maxAmount:0,
-        accountAddress: [],
-        remnant: 0,
-        address: localStorage.getItem('newAccountAddress'),
+        maxAmount: 0,
+        //form 表单数据
         transferForm: {
-          address: localStorage.getItem('newAccountAddress'),
-          outName: '',
+          address: this.selectAddress,
           joinAddress: '',
           joinNo: '',
-          serviceNo: '',
+          gas: '',
+          price: '',
           remark: ''
         },
+
+        //form 表单验证信息
         transferRules: {
           selectAddress: [
             {validator: selectAddress, trigger: 'blur'}
@@ -150,8 +166,26 @@
           ],
           joinNo: [
             {validator: checkJoinNo, trigger: 'blur'}
+          ],
+          gas: [
+            {validator: validateGas, trigger: 'blur'}
+          ],
+          price: [
+            {validator: validatePrice, trigger: 'blur'}
           ]
         },
+
+        //转出地址是否可选择
+        outAddressIf: true,
+        //代币转账显示内容
+        seniorIf: false,
+        //代币精度系数
+        decimalsNo: 0,
+        //获取系统计算的gas
+        systemGas: 0,
+        //高级选项开关
+        callSeniorValue: false,
+
         userAddressList: [],
         dialogTableVisible: false,
       }
@@ -161,18 +195,13 @@
       AccountAddressBar,
       Password,
     },
-    mounted() {
-      let _this = this;
-      //this.openDB();
-      if (this.address === '') {
-        this.address = localStorage.getItem('newAccountAddress')
+    created() {
+      //获取10的N次方
+      this.decimalsNo = Power(this.$route.query.decimals);
+      if (this.$route.query.address) {
+        this.seniorIf = true;
+        this.outAddressIf = false;
       }
-      this.getBalanceAddress('/accountledger/balance/' + this.address);
-
-      setInterval(()=>{
-        //this.toSubmitsss();
-      },50)
-
     },
     methods: {
 
@@ -186,8 +215,7 @@
           .then((response) => {
             //console.log(response);
             if (response.success) {
-              let leftShift = new BigNumber(0.00000001);
-              this.usable = parseFloat(leftShift.times(response.data.usable.value).toString())
+              this.usable = LeftShiftEight(response.data.usable.value).toString()
             }
           })
       },
@@ -198,9 +226,8 @@
        * @param chenckAddress
        */
       chenckAccountAddress(chenckAddress) {
-        this.address = chenckAddress;
-        this.accountAddressValue = chenckAddress;
-        localStorage.setItem('newAccountAddress', this.address);
+        this.selectAddress = chenckAddress;
+        localStorage.setItem('newAccountAddress', this.selectAddress);
         this.getBalanceAddress('/accountledger/balance/' + chenckAddress);
         this.$refs.transferForm.validateField('joinAddress');
         this.$refs.transferForm.validateField('joinNo');
@@ -212,32 +239,10 @@
        * copy
        */
       accountCopy() {
-        //javaUtil.copy(this.accountAddressValue);
-        copy(this.accountAddressValue);
+        copys(this.selectAddress);
         this.$message({
           message: this.$t('message.c129'), type: 'success', duration: '800'
         })
-      },
-
-      /**
-       * 选择全部金额
-       * Choose the total amount
-       * @param balance
-       */
-      allUsable(balance) {
-        if (balance === 0) {
-          this.$message({
-            message: this.$t('message.creditLow'),
-            type: 'warning '
-          })
-        } else {
-          this.countFee(balance);
-          setTimeout(() => {
-            this.transferForm.joinNo = config.FloatSub(balance, 0.01);
-            this.$refs.transferForm.validateField('joinAddress');
-            this.$refs.transferForm.validateField('joinNo')
-          }, 500);
-        }
       },
 
       /**
@@ -315,26 +320,113 @@
       },
 
       /**
+       * 验证是否为合约地址
+       *
+       **/
+      ifContractAddres() {
+        this.$fetch('/contract/' + this.transferForm.joinAddress)
+          .then((response) => {
+            //console.log(response);
+            if (response.success) {
+              //是合约地址
+              if (response.data) {
+                this.transferForm.gas = '';
+                this.transferForm.price = '';
+                this.seniorIf = true;
+              } else {
+                this.transferForm.gas = '1';
+                this.transferForm.price = '1';
+              }
+            }
+          });
+      },
+
+      /**
        *计算手续费
        *Calculation fee
        **/
       countFee() {
-        if (this.transferForm.joinAddress !== '' && this.transferForm.joinNo > 0) {
-          let rightShift = new BigNumber(100000000);
-          let params = "address=" + this.address
-            + "&toAddress=" + this.transferForm.joinAddress
-            + "&amount=" + rightShift.times(this.transferForm.joinNo)
-            + "&remark=" + htmlEncodeByRegExp(this.transferForm.remark);
-          //console.log(params);
-          this.$fetch('/accountledger/transfer/fee?' + params)
-            .then((response) => {
-              //console.log(response);
-              if (response.success) {
-                let leftShift = new BigNumber(0.00000001);
-                this.fee = leftShift.times(response.data.fee);
-                this.maxAmount = response.data.maxAmount
-              }
-            });
+        let _this = this;
+        //代币转账 不做余额计算
+        if (this.seniorIf) {
+          if (this.transferForm.joinAddress !== '' && this.transferForm.joinNo > 0) {
+            //金额精度系数计算
+            let decimalsValue = new BigNumber(this.transferForm.joinNo);
+            let param = '';
+
+            if (this.seniorIf && this.outAddressIf) {
+              param = '{"sender":"' + this.selectAddress
+                + '","contractAddress":"' + this.transferForm.joinAddress
+                + '","value":"' + decimalsValue.times(this.decimalsNo).toString()
+                + '","methodName":"_payable","methodDesc":"() return void","price":1'
+                + '}';
+
+              //计算手续费
+              setTimeout( ()=>{
+                let params = '{"address":"' + this.selectAddress
+                  + '","toAddress":"' + this.transferForm.joinAddress
+                  + '","gasLimit":"' + this.transferForm.gas
+                  + '","price":"' + this.transferForm.price
+                  + '","amount":"' + RightShiftEight(this.transferForm.joinNo).toString()
+                  + '","remark":"' + htmlEncodeByRegExp(this.transferForm.remark)
+                  + '"}';
+                //console.log(params);
+                this.$post('/contract/transfer/fee',params)
+                  .then((response) => {
+                    //console.log(response);
+                    if (response.success) {
+                      this.fee = LeftShiftEight(response.data.fee).toString();
+                      this.maxAmount = response.data.maxAmount
+                    }
+                  });
+              },500);
+            } else {
+              param = '{"sender":"' + this.selectAddress
+                + '","contractAddress":"' + this.$route.query.address
+                + '","value":0,"methodName":"transfer","methodDesc":"","price":1'
+                + ',"args":["' + this.transferForm.joinAddress + '","' + decimalsValue.times(this.decimalsNo).toString()
+                + '"]}';
+            }
+            let params = '{"sender":"' + localStorage.getItem('newAccountAddress') + '"}';
+            //console.log(param);
+            this.$post('/contract/imputedgas/call', param)
+              .then((response) => {
+                //console.log(response);
+                //估算gas成功后估算price
+                if (response.success) {
+                  this.systemGas = response.data.gasLimit;
+                  this.transferForm.gas = response.data.gasLimit;
+                  //console.log(params);
+                  _this.$post('/contract/imputedprice', params)
+                    .then((response) => {
+                      //console.log(response);
+                      if (response.success) {
+                        this.transferForm.price = response.data;
+                      } else {
+                        console.log("估算price失败")
+                      }
+                    })
+                } else {
+                  console.log("估算gas失败")
+                }
+              })
+          }
+        }else {
+          if (this.transferForm.joinAddress !== '' && this.transferForm.joinNo > 0) {
+            let params = "address=" + this.selectAddress
+              + "&toAddress=" + this.transferForm.joinAddress
+              + "&amount=" + RightShiftEight(this.transferForm.joinNo).toString()
+              + "&remark=" + htmlEncodeByRegExp(this.transferForm.remark);
+            //console.log(params);
+            this.$fetch('/accountledger/transfer/fee?' + params)
+              .then((response) => {
+                //console.log(response);
+                if (response.success) {
+                  this.fee = LeftShiftEight(response.data.fee).toString();
+                  this.maxAmount = response.data.maxAmount
+                }
+              });
+          }
         }
       },
 
@@ -371,13 +463,43 @@
        */
       toSubmit(password) {
         let rightShift = new BigNumber(100000000);
-        let param = '{"address":"' + this.address
-          + '","toAddress":"' + this.transferForm.joinAddress
-          + '","amount":' + rightShift.times(this.transferForm.joinNo)
-          + ',"password":"' + password
-          + '","remark":"' + htmlEncodeByRegExp(this.transferForm.remark) + '"}';
-        //console.log(param);
-        this.$post('/accountledger/transfer', param)
+        let url = '';
+        let params = '';
+        //判断是否代币转账
+        if (this.seniorIf) {
+          let decimalsValue = new BigNumber(this.transferForm.joinNo);
+          if(this.$route.query.address){
+            url = '/contract/call';
+            params = '{"sender":"' + this.selectAddress
+              + '","gasLimit":' + this.transferForm.gas
+              + ',"price":' + this.transferForm.price
+              + ',"password":"' + password
+              + '","remark":"' + htmlEncodeByRegExp(this.transferForm.remark)
+              + '","contractAddress":"' + this.$route.query.address
+              + '","value":0,"methodName":"transfer","methodDesc":"","args":["'
+              + this.transferForm.joinAddress + '","' + decimalsValue.times(this.decimalsNo)
+              + '"]}';
+          }else {
+            url = '/contract/transfer';
+            params = '{"address":"' + this.selectAddress
+              + '","toAddress":"' + this.transferForm.joinAddress
+              + '","gasLimit":' + this.transferForm.gas
+              + ',"price":' + this.transferForm.price
+              + ',"password":"' + password
+              + '","remark":"' + htmlEncodeByRegExp(this.transferForm.remark)
+              + '"}';
+          }
+        } else {
+          url = '/accountledger/transfer';
+          params = '{"address":"' + this.selectAddress
+            + '","toAddress":"' + this.transferForm.joinAddress
+            + '","amount":' + rightShift.times(this.transferForm.joinNo)
+            + ',"password":"' + password
+            + '","remark":"' + htmlEncodeByRegExp(this.transferForm.remark) + '"}';
+        }
+        //console.log(url);
+        //console.log(params);
+        this.$post(url, params)
           .then((response) => {
             //console.log(response);
             if (response.success) {
@@ -401,16 +523,6 @@
             }
           })
       },
-
-     /* toSubmitsss() {
-        let rightShift = new BigNumber(100000000);
-        let param = '{"address":"NsdvCLtZZBX4QHkZcvkyrRfoeJjRorRW","toAddress":"Nse16StBPcR1wzGxR4ZqoLNnLYTSKKYS","amount":1587000,"password":"","remark":"sdf"}';
-        //console.log(param);
-        this.$post('/accountledger/transfer', param)
-          .then((response) => {
-            console.log(response);
-          })
-      },*/
     }
   }
 </script>
@@ -450,6 +562,11 @@
                   }
                 }
               }
+            }
+            .contract-address {
+              border: 1px solid #24426c;
+              line-height: 26px;
+              padding: 0 0 0 5px;
             }
             .copy_icon {
               position: absolute;
@@ -498,12 +615,34 @@
                 border-radius: 1px;
               }
             }
+            .price-min {
+              color: #ffd966;
+              line-height: 15px;
+              text-align: left;
+            }
           }
         }
         .out-address {
           .el-form-item__label {
             line-height: 30px;
             float: none;
+          }
+        }
+        .contract-t {
+          .call-senior {
+            height: 45px;
+            text-align: left;
+            font-size: 14px;
+            .el-switch {
+              .el-switch__core {
+                background: #222D3E;
+                height: 16px;
+                &:after {
+                  width: 12px;
+                  height: 12px;
+                }
+              }
+            }
           }
         }
         .transfer-submit {

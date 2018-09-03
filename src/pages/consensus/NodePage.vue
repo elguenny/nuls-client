@@ -337,7 +337,7 @@
         float: left;
         label {
           display: block;
-          width: 90px;
+          width: 95px;
           float: left;
           padding-left: 25px;
         }
