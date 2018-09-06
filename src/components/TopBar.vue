@@ -9,7 +9,7 @@
           class="wallet_icon"></i> <span>{{$t('message.wallet')}}</span></li>
         <li @click="to('consensus','2')" :class="[errorClass ,isActive===2 ? activeClass : '']"><i
           class="consensus_icon"></i> <span>{{$t('message.consensus')}}</span></li>
-        <li @click="to('application','3')"><i
+        <li @click="to('application','3')" v-show="false"><i
           class="application_icon"></i> <span>{{$t('message.applications')}}</span></li>
         <li @click="to('contract','4')" :class="[errorClass ,isActive===4 ? activeClass : '']"><i
           class="application_icon"></i> <span>{{$t('message.contract')}}</span></li>

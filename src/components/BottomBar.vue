@@ -1,5 +1,5 @@
 <template>
-  <div class="bottom">
+  <div class="bottom" :class="this.bottomCss ? 'bottomP':''">
     <footer>
       <el-col :span="10" class='footer-left'>
         <span>{{$t('message.purseVersion')}}</span>：V{{this.$store.getters.getVersionInfo.myVersion}}
@@ -17,6 +17,7 @@
 <script>
   import {getNetworkInfo} from '@/api/httpData.js'
   import {accountList} from '@/api/util.js'
+
   export default {
     data() {
       return {
@@ -26,6 +27,9 @@
         connectNumber: '0',
         //WiFi icon
         iconWifi: 'no-wifi_icon',
+        //底部样式
+        bottomCss:false,
+
       }
     },
     mounted() {
@@ -38,6 +42,10 @@
           this.getAccountList()
         }
       }, 5000);
+
+      setInterval(() => {
+        this.bottomCss = this.hasScrollbar();
+      },100);
 
       //调用查询账户列表
       this.getAccountList();
@@ -82,13 +90,17 @@
       getAccountList() {
         accountList().then((response) => {
           //console.log(response);
-          if(response.success){
+          if (response.success) {
             this.$store.commit('setAddressList', response.list);
-          }else {
+          } else {
             this.$store.commit('setAddressList', '');
             console.log("err")
           }
         });
+      },
+
+      hasScrollbar() {
+        return document.body.scrollHeight > (window.innerHeight || document.documentElement.clientHeight);
       }
     }
   }
@@ -101,6 +113,9 @@
     height: 30px;
     position: fixed;
     bottom: 0;
+  }
+  .bottomP{
+    position: relative;
   }
 
   footer {

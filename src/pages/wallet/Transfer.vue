@@ -73,7 +73,7 @@
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
   import {BigNumber} from 'bignumber.js'
-  import {htmlEncodeByRegExp, LeftShiftEight, RightShiftEight, Power, Division,copys} from '@/api/util'
+  import {htmlEncodeByRegExp, LeftShiftEight, RightShiftEight, Power, Division,Minus,copys} from '@/api/util'
   import {numbers} from '@/api/validate'
 
 
@@ -106,15 +106,24 @@
         }else if (value < this.fee) {
           callback(new Error(this.$t('message.transferNO3')))
         }else {
-          setTimeout( () =>{
-            if(RightShiftEight(this.transferForm.joinNo).toString() === RightShiftEight(this.usable).toString()) {
-              this.transferForm.joinNo = LeftShiftEight(parseInt(RightShiftEight(this.usable).toString()) - parseInt(RightShiftEight(this.fee).toString()));
-            }else if (parseInt(RightShiftEight(value).toString()) > this.maxAmount && !this.seniorIf) {
-              callback(new Error(this.$t('message.c202') + LeftShiftEight(this.maxAmount).toString()))
+          if(this.seniorIf){
+            if(value > this.usable ){
+              callback(new Error(this.$t('message.c2021')))
             }else {
               callback()
             }
-          },100);
+          }else {
+            setTimeout( () =>{
+              if(RightShiftEight(this.transferForm.joinNo).toString() === RightShiftEight(this.usable).toString()) {
+                //console.log(Minus(RightShiftEight(this.usable),RightShiftEight(this.fee)).toString());
+                this.transferForm.joinNo = LeftShiftEight(Minus(RightShiftEight(this.usable),RightShiftEight(this.fee))).toString();
+              }else if (parseInt(RightShiftEight(value).toString()) > this.maxAmount && !this.seniorIf) {
+                callback(new Error(this.$t('message.c202') + LeftShiftEight(this.maxAmount).toString()))
+              }else {
+                callback()
+              }
+            },100);
+          }
         }
       };
       let validateGas = (rule, value, callback) => {
