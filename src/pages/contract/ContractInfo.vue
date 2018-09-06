@@ -13,18 +13,22 @@
         </p>
         <p v-show="this.contractInfo.status ==='stop'">{{$t('message.c951')}} </p>
       </div>
-      <ul class="info">
-        <li><span>Balance:</span>{{this.contractInfo.balance}} NULS</li>
-        <li><span>Transactions:</span>{{this.contractInfo.txCount}} Txns</li>
+      <ul class="info" :class="this.contractInfo.isNrc20 ? '':'infos'">
+        <li><span>{{$t('message.tips4')}}:</span>{{this.contractInfo.balance}} NULS</li>
+        <li><span>{{$t('message.tips5')}}:</span>{{this.contractInfo.txCount}} Txns</li>
         <li class="overflow">
-          <span>Contract Creator:</span>
+          <span>{{$t('message.tips6')}}:</span>
           <label class="overflow cursor-p text-ds" @click="toNulscan(contractInfo.creater)">{{this.contractInfo.creater}}</label>
           <label class="labels">at txid</label>
-          <label class="overflow cursor-p text-ds" @click="toTxid(contractInfo.createTxHash)">{{this.contractInfo.createTxHash}}</label>
+          <label class="overflow cursor-p text-ds" @click="toTxid(contractInfo.createTxHash,101)">{{this.contractInfo.createTxHash}}</label>
+        </li>
+        <li class="overflow" v-show="this.contractInfo.isNrc20">
+          <span>Token Tracker:</span>
+            {{this.contractInfo.nrc20TokenName}}
+            <font v-show="this.contractInfo.nrc20TokenSymbol">({{this.contractInfo.nrc20TokenSymbol}})</font>
         </li>
         <li v-show="this.contractInfo.isNrc20">
-          <span>Token Tracker:</span>{{this.contractInfo.nrc20TokenName}}
-          <font v-show="this.contractInfo.nrc20TokenSymbol">({{this.contractInfo.nrc20TokenSymbol}})</font></li>
+          <span>{{$t('message.tips8')}}:</span>{{this.contractInfo.totalSupply}}</li>
       </ul>
     </div>
 
@@ -36,7 +40,13 @@
               {{$t('message.type'+scope.row.type)}}
             </template>
           </el-table-column>
-          <el-table-column prop="txData.data.sender" :label="$t('message.c242')" min-width="150" align="center"></el-table-column>
+          <el-table-column prop="txData.data.sender" :label="$t('message.c242')" min-width="150" align="center">
+            <template slot-scope="scope">
+             <span  @click="toNulscan(scope.row.txData.data.sender)" class="cursor-p text-ds overflow">
+									{{ scope.row.txData.data.sender}}
+								</span>
+            </template>
+          </el-table-column>
           <el-table-column label="txid" min-width="180" align="center">
             <template slot-scope="scope">
 								<span @click="toTxid(scope.row.hash,scope.row.type)" class="cursor-p text-ds overflow">
@@ -44,7 +54,7 @@
 								</span>
             </template>
           </el-table-column>
-          <el-table-column prop="time" :label="$t('message.time')" width="140" align="center"></el-table-column>
+          <el-table-column prop="time" :label="$t('message.time')" width="145" align="center"></el-table-column>
           <el-table-column :label="$t('message.state')" align="center">
             <template slot-scope="scope">
               <span>{{ $t('message.statusS'+scope.row.status) }}</span>
@@ -65,8 +75,16 @@
         <el-table :data="contractData" style="width: 100%">
           <el-table-column prop="name" :label="$t('message.c218')" width="150" align="center"></el-table-column>
           <el-table-column prop="newArgs" :label="$t('message.c219')" min-width="200" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.newArgs === '' ? $t('message.c245') : scope.row.newArgs}}</span>
+            </template>
           </el-table-column>
-          <el-table-column prop="returnArg" :label="$t('message.c220')" width="150" align="center"></el-table-column>
+          <el-table-column prop="returnArg" :label="$t('message.c220')" width="150" align="center">
+            <template slot-scope="scope">
+              <span> [{{scope.row.returnArg}}]</span>
+            </template>
+          </el-table-column>
+
         </el-table>
       </el-tab-pane>
 
@@ -74,7 +92,7 @@
 
         <div class="query-info">
           <el-form :model="callForm" :rules="callRules" ref="callForm" class="call-contract">
-            <el-form-item :label="$t('message.c229')" class="lable">
+            <el-form-item label="" class="lable">
               <el-select v-model="callForm.region" :placeholder="$t('message.c229')" @change="changeCallOptions">
                 <el-option v-for="item in contractData" :key="item.name" :label="item.name" :value="item">
                 </el-option>
@@ -82,10 +100,10 @@
             </el-form-item>
             <el-form-item
               v-for="(domain, index) in callForm.domains"
-              :label="domain.name + '('+domain.type+')' +domain.types"
+              :label="domain.name + '( '+domain.type+')' +domain.types"
               :key="domain.name"
               :prop="'domains.' + index + '.value'"
-              :rules="{required: true, message: domain.name+$t('message.c230'), trigger: 'blur'}"
+              :rules="{required: domain.required, message: domain.name+$t('message.c230'), trigger: 'blur'}"
             >
               <el-input v-model.trim="domain.value" @change="getCallGas(contractItem)"></el-input>
             </el-form-item>
@@ -105,7 +123,7 @@
               <el-form-item label="Value" prop="values" v-show="!valuesIf">
                 <el-input v-model="callForm.values" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
               </el-form-item>
-              <el-form-item label="Addtion" prop="addtion">
+              <el-form-item :label="$t('message.tips3')" prop="addtion">
                 <el-input v-model="callForm.addtion" :maxlength="30"></el-input>
               </el-form-item>
             </div>
@@ -118,9 +136,9 @@
           <div class="click-after scroll" v-show="submitCallFormIf">
             <p :class="this.submitCallFormHight <= 6 ? 'waingClass':''">
             <!--  <span v-show="this.submitCallFormHight <= 6">{{this.submitCallFormSuccse}}</span> -->
-              <span v-show="this.submitCallFormHight <= 1">{{this.submitCallFormSuccse}} {{$t('message.confirming')}}....</span>
-              <span v-show="this.submitCallFormHight > 1" class="cursor-p text-ds"
-                    @click="toTxid(submitCallFormSuccse,101)">{{this.submitCallFormSuccse}}</span>
+              <span v-show="this.submitCallFormHight <= 1" class="overflow" >TxID:{{this.submitCallFormSuccse}} {{$t('message.confirming')}}....</span>
+              <span v-show="this.submitCallFormHight > 1" class="cursor-p text-ds overflow"
+                    @click="toTxid(submitCallFormSuccse,100)">{{this.submitCallFormSuccse}}</span>
              <!-- <label v-show="this.submitCallFormHight <= 6 && !this.valuesIf">({{this.submitCallFormHight}}/6)</label>-->
             </p>
             <pre id="out_pre"></pre>
@@ -138,15 +156,19 @@
   import moment from 'moment'
   import Back from './../../components/BackBar.vue'
   import Password from '@/components/PasswordBar.vue'
-  import {copys,RightShiftEight,LeftShiftEight, getLocalTime,allParams,htmlEncodeByRegExp} from '@/api/util.js'
+  import {copys,RightShiftEight,LeftShiftEight, getLocalTime,allParams,htmlEncodeByRegExp,Power,Division} from '@/api/util.js'
 
   export default {
     data() {
       let validateGas = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.c204')));
-        } else if (value < 1 || value > 10000000) {
-          callback(new Error(this.$t('message.c204')));
+        } else if (value < 1 ) {
+          this.callForm.gas = 1;
+          callback();
+        }else if(value > 10000000){
+          this.callForm.gas = 10000000;
+          callback();
         } else {
           callback();
         }
@@ -154,7 +176,9 @@
       let validatePrice = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.c205')));
-        } else {
+        }else if(value < 1){
+          this.callForm.price = 1;
+        }else {
           callback();
         }
       };
@@ -215,6 +239,13 @@
         //调用结果返回内容
         submitCallFormSuccse: '',
         submitCallFormHight: 0,
+
+        //精度系数
+        decimals:0,
+        //是否为isNrc20
+        isNrc20:false,
+        //乘运算or除运算
+        bigInteger:false,
         //定义定时器
         contractInfoSetInterval: null,
       }
@@ -261,9 +292,17 @@
             //console.log(response);
             if (response.success) {
               this.contractInfo = response.data;
+              //精度系数
+              let powerNu =  Power(response.data.decimals);
+              this.decimals = powerNu;
+              //判断是否为NRC20
+              if( response.data.isNrc20){
+                this.isNrc20 = true;
+                response.data.totalSupply = Division(response.data.totalSupply,powerNu).toString();
+              }
               //双层选好获取合约详情的方法参数
               for (let i in response.data.method) {
-                if (response.data.method[i].name !== '<init>' || !response.data.method) {
+                if (response.data.method[i].name !== '<init>' && !response.data.method[i].event) {
                   this.contractData.push(response.data.method[i]);
                 }
                 //获取合约详情的方法参数
@@ -344,7 +383,7 @@
         if (localStorage.getItem('encrypted') === "true") {
           this.$refs.password.showPassword(true)
         } else {
-          this.$confirm(this.$t('message.c1721'), '', {
+          this.$confirm(this.$t('message.tip1'), '', {
             confirmButtonText: this.$t('message.confirmButtonText'),
             cancelButtonText: this.$t('message.cancelButtonText'),
           }).then(() => {
@@ -422,6 +461,12 @@
           }else {
             item.args[i].types = ''
           }
+          //判断参数类型是否需要乘以精度系数
+          if(item.args[i].type === 'BigInteger'){
+            item.args[i].bigInteger = true
+          }else {
+            item.args[i].bigInteger = false
+          }
         }
         this.callForm.domains = item.args;
 
@@ -447,6 +492,14 @@
           this.callForm.values = 0;
         }
 
+        //根据returnArg 进行判断是否乘除
+        if(item.returnArg ==='BigInteger'){
+          this.bigInteger = true;
+        }else {
+          this.bigInteger = false;
+        }
+
+        //根据参数长度进行gas估算
         if (item.args.length > 0) {
           this.callForm.domains = item.args;
         } else {
@@ -469,10 +522,10 @@
                 + '","value":"0","methodName":"' + item.name
                 + '","methodDesc":"' + item.desc
                 + '","price":"1"'
-                + ',"args":[' + allParams(this.callForm.domains).params
+                + ',"args":[' + allParams(this.callForm.domains,this.decimals).params
                 + ']}';
             } else {
-              console.log("动态参数必填信息没填写")
+              //console.log("动态参数必填信息没填写")
             }
           } else {
             param = '{"sender":"' + this.accountAddressValue
@@ -518,7 +571,7 @@
                 this.$refs.password.showPassword(true)
               } else {
                 //没密码弹框
-                this.$confirm(this.$t('message.c1721'), '', {
+                this.$confirm(this.$t('message.tip1'), '', {
                   confirmButtonText: this.$t('message.confirmButtonText'),
                   cancelButtonText: this.$t('message.cancelButtonText'),
                 }).then(() => {
@@ -532,7 +585,7 @@
               let param = '{"contractAddress":"' + this.contractAddress
                 + '","methodName":"' + this.contractItem.name
                 + '","methodDesc":"' + this.contractItem.desc
-                + '","args":[' + allParams(this.callForm.domains).params
+                + '","args":[' + allParams(this.callForm.domains,this.decimals).params
                 + ']}';
               //console.log(param);
               this.$post('/contract/view', param)
@@ -542,7 +595,12 @@
                     this.submitCallFormIf = true;
                     this.submitCallFormHight = 2;
                     document.getElementById('out_pre').innerText = '';
-                    document.getElementById('out_pre').innerText = response.data.toString();
+                    //判断是否为isNrc20
+                    if(this.isNrc20 && this.bigInteger){
+                      document.getElementById('out_pre').innerText = Division(response.data,this.decimals).toString();
+                    }else {
+                      document.getElementById('out_pre').innerText = response.data.toString();
+                    }
                   } else {
                     this.$message({
                       message: this.$t('message.passWordFailed') + response.data.msg,
@@ -577,7 +635,7 @@
             + '","value":"' + RightShiftEight(this.callForm.values || 0).toString()
             + '","methodName":"' + this.contractItem.name
             + '","methodDesc":"' + this.contractItem.desc
-            + '","args":[' + allParams(this.callForm.domains).params
+            + '","args":[' + allParams(this.callForm.domains,this.decimals).params
             + ']}';
         } else {
           url = '/contract/delete';
@@ -660,10 +718,12 @@
         h3 {
           width: 70%;
           float: left;
+          font-size: 14px;
         }
         p {
           width: 30%;
           float: right;
+          font-size: 14px;
           text-align: right;
           .collects {
             color: #82bd39;
@@ -675,7 +735,7 @@
       }
       ul {
         border: 1px solid #3a8ee6;
-        height: 60px;
+        height: 85px;
         padding: 10px 0;
         font-size: 14px;
         li {
@@ -704,6 +764,9 @@
         }
 
       }
+      .infos{
+        height: 60px;
+      }
     }
     .contract-info-tab {
       margin-top: 20px;
@@ -717,7 +780,7 @@
           margin: auto;
           .el-form-item {
             text-align: left;
-            margin-bottom: 20px;
+            margin: 20px auto;
             .el-form-item__label {
               color: #FFFFFF;
               padding: 0;
@@ -773,8 +836,8 @@
           }
         }
         .click-after {
-          width: 430px;
-          max-height: 100px;
+          width: 680px;
+          max-height: 280px;
           background-color: #1c2738;
           text-align: left;
           margin: 0 auto 40px;

@@ -29,8 +29,10 @@
               <template slot-scope="scope">
                 <div @click="setRemarkName(scope.row.contractAddress,scope.row.remarkName)">
                   <span class="cursor-p text-ds">{{ scope.row.remarkName ? scope.row.remarkName:'' }}</span>
-                  <i class="el-icon-edit cursor-p"
-                     v-show="scope.row.confirmCount > 6 && scope.row.status > 0 "></i>
+                  <span v-show="scope.row.remarkName ? false:true">
+                    <i class="el-icon-edit cursor-p"
+                       v-show="scope.row.confirmCount > 6 && scope.row.status > 0 "></i>
+                  </span>
                 </div>
               </template>
             </el-table-column>
@@ -78,9 +80,9 @@
                 <label>{{$t('message.c215')}}:</label>
                 <span class="cursor-p text-ds" @click="toContractInfo(callFormAddress)">{{this.callFormAddress}}</span>
                 <i class="el-icon-star-on cursor-p" :class="this.isCollect ? 'collects':'collect'"
-                   v-show="!addressNewIf" @click="collect(accountAddressValue,callFormAddress)"></i>
+                   v-show="addressNewIf" @click="collect(accountAddressValue,callFormAddress)"></i>
               </div>
-              <el-form-item :label="$t('message.c229')">
+              <el-form-item label="">
                 <el-select v-model="callForm.region" :placeholder="$t('message.c229')" @change="changeCallOptions">
                   <el-option v-for="item in callFormOptions" :key="item.name" :label="item.name" :value="item">
                   </el-option>
@@ -91,7 +93,7 @@
                 :label="domain.name + '('+domain.type+')' +domain.types"
                 :key="domain.name"
                 :prop="'domains.' + index + '.value'"
-                :rules="{required: true, message: domain.name+$t('message.c230'), trigger: 'blur'}"
+                :rules="{required: domain.required, message: domain.name+$t('message.c230'), trigger: 'blur'}"
               >
                 <el-input v-model.trim="domain.value" @change="getCallGas(contractFormItem)"></el-input>
               </el-form-item>
@@ -113,7 +115,7 @@
                   <el-input v-model="callForm.values" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
                 </el-form-item>
                 <el-form-item label="Addtion" prop="addtion">
-                  <el-input v-model="callForm.addtion" :maxlength="40"></el-input>
+                  <el-input v-model="callForm.addtion" :maxlength="30"></el-input>
                 </el-form-item>
               </div>
               <el-form-item class="submit-bt" style="text-align: center">
@@ -124,7 +126,7 @@
             <div class="click-after scroll" v-show="submitCallFormIf">
               <p :class="this.submitCallFormHight <= 6 ? 'waingClass':''">
                 <!--<span v-show="this.submitCallFormHight <= 6">{{this.submitCallFormSuccse}}</span>-->
-                <span v-show="this.submitCallFormHight <= 1">{{this.submitCallFormSuccse}} {{$t('message.confirming')}}....</span>
+                <span v-show="this.submitCallFormHight <= 1">TxID:{{this.submitCallFormSuccse}} {{$t('message.confirming')}}....</span>
                 <span v-show="this.submitCallFormHight > 1" class="cursor-p text-ds"
                       @click="toTxid(submitCallFormSuccse,101)">{{this.submitCallFormSuccse}}</span>
                 <!-- <label v-show="this.submitCallFormHight <= 6 && !this.valuesIf">({{this.submitCallFormHight}}/6)</label>-->
@@ -139,7 +141,7 @@
           <div class="third-radio">
             <el-radio-group v-model="contractRadio" @change="changeRadio">
               <el-radio :label="0">{{$t('message.c233')}}</el-radio>
-              <el-radio :label="1">{{$t('message.c234')}}</el-radio>
+             <!-- <el-radio :label="1">{{$t('message.c234')}}</el-radio>-->
             </el-radio-group>
           </div>
           <el-form :model="contractForm" :rules="contractRules" ref="contractForm">
@@ -183,7 +185,7 @@
                 <el-input v-model="contractForm.price" onkeyup="value=value.replace(/[^\d]/g,'')"></el-input>
               </el-form-item>
               <el-form-item label="Addtion" prop="addtion">
-                <el-input v-model="contractForm.addtion" :maxlength="40"></el-input>
+                <el-input v-model="contractForm.addtion" :maxlength="30"></el-input>
               </el-form-item>
             </div>
             <el-form-item class="add-contrant">
@@ -196,7 +198,7 @@
               </div>
               <div class="add-contrant-submit">
                 <el-button type="primary" @click="deployContractForm('contractForm')"
-                           :class=" this.testIf ? 'isBright' : ''">{{$t('message.c232')}}
+                           :class=" this.testIf ? 'isBright' : ''">{{$t('message.tips11')}}
                 </el-button>
               </div>
             </el-form-item>
@@ -228,7 +230,7 @@
 
 <script>
   import moment from 'moment'
-  import {copys, RightShiftEight, LeftShiftEight, getLocalTime, allParams, htmlEncodeByRegExp} from '@/api/util.js'
+  import {copys, RightShiftEight, LeftShiftEight, getLocalTime, allParams,Power,Division,htmlEncodeByRegExp} from '@/api/util.js'
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
   import Password from '@/components/PasswordBar.vue'
 
@@ -237,8 +239,20 @@
       let validateGas = (rule, value, callback) => {
         if (!value) {
           callback(new Error(this.$t('message.c204')));
-        } else if (value < 1 || value > 10000000) {
-          callback(new Error(this.$t('message.c204')));
+        } else if (value < 1 ) {
+          if(this.contractActive === 'third'){
+            this.contractForm.gas = 1;
+          }else {
+            this.callForm.gas = 1;
+          }
+          callback();
+        }else if(value > 10000000){
+          if(this.contractActive === 'third'){
+            this.contractForm.gas = 10000000;
+          }else {
+            this.callForm.gas = 10000000;
+          }
+          callback();
         } else {
           callback();
         }
@@ -247,7 +261,12 @@
         if (!value) {
           callback(new Error(this.$t('message.c205')));
         } else if (value < 1) {
-          callback(new Error(this.$t('message.c205')));
+          if(this.contractActive === 'third'){
+            this.contractForm.price = 1;
+          }else {
+            this.callForm.price = 1;
+          }
+          callback();
         } else {
           callback();
         }
@@ -367,6 +386,12 @@
         testIf: false,
         //部署表单记录
         deployForm: [],
+        //精度系数
+        decimals:0,
+        //是否为isNrc20
+        isNrc20:false,
+        //乘运算or除运算
+        bigInteger:false,
       }
     },
     components: {
@@ -406,6 +431,7 @@
         this.callForm.region = '';
         this.callFormOptions = [];
         //清除部署合约信息
+        this.contractForm.hex ='';
         this.$refs.contractForm.resetFields();
         this.contractForm.domains = '';
       },
@@ -579,7 +605,7 @@
        *  @param row
        **/
       cancelCollection(index, row) {
-        this.$confirm(this.$t('message.c1721'), '', {
+        this.$confirm(this.$t('message.tips2'), '', {
           confirmButtonText: this.$t('message.confirmButtonText'),
           cancelButtonText: this.$t('message.cancelButtonText'),
         }).then(() => {
@@ -634,27 +660,45 @@
               .then((response) => {
                 //console.log(response);
                 if (response.success) {
+                  //清空以前的方法及调用结果
+                  this.$refs.callForm.resetFields();
+                  this.callForm.domains = [];
+                  this.callForm.region ='';
+                  this.callFormOptions =[];
+                  this.switchDisabled = false;
+                  this.callSeniorValue = false;
+                  this.submitCallFormIf = false;
+                  document.getElementById('out_pre').innerText = '';
+
                   this.callFormAddress = response.data.address;
                   this.queryInfoIf = true;
 
+                  //精度系数
+                  this.decimals =  Power(response.data.decimals);
+                  //判断是否为NRC20
+                  if( response.data.isNrc20){
+                    this.isNrc20 = true;
+                  }
+
                   //判断用户列表里有没有查询的合约地址
-                  let set = new Set(this.contractData);
+                  let set = new Set();
                   for (let i of this.contractData) {
                     set.add(i.contractAddress)
                   }
                   if (response.data.creater !== this.accountAddressValue) {
+                    this.addressNewIf = true;
                     if (!set.has(response.data.address)) {
                       this.isCollect = false;
                     } else {
                       this.isCollect = true;
                     }
                   } else {
-                    this.addressNewIf = true;
+                    this.addressNewIf = false;
                   }
 
                   //this.callFormOptions = response.data.method
                   for (let i in response.data.method) {
-                    if (response.data.method[i].name !== '<init>' || !response.data.method) {
+                    if (response.data.method[i].name !== '<init>' && !response.data.method[i].event) {
                       this.callFormOptions.push(response.data.method[i]);
                     }
                   }
@@ -677,6 +721,7 @@
        * @param item
        **/
       changeCallOptions(item) {
+        //console.log(item);
         this.contractFormItem = item;
         //循环那些数数组形式
         for (let i in item.args) {
@@ -685,6 +730,12 @@
             item.args[i].types = this.$t('message.c241')
           } else {
             item.args[i].types = ''
+          }
+          //判断参数类型是否需要乘以精度系数
+          if(item.args[i].type === 'BigInteger'){
+            item.args[i].bigInteger = true
+          }else {
+            item.args[i].bigInteger = false
           }
         }
         this.callForm.domains = item.args;
@@ -698,6 +749,11 @@
         //是否上链，true:不上链,false:上链
         if (!item.view) {
           this.switchDisabled = true;
+          this.systemCallGas = '';
+          this.callForm.gas = '';
+          this.callForm.price = '';
+          this.callForm.values = '';
+          this.$refs.callForm.resetFields();
         } else {
           //禁止滑块打开
           this.switchDisabled = false;
@@ -710,6 +766,14 @@
           this.callForm.values = 0;
         }
 
+        //根据returnArg 进行判断是否乘除
+        if(item.returnArg ==='BigInteger'){
+          this.bigInteger = true;
+        }else {
+          this.bigInteger = false;
+        }
+
+        //根据参数长度进行gas估算
         if (item.args.length > 0) {
           this.callForm.domains = item.args
         } else {
@@ -725,16 +789,16 @@
         //判断是否上链方法（true:不上链,false:上链）
         if (!item.view) {
           if (item.args.length > 0) {
-            if (allParams(item.args).success) {
+            if (allParams(item.args,this.decimals).success) {
               param = '{"sender":"' + this.accountAddressValue
                 + '","contractAddress":"' + this.callFormAddress
                 + '","value":"0","methodName":"' + item.name
                 + '","methodDesc":"' + item.desc
                 + '","price":"1"'
-                + ',"args":[' + allParams(item.args).params
+                + ',"args":[' + allParams(item.args,this.decimals).params
                 + ']}';
             } else {
-              console.log("动态参数必填信息没填写")
+              //console.log("动态参数必填信息没填写")
             }
           } else {
             param = '{"sender":"' + this.accountAddressValue
@@ -785,10 +849,11 @@
           if (valid) {
             //判断是否上链方法
             if (!this.valuesIf) {
+
               if (localStorage.getItem('encrypted') === "true") {
                 this.$refs.password.showPassword(true)
               } else {
-                this.$confirm(this.$t('message.c172'), '', {
+                this.$confirm(this.$t('message.tip1'), '', {
                   confirmButtonText: this.$t('message.confirmButtonText'),
                   cancelButtonText: this.$t('message.cancelButtonText'),
                 }).then(() => {
@@ -801,7 +866,7 @@
               let param = '{"contractAddress":"' + this.callFormAddress
                 + '","methodName":"' + this.contractFormItem.name
                 + '","methodDesc":"' + this.contractFormItem.desc
-                + '","args":[' + allParams(this.contractFormItem.args).params
+                + '","args":[' + allParams(this.contractFormItem.args,this.decimals).params
                 + ']}';
               this.$post('/contract/view', param)
                 .then((response) => {
@@ -810,7 +875,12 @@
                     this.submitCallFormIf = true;
                     this.submitCallFormHight = 2;
                     document.getElementById('out_pre').innerText = '';
-                    document.getElementById('out_pre').innerText = response.data.toString();
+                    //判断是否为isNrc20
+                    if(this.isNrc20 && this.bigInteger){
+                      document.getElementById('out_pre').innerText = Division(response.data,this.decimals).toString();
+                    }else {
+                      document.getElementById('out_pre').innerText = response.data.toString();
+                    }
                   } else {
                     this.$message({
                       message: this.$t('message.passWordFailed') + response.data.msg,
@@ -867,13 +937,13 @@
       newContractGas() {
         let param = '';
         if (this.contractForm.domains.length > 0) {
-          if (allParams(this.contractForm.domains).success) {
+          if (allParams(this.contractForm.domains,this.decimals).success) {
             param = '{"sender":"' + this.accountAddressValue
               + '","price":1,"contractCode":"' + this.contractForm.hex
-              + '","args":[' + allParams(this.contractForm.domains).params
+              + '","args":[' + allParams(this.contractForm.domains,this.decimals).params
               + ']}';
           } else {
-            console.log("动态参数必填信息没填写")
+            //console.log("动态参数必填信息没填写")
           }
         } else {
           param = '{"sender":"' + this.accountAddressValue
@@ -913,7 +983,7 @@
               + ',"price":' + this.contractForm.price
               + ',"remark":"' + this.contractForm.addtion
               + '","contractCode":"' + this.contractForm.hex
-              + '","args":[' + allParams(this.contractForm.domains).params
+              + '","args":[' + allParams(this.contractForm.domains,this.decimals).params
               + ']}';
             //console.log(param);
             this.$post('/contract/precreate', param)
@@ -951,7 +1021,7 @@
               if (localStorage.getItem('encrypted') === "true") {
                 this.$refs.password.showPassword(true)
               } else {
-                this.$confirm(this.$t('message.c1721'), '', {
+                this.$confirm(this.$t('message.tip1'), '', {
                   confirmButtonText: this.$t('message.confirmButtonText'),
                   cancelButtonText: this.$t('message.cancelButtonText'),
                 }).then(() => {
@@ -989,7 +1059,7 @@
             + '","value":"' + RightShiftEight(this.callForm.values || 0).toString()
             + '","methodName":"' + this.contractFormItem.name
             + '","methodDesc":"' + this.contractFormItem.desc
-            + '","args":[' + allParams(this.contractFormItem.args).params
+            + '","args":[' + allParams(this.contractFormItem.args,this.decimals).params
             + ']}';
         } else {
           url = '/contract/create';
@@ -999,7 +1069,7 @@
             + ',"password":"' + password
             + '","remark":"' + htmlEncodeByRegExp(this.contractForm.addtion)
             + '","contractCode":"' + this.contractForm.hex
-            + '","args":[' + allParams(this.contractForm.domains).params
+            + '","args":[' + allParams(this.contractForm.domains,this.decimals).params
             + ']}';
         }
         //console.log(url);
@@ -1075,10 +1145,10 @@
        * toTxid跳转
        * @param txId
        */
-      toTxid(txId) {
+      toTxid(hash,type) {
         this.$router.push({
           name: 'dealInfo',
-          query: {hash: txId},
+          query: {hash: hash,type:type},
         })
       },
 
@@ -1160,10 +1230,14 @@
           .call-contract {
             width: 500px;
             .address {
+              label{
+                font-size: 14px;
+              }
               text-align: left;
               margin: 30px auto 10px;
               span {
                 color: #C1C5C9;
+                font-size: 14px;
               }
               .collects {
                 color: #82bd39;
@@ -1214,8 +1288,8 @@
 
           }
           .click-after {
-            width: 500px;
-            max-height: 100px;
+            width: 680px;
+            max-height: 280px;
             background-color: #1c2738;
             text-align: left;
             margin: 0 auto 40px;

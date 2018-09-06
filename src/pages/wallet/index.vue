@@ -19,25 +19,25 @@
               <span>{{ scope.row.asset }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('message.indexSum')" width="180" align='center'>
+          <el-table-column :label="$t('message.indexSum')" width="230" align='center'>
             <template slot-scope="scope">
               <span>{{ scope.row.balance }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('message.indexUsable')" width="280" align='center'>
+          <el-table-column :label="$t('message.indexUsable')" width="230" align='center'>
             <template slot-scope="scope">
               <span>{{ scope.row.usable }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('message.indexLock')" width="280" align='center'>
+          <el-table-column :label="$t('message.indexLock')" width="230" align='center'>
             <template slot-scope="scope">
               <span class="cursor-p text-d" @click="toLocked(accountAddressValue)" v-show="!scope.row.address">{{ scope.row.locked }}</span>
             </template>
           </el-table-column>
           <el-table-column :label="$t('message.operation')" align='center'>
             <template slot-scope="scope">
-              <span class="cursor-p text-d" @click="toTransfer(scope.row)">{{$t('message.transfer')}}</span>
-              <span class="cursor-p text-d" @click="toDealList(scope.$index, scope.row)">{{$t('message.transactionRecord')}}</span>
+              <span class="cursor-p text-ds" @click="toTransfer(scope.row)" style="margin-right:10px">{{$t('message.transfer')}}</span>
+              <span class="cursor-p text-ds" @click="toDealList(scope.$index, scope.row)">{{$t('message.transactionRecord')}}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -48,7 +48,7 @@
 
 <script>
   import AccountAddressBar from '@/components/AccountAddressBar.vue'
-  import {copys, LeftShiftEight,Power,Division,getLocalTime} from '@/api/util.js'
+  import {copys, LeftShiftEight, Power, Division, getLocalTime} from '@/api/util.js'
   import {getAccountAssets, getAccountTxList} from '@/api/httpData.js'
 
   export default {
@@ -69,7 +69,7 @@
       this.getAccountAssets(this.accountAddressValue);
 
       this.walletSetInterval = setInterval(() => {
-          this.getAccountAssets(this.accountAddressValue)
+        this.getAccountAssets(this.accountAddressValue)
       }, 10000)
     },
     destroyed() {
@@ -88,12 +88,12 @@
             if (response.success) {
               for (let i in response.data.list) {
                 //根据是否有地址判断 代币和非代币
-                if(!response.data.list[i].address){
+                if (!response.data.list[i].address) {
                   response.data.list[i].balance = LeftShiftEight(response.data.list[i].balance).toString();
                   response.data.list[i].locked = LeftShiftEight(response.data.list[i].locked).toString();
                   response.data.list[i].usable = LeftShiftEight(response.data.list[i].usable).toString()
-                }else {
-                  response.data.list[i].balance =Division( response.data.list[i].balance,Power(response.data.list[i].decimals)) .toString();
+                } else {
+                  response.data.list[i].balance = Division(response.data.list[i].balance, Power(response.data.list[i].decimals)).toString();
                   response.data.list[i].usable = response.data.list[i].balance
                 }
               }
@@ -156,7 +156,7 @@
           this.$router.push({
             name: 'transfer',
             //params: {address: address},
-             query: {address: row.address,balance:row.usable,asset:row.asset,decimals:row.decimals}
+            query: {address: row.address, balance: row.usable, asset: row.asset, decimals: row.decimals}
           })
         } else {
           this.$message({
@@ -166,9 +166,11 @@
       },
 
       //跳转交易记录
-      toDealList(index,row){
+      toDealList(index, row) {
+        //console.log(row)
         this.$router.push({
-          name: 'deallist'
+          name: 'deallist',
+          query: {address: row.address}
         });
       },
     },
@@ -177,6 +179,7 @@
 
 <style lang="less">
   @import url("../../assets/css/style.less");
+
   .wallet {
     width: 1024px;
     margin: 68px auto 0;
@@ -245,7 +248,7 @@
     .wallet-tab {
       width: 100%;
       margin: auto;
-      .wallet-list{
+      .wallet-list {
         margin-top: 20px;
       }
       .el-tabs__item {

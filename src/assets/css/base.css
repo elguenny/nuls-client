@@ -198,8 +198,10 @@ a:focus {
   text-decoration: underline
    }
 .text-ds{
-  box-shadow: 0 -1px #76A1DE inset;
-  color: #76A1DE;
+  box-shadow: 0 -1px #C1C5C9 inset;
+  color: #C1C5C9;
+ /* box-shadow: 0 -1px #76A1DE inset;*/
+  /*color: #76A1DE;*/
 }
 
 /**overflow ....**/
@@ -229,6 +231,12 @@ a:focus {
   color: #8a929b;
   line-height: 26px;
   font-size: 12px;
+}
+.success{
+  color: #5daf34;
+}
+.failed{
+  color: #ea1818;
 }
 
 

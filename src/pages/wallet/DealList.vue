@@ -35,7 +35,7 @@
     </div>
     <div class="deal-list-info cl">
       <el-table :data="dealList" @filter-change="changeType">
-        <el-table-column prop="symbol" label="资产类型" width="120" align="center">
+        <el-table-column prop="symbol" :label="$t('message.c207')" width="120" align="center">
           <template slot-scope="scope">
             {{scope.row.symbol === null ? "NULS" : scope.row.symbol}}
           </template>
@@ -47,7 +47,12 @@
         </el-table-column>
         <el-table-column label="txid" min-width="195" align='center'>
           <template slot-scope="scope">
-								<span @click="toTxid(scope.row.txHash,scope.row.txType)" class="cursor-p text-d overflow">
+								<span @click="toTxid(scope.row.txHash,scope.row.txType)"
+                      class="cursor-p text-d overflow"
+                      v-show="scope.row.status !==0">
+									{{ scope.row.txHash}}
+								</span>
+            <span class="overflow" v-show="scope.row.symbol !== null && scope.row.status ===0">
 									{{ scope.row.txHash}}
 								</span>
           </template>
@@ -101,10 +106,10 @@
         //当前页
         pages: parseInt(sessionStorage.getItem('walletPages')) || 1,
         //类型
-        //资产类型
-        dealRegion: '',
+        //资产类型 this.$route.query.address
+        dealRegion: this.$route.query.address ===null ? 'NULS': this.$route.query.address,
         dealOptions: [],
-        nulsIf:false,
+        nulsIf:this.$route.query.address ===null ? true:false,
         //交易类型
         typeRegion: '',
         typeOptions:[
@@ -236,19 +241,7 @@
        */
       txIdConsensusSize(events) {
         this.pages = events;
-        if (this.types !== '') {
-          this.getAccountTxList(this.accountAddressValue, {
-            'type': this.types,
-            'pageSize': 20,
-            'pageNumber': this.pages
-          })
-        } else {
-          this.getAccountTxList(this.accountAddressValue, {
-            'pageSize': 20,
-            'pageNumber': this.pages
-          })
-        }
-
+        this.getAccountTxList(this.accountAddressValue, '?assetType='+this.dealRegion+'&type='+this.typeRegion+'&pageNumber='+this.pages+'&pageSize=20')
       },
 
       /**
@@ -257,12 +250,15 @@
        **/
       changeDeal(dealValue){
         //console.log(dealValue)
+        this.pages = 1;
         let dealvalue = '';
+        this.typeRegion = '';
         if(dealValue === 'NULS'){
           dealvalue = 'NULS';
           this.nulsIf = true;
         }else if(dealValue === '0'){
-          dealvalue = '';
+          dealValue = '';
+          this.dealRegion ='';
           this.nulsIf = false;
         }else {
           this.nulsIf = false;
@@ -278,6 +274,7 @@
        * @param typeValue
        */
       changeType(typeValue) {
+        //console.log(typeValue)
         clearInterval(this.walletSetInterval);
         this.getAccountTxList(this.accountAddressValue, '?assetType='+this.dealRegion+'&type='+this.typeRegion+'&pageNumber='+this.pages+'&pageSize=20');
       },
@@ -330,8 +327,12 @@
     width: 1024px;
     margin: 20px auto 0;
     background-color: #0c1323;
+    h3{
+      font-size: 14px;
+    }
     .account-top {
       margin: 30px 0;
+
     }
     .search {
       width: 100%;

@@ -42,7 +42,7 @@
         <li><span>{{$t('message.transactionState')}}</span>{{ $t('message.statusS'+infoData.status) }}</li>
 
         <li v-show="contractIf || infoData.type === 102 "><span>{{$t('message.c215')}}</span>{{ infoData.contractAddress }}</li>
-        <li v-show="contractIf || infoData.type === 102 "><span>{{$t('message.c247')}}</span>{{ infoData.modelIf }}</li>
+        <li v-show="contractIf || infoData.type === 102 "><span>{{$t('message.c247')}}</span><font :class="infoData.modelIf ? 'success' : 'failed'">{{ $t('message.c'+infoData.modelIf) }}</font></li>
         <li v-show="insideIf" v-for="item in infoData.insideItme">
           <span>{{item.name ===''? '&nbsp;': item.name}}</span>
           From <label class="text-ds cursor-p" @click="hashCopy(item.from)">{{item.from}}</label>
@@ -128,7 +128,7 @@
         //console.log(url)
         this.$fetch(url)
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             this.infoData = response.data;
 
             this.infoData.fee = LeftShiftEight(response.data.fee).toString();

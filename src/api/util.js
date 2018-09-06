@@ -36,6 +36,29 @@ export function Power(arg) {
 }
 
 /**
+ * 减法
+ * @param nu
+ * @param arg
+ * @returns {BigNumber}
+ * @constructor
+ */
+export function Minus(nu,arg) {
+  let newMinus = new BigNumber(nu);
+  return newMinus.minus(arg);
+}
+/**
+ * 除法
+ * @param nu
+ * @param arg
+ * @returns {BigNumber}
+ * @constructor
+ */
+export function Times(nu,arg) {
+  let newTimes = new BigNumber(nu);
+  return newTimes.times(arg);
+}
+
+/**
  * 除法
  * @param nu
  * @param arg
@@ -113,8 +136,9 @@ export function htmlDecodeByRegExp(str){
  * @param array
  * @returns {arg}
  */
-export function allParams(array) {
+export function allParams(array,decimals) {
   //console.log(array);
+  //console.log(decimals);
   let arg = {success: true, params: ''};
   for (let i of array) {
     //判断是否有值
@@ -123,7 +147,12 @@ export function allParams(array) {
       if(i.types){
         arg.params += i.value + ',';
       }else {
-        arg.params += '"' + i.value + '",';
+        //根据bigInteger 乘以精度系数
+        if(i.bigInteger){
+          arg.params += '"' + Times(i.value,decimals).toString() + '",';
+        }else {
+          arg.params += '"' + i.value + '",';
+        }
       }
     } else {
       arg.params += '"",';
